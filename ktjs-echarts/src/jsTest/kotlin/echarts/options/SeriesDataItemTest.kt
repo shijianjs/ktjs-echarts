@@ -7,12 +7,14 @@ import echarts.EChartsInstance
 import echarts.FocusNodeAdjacencies
 import echarts.MarkerRelativeTos
 import echarts.MarkerStatisticTypes
+import echarts.GraphLayouts
 import echarts.MoveOverlaps
 import echarts.NodeAligns
 import echarts.NodeClickBehaviors
 import echarts.Orients
 import echarts.SeriesTypes
 import echarts.SortOrders
+import echarts.TreeLayouts
 import echarts.createChart
 import echarts.destroyChart
 import js.objects.unsafeJso
@@ -46,7 +48,7 @@ class SeriesDataItemTest {
                         ScaleDataValueOrMarkerStatisticType(ScaleDataValue("Mon")),
                         ScaleDataValueOrMarkerStatisticType(MarkerStatisticTypes.max),
                     )
-                    symbolSize = DoubleOrDoubleArray(24.0)
+                    symbolSize = SymbolSize(24.0)
                 },
             )
         }
@@ -162,7 +164,7 @@ class SeriesDataItemTest {
     @Test
     fun graphSeriesCarriesTypedCategoriesNodesAndEdges() {
         val series = graphSeries {
-            layout = "force"
+            layout = GraphLayouts.force
             categories = arrayOf(
                 unsafeJso<GraphCategoryItemOption> { name = "core" },
                 unsafeJso<GraphCategoryItemOption> { name = "shell" },
@@ -195,7 +197,7 @@ class SeriesDataItemTest {
     @Test
     fun treeSeriesLeavesAndLabelLayoutAreTyped() {
         val series = treeSeries {
-            layout = "orthogonal"
+            layout = TreeLayouts.orthogonal
             leaves = unsafeJso<TreeSeriesLeavesOption> {
                 label = unsafeJso<LabelOption> { position = LabelPosition("right") }
             }
@@ -530,7 +532,7 @@ class SeriesDataItemChartTest {
                             }
                         },
                         graphSeries {
-                            layout = "circular"
+                            layout = GraphLayouts.circular
                             categories = arrayOf(unsafeJso<GraphCategoryItemOption> { name = "core" })
                             nodes = arrayOf(
                                 unsafeJso<GraphNodeItemOption> { name = "a"; category = StringOrDouble(0.0) },

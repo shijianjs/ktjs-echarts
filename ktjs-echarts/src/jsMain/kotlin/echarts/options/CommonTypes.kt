@@ -335,6 +335,21 @@ external interface ScaleLimitOption {
 }
 
 /**
+ * Shape of a symbol: a built-in name such as `"circle"`, a `"path://..."` / `"image://..."` value,
+ * or a callback that computes it from the data item.
+ *
+ * Upstream `string | SymbolCallback<T>`.
+ */
+external interface SymbolShape
+
+/** Wraps a built-in shape name or a path. */
+fun SymbolShape(value: String): SymbolShape = value.unsafeCast<SymbolShape>()
+
+/** Wraps a callback that computes the shape from the data item. */
+fun SymbolShape(callback: (value: OptionDataItem, params: CallbackDataParams) -> String): SymbolShape =
+    callback.unsafeCast<SymbolShape>()
+
+/**
  * Offset of a symbol: `string | number | (string | number)[] | callback`.
  */
 external interface SymbolOffset
@@ -349,7 +364,7 @@ fun SymbolOffset(value: Double): SymbolOffset = value.unsafeCast<SymbolOffset>()
 fun SymbolOffset(values: Array<StringOrDouble>): SymbolOffset = values.unsafeCast<SymbolOffset>()
 
 /** Wraps a callback that computes the offset from the data value. */
-fun SymbolOffset(callback: (value: OptionDataItem, params: CallbackDataParams) -> Array<Double>): SymbolOffset =
+fun SymbolOffset(callback: (value: OptionDataItem, params: CallbackDataParams) -> StringOrDoubleOrArray): SymbolOffset =
     callback.unsafeCast<SymbolOffset>()
 
 /**
@@ -366,6 +381,18 @@ fun SymbolSize(values: Array<Double>): SymbolSize = values.unsafeCast<SymbolSize
 /** Wraps a callback that computes the size from the data value. */
 fun SymbolSize(callback: (value: OptionDataItem, params: CallbackDataParams) -> DoubleOrDoubleArray): SymbolSize =
     callback.unsafeCast<SymbolSize>()
+
+/**
+ * Rotation of a symbol in degrees: `number | callback`.
+ */
+external interface SymbolRotate
+
+/** Wraps a rotation in degrees. */
+fun SymbolRotate(value: Double): SymbolRotate = value.unsafeCast<SymbolRotate>()
+
+/** Wraps a callback that computes the rotation from the data value. */
+fun SymbolRotate(callback: (value: OptionDataItem, params: CallbackDataParams) -> Double): SymbolRotate =
+    callback.unsafeCast<SymbolRotate>()
 
 /**
  * `number | string | (number | string)[]`, used by radii and similar sizes.
@@ -760,15 +787,55 @@ fun DecalList(value: DecalObject): DecalList = value.unsafeCast<DecalList>()
 fun DecalList(values: Array<DecalObject>): DecalList = values.unsafeCast<DecalList>()
 
 /**
- * `boolean | "single" | "multiple"`, used by selection modes.
+ * `boolean | "single" | "multiple" | "series"`, used by the selection modes of a series or of a
+ * legend.
  */
 external interface SelectionMode
 
 /** Wraps a boolean. */
 fun SelectionMode(value: Boolean): SelectionMode = value.unsafeCast<SelectionMode>()
 
-/** Wraps `"single"`, `"multiple"` or another mode name. */
+/** Wraps a mode name. */
 fun SelectionMode(value: String): SelectionMode = value.unsafeCast<SelectionMode>()
+
+/**
+ * The documented values of [SelectionMode].
+ */
+object SelectionModes {
+    /** One item is selected at a time. */
+    inline val single: SelectionMode get() = SelectionMode("single")
+
+    /** Several items are selected at a time. */
+    inline val multiple: SelectionMode get() = SelectionMode("multiple")
+
+    /** Selecting an item selects its whole series, used by the series option. */
+    inline val series: SelectionMode get() = SelectionMode("series")
+}
+
+/**
+ * `Dictionary<boolean> | "all"`, used by `SeriesOption.selectedMap`.
+ */
+external interface SelectedMap
+
+/** Wraps the map of the selected data items, keyed by name or index. */
+fun SelectedMap(value: Record<String, Boolean>): SelectedMap = value.unsafeCast<SelectedMap>()
+
+/** Wraps `"all"`. */
+fun SelectedMap(value: String): SelectedMap = value.unsafeCast<SelectedMap>()
+
+/**
+ * A date-like data value: `Date | string | number`.
+ */
+external interface OptionDataValueDate
+
+/** Wraps a date. */
+fun OptionDataValueDate(value: Date): OptionDataValueDate = value.unsafeCast<OptionDataValueDate>()
+
+/** Wraps a date string. */
+fun OptionDataValueDate(value: String): OptionDataValueDate = value.unsafeCast<OptionDataValueDate>()
+
+/** Wraps a timestamp. */
+fun OptionDataValueDate(value: Double): OptionDataValueDate = value.unsafeCast<OptionDataValueDate>()
 
 /**
  * Layout returned by `convertToLayout`.

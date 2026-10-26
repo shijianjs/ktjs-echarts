@@ -9,119 +9,94 @@
   - echarts 源码：`S:\workspace\github\Apache\echarts`（`6.1.0-44-g34f4d927e`）
   - 锁定版本的声明（权威）：`node_modules/echarts/types/dist/shared.d.ts`（以及 `*.d.cts`、各入口 `*.d.ts`）
   - kotlin-wrappers 参考实现：`S:\workspace\github\JetBrains\kotlin-wrappers`
-- 写法约定：`TYPE-MAPPING.md`（尤其第 12 节「上游写法与 Kotlin 表达力不匹配时」）。
+- 写法约定：`TYPE-MAPPING.md`（§2 mixin 与公共基接口、§3 联合去重、§12 上游写法 Kotlin 表达不了时）。
 - 验证方式：`./gradlew :ktjs-echarts:jsBrowserTest`（浏览器用例）或 `./gradlew build`（含 detekt）。
-- 后续处理：`Agent.md` 已指向本文件，模板仓库 `../ktjs-wrapper-template` 同步了 `TYPE-MAPPING.md` 与 `AGENTS.md` 相关改动。
-
-## 已完成的最近一轮（2026-10-26 的「未建模字段」一轮）
-
-- 补齐了上一轮遗留的未建模字段：
-  - `MarkOption.data` → 拆到 `MarkPointOption` / `MarkLineOption` / `MarkAreaOption` 各自声明精确 `data`，基接口不再声明 `data`。
-  - `GaugeAxisLineOption.lineStyle` → `GaugeAxisLineStyleOption` 改为继承更浅的 `ShadowOption` 再逐个声明，新增 `GaugeColorStop`（`[number, ColorString]` 元组）工厂。
-  - `MapSeriesOption.regions` → 复用 `RegionOption`。
-  - Graph：`categories` / `nodes` / `edges` / `links` + 节点、边、分类类型。
-  - Tree：`leaves` / `labelLayout`（+ 节点类型）；Treemap：`breadcrumb` / `levels` / `sort` / `clipWindow` / `nodeClick` / `colorMappingBy` / `colorSaturation`；Sunburst：`sort` / `levels` / `animationType`；Sankey：`levels` / `links`；Chord：`links`。
-  - `CustomSeriesOption.renderItem` → `CustomSeriesRenderItem`，参数/API 的退化一起收紧。
-  - 新增 `EChartsSeriesLiterals.kt`（10 个字面量类型）与 `CommonTypes.kt`（`ScaleDataValue`、`OptionDataValueNumeric`、`DoubleArrayOrNone`、`ColorArrayOrNone`、`DecalArrayOrNone`、`BooleanOrSortOrder`）；选项类型拆成 `HierarchySeriesOptions.kt` / `RelationSeriesOptions.kt` / `MarkDataItemOptions.kt`。
-  - 测试：`SeriesDataItemTest`（16 例，含真实图表 `setOption` 端到端用例）+ 4 组字面量断言，浏览器用例 90 个全过，`./gradlew build`（含 detekt、demo 打包）通过。
-  - 提交：`ktjs-echarts` → `d60ef46`（已推送）；模板仓库 → `329f0bf`（已推送）。两仓库工作区干净、与远端同步。
-- 遗留提醒（已记在后续项里可复核）：`GraphSeriesOption` 里原 `directed` / `edgeShape` / `edgeForkPosition` / `selectedMode` 在 6.1.0 `.d.ts` 查不到，已按上游删除，若后续上游版本再加回则按新 `.d.ts` 恢复。
+- 已完成的两轮：① 系列数据项类型（mark 数据项、GaugeColorStop 元组、层级/关系图节点与边、`labelLayout`、
+  `regions`、`renderItem`）；② symbol 字段联合 + 关键字字面量 sweep + `selectedMode`/`selectedMap` +
+  仪表盘数据项 + 主题河流数据项。剩余项见下。
 
 ## 待办
 
-### 1. symbol 相关字段的全局 sweep（含死代码 `SymbolSize`）
+### 1. 剩下的关键字字面量字段
 
-- 上游 `SymbolOptionMixin` 的 `symbol` / `symbolSize` / `symbolRotate` 都允许回调形式
-  （`SymbolCallback` / `SymbolSizeCallback` / `SymbolRotateCallback`）。
-- 现状：项目里同一语义的字段类型不统一，例如 `String?`（line/scatter/radar/pictorialBar/tree/graph）、
-  `StringOrStringArray?`（mark/axisLine/decal/graph）、`Double?` / `DoubleOrDoubleArray?`；
-  `echarts.options.SymbolSize`（已经是 `number | number[] | callback` 的联合）**目前无人引用**。
-- 计划：新增 `SymbolShape`（`string | callback`）与 `SymbolRotate`（`number | callback`），
-  `symbolSize` 统一改用现成的 `SymbolSize`；然后一次性替换所有 `symbol` / `symbolSize` / `symbolRotate` 字段。
-- 注意：这是破坏性改动（`symbol = "circle"` 这种裸字符串赋值会编译失败），要同步改 demo 与测试，
-  且 `MarkLineOption.symbol` 上游是 `string | string[]`，它和 `SymbolOptionMixin.symbol` 不是同一个联合，
-  需要各自决定类型（可能要一个 `string | string[] | callback` 的三支联合）。
+上一轮补齐了 series 级与部分组件级的字面量，以下仍是 `String?`（都要先查 `.d.ts` 确认取值）：
 
-### 2. 字面量联合 sweep（仍是 `String?` 的字段）
+- `series.progressiveChunkMode`（`'mod'`）、各 series 自己的 `coordinateSystem`（如 line `'cartesian2d' | 'polar'`、
+  chord `'none'`、sankey `'view'`；注意基接口 `SeriesOption.coordinateSystem` 是 `string`，子类型只能用
+  `override` 且类型必须一致，想收窄得先把基接口改成联合或放弃收窄）
+- `areaStyle.origin`（`'auto' | 'start' | 'end' | number`，line series 会再收窄）
+- gauge `axisLabel`（上游 `Omit<LabelOption,'rotate'> & { formatter; rotate?: 'tangential' | 'radial' | number }`）
+  与 `label.rotate`
+- `label.lineOverflow`（`'truncate'`）
+- `timeline.controlStyle.position`（`'left' | 'right'`）
+- `title.target` / `subtarget`（`'self' | 'blank'`）
+- `legend.align`（`'auto' | 'left' | 'right'`）、`legend.pageButtonPosition`（`'start' | 'end'`）
+- `axis.nameLocation`（`'start' | 'middle' | 'end'`）
+- `visualMap.selectedMode`（Kotlin 现在写的是「`"auto"` 或 `"all"`」，要核对上游再定）
+- `graphic` 元素、`matrix`、`parallel`、`dataZoom` 里零散的 `String` 字段
 
-上一轮补了组件级与部分系列级字面量，以下仍是裸 `String?`，需要逐个确认上游字面量并补类型（放
-`EChartsLiterals.kt` 或 `EChartsSeriesLiterals.kt`，按主题）：
+### 2. `Omit<...> & { ... }`、var 收窄带来的限制（需要新写法才解）
 
-- `graph.layout`（`'none' | 'force' | 'circular'`）、`graph.force.initLayout`（`'circular' | 'none'`）
-- `tree.layout`（`'orthogonal' | 'radial'`）、`tree.edgeShape`（`'polyline' | 'curve'`）、
-  `tree.edgeForkPosition`（上游是 `string | number`）
-- `funnel.sort`（`'ascending' | 'descending' | 'none'`）、`funnel.funnelAlign`
-- `radar.shape`（`'polygon' | 'circle'`）
-- `series.progressiveChunkMode`（`'mod'`）、`series.seriesLayoutBy`（`'column' | 'row'`）
-- `axis.position`、`tooltip.triggerOn`、`areaStyle.origin`、`label.lineOverflow` 等
-- `chord.coordinateSystem`（`'none'`）、`sankey.coordinateSystem`（`'view'`）
+- series 级 `itemStyle` / `label` 上游会收窄成子类型（`TreemapSeriesItemStyleOption`、`SunburstLabelOption`、
+  `ChordItemStyleOption` …），Kotlin 的 `var` 覆盖要求类型完全相同，这些字段只能保留基接口类型；
+  精确类型在 `levels` / `data` 的 item 上可用，因此不算功能缺失。
+- gauge `axisLabel` 的 `rotate` 是同类问题（`LabelOption.rotate: Double?` 无法收窄成
+  `'tangential' | 'radial' | number`）。
+- 可选方案：对同名字段用 `@JsName` + `Property` 后缀另起一个 Kotlin 名（见 `AGENTS.md` 的 DOM 同名字段约定），
+  但要先验证 `external interface` 继承里两个成员映射到同一个 JS 属性名是否被编译器接受。
 
-### 3. `SeriesOption.selectedMode` / `selectedMap`
-
-- 上游基接口有 `selectedMode?: 'single' | 'multiple' | 'series' | boolean` 与
-  `selectedMap?: Dictionary<boolean> | 'all'`，Kotlin 基接口目前都没有。
-- 直接加会和 `PieSeriesOption.selectedMode` / `MapSeriesOption.selectedMode`（现为 `BooleanOrString?`）冲突：
-  需要先把这些统一成 `SelectionMode`，并给 `SelectionModes` 补上 `series` 常量；
-  `selectedMap` 需要一个 `Dictionary<boolean> | 'all'` 的联合类型。
-- 加上之后要检查 `LegendOption.selectedMode` 等其它同名成员。
-
-### 4. 自定义系列的返回值类型
+### 3. 自定义系列的元素选项树
 
 - `CustomSeriesRenderItemReturn` 目前是 `echarts.options.GraphicElement?` 的近似实现。
 - 上游是 `CustomRootElementOption | undefined | null`，需要新建除选项树：
   `CustomBaseElementOption`（`type` / `info` / `textContent` / `clipPath` / `tooltipDisabled` / `extra` /
-  `during` / `enter|update|leaveAnimation`）、`CustomDisplayableOption`（`style` / `emphasis` / `blur` /
-  `select` / `z` / `zlevel` / `z2` / `invisible`）、`CustomPathOption`（含 `type` 字面量联合与 `BuiltinShapes` 的 `shape`）、
+  `during` / `enter|update|leaveAnimation`）、`CustomDisplayableOption`（`style` / `emphasis` / `blur` / `select` /
+  `z` / `zlevel` / `z2` / `invisible`）、`CustomPathOption`（含 `type` 字面量联合与 `BuiltinShapes` 的 `shape`）、
   `CustomImageOption`、`CustomTextOption`、`CustomGroupOption`、`CustomCompoundPathOption`、
   `ElementKeyframeAnimationOption` 与 `TransitionOptionMixin`。
+- 难点：这些类型引用 zrender 的 `PathProps` / `TextProps` / `GroupProps` / `Displayable` / `TransformProp`
+  等内部类型，需要先决定用 `ZRShapeProps` / `ZRStyleProps` 这类现成封装顶替哪些成员。
 - 顺带：`CustomSeriesRenderItemAPI.visual(type)` 的入参目前是 `String`，上游是
   `NonStyleVisualProps | StyleVisualProps`（`'color' | 'borderColor' | 'symbol' | ...`），可补字面量类型。
 
-### 5. 仪表盘数据项
+### 4. 其余数据项类型
 
-- 上游 `GaugeSeriesOption.data?: (OptionDataValueNumeric | GaugeDataItemOption)[]`，
-  `GaugeDataItemOption` 支持逐项覆盖 `pointer` / `progress` / `title` / `detail`。
-- 现在 `data` 走通用的 `Array<OptionDataItem?>`：数值可用，但逐项覆盖对象无法精确表达。
-  （`OptionDataValueNumeric` 联合已经在 `CommonTypes.kt` 里备好。）
+- 除 gauge / theme river / 层级与关系图外，各系列的 `*DataItemOption` 都还没有单独声明，`data` 走通用联合：
+  line / bar / scatter / effectScatter / radar（`*DataItemOption`）、boxplot、candlestick、heatmap、lines、
+  parallel、pictorialBar、funnel、pie、map。
+- `OptionDataValueDate`（`Date | string | number`）已备好，用于这类数据项。
+- 前置问题见第 5 条。
 
-### 6. 主题河流与其它数据项类型
+### 5. 基接口 `data` 的处理（设计问题）
 
-- `ThemerRiverDataItem = [OptionDataValueDate, OptionDataValueNumeric, string]`（三元组）未建模；
-  需要 `OptionDataValueDate`（`Date | string | number`）与一个元组工厂（参考 `gaugeColorStop`）。
-- 其余系列的 `*DataItemOption`（boxplot / candlestick / heatmap / lines / parallel / pictorialBar /
-  themeRiver / funnel / pie / map / radar / line / bar / scatter）大多没有单独声明，`data` 走通用联合。
-  按上游逐个补，能给 `data` 带来更精确的类型（但要先想清楚基接口 `data` 的处理，见第 8 条）。
-
-### 7. 基接口 `data` 的处理（设计问题）
-
-- 上游 `SeriesOption.data?: unknown`，各具体类型收窄；Kotlin 基接口现在是
-  `Array<OptionDataItem?>?`，层级图节点靠继承 `OptionDataItemObject` + `items(...)` 塞进去。
-- 若要完全精确，需要按 TYPE-MAPPING 第 12 节把 `data` 从基接口下放到每个具体系列；
+- 上游 `SeriesOption.data?: unknown`，各具体类型收窄；Kotlin 基接口现在是 `Array<OptionDataItem?>?`，
+  节点类 item 靠继承 `OptionDataItemObject` + `items(...)` 塞进去。
+- 若要完全精确，需要按 TYPE-MAPPING §12 把 `data` 从基接口下放到每个具体系列；
   代价是 `option.series[i].data` 这种基类访问会消失（`OptionModelTest` / `LiteralsTest` 里有用例依赖它）。
 - 决定前先评估：下放后是否需要给 `EChartsOption.series` 之外再提供一个「只读 data」的视图。
 
-### 8. 图例（legend）的细分类型
+### 6. 图例（legend）的细分类型
 
-- 上游 `LegendOption` 是 `LegendStyleOption + BoxLayoutOptionMixin + BorderOptionMixin + ...`，
-  分页字段（`pageIconColor` / `pageTextStyle` / `pageFormatter` / `scrollDataIndex`）其实属于
-  `ScrollableLegendOption`，`LegendLineStyleOption`（`inactiveColor` / `inactiveWidth`）与
-  `LegendItemStyleOption`（`borderWidth: 'auto'` 等 `inherit` 扩展）也没有单独建模。
-- 现状把分页字段都摊在 `LegendOption` 上（宽度更宽），需要复核后决定是否细分。
+- 上游 `LegendOption` 由 `LegendStyleOption + BoxLayoutOptionMixin + BorderOptionMixin + ...` 组成，另有
+  `ScrollableLegendOption`（分页字段）、`LegendLineStyleOption`（`inactiveColor` / `inactiveWidth`、
+  `width: 'auto' | 'inherit'`）、`LegendItemStyleOption`（`borderWidth: 'auto' | 'inherit'`）。
+- 现状把分页字段摊在 `LegendOption` 上、`lineStyle` 用通用 `LineStyleOption`（都更宽）；
+  想把它们收窄会撞上 `var` 覆盖限制（同第 2 条），因此需要先定方案再动手。
 
-### 9. 已确认「保持现状」的项（不要重复修）
+### 7. 上游导出清单的全量复核
+
+- 目前只补「已知空缺」，没有重新逐个核对 `echarts` 的公开导出（`EChartsType` / `ChartView` / `SeriesModel` /
+  `ComponentModel` / `Payload` / 各 `*Payload` / `*Event` …）与各入口
+  （`echarts/core`、`echarts/charts`、`echarts/components`、`echarts/features`、`echarts/renderers`）的差异。
+- 建议单独开一轮：从 `types/dist/*.d.ts` 生成导出清单再逐项比对（参考 `custom-elements.json` 式清单的做法）。
+
+### 8. 已确认「保持现状」的项（不要重复修）
 
 - `LegendDataItemOption.tooltip` 保持 `JsAny`：上游就是 `DataItem.tooltip?: unknown`，是正确映射。
 - `MapSeriesOption.markPoint` / `markLine` / `markArea`：上游声明为 `any`，Kotlin 侧继承基接口的具名类型
   （比上游更严格）属于有意选择。
-- `CustomSeriesRenderItemParams.itemPayload` / `context` 的值类型：上游 `Dictionary<unknown>`，
-  值用 `JsAny`，键已用 `Record<String, JsAny>`。
+- `CustomSeriesRenderItemParams.itemPayload` / `context` 的值类型：上游 `Dictionary<unknown>`，值用 `JsAny`，
+  键已用 `Record<String, JsAny>`。
 - `GraphSeriesOption` 里已删除的 `directed` / `edgeShape` / `edgeForkPosition` / `selectedMode`：
-  在 6.1.0 的 `.d.ts` 的 `GraphSeriesOption` 里查不到（`edgeShape` / `edgeForkPosition` 只属于 tree 系列）。
-  如果后续上游版本又加回来，按新 `.d.ts` 恢复。
-
-### 10. 上游导出清单的全量复核
-
-- 本轮只补了「已知空缺」的成员，没有重新逐个核对 `echarts` 的公开导出（`EChartsType` / `ChartView` /
-  `SeriesModel` / `ComponentModel` / `Payload` / 各 `*Payload` / `*Event` 等）与各入口
-  （`echarts/core`、`echarts/charts`、`echarts/components`、`echarts/features`、`echarts/renderers`）的差异。
-- 建议单独开一轮：按 `custom-elements.json` 式的清单方式，从 `types/dist/*.d.ts` 生成导出清单再逐项比对。
+  6.1.0 的 `.d.ts` 里查不到（`edgeShape` / `edgeForkPosition` 只属于 tree 系列）；上游若加回来再恢复。
+- `MarkAreaOption` 没有 symbol 成员、`MarkOption` 不再有 `show`：都按上游声明处理，不是遗漏。

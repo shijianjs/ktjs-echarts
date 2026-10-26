@@ -256,3 +256,230 @@ object FocusNodeAdjacencies {
     inline val allEdges: FocusNodeAdjacency get() = FocusNodeAdjacency("allEdges")
 
 }
+
+/**
+ * How a series reads a dataset: one series value per column (`"column"`) or per row (`"row"`).
+ */
+sealed external interface SeriesLayoutBy
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [SeriesLayoutBys]. */
+inline fun SeriesLayoutBy(value: String): SeriesLayoutBy = value.unsafeCast<SeriesLayoutBy>()
+
+/**
+ * The documented values of [SeriesLayoutBy].
+ */
+object SeriesLayoutBys {
+    /** One series value per column of the dataset. */
+    inline val column: SeriesLayoutBy get() = SeriesLayoutBy("column")
+
+    /** One series value per row of the dataset. */
+    inline val row: SeriesLayoutBy get() = SeriesLayoutBy("row")
+
+}
+
+/**
+ * Sort order of a funnel series.
+ */
+sealed external interface FunnelSort
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [FunnelSorts]. */
+inline fun FunnelSort(value: String): FunnelSort = value.unsafeCast<FunnelSort>()
+
+/**
+ * The documented values of [FunnelSort].
+ */
+object FunnelSorts {
+    /** From the smallest value to the largest. */
+    inline val ascending: FunnelSort get() = FunnelSort("ascending")
+
+    /** From the largest value to the smallest. */
+    inline val descending: FunnelSort get() = FunnelSort("descending")
+
+    /** Keep the order of the data. */
+    inline val none: FunnelSort get() = FunnelSort("none")
+
+}
+
+/**
+ * Alignment of a funnel series: `HorizontalAlign | VerticalAlign` upstream, so both the horizontal
+ * and the vertical keywords are accepted.
+ */
+sealed external interface FunnelAlign
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [FunnelAligns]. */
+inline fun FunnelAlign(value: String): FunnelAlign = value.unsafeCast<FunnelAlign>()
+
+/**
+ * The documented values of [FunnelAlign].
+ */
+object FunnelAligns {
+    /** Align the funnel to the left side. */
+    inline val left: FunnelAlign get() = FunnelAlign("left")
+
+    /** Center the funnel. */
+    inline val center: FunnelAlign get() = FunnelAlign("center")
+
+    /** Align the funnel to the right side. */
+    inline val right: FunnelAlign get() = FunnelAlign("right")
+
+    /** Align the funnel to the top side. */
+    inline val top: FunnelAlign get() = FunnelAlign("top")
+
+    /** Center the funnel vertically. */
+    inline val middle: FunnelAlign get() = FunnelAlign("middle")
+
+    /** Align the funnel to the bottom side. */
+    inline val bottom: FunnelAlign get() = FunnelAlign("bottom")
+
+}
+
+/**
+ * Shape of the radar coordinate system.
+ */
+sealed external interface RadarShape
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [RadarShapes]. */
+inline fun RadarShape(value: String): RadarShape = value.unsafeCast<RadarShape>()
+
+/**
+ * The documented values of [RadarShape].
+ */
+object RadarShapes {
+    /** A polygon. */
+    inline val polygon: RadarShape get() = RadarShape("polygon")
+
+    /** A circle. */
+    inline val circle: RadarShape get() = RadarShape("circle")
+
+}
+
+/**
+ * Layout of a graph series.
+ */
+sealed external interface GraphLayout
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [GraphLayouts]. */
+inline fun GraphLayout(value: String): GraphLayout = value.unsafeCast<GraphLayout>()
+
+/**
+ * The documented values of [GraphLayout].
+ */
+object GraphLayouts {
+    /** The nodes keep the positions given in the data. */
+    inline val none: GraphLayout get() = GraphLayout("none")
+
+    /** The nodes are placed by the force layout. */
+    inline val force: GraphLayout get() = GraphLayout("force")
+
+    /** The nodes are placed on a circle. */
+    inline val circular: GraphLayout get() = GraphLayout("circular")
+
+}
+
+/**
+ * Initial layout of the force layout of a graph series.
+ */
+sealed external interface GraphInitLayout
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [GraphInitLayouts]. */
+inline fun GraphInitLayout(value: String): GraphInitLayout = value.unsafeCast<GraphInitLayout>()
+
+/**
+ * The documented values of [GraphInitLayout].
+ */
+object GraphInitLayouts {
+    /** Place the nodes on a circle before the layout runs. */
+    inline val circular: GraphInitLayout get() = GraphInitLayout("circular")
+
+    /** Start from random positions. */
+    inline val none: GraphInitLayout get() = GraphInitLayout("none")
+
+}
+
+/**
+ * Layout of a tree series.
+ */
+sealed external interface TreeLayout
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [TreeLayouts]. */
+inline fun TreeLayout(value: String): TreeLayout = value.unsafeCast<TreeLayout>()
+
+/**
+ * The documented values of [TreeLayout].
+ */
+object TreeLayouts {
+    /** Lay the tree out along an axis. */
+    inline val orthogonal: TreeLayout get() = TreeLayout("orthogonal")
+
+    /** Lay the tree out as concentric rings. */
+    inline val radial: TreeLayout get() = TreeLayout("radial")
+
+}
+
+/**
+ * Shape of the edges of a tree series.
+ */
+sealed external interface TreeEdgeShape
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [TreeEdgeShapes]. */
+inline fun TreeEdgeShape(value: String): TreeEdgeShape = value.unsafeCast<TreeEdgeShape>()
+
+/**
+ * The documented values of [TreeEdgeShape].
+ */
+object TreeEdgeShapes {
+    /** A polyline with a fork. */
+    inline val polyline: TreeEdgeShape get() = TreeEdgeShape("polyline")
+
+    /** A quadratic curve. */
+    inline val curve: TreeEdgeShape get() = TreeEdgeShape("curve")
+
+}
+
+/**
+ * Anchor of a pictorial bar on its data point.
+ */
+sealed external interface PictorialBarSymbolPosition
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [PictorialBarSymbolPositions]. */
+inline fun PictorialBarSymbolPosition(value: String): PictorialBarSymbolPosition =
+    value.unsafeCast<PictorialBarSymbolPosition>()
+
+/**
+ * The documented values of [PictorialBarSymbolPosition].
+ */
+object PictorialBarSymbolPositions {
+    /** The symbol starts at the data point. */
+    inline val start: PictorialBarSymbolPosition get() = PictorialBarSymbolPosition("start")
+
+    /** The symbol is centered on the data point. */
+    inline val end: PictorialBarSymbolPosition get() = PictorialBarSymbolPosition("end")
+
+    /** The symbol is centered on the middle of the bar. */
+    inline val center: PictorialBarSymbolPosition get() = PictorialBarSymbolPosition("center")
+
+}
+
+/**
+ * Direction in which the symbols of a pictorial bar are repeated; the reverse of it is filled
+ * first.
+ */
+sealed external interface PictorialBarSymbolRepeatDirection
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [PictorialBarSymbolRepeatDirections]. */
+inline fun PictorialBarSymbolRepeatDirection(value: String): PictorialBarSymbolRepeatDirection =
+    value.unsafeCast<PictorialBarSymbolRepeatDirection>()
+
+/**
+ * The documented values of [PictorialBarSymbolRepeatDirection].
+ */
+object PictorialBarSymbolRepeatDirections {
+    /** Fill from the start of the bar. */
+    inline val start: PictorialBarSymbolRepeatDirection get() =
+        PictorialBarSymbolRepeatDirection("start")
+
+    /** Fill from the end of the bar. */
+    inline val end: PictorialBarSymbolRepeatDirection get() =
+        PictorialBarSymbolRepeatDirection("end")
+
+}

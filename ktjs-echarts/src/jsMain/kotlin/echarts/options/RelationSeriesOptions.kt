@@ -1,8 +1,10 @@
 package echarts.options
 
-import echarts.FocusNodeAdjacency
-import echarts.NodeAlign
 import echarts.Orient
+import echarts.NodeAlign
+import echarts.GraphLayout
+import echarts.GraphInitLayout
+import echarts.FocusNodeAdjacency
 import zrender.ZRColor
 
 /*
@@ -13,8 +15,8 @@ import zrender.ZRColor
  * Configuration of the force layout of a graph series.
  */
 external interface GraphForceOption {
-    /** Initial layout: `"circular"` or `"none"`. */
-    var initLayout: String?
+    /** Initial layout of the nodes. */
+    var initLayout: GraphInitLayout?
 
     /** Repulsion between the nodes, one value per category or a single value. */
     var repulsion: DoubleOrDoubleArray?
@@ -134,9 +136,9 @@ external interface GraphCategoryItemOption : GraphNodeStateOption, SymbolOptionM
 /**
  * Graph series: a node-link diagram.
  */
-external interface GraphSeriesOption : SeriesOption {
-    /** Layout: `"none"`, `"circular"` or `"force"`. */
-    var layout: String?
+external interface GraphSeriesOption : SeriesOption, SymbolOptionMixin {
+    /** Layout of the nodes. */
+    var layout: GraphLayout?
 
     /** Whether the layout animates. */
     var layoutAnimation: Boolean?
@@ -161,21 +163,6 @@ external interface GraphSeriesOption : SeriesOption {
 
     /** Whether the nodes can be dragged. */
     var draggable: Boolean?
-
-    /** Symbol shape of the nodes. */
-    var symbol: String?
-
-    /** Symbol size of the nodes. */
-    var symbolSize: DoubleOrDoubleArray?
-
-    /** Symbol rotation in degrees. */
-    var symbolRotate: Double?
-
-    /** Whether to keep the symbol aspect ratio. */
-    var symbolKeepAspect: Boolean?
-
-    /** Symbol offset, `[x, y]`. */
-    var symbolOffset: SymbolOffset?
 
     /** Symbol of the edges, one for both ends or one per end. */
     var edgeSymbol: StringOrStringArray?
@@ -288,7 +275,7 @@ external interface ChordEdgeItemOption : ChordEdgeStateOption, OptionDataItemObj
 /**
  * Chord series introduced in ECharts 6.
  */
-external interface ChordSeriesOption : SeriesOption {
+external interface ChordSeriesOption : SeriesOption, SymbolOptionMixin {
     /** Width of the nodes. */
     var nodeWidth: Double?
 

@@ -1,14 +1,16 @@
 package echarts.options
 
-import echarts.AnimationEasing
-import echarts.AnimationType
-import echarts.BlurScope
-import echarts.ClipWindow
-import echarts.ColorMappingBy
-import echarts.EmphasisFocus
-import echarts.NodeClickBehavior
-import echarts.Orient
+import echarts.TreeLayout
+import echarts.TreeEdgeShape
 import echarts.SortOrder
+import echarts.Orient
+import echarts.NodeClickBehavior
+import echarts.EmphasisFocus
+import echarts.ColorMappingBy
+import echarts.ClipWindow
+import echarts.BlurScope
+import echarts.AnimationType
+import echarts.AnimationEasing
 import kotlin.js.unsafeCast
 
 /*
@@ -57,9 +59,9 @@ external interface TreeSeriesLeavesOption : TreeSeriesStateOption
 /**
  * Tree series: a hierarchy laid out as a node-link diagram.
  */
-external interface TreeSeriesOption : SeriesOption {
-    /** Layout: `"orthogonal"` or `"radial"`. */
-    var layout: String?
+external interface TreeSeriesOption : SeriesOption, SymbolOptionMixin {
+    /** Layout of the tree. */
+    var layout: TreeLayout?
 
     /** Orientation of an orthogonal tree. */
     var orient: Orient?
@@ -81,21 +83,6 @@ external interface TreeSeriesOption : SeriesOption {
 
     /** Height of the tree. */
     var height: StringOrDouble?
-
-    /** Symbol shape of the tree nodes. */
-    var symbol: String?
-
-    /** Symbol size of the tree nodes. */
-    var symbolSize: DoubleOrDoubleArray?
-
-    /** Symbol rotation in degrees. */
-    var symbolRotate: Double?
-
-    /** Whether to keep the symbol aspect ratio. */
-    var symbolKeepAspect: Boolean?
-
-    /** Symbol offset, `[x, y]`. */
-    var symbolOffset: SymbolOffset?
 
     /** Depth of the tree that is expanded initially. */
     var initialTreeDepth: Double?
@@ -124,11 +111,11 @@ external interface TreeSeriesOption : SeriesOption {
     /** Zoom limits. */
     var scaleLimit: ScaleLimitOption?
 
-    /** Shape of the edges: `"curve"`, `"polyline"` or `"line"`. */
-    var edgeShape: String?
+    /** Shape of the edges. */
+    var edgeShape: TreeEdgeShape?
 
-    /** Position of the fork in a `"curve"` edge. */
-    var edgeForkPosition: String?
+    /** Position of the fork in a `"polyline"` edge. */
+    var edgeForkPosition: StringOrDouble?
 }
 
 /**

@@ -7,23 +7,22 @@ import kotlin.js.unsafeCast
 /**
  * Symbol members shared by mark items, graph nodes, tree nodes and similar option objects.
  *
- * Upstream `SymbolOptionMixin`: besides the shapes modelled here, `symbol`, `symbolSize` and
- * `symbolRotate` also accept a callback over the data item upstream.
+ * Upstream `SymbolOptionMixin<T>`: every member also accepts a callback over the data item.
  */
 external interface SymbolOptionMixin {
-    /** Symbol shape: a built-in name such as `"circle"` or `"path://..."`. */
-    var symbol: StringOrStringArray?
+    /** Symbol shape: a built-in name, a `"path://..."` value or a callback. */
+    var symbol: SymbolShape?
 
-    /** Symbol size, or `[width, height]`. */
-    var symbolSize: DoubleOrDoubleArray?
+    /** Symbol size, `[width, height]`, or a callback. */
+    var symbolSize: SymbolSize?
 
-    /** Symbol rotation in degrees. */
-    var symbolRotate: DoubleOrDoubleArray?
+    /** Symbol rotation in degrees, or a callback. */
+    var symbolRotate: SymbolRotate?
 
     /** Whether to keep the symbol aspect ratio. */
     var symbolKeepAspect: Boolean?
 
-    /** Symbol offset, `[x, y]`. */
+    /** Symbol offset, `[x, y]`, or a callback. */
     var symbolOffset: SymbolOffset?
 }
 
@@ -113,13 +112,17 @@ external interface MarkLineStateOption {
 /**
  * Members shared by the two shapes of a mark line definition.
  */
-external interface MarkLineDataItemOptionBase : MarkLineStateOption, SymbolOptionMixin {
+external interface MarkLineDataItemOptionBase : MarkLineStateOption {
     /** Name of the mark line. */
     var name: String?
 }
 
 /**
  * A mark line defined on one axis, e.g. `{ yAxis: "average" }`.
+ *
+ * Upstream declares the symbol members here instead of inheriting `SymbolOptionMixin`, so `symbol`
+ * also accepts a `[startSymbol, endSymbol]` pair and `symbolSize` / `symbolRotate` also accept one
+ * value per end.
  */
 external interface MarkLine1DDataItemOption : MarkLineDataItemOptionBase {
     /** Position on the x axis. */
@@ -136,12 +139,24 @@ external interface MarkLine1DDataItemOption : MarkLineDataItemOptionBase {
 
     /** Name of the dimension [type] is computed from. */
     var valueDim: String?
+
+    /** Symbol of both ends, or one per end. */
+    var symbol: StringOrStringArray?
+
+    /** Symbol size of both ends, or one per end. */
+    var symbolSize: DoubleOrDoubleArray?
+
+    /** Symbol rotation of both ends, or one per end. */
+    var symbolRotate: DoubleOrDoubleArray?
+
+    /** Symbol offset of both ends. */
+    var symbolOffset: SymbolOffset?
 }
 
 /**
  * One end of a mark line defined by two points.
  */
-external interface MarkLine2DDataItemDimOption : MarkLineDataItemOptionBase, MarkerPositionOption
+external interface MarkLine2DDataItemDimOption : MarkLineDataItemOptionBase, SymbolOptionMixin, MarkerPositionOption
 
 /**
  * One entry of `MarkLineOption.data`: a single definition or a pair of them.

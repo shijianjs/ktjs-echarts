@@ -1,7 +1,7 @@
 package echarts
 
 import echarts.options.AxisMinMax
-import echarts.options.BooleanOrString
+import echarts.options.SelectionModes
 import echarts.options.CalendarOption
 import echarts.options.CalendarRange
 import echarts.options.DataZoomValue
@@ -319,7 +319,7 @@ class EChartsTest {
                 unsafeJso<EChartsOption> {
                     series = one(
                         pieSeries {
-                            selectedMode = BooleanOrString("multiple")
+                            selectedMode = SelectionModes.multiple
                             data = numbers(1.0, 2.0)
                         },
                     )

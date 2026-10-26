@@ -1,8 +1,9 @@
 package echarts.options
 
-import echarts.AnimationEasing
-import echarts.CustomSeriesRenderItem
 import echarts.SeriesType
+import echarts.SeriesLayoutBy
+import echarts.CustomSeriesRenderItem
+import echarts.AnimationEasing
 import zrender.ZRColor
 import zrender.ZRFontWeight
 
@@ -143,6 +144,12 @@ external interface SeriesOption {
     /** Animation of the state transitions of the series. */
     var stateAnimation: StateAnimationOption?
 
+    /** Map of the selected data items, keyed by name or index, or `"all"`. */
+    var selectedMap: SelectedMap?
+
+    /** Selection mode of the data items of the series. */
+    var selectedMode: SelectionMode?
+
     /** Number of elements above which a separate hover layer is used. */
     var hoverLayerThreshold: Double?
 }
@@ -150,7 +157,7 @@ external interface SeriesOption {
 /**
  * Line series.
  */
-external interface LineSeriesOption : SeriesOption {
+external interface LineSeriesOption : SeriesOption, SymbolOptionMixin {
     /** Coordinate system: `"cartesian2d"` or `"polar"`. */
     override var coordinateSystem: String?
 
@@ -175,21 +182,6 @@ external interface LineSeriesOption : SeriesOption {
     /** Whether to show all symbols when the data is large. */
     var showAllSymbol: BooleanOrString?
 
-    /** Symbol shape. */
-    var symbol: String?
-
-    /** Symbol size. */
-    var symbolSize: DoubleOrDoubleArray?
-
-    /** Symbol rotation in degrees. */
-    var symbolRotate: Double?
-
-    /** Whether to keep the symbol aspect ratio. */
-    var symbolKeepAspect: Boolean?
-
-    /** Symbol offset, `[x, y]`. */
-    var symbolOffset: SymbolOffset?
-
     /** Label at the end of the line. */
     var endLabel: LabelOption?
 
@@ -208,8 +200,8 @@ external interface LineSeriesOption : SeriesOption {
     /** Data size above which [sampling] is applied. */
     var samplingThreshold: Double?
 
-    /** How the data maps to the axes: `"column"` or `"row"`. */
-    var seriesLayoutBy: String?
+    /** How the data maps to the axes. */
+    var seriesLayoutBy: SeriesLayoutBy?
 
     /** Index of the x axis. */
     var xAxisIndex: Double?
@@ -279,8 +271,8 @@ external interface BarSeriesOption : SeriesOption {
     /** Whether to sort the data in real time. */
     var realtimeSort: Boolean?
 
-    /** How the data maps to the axes: `"column"` or `"row"`. */
-    var seriesLayoutBy: String?
+    /** How the data maps to the axes. */
+    var seriesLayoutBy: SeriesLayoutBy?
 
     /** Downsampling method. */
     var sampling: String?
@@ -304,24 +296,9 @@ external interface BarSeriesOption : SeriesOption {
 /**
  * Scatter series.
  */
-external interface ScatterSeriesOption : SeriesOption {
+external interface ScatterSeriesOption : SeriesOption, SymbolOptionMixin {
     /** Coordinate system: `"cartesian2d"`, `"polar"`, `"geo"`, `"singleAxis"`, `"calendar"`. */
     override var coordinateSystem: String?
-
-    /** Symbol shape. */
-    var symbol: String?
-
-    /** Symbol size. */
-    var symbolSize: DoubleOrDoubleArray?
-
-    /** Symbol rotation in degrees. */
-    var symbolRotate: Double?
-
-    /** Whether to keep the symbol aspect ratio. */
-    var symbolKeepAspect: Boolean?
-
-    /** Symbol offset, `[x, y]`. */
-    var symbolOffset: SymbolOffset?
 
     /** Whether to enable large-data mode. */
     var large: Boolean?
@@ -348,7 +325,7 @@ external interface ScatterSeriesOption : SeriesOption {
     var calendarIndex: Double?
 
     /** How the data maps to the axes. */
-    var seriesLayoutBy: String?
+    var seriesLayoutBy: SeriesLayoutBy?
 
     /** Downsampling method. */
     var sampling: String?
@@ -506,8 +483,8 @@ external interface LinesSeriesOption : SeriesOption {
     /** Data size above which large-data mode is used. */
     var largeThreshold: Double?
 
-    /** Symbol of the line ends. */
-    var symbol: String?
+    /** Symbol of the line ends, one for both ends or one per end. */
+    var symbol: StringOrStringArray?
 
     /** Symbol size of the line ends. */
     var symbolSize: DoubleOrDoubleArray?

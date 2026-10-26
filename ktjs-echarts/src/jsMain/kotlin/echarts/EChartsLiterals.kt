@@ -449,3 +449,62 @@ object AnimationEasings {
     /** `bounceInOut`. */
     inline val bounceInOut: AnimationEasing get() = AnimationEasing("bounceInOut")
 }
+
+/**
+ * Event that triggers a tooltip.
+ *
+ * Upstream `'mousemove' | 'click' | 'none' | 'mousewheel' | 'mousemove|click|mousewheel'`; the
+ * combined value is available as [TooltipTriggerOns.mouseMoveClickWheel].
+ */
+sealed external interface TooltipTriggerOn
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [TooltipTriggerOns]. */
+inline fun TooltipTriggerOn(value: String): TooltipTriggerOn = value.unsafeCast<TooltipTriggerOn>()
+
+/**
+ * The documented values of [TooltipTriggerOn].
+ */
+object TooltipTriggerOns {
+    /** Trigger while the pointer moves. */
+    inline val mouseMove: TooltipTriggerOn get() = TooltipTriggerOn("mousemove")
+
+    /** Trigger on a click. */
+    inline val click: TooltipTriggerOn get() = TooltipTriggerOn("click")
+
+    /** Never trigger. */
+    inline val none: TooltipTriggerOn get() = TooltipTriggerOn("none")
+
+    /** Trigger while the mouse wheel scrolls. */
+    inline val mouseWheel: TooltipTriggerOn get() = TooltipTriggerOn("mousewheel")
+
+    /** Trigger on a pointer move, a click or a wheel scroll. */
+    inline val mouseMoveClickWheel: TooltipTriggerOn get() =
+        TooltipTriggerOn("mousemove|click|mousewheel")
+
+}
+
+/**
+ * Position of a cartesian or single axis inside its grid.
+ */
+sealed external interface AxisPosition
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [AxisPositions]. */
+inline fun AxisPosition(value: String): AxisPosition = value.unsafeCast<AxisPosition>()
+
+/**
+ * The documented values of [AxisPosition].
+ */
+object AxisPositions {
+    /** Top side of the grid; for the x axis. */
+    inline val top: AxisPosition get() = AxisPosition("top")
+
+    /** Bottom side of the grid; for the x axis. */
+    inline val bottom: AxisPosition get() = AxisPosition("bottom")
+
+    /** Left side of the grid; for the y axis. */
+    inline val left: AxisPosition get() = AxisPosition("left")
+
+    /** Right side of the grid; for the y axis. */
+    inline val right: AxisPosition get() = AxisPosition("right")
+
+}

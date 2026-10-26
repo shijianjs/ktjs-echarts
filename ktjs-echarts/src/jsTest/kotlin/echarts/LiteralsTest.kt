@@ -281,4 +281,52 @@ class LiteralsTest {
         assertEquals("shuffleX", MoveOverlaps.shuffleX.unsafeCast<String>())
         assertEquals("shuffleY", MoveOverlaps.shuffleY.unsafeCast<String>())
     }
+
+    @Test
+    fun seriesShapeAndLayoutLiteralsMatchTheUpstreamNames() {
+        assertEquals("column", SeriesLayoutBys.column.unsafeCast<String>())
+        assertEquals("row", SeriesLayoutBys.row.unsafeCast<String>())
+        assertEquals("polygon", RadarShapes.polygon.unsafeCast<String>())
+        assertEquals("circle", RadarShapes.circle.unsafeCast<String>())
+        assertEquals("ascending", FunnelSorts.ascending.unsafeCast<String>())
+        assertEquals("descending", FunnelSorts.descending.unsafeCast<String>())
+        assertEquals("none", FunnelSorts.none.unsafeCast<String>())
+        assertEquals("left", FunnelAligns.left.unsafeCast<String>())
+        assertEquals("center", FunnelAligns.center.unsafeCast<String>())
+        assertEquals("right", FunnelAligns.right.unsafeCast<String>())
+        assertEquals("top", FunnelAligns.top.unsafeCast<String>())
+        assertEquals("middle", FunnelAligns.middle.unsafeCast<String>())
+        assertEquals("bottom", FunnelAligns.bottom.unsafeCast<String>())
+        assertEquals("none", GraphLayouts.none.unsafeCast<String>())
+        assertEquals("force", GraphLayouts.force.unsafeCast<String>())
+        assertEquals("circular", GraphLayouts.circular.unsafeCast<String>())
+        assertEquals("circular", GraphInitLayouts.circular.unsafeCast<String>())
+        assertEquals("none", GraphInitLayouts.none.unsafeCast<String>())
+        assertEquals("orthogonal", TreeLayouts.orthogonal.unsafeCast<String>())
+        assertEquals("radial", TreeLayouts.radial.unsafeCast<String>())
+        assertEquals("polyline", TreeEdgeShapes.polyline.unsafeCast<String>())
+        assertEquals("curve", TreeEdgeShapes.curve.unsafeCast<String>())
+    }
+
+    @Test
+    fun pictorialBarLiteralsMatchTheUpstreamNames() {
+        assertEquals("start", PictorialBarSymbolPositions.start.unsafeCast<String>())
+        assertEquals("end", PictorialBarSymbolPositions.end.unsafeCast<String>())
+        assertEquals("center", PictorialBarSymbolPositions.center.unsafeCast<String>())
+        assertEquals("start", PictorialBarSymbolRepeatDirections.start.unsafeCast<String>())
+        assertEquals("end", PictorialBarSymbolRepeatDirections.end.unsafeCast<String>())
+    }
+
+    @Test
+    fun componentKeywordLiteralsMatchTheUpstreamNames() {
+        assertEquals("mousemove", TooltipTriggerOns.mouseMove.unsafeCast<String>())
+        assertEquals("click", TooltipTriggerOns.click.unsafeCast<String>())
+        assertEquals("none", TooltipTriggerOns.none.unsafeCast<String>())
+        assertEquals("mousewheel", TooltipTriggerOns.mouseWheel.unsafeCast<String>())
+        assertEquals("mousemove|click|mousewheel", TooltipTriggerOns.mouseMoveClickWheel.unsafeCast<String>())
+        assertEquals("top", AxisPositions.top.unsafeCast<String>())
+        assertEquals("bottom", AxisPositions.bottom.unsafeCast<String>())
+        assertEquals("left", AxisPositions.left.unsafeCast<String>())
+        assertEquals("right", AxisPositions.right.unsafeCast<String>())
+    }
 }

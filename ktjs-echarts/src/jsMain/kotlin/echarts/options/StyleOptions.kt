@@ -555,8 +555,10 @@ external interface SelectOption {
 /**
  * Mark point, line and area styling.
  *
- * The `data` field of each mark type is declared on the concrete interface, because upstream
- * narrows `MarkerOption.data` (`unknown[]`) to the item type of the mark.
+ * Upstream `MarkerOption` only carries [silent] and [tooltip] (plus the animation members); the
+ * label, item and line styles come from the state option of each mark, and the symbol members from
+ * [SymbolOptionMixin] on the marks that support them. `data` is declared on each concrete interface
+ * because upstream narrows `MarkerOption.data` (`unknown[]`) to the item type of the mark.
  *
  * @see MarkPointOption
  * @see MarkLineOption
@@ -566,35 +568,17 @@ external interface MarkOption {
     /** Whether the mark is silent (ignores mouse events). */
     var silent: Boolean?
 
-    /** Label style. */
-    var label: LabelOption?
-
-    /** Item style. */
-    var itemStyle: ItemStyleOption?
-
-    /** Line style. */
-    var lineStyle: LineStyleOption?
-
-    /** Whether to show the marker. */
-    var show: Boolean?
-
-    /** Symbol used by points and line ends. */
-    var symbol: StringOrStringArray?
-
-    /** Symbol size. */
-    var symbolSize: DoubleOrDoubleArray?
-
-    /** Symbol rotation in degrees. */
-    var symbolRotate: DoubleOrDoubleArray?
-
-    /** Whether to keep the symbol upright. */
-    var symbolKeepAspect: Boolean?
-
-    /** Symbol offset. */
-    var symbolOffset: SymbolOffset?
-
     /** Precision of displayed values. */
     var precision: Double?
+
+    /** Whether the mark animates. */
+    var animation: Boolean?
+
+    /** Duration of the animation in milliseconds. */
+    var animationDuration: Double?
+
+    /** Easing of the animation. */
+    var animationEasing: AnimationEasing?
 
     /**
      * Tooltip specific to the mark.
@@ -606,34 +590,32 @@ external interface MarkOption {
 }
 
 /**
- * Mark point configuration; adds the point-specific display options.
+ * Mark point configuration.
  */
-external interface MarkPointOption : MarkOption {
-    /** Animation used when the mark point appears. */
-    var animation: Boolean?
-
-    /** Animation duration in milliseconds. */
-    var animationDuration: Double?
-
-    /** Animation easing. */
-    var animationEasing: AnimationEasing?
-
+external interface MarkPointOption : MarkOption, MarkPointStateOption, SymbolOptionMixin {
     /** Position and style of every mark point. */
     var data: Array<MarkPointDataItemOption>?
 }
 
 /**
  * Mark line configuration.
+ *
+ * Upstream declares the symbol members here instead of inheriting `SymbolOptionMixin`, so `symbol`
+ * also accepts a `[startSymbol, endSymbol]` pair and `symbolSize` / `symbolRotate` also accept one
+ * value per end.
  */
-external interface MarkLineOption : MarkOption {
-    /** Whether the mark line is silent. */
-    override var silent: Boolean?
+external interface MarkLineOption : MarkOption, MarkLineStateOption {
+    /** Symbol of both ends, or one per end. */
+    var symbol: StringOrStringArray?
 
-    /** Precision of displayed values. */
-    override var precision: Double?
+    /** Symbol size of both ends, or one per end. */
+    var symbolSize: DoubleOrDoubleArray?
 
-    /** Whether to display the two end labels. */
-    override var label: LabelOption?
+    /** Symbol rotation of both ends, or one per end. */
+    var symbolRotate: DoubleOrDoubleArray?
+
+    /** Symbol offset of both ends. */
+    var symbolOffset: SymbolOffset?
 
     /**
      * Position of every mark line: a single definition `{ xAxis: 0 }` or a pair of them
@@ -644,11 +626,11 @@ external interface MarkLineOption : MarkOption {
 
 /**
  * Mark area configuration.
+ *
+ * Upstream has no symbol members on a mark area, so the label and the item style come from
+ * [MarkAreaStateOption].
  */
-external interface MarkAreaOption : MarkOption {
-    /** Whether the mark area is silent. */
-    override var silent: Boolean?
-
+external interface MarkAreaOption : MarkOption, MarkAreaStateOption {
     /**
      * Position of every mark area: a single definition `{ xAxis: 0 }` or a pair of them
      * `[{ coord: [0, 0] }, { coord: [1, 1] }]`.

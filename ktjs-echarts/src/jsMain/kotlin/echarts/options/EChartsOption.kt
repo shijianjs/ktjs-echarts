@@ -1,13 +1,14 @@
 package echarts.options
 
-import echarts.AnimationEasing
-import echarts.AxisPointerType
-import echarts.DataZoomType
-import echarts.FilterMode
-import echarts.ImageType
-import echarts.NameMap
-import echarts.Orient
 import echarts.VisualMapType
+import echarts.RadarShape
+import echarts.Orient
+import echarts.NameMap
+import echarts.ImageType
+import echarts.FilterMode
+import echarts.DataZoomType
+import echarts.AxisPointerType
+import echarts.AnimationEasing
 import js.objects.Record
 import kotlin.js.JsAny
 import web.html.HTMLDivElement
@@ -731,8 +732,8 @@ external interface GeoOption {
     /** Aspect ratio of the map. */
     var aspectScale: Double?
 
-    /** Selection mode: `false`, `"single"` or `"multiple"`. */
-    var selectedMode: BooleanOrString?
+    /** Selection mode of the regions. */
+    var selectedMode: SelectionMode?
 
     /** Selection state per region name. */
     var selectedMap: Record<String, Boolean>?
@@ -856,8 +857,8 @@ external interface RadarOption {
     /** z-level of the component. */
     var zlevel: Double?
 
-    /** Shape of the radar: `"polygon"` or `"circle"`. */
-    var shape: String?
+    /** Shape of the radar. */
+    var shape: RadarShape?
 
     /** Center of the radar. */
     var center: Array<StringOrDouble>?
@@ -1157,7 +1158,7 @@ external interface TimelineLabelOption : LabelOption {
 /**
  * Style of the current point of a timeline.
  */
-external interface TimelineCheckpointStyle : ItemStyleOption {
+external interface TimelineCheckpointStyle : ItemStyleOption, SymbolOptionMixin {
     /** Whether the point animates. */
     var animation: Boolean?
 

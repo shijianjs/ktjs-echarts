@@ -1,10 +1,12 @@
 package echarts.options
 
-import echarts.AnimationEasing
-import echarts.AxisType
-import echarts.LegendType
-import echarts.Orient
+import echarts.TooltipTriggerOn
 import echarts.TooltipTrigger
+import echarts.Orient
+import echarts.LegendType
+import echarts.AxisType
+import echarts.AxisPosition
+import echarts.AnimationEasing
 import js.objects.Record
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
@@ -161,14 +163,14 @@ external interface LegendOption {
     /** Style of the legend line. */
     var lineStyle: LineStyleOption?
 
-    /** Rotation of the legend symbols in degrees. */
-    var symbolRotate: Double?
+    /** Rotation of the legend symbols in degrees, or `"inherit"`. */
+    var symbolRotate: StringOrDouble?
 
     /** Formatter of the legend labels. */
     var formatter: LabelFormatter?
 
-    /** Selection mode: `false`, `"single"` or `"multiple"`. */
-    var selectedMode: BooleanOrString?
+    /** Selection mode of the legend items. */
+    var selectedMode: SelectionMode?
 
     /** Color of unselected items. */
     var inactiveColor: String?
@@ -306,8 +308,8 @@ external interface TooltipOption {
     /** Whether the tooltip is always visible. */
     var alwaysShowContent: Boolean?
 
-    /** How the tooltip is triggered: `"mousemove"`, `"click"`, `"mousemove|click"` or `"none"`. */
-    var triggerOn: String?
+    /** Event that triggers the tooltip. */
+    var triggerOn: TooltipTriggerOn?
 
     /** Delay before showing the tooltip, in milliseconds. */
     var showDelay: Double?
@@ -485,8 +487,8 @@ external interface AxisOption {
     /** Whether ticks of multiple axes are aligned. */
     var alignTicks: Boolean?
 
-    /** Position of the axis relative to the grid, e.g. `"top"`, `"bottom"`, `"left"`, `"right"`. */
-    var position: String?
+    /** Position of the axis relative to the grid. */
+    var position: AxisPosition?
 
     /** Offset of the axis line in pixels. */
     var offset: Double?

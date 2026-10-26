@@ -1,6 +1,11 @@
 package echarts.options
 
+import echarts.SeriesLayoutBy
 import echarts.RoseType
+import echarts.PictorialBarSymbolRepeatDirection
+import echarts.PictorialBarSymbolPosition
+import echarts.FunnelSort
+import echarts.FunnelAlign
 import js.objects.Record
 import kotlin.js.unsafeCast
 import web.canvas.CanvasLineCap
@@ -50,8 +55,8 @@ external interface PieSeriesOption : SeriesOption {
     /** Precision of the percentage values. */
     var percentPrecision: Double?
 
-    /** Selection mode: `false`, `"single"` or `"multiple"`. */
-    var selectedMode: BooleanOrString?
+    /** Selection mode of the sectors. */
+    override var selectedMode: SelectionMode?
 
     /** Offset of a selected sector in pixels. */
     var selectedOffset: Double?
@@ -91,14 +96,14 @@ external interface FunnelSeriesOption : SeriesOption {
     /** Maximum size of the funnel. */
     var maxSize: StringOrDouble?
 
-    /** Sort order: `"ascending"`, `"descending"` or `"none"`. */
-    var sort: String?
+    /** Sort order of the funnel items. */
+    var sort: FunnelSort?
 
     /** Gap between funnel items in pixels. */
     var gap: Double?
 
-    /** Alignment of the funnel: `"left"`, `"center"` or `"right"`. */
-    var funnelAlign: String?
+    /** Alignment of the funnel. */
+    var funnelAlign: FunnelAlign?
 
     /** Style of the labels. */
     override var label: LabelOption?
@@ -154,16 +159,59 @@ external interface GaugeSeriesOption : SeriesOption {
     var axisLabel: LabelOption?
 
     /** Configuration of the title. */
-    var title: LabelOption?
+    var title: GaugeTitleOption?
 
     /** Configuration of the detail text. */
-    var detail: LabelOption?
+    var detail: GaugeDetailOption?
 
     /** Precision of the displayed value. */
     var precision: Double?
 
     /** Whether the gauge is silent. */
     override var silent: Boolean?
+}
+
+/**
+ * Title of a gauge: a label positioned by [offsetCenter] from the center of the gauge.
+ *
+ * Upstream `TitleOption`; its `formatter` takes the value only, which [LabelOption.formatter] does
+ * not model.
+ */
+external interface GaugeTitleOption : LabelOption {
+    /** Offset of the title from the center of the gauge, `[x, y]`. */
+    var offsetCenter: Array<StringOrDouble>?
+}
+
+/**
+ * Detail text of a gauge: a label positioned by [offsetCenter] from the center of the gauge.
+ *
+ * Upstream `DetailOption`; its `formatter` takes the value only, which [LabelOption.formatter] does
+ * not model.
+ */
+external interface GaugeDetailOption : LabelOption {
+    /** Offset of the detail text from the center of the gauge, `[x, y]`. */
+    var offsetCenter: Array<StringOrDouble>?
+}
+
+/**
+ * One data item of a gauge series.
+ *
+ * Upstream `GaugeDataItemOption`; [value] is inherited from [OptionDataItemObject], i.e. it is the
+ * generic data value rather than the upstream `OptionDataValueNumeric`. Put the items into
+ * `SeriesOption.data` with [items].
+ */
+external interface GaugeDataItemOption : OptionDataItemObject {
+    /** Configuration of the pointer of this item. */
+    var pointer: GaugePointerOption?
+
+    /** Configuration of the progress arc of this item. */
+    var progress: GaugeProgressOption?
+
+    /** Configuration of the title of this item. */
+    var title: GaugeTitleOption?
+
+    /** Configuration of the detail text of this item. */
+    var detail: GaugeDetailOption?
 }
 
 /**
@@ -348,27 +396,12 @@ external interface GaugeSplitLineOption {
 /**
  * Radar series.
  */
-external interface RadarSeriesOption : SeriesOption {
+external interface RadarSeriesOption : SeriesOption, SymbolOptionMixin {
     /** Index of the radar coordinate system. */
     var radarIndex: Double?
 
-    /** Symbol shape. */
-    var symbol: String?
-
-    /** Symbol size. */
-    var symbolSize: DoubleOrDoubleArray?
-
-    /** Symbol rotation in degrees. */
-    var symbolRotate: Double?
-
-    /** Whether to keep the symbol aspect ratio. */
-    var symbolKeepAspect: Boolean?
-
-    /** Symbol offset, `[x, y]`. */
-    var symbolOffset: SymbolOffset?
-
     /** How the data maps to the radar axes. */
-    var seriesLayoutBy: String?
+    var seriesLayoutBy: SeriesLayoutBy?
 }
 
 /**
@@ -393,8 +426,8 @@ external interface MapSeriesOption : SeriesOption {
     /** Mapping of the names in the map data to display names. */
     var nameMap: Record<String, String>?
 
-    /** Selection mode: `false`, `"single"` or `"multiple"`. */
-    var selectedMode: BooleanOrString?
+    /** Selection mode of the regions. */
+    override var selectedMode: SelectionMode?
 
     /** Style of the labels. */
     override var label: LabelOption?
@@ -411,6 +444,27 @@ external interface MapSeriesOption : SeriesOption {
     /** Whether to show the legend symbol. */
     var showLegendSymbol: Boolean?
 }
+
+/**
+ * One data item of a theme river: the tuple `[date, value, name]`.
+ *
+ * Put it into `SeriesOption.data` with `OptionDataItem(...)`:
+ *
+ * ```kotlin
+ * data = arrayOf(OptionDataItem(themeRiverDataItem(OptionDataValue("2026-01-01"), OptionDataValue(10.0), OptionDataValue("a"))))
+ * ```
+ */
+typealias ThemeRiverDataItem = Array<OptionDataValue?>
+
+/**
+ * Creates a `[date, value, name]` data item for [ThemeRiverSeriesOption].
+ *
+ * @param date date of the item.
+ * @param value value of the item.
+ * @param name name of the band the item belongs to.
+ */
+fun themeRiverDataItem(date: OptionDataValue, value: OptionDataValue, name: OptionDataValue): ThemeRiverDataItem =
+    arrayOf(date, value, name)
 
 /**
  * Theme river series.
@@ -439,23 +493,23 @@ external interface PictorialBarSeriesOption : SeriesOption {
     /** Symbol shape of the bars. */
     var symbol: String?
 
-    /** Symbol size. */
-    var symbolSize: DoubleOrDoubleArray?
+    /** Symbol size, or `[width, height]`. */
+    var symbolSize: StringOrDoubleOrArray?
 
-    /** Position of the symbol: `"start"`, `"end"` or `"middle"`. */
-    var symbolPosition: String?
+    /** Anchor of the symbol on the data point. */
+    var symbolPosition: PictorialBarSymbolPosition?
 
     /** Symbol offset, `[x, y]`. */
-    var symbolOffset: SymbolOffset?
+    var symbolOffset: StringOrDoubleOrArray?
 
     /** Symbol rotation in degrees. */
-    var symbolRotate: DoubleOrDoubleArray?
+    var symbolRotate: Double?
 
     /** Whether to repeat the symbol along the bar. */
     var symbolRepeat: BooleanOrDoubleOrString?
 
-    /** Direction of the repetition: `"start"` or `"end"`. */
-    var symbolRepeatDirection: String?
+    /** Direction of the repetition. */
+    var symbolRepeatDirection: PictorialBarSymbolRepeatDirection?
 
     /** Margin between repeated symbols. */
     var symbolMargin: StringOrDoubleOrArray?
@@ -464,7 +518,7 @@ external interface PictorialBarSeriesOption : SeriesOption {
     var symbolClip: Boolean?
 
     /** Bounding value used to size the symbols. */
-    var symbolBoundingData: Double?
+    var symbolBoundingData: DoubleOrDoubleArray?
 
     /** Size of the symbol pattern. */
     var symbolPatternSize: Double?

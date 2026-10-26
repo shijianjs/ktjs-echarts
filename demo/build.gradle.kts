@@ -18,7 +18,8 @@ kotlin {
     sourceSets {
         jsMain.dependencies {
             implementation("org.jetbrains.kotlin-wrappers:kotlin-browser:2026.10.1")
-            // scripts/init-wrapper-project.py appends the wrapper modules this demo uses below.
+            // Wrapper modules used by the demo.
+            implementation(project(":ktjs-echarts"))
         }
 
         jvmTest.dependencies {
@@ -48,7 +49,7 @@ tasks.register<Test>("e2eTest") {
     group = "verification"
     description = "Runs the Kotlin/JVM Playwright suite against the bundled demo page."
     useJUnitPlatform()
-    dependsOn("jsBrowserDistribution", ":__PREFIX__-__MODULE__:kotlinInstallPlaywrightBrowsers")
+    dependsOn("jsBrowserDistribution", ":ktjs-echarts:kotlinInstallPlaywrightBrowsers")
 
     testClassesDirs = jvmE2eCompilation.output.classesDirs
     classpath = files(jvmE2eCompilation.output.allOutputs, jvmE2eCompilation.runtimeDependencyFiles)

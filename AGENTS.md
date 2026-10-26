@@ -14,9 +14,9 @@
 
 ## 项目概况与模块结构
 
-`__PROJECT__` 为 [`__NPM_PACKAGE__`](https://www.npmjs.com/package/__NPM_PACKAGE__) 提供 Kotlin/JS wrapper。
+`ktjs-echarts` 为 [`echarts`](https://www.npmjs.com/package/echarts) 提供 Kotlin/JS wrapper。
 
-- `__PREFIX__-__MODULE__`：发布模块，`version = {上游 npm 版本}-kt.{修订号}`。
+- `ktjs-echarts`：发布模块，`version = {上游 npm 版本}-kt.{修订号}`。
 - `demo`：GitHub Pages 演示站点，不发布、也不进入 Dokka。
 - `scaffold/module`：新增模块时复制的骨架，不参与构建。
 
@@ -75,10 +75,10 @@ wrapper 的目标是让上游 npm 包暴露的公开 API 在 Kotlin/JS 侧都能
 
 ### 新增模块
 
-1. 复制 `scaffold/module` 为 `__PREFIX__-<name>`，替换文件里的所有占位符（包名、npm 包名、项目名）。
-2. `settings.gradle.kts` 加 `include(":__PREFIX__-<name>")`。
-3. `package.json` 的 `dependencies` 加 npm 包版本；`wrapper-revisions.properties` 加 `__PREFIX__-<name>=1`。
-4. `demo/build.gradle.kts` 的 `jsMain.dependencies` 加 `implementation(project(":__PREFIX__-<name>"))`，
+1. 复制 `scaffold/module` 为 `ktjs-echarts-<name>`，替换文件里的所有占位符（包名、npm 包名、项目名）。
+2. `settings.gradle.kts` 加 `include(":ktjs-echarts-<name>")`。
+3. `package.json` 的 `dependencies` 加 npm 包版本；`wrapper-revisions.properties` 加 `ktjs-echarts-<name>=1`。
+4. `demo/build.gradle.kts` 的 `jsMain.dependencies` 加 `implementation(project(":ktjs-echarts-<name>"))`，
    并在 demo 里实际使用它。
 5. 全局替换时同步检查 `detekt`、Dependabot 分组、README 模块表与 Dokka（Dokka 按前缀自动收集，无需改）。
 
@@ -339,7 +339,7 @@ update(data) { this.replaceChildren(); this.render(data); }   // 禁止
 ## 发布到 Maven Central
 
 发布配置统一在根 `build.gradle.kts` 的 `subprojects {}` 里，使用 `com.vanniktech.maven.publish`，
-group 固定为 `io.github.__OWNER__`。`subprojects` 的 group 必须单独设置，根项目的 `group` 不会自动继承。
+group 固定为 `io.github.shijianjs`。`subprojects` 的 group 必须单独设置，根项目的 `group` 不会自动继承。
 
 发布是两段式，Central 只在第二段被触及：
 
@@ -347,12 +347,12 @@ group 固定为 `io.github.__OWNER__`。`subprojects` 的 group 必须单独设�
    签名 → 发布到模块内的 `build/hub-staging` 文件仓库 → `scripts/hub-release.py` 为**每个 Maven 坐标**
    打一个 `.tar.xz` 并生成注册 → 创建/更新 GitHub Release 并上传归档 → 把注册推到 hub → 触发 hub 的
    `upload=false` dry run 并等待它结束。
-2. hub（`__OWNER__/maven-central-publishing`）手动 dispatch 且勾选 `upload=true`，才真正上传 Central，
+2. hub（`shijianjs/maven-central-publishing`）手动 dispatch 且勾选 `upload=true`，才真正上传 Central，
    并在成功后删除已满足的注册。
 
 ```bash
 gh workflow run release.yml -f release=release-1 \
-  -f modules=__PREFIX__-__MODULE__
+  -f modules=ktjs-echarts
 ```
 
 - `release`：`release-<数字>`，tag 由工作流创建；工作流不会移动已有 tag。
@@ -370,7 +370,7 @@ gh workflow run release.yml -f release=release-1 \
 
 ### 一次性准备
 
-1. 在 [Central Portal](https://central.sonatype.com/) 注册账号并验证 `io.github.__OWNER__` namespace
+1. 在 [Central Portal](https://central.sonatype.com/) 注册账号并验证 `io.github.shijianjs` namespace
    （GitHub 方式）。
 2. 生成 GPG 密钥并发布公钥到 `keys.openpgp.org` / `keyserver.ubuntu.com`。
 3. 在本仓库 Settings → Secrets 配置 `MAVEN_CENTRAL_SIGNING_KEY`、`MAVEN_CENTRAL_SIGNING_KEY_PASSWORD`
@@ -386,10 +386,10 @@ gh workflow run release.yml -f release=release-1 \
 ```bash
 ORG_GRADLE_PROJECT_signingInMemoryKey="$(< ~/central-signing-key.txt)" \
 ORG_GRADLE_PROJECT_signingInMemoryKeyPassword=... \
-./gradlew :__PREFIX__-__MODULE__:publishAllPublicationsToHubStagingRepository
+./gradlew :ktjs-echarts:publishAllPublicationsToHubStagingRepository
 
-python3 scripts/hub-release.py --project __OWNER__/__REPO__ --release release-1 \
-  --module __PREFIX__-__MODULE__=<version> --repository . \
+python3 scripts/hub-release.py --project shijianjs/ktjs-echarts --release release-1 \
+  --module ktjs-echarts=<version> --repository . \
   --archives build/hub-release/archives --registrations build/hub-release
 ```
 
@@ -417,7 +417,7 @@ klibs.io 从 Maven Central 与 GitHub 自动抓取，无需提交元数据文件
 ## 演示页面与 GitHub Pages
 
 - `demo` 只消费公共 API，不发布、也不进入 Dokka。根 `build.gradle.kts` 的发布与 Dokka 配置按
-  `__PREFIX__-` 前缀过滤子模块，新增非发布模块时沿用该约定。
+  `ktjs-echarts` 前缀过滤子模块，新增非发布模块时沿用该约定。
 - 端到端测试是 `demo` 的 JVM 目标里的 Playwright JUnit 5 套件（`demo/src/jvmTest/kotlin/demo/e2e`）：
   Playwright 驱动打包后的 `demo/build/dist/js/productionExecutable`，`DemoServer` 用 Hutool 的
   `SimpleServer` 在测试 JVM 内提供静态文件。运行 `./gradlew :demo:e2eTest`；它不在 `check` 里，CI 在

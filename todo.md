@@ -34,7 +34,7 @@
   `GaugeTitleOption` / `GaugeDetailOption` / `GaugeDataItemOption`；主题河流补
   `OptionDataValueDate` 与 `ThemeRiverDataItem` 元组。
 - 测试：`SymbolAndKeywordOptionsTest`（9 + 1 例）+ 4 组字面量断言；浏览器用例 103 个全过。
-- 模板仓库同步 `TYPE-MAPPING.md` / `AGENTS.md`（提交 `329f0bf`、本轮待推）。
+- 模板仓库同步 `TYPE-MAPPING.md` / `AGENTS.md`（提交 `329f0bf`、`ccc5ab8`）。
 
 ### 遗留提醒
 

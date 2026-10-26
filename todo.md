@@ -11,9 +11,35 @@
   - kotlin-wrappers 参考实现：`S:\workspace\github\JetBrains\kotlin-wrappers`
 - 写法约定：`TYPE-MAPPING.md`（§2 mixin 与公共基接口、§3 联合去重、§12 上游写法 Kotlin 表达不了时）。
 - 验证方式：`./gradlew :ktjs-echarts:jsBrowserTest`（浏览器用例）或 `./gradlew build`（含 detekt）。
-- 已完成的两轮：① 系列数据项类型（mark 数据项、GaugeColorStop 元组、层级/关系图节点与边、`labelLayout`、
-  `regions`、`renderItem`）；② symbol 字段联合 + 关键字字面量 sweep + `selectedMode`/`selectedMap` +
-  仪表盘数据项 + 主题河流数据项。剩余项见下。
+
+## 已完成的轮次
+
+### ① 系列数据项类型（提交 `d60ef46`，已推送）
+
+- mark 数据项（`MarkPointDataItemOption` / `MarkLine1D|2D…` / `MarkArea1D|2D…`）、`GaugeColorStop` 元组、
+  Tree / Treemap / Sunburst / Sankey / Chord / Graph 的节点与边类型、`labelLayout`、`regions`、
+  `CustomSeriesRenderItem`；选项类型拆成 `HierarchySeriesOptions.kt` / `RelationSeriesOptions.kt` /
+  `MarkDataItemOptions.kt`，新增 `EChartsSeriesLiterals.kt` 与 `CommonTypes.kt` 的一批联合。
+- 测试：`SeriesDataItemTest`（16 例，含真实图表用例）+ 4 组字面量断言；浏览器用例 90 个全过。
+
+### ② symbol 联合 + 关键字字面量 + 选择模式（提交 `2dea7f1`）
+
+- symbol 字段统一成 `SymbolShape` / `SymbolSize` / `SymbolRotate` / `SymbolOffset`，上游
+  `SymbolOptionMixin` 只保留一个 Kotlin 接口并被各类型继承；mark 选项按上游拆开
+  （`MarkOption` 只留真正共享的成员，symbol 分别来自 mixin 或 markLine 自身的收窄形式）。
+- 新增 12 个字面量（`SeriesLayoutBy`、`FunnelSort`、`FunnelAlign`、`RadarShape`、`GraphLayout`、
+  `GraphInitLayout`、`TreeLayout`、`TreeEdgeShape`、`PictorialBarSymbolPosition`、
+  `PictorialBarSymbolRepeatDirection`、`TooltipTriggerOn`、`AxisPosition`）并替换对应字段。
+- `SeriesOption` 补 `selectedMode`（新增 `"series"`）与 `selectedMap`；仪表盘补
+  `GaugeTitleOption` / `GaugeDetailOption` / `GaugeDataItemOption`；主题河流补
+  `OptionDataValueDate` 与 `ThemeRiverDataItem` 元组。
+- 测试：`SymbolAndKeywordOptionsTest`（9 + 1 例）+ 4 组字面量断言；浏览器用例 103 个全过。
+- 模板仓库同步 `TYPE-MAPPING.md` / `AGENTS.md`（提交 `329f0bf`、本轮待推）。
+
+### 遗留提醒
+
+`GraphSeriesOption` 里原 `directed` / `edgeShape` / `edgeForkPosition` / `selectedMode` 在 6.1.0 的
+`.d.ts` 中查不到，已按上游删除；上游若加回来则按新 `.d.ts` 恢复。
 
 ## 待办
 

@@ -17,7 +17,8 @@ import web.html.HTMLElement
  */
 internal fun createContainer(width: Int = 400, height: Int = 300): HTMLElement {
     val container = document.createElement("div")
-    container.setAttribute("style", "width:${width}px;height:${height}px")
+    container.style.width = "${width}px"
+    container.style.height = "${height}px"
     document.body.appendChild(container)
     return container
 }

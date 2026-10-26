@@ -22,12 +22,15 @@ import echarts.options.one
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
 import web.cssom.ClassName
+import web.dom.ElementId
 import web.dom.document
 import web.events.EventHandler
+import web.html.ButtonType
 import web.html.HTMLButtonElement
 import web.html.HTMLDivElement
 import web.html.HTMLElement
 import web.html.HtmlTagName
+import web.html.button
 import web.window.window
 
 private const val PROJECT_NAME = "ktjs-echarts"
@@ -63,17 +66,17 @@ fun main() {
     val appendButton = createButton("append", "Add month")
     val status = document.createElement(HtmlTagName.span)
     status.className = ClassName("status")
-    status.setAttribute("id", "status")
-    status.setAttribute("aria-live", "polite")
+    status.id = ElementId("status")
+    status.ariaLive = "polite"
     status.textContent = "Click a chart item to inspect it."
 
     toolbar.append(randomizeButton, appendButton, status)
 
     val chartElement = document.createElement(HtmlTagName.div)
     chartElement.className = ClassName("chart")
-    chartElement.setAttribute("id", "chart")
-    chartElement.setAttribute("role", "img")
-    chartElement.setAttribute("aria-label", "Revenue and orders per month")
+    chartElement.id = ElementId("chart")
+    chartElement.role = "img"
+    chartElement.ariaLabel = "Revenue and orders per month"
 
     page.append(heading, lead, toolbar, chartElement)
     document.body.append(page)
@@ -115,8 +118,8 @@ fun main() {
 private fun createButton(id: String, label: String): HTMLButtonElement {
     val button = document.createElement(HtmlTagName.button)
     button.className = ClassName("action")
-    button.setAttribute("id", id)
-    button.setAttribute("type", "button")
+    button.id = ElementId(id)
+    button.type = ButtonType.button
     button.textContent = label
     return button
 }

@@ -1,9 +1,16 @@
 package echarts
 
+import echarts.options.DimensionDefinitionLoose
 import kotlin.js.JsAny
-import kotlin.js.unsafeCast
+import web.canvas.CanvasRenderingContext2D
 import web.html.HTMLCanvasElement
 import web.html.HTMLElement
+import zrender.MatrixNamespace
+import zrender.UtilNamespace
+import zrender.VectorNamespace
+import zrender.ZRElement
+import zrender.ZRenderNamespace
+import zrender.ZrUtilNamespace
 
 /**
  * Named exports of the `echarts` npm package (the full bundle).
@@ -112,7 +119,7 @@ external object ECharts {
     /**
      * Registers a locale object, for example the object exported by `echarts/i18n/langEN`.
      */
-    fun registerLocale(name: String, locale: JsAny)
+    fun registerLocale(name: String, locale: LocaleOption)
 
     /**
      * Registers a map (GeoJSON or SVG).
@@ -121,7 +128,7 @@ external object ECharts {
      * @param map GeoJSON object, `{ geoJSON, specialAreas }`, or `{ svg }`.
      * @param specialAreas optional area offsets for legacy GeoJSON maps.
      */
-    fun registerMap(mapName: String, map: JsAny, specialAreas: JsAny? = definedExternally)
+    fun registerMap(mapName: String, map: MapInput, specialAreas: GeoSpecialAreas? = definedExternally)
 
     /**
      * Returns the map registered under [mapName], or `null` when it does not exist.
@@ -131,12 +138,12 @@ external object ECharts {
     /**
      * Installs ECharts extensions, for example the installers exported by `echarts/charts`.
      */
-    fun use(extension: JsAny)
+    fun use(extension: EChartsExtensionInstaller)
 
     /**
      * Installs several ECharts extensions.
      */
-    fun use(extensions: Array<JsAny>)
+    fun use(extensions: Array<EChartsExtensionInstaller>)
 
     /**
      * Registers a custom action.
@@ -160,42 +167,62 @@ external object ECharts {
     /**
      * Registers a coordinate system.
      */
-    fun registerCoordinateSystem(type: String, creator: JsAny)
+    fun registerCoordinateSystem(type: String, creator: CoordinateSystemCreator)
 
     /**
      * Returns the dimensions of a registered coordinate system.
      */
-    fun getCoordinateSystemDimensions(type: String): Array<JsAny>
+    fun getCoordinateSystemDimensions(type: String): Array<DimensionDefinitionLoose>
 
     /**
      * Registers a custom series renderer.
      */
-    fun registerCustomSeries(seriesType: String, renderItem: (JsAny, JsAny) -> JsAny?)
+    fun registerCustomSeries(seriesType: String, renderItem: CustomSeriesRenderItem)
 
     /**
      * Registers a layout stage handler.
      */
-    fun registerLayout(handler: (JsAny) -> Unit)
+    fun registerLayout(handler: StageHandlerOverallReset)
+
+    /**
+     * Registers a layout stage handler.
+     */
+    fun registerLayout(handler: StageHandler)
 
     /**
      * Registers a layout stage handler with an explicit [priority].
      */
-    fun registerLayout(priority: Double, handler: (JsAny) -> Unit)
+    fun registerLayout(priority: Double, handler: StageHandlerOverallReset)
+
+    /**
+     * Registers a layout stage handler with an explicit [priority].
+     */
+    fun registerLayout(priority: Double, handler: StageHandler)
 
     /**
      * Registers a visual encoding stage handler.
      */
-    fun registerVisual(handler: (JsAny) -> Unit)
+    fun registerVisual(handler: StageHandlerOverallReset)
+
+    /**
+     * Registers a visual encoding stage handler.
+     */
+    fun registerVisual(handler: StageHandler)
 
     /**
      * Registers a visual encoding stage handler with an explicit [priority].
      */
-    fun registerVisual(priority: Double, handler: (JsAny) -> Unit)
+    fun registerVisual(priority: Double, handler: StageHandlerOverallReset)
+
+    /**
+     * Registers a visual encoding stage handler with an explicit [priority].
+     */
+    fun registerVisual(priority: Double, handler: StageHandler)
 
     /**
      * Registers a loading effect.
      */
-    fun registerLoading(name: String, creator: JsAny)
+    fun registerLoading(name: String, creator: LoadingEffectCreator)
 
     /**
      * Registers a callback that runs after a chart is initialized.
@@ -205,27 +232,37 @@ external object ECharts {
     /**
      * Registers a callback that runs after every update.
      */
-    fun registerPostUpdate(callback: (EChartsInstance) -> Unit)
+    fun registerPostUpdate(callback: PostUpdater)
 
     /**
      * Registers an option preprocessor.
      */
-    fun registerPreprocessor(preprocessor: (JsAny) -> Unit)
+    fun registerPreprocessor(preprocessor: OptionPreprocessor)
 
     /**
      * Registers a data processor.
      */
-    fun registerProcessor(processor: (JsAny) -> Unit)
+    fun registerProcessor(processor: StageHandlerOverallReset)
+
+    /**
+     * Registers a data processor.
+     */
+    fun registerProcessor(processor: StageHandler)
 
     /**
      * Registers a data processor with an explicit [priority].
      */
-    fun registerProcessor(priority: Double, processor: (JsAny) -> Unit)
+    fun registerProcessor(priority: Double, processor: StageHandlerOverallReset)
+
+    /**
+     * Registers a data processor with an explicit [priority].
+     */
+    fun registerProcessor(priority: Double, processor: StageHandler)
 
     /**
      * Registers an external data transform used by `dataset.transform`.
      */
-    fun registerTransform(transform: JsAny)
+    fun registerTransform(transform: ExternalTransform)
 
     /**
      * Registers a callback for an update lifecycle event (`afterinit`, `afterupdate`,
@@ -241,17 +278,17 @@ external object ECharts {
     /**
      * Overrides platform APIs such as `createCanvas` and `measureText` (SSR and Node.js).
      */
-    fun setPlatformAPI(api: JsAny)
+    fun setPlatformAPI(api: PlatformAPI)
 
     /**
      * Parses GeoJSON into ECharts regions.
      */
-    fun parseGeoJSON(geoJson: JsAny, nameProperty: String): Array<JsAny>
+    fun parseGeoJSON(geoJson: GeoJSON, nameProperty: String): Array<GeoJSONRegion>
 
     /**
      * Alias of [parseGeoJSON]; kept because the upstream package exports both names.
      */
-    fun parseGeoJson(geoJson: JsAny, nameProperty: String): Array<JsAny>
+    fun parseGeoJson(geoJson: GeoJSON, nameProperty: String): Array<GeoJSONRegion>
 
     /**
      * Wraps [fn] so that it is called at most once per [delay] milliseconds.
@@ -293,38 +330,38 @@ external object ECharts {
     /**
      * The `echarts.matrix` namespace (2D matrix helpers).
      */
-    val matrix: JsAny
+    val matrix: MatrixNamespace
 
     /**
      * The `echarts.vector` namespace (2D vector helpers).
      */
-    val vector: JsAny
+    val vector: VectorNamespace
 
     /**
      * The `echarts.util` namespace (zrender utilities).
      */
-    val util: JsAny
+    val util: UtilNamespace
 
     /**
      * The `echarts.zrUtil` namespace (zrender utilities with their original names).
      */
-    val zrUtil: JsAny
+    val zrUtil: ZrUtilNamespace
 
     /**
      * The `echarts.zrender` namespace (the bundled zrender library).
      */
-    val zrender: JsAny
+    val zrender: ZRenderNamespace
 
     /**
      * The `echarts.dataTool` namespace. Empty in the npm build; the tools live in
      * `echarts/extension/dataTool`.
      */
-    val dataTool: JsAny
+    val dataTool: DataToolNamespace
 
     /**
      * Draws a single displayable element on a canvas context.
      */
-    fun innerDrawElementOnCanvas(context: JsAny, element: JsAny)
+    fun innerDrawElementOnCanvas(context: CanvasRenderingContext2D?, element: ZRElement)
 }
 
 /**
@@ -395,19 +432,19 @@ external object EChartsCore {
     fun registerTheme(name: String, theme: ThemeOption)
 
     /** Registers a locale object. See [ECharts.registerLocale]. */
-    fun registerLocale(name: String, locale: JsAny)
+    fun registerLocale(name: String, locale: LocaleOption)
 
     /** Registers a map. See [ECharts.registerMap]. */
-    fun registerMap(mapName: String, map: JsAny, specialAreas: JsAny? = definedExternally)
+    fun registerMap(mapName: String, map: MapInput, specialAreas: GeoSpecialAreas? = definedExternally)
 
     /** Returns a registered map. See [ECharts.getMap]. */
     fun getMap(mapName: String): JsAny?
 
     /** Installs ECharts extensions. See [ECharts.use]. */
-    fun use(extension: JsAny)
+    fun use(extension: EChartsExtensionInstaller)
 
     /** Installs several ECharts extensions. See [ECharts.use]. */
-    fun use(extensions: Array<JsAny>)
+    fun use(extensions: Array<EChartsExtensionInstaller>)
 
     /** Registers a custom action. See [ECharts.registerAction]. */
     fun registerAction(type: String, eventType: String, action: (Payload) -> Unit)
@@ -419,37 +456,37 @@ external object EChartsCore {
     fun registerAction(actionInfo: ActionInfo, action: ((Payload) -> Unit)? = definedExternally)
 
     /** Registers a coordinate system. See [ECharts.registerCoordinateSystem]. */
-    fun registerCoordinateSystem(type: String, creator: JsAny)
+    fun registerCoordinateSystem(type: String, creator: CoordinateSystemCreator)
 
     /** Returns the dimensions of a coordinate system. See [ECharts.getCoordinateSystemDimensions]. */
-    fun getCoordinateSystemDimensions(type: String): Array<JsAny>
+    fun getCoordinateSystemDimensions(type: String): Array<DimensionDefinitionLoose>
 
     /** Registers a custom series renderer. See [ECharts.registerCustomSeries]. */
-    fun registerCustomSeries(seriesType: String, renderItem: (JsAny, JsAny) -> JsAny?)
+    fun registerCustomSeries(seriesType: String, renderItem: CustomSeriesRenderItem)
 
     /** Registers a layout stage handler. See [ECharts.registerLayout]. */
-    fun registerLayout(handler: (JsAny) -> Unit)
+    fun registerLayout(handler: StageHandlerOverallReset)
 
     /** Registers a layout stage handler. See [ECharts.registerLayout]. */
     fun registerLayout(priority: Double, handler: (JsAny) -> Unit)
 
     /** Registers a visual encoding stage handler. See [ECharts.registerVisual]. */
-    fun registerVisual(handler: (JsAny) -> Unit)
+    fun registerVisual(handler: StageHandlerOverallReset)
 
     /** Registers a visual encoding stage handler. See [ECharts.registerVisual]. */
     fun registerVisual(priority: Double, handler: (JsAny) -> Unit)
 
     /** Registers a loading effect. See [ECharts.registerLoading]. */
-    fun registerLoading(name: String, creator: JsAny)
+    fun registerLoading(name: String, creator: LoadingEffectCreator)
 
     /** Registers a post-init callback. See [ECharts.registerPostInit]. */
     fun registerPostInit(callback: (EChartsInstance) -> Unit)
 
     /** Registers a post-update callback. See [ECharts.registerPostUpdate]. */
-    fun registerPostUpdate(callback: (EChartsInstance) -> Unit)
+    fun registerPostUpdate(callback: PostUpdater)
 
     /** Registers an option preprocessor. See [ECharts.registerPreprocessor]. */
-    fun registerPreprocessor(preprocessor: (JsAny) -> Unit)
+    fun registerPreprocessor(preprocessor: OptionPreprocessor)
 
     /** Registers a data processor. See [ECharts.registerProcessor]. */
     fun registerProcessor(processor: (JsAny) -> Unit)
@@ -458,7 +495,7 @@ external object EChartsCore {
     fun registerProcessor(priority: Double, processor: (JsAny) -> Unit)
 
     /** Registers a data transform. See [ECharts.registerTransform]. */
-    fun registerTransform(transform: JsAny)
+    fun registerTransform(transform: ExternalTransform)
 
     /** Registers an update lifecycle callback. See [ECharts.registerUpdateLifecycle]. */
     fun registerUpdateLifecycle(name: String, callback: (JsAny) -> Unit)
@@ -467,13 +504,13 @@ external object EChartsCore {
     fun setCanvasCreator(creator: () -> HTMLCanvasElement)
 
     /** Overrides platform APIs. See [ECharts.setPlatformAPI]. */
-    fun setPlatformAPI(api: JsAny)
+    fun setPlatformAPI(api: PlatformAPI)
 
     /** Parses GeoJSON. See [ECharts.parseGeoJSON]. */
-    fun parseGeoJSON(geoJson: JsAny, nameProperty: String): Array<JsAny>
+    fun parseGeoJSON(geoJson: GeoJSON, nameProperty: String): Array<GeoJSONRegion>
 
     /** Alias of [parseGeoJSON]. See [ECharts.parseGeoJson]. */
-    fun parseGeoJson(geoJson: JsAny, nameProperty: String): Array<JsAny>
+    fun parseGeoJson(geoJson: GeoJSON, nameProperty: String): Array<GeoJSONRegion>
 
     /** Throttles a function. See [ECharts.throttle]. */
     fun throttle(fn: JsAny, delay: Double? = definedExternally, debounce: Boolean? = definedExternally): JsAny
@@ -497,25 +534,25 @@ external object EChartsCore {
     val color: ColorNamespace
 
     /** The `matrix` namespace. See [ECharts.matrix]. */
-    val matrix: JsAny
+    val matrix: MatrixNamespace
 
     /** The `vector` namespace. See [ECharts.vector]. */
-    val vector: JsAny
+    val vector: VectorNamespace
 
     /** The `util` namespace. See [ECharts.util]. */
-    val util: JsAny
+    val util: UtilNamespace
 
     /** The `zrUtil` namespace. See [ECharts.zrUtil]. */
-    val zrUtil: JsAny
+    val zrUtil: ZrUtilNamespace
 
     /** The `zrender` namespace. See [ECharts.zrender]. */
-    val zrender: JsAny
+    val zrender: ZRenderNamespace
 
     /** The `dataTool` namespace. See [ECharts.dataTool]. */
-    val dataTool: JsAny
+    val dataTool: DataToolNamespace
 
     /** Draws a single element on a canvas context. See [ECharts.innerDrawElementOnCanvas]. */
-    fun innerDrawElementOnCanvas(context: JsAny, element: JsAny)
+    fun innerDrawElementOnCanvas(context: CanvasRenderingContext2D?, element: ZRElement)
 }
 
 /**
@@ -526,73 +563,73 @@ external object EChartsCore {
 @JsModule("echarts/charts")
 external object EChartsCharts {
     /** Installs the line chart. */
-    val LineChart: JsAny
+    val LineChart: EChartsExtensionInstaller
 
     /** Installs the bar chart. */
-    val BarChart: JsAny
+    val BarChart: EChartsExtensionInstaller
 
     /** Installs the pie chart. */
-    val PieChart: JsAny
+    val PieChart: EChartsExtensionInstaller
 
     /** Installs the scatter chart. */
-    val ScatterChart: JsAny
+    val ScatterChart: EChartsExtensionInstaller
 
     /** Installs the effect scatter chart. */
-    val EffectScatterChart: JsAny
+    val EffectScatterChart: EChartsExtensionInstaller
 
     /** Installs the radar chart. */
-    val RadarChart: JsAny
+    val RadarChart: EChartsExtensionInstaller
 
     /** Installs the map chart. */
-    val MapChart: JsAny
+    val MapChart: EChartsExtensionInstaller
 
     /** Installs the tree chart. */
-    val TreeChart: JsAny
+    val TreeChart: EChartsExtensionInstaller
 
     /** Installs the treemap chart. */
-    val TreemapChart: JsAny
+    val TreemapChart: EChartsExtensionInstaller
 
     /** Installs the sunburst chart. */
-    val SunburstChart: JsAny
+    val SunburstChart: EChartsExtensionInstaller
 
     /** Installs the graph chart. */
-    val GraphChart: JsAny
+    val GraphChart: EChartsExtensionInstaller
 
     /** Installs the chord chart. */
-    val ChordChart: JsAny
+    val ChordChart: EChartsExtensionInstaller
 
     /** Installs the funnel chart. */
-    val FunnelChart: JsAny
+    val FunnelChart: EChartsExtensionInstaller
 
     /** Installs the gauge chart. */
-    val GaugeChart: JsAny
+    val GaugeChart: EChartsExtensionInstaller
 
     /** Installs the pictorial bar chart. */
-    val PictorialBarChart: JsAny
+    val PictorialBarChart: EChartsExtensionInstaller
 
     /** Installs the theme river chart. */
-    val ThemeRiverChart: JsAny
+    val ThemeRiverChart: EChartsExtensionInstaller
 
     /** Installs the custom chart. */
-    val CustomChart: JsAny
+    val CustomChart: EChartsExtensionInstaller
 
     /** Installs the boxplot chart. */
-    val BoxplotChart: JsAny
+    val BoxplotChart: EChartsExtensionInstaller
 
     /** Installs the candlestick chart. */
-    val CandlestickChart: JsAny
+    val CandlestickChart: EChartsExtensionInstaller
 
     /** Installs the heatmap chart. */
-    val HeatmapChart: JsAny
+    val HeatmapChart: EChartsExtensionInstaller
 
     /** Installs the parallel chart. */
-    val ParallelChart: JsAny
+    val ParallelChart: EChartsExtensionInstaller
 
     /** Installs the lines chart. */
-    val LinesChart: JsAny
+    val LinesChart: EChartsExtensionInstaller
 
     /** Installs the sankey chart. */
-    val SankeyChart: JsAny
+    val SankeyChart: EChartsExtensionInstaller
 }
 
 /**
@@ -603,100 +640,100 @@ external object EChartsCharts {
 @JsModule("echarts/components")
 external object EChartsComponents {
     /** Installs the aria component. */
-    val AriaComponent: JsAny
+    val AriaComponent: EChartsExtensionInstaller
 
     /** Installs the axis pointer component. */
-    val AxisPointerComponent: JsAny
+    val AxisPointerComponent: EChartsExtensionInstaller
 
     /** Installs the brush component. */
-    val BrushComponent: JsAny
+    val BrushComponent: EChartsExtensionInstaller
 
     /** Installs the calendar component. */
-    val CalendarComponent: JsAny
+    val CalendarComponent: EChartsExtensionInstaller
 
     /** Installs both data zoom variants. */
-    val DataZoomComponent: JsAny
+    val DataZoomComponent: EChartsExtensionInstaller
 
     /** Installs the inside data zoom component. */
-    val DataZoomInsideComponent: JsAny
+    val DataZoomInsideComponent: EChartsExtensionInstaller
 
     /** Installs the slider data zoom component. */
-    val DataZoomSliderComponent: JsAny
+    val DataZoomSliderComponent: EChartsExtensionInstaller
 
     /** Installs the dataset component. */
-    val DatasetComponent: JsAny
+    val DatasetComponent: EChartsExtensionInstaller
 
     /** Installs the geo component. */
-    val GeoComponent: JsAny
+    val GeoComponent: EChartsExtensionInstaller
 
     /** Installs the graphic component. */
-    val GraphicComponent: JsAny
+    val GraphicComponent: EChartsExtensionInstaller
 
     /** Installs the grid component. */
-    val GridComponent: JsAny
+    val GridComponent: EChartsExtensionInstaller
 
     /** Installs the simple grid component. */
-    val GridSimpleComponent: JsAny
+    val GridSimpleComponent: EChartsExtensionInstaller
 
     /** Installs both legend variants. */
-    val LegendComponent: JsAny
+    val LegendComponent: EChartsExtensionInstaller
 
     /** Installs the plain legend component. */
-    val LegendPlainComponent: JsAny
+    val LegendPlainComponent: EChartsExtensionInstaller
 
     /** Installs the scrollable legend component. */
-    val LegendScrollComponent: JsAny
+    val LegendScrollComponent: EChartsExtensionInstaller
 
     /** Installs the mark area component. */
-    val MarkAreaComponent: JsAny
+    val MarkAreaComponent: EChartsExtensionInstaller
 
     /** Installs the mark line component. */
-    val MarkLineComponent: JsAny
+    val MarkLineComponent: EChartsExtensionInstaller
 
     /** Installs the mark point component. */
-    val MarkPointComponent: JsAny
+    val MarkPointComponent: EChartsExtensionInstaller
 
     /** Installs the matrix component. */
-    val MatrixComponent: JsAny
+    val MatrixComponent: EChartsExtensionInstaller
 
     /** Installs the parallel coordinate component. */
-    val ParallelComponent: JsAny
+    val ParallelComponent: EChartsExtensionInstaller
 
     /** Installs the polar coordinate component. */
-    val PolarComponent: JsAny
+    val PolarComponent: EChartsExtensionInstaller
 
     /** Installs the radar coordinate component. */
-    val RadarComponent: JsAny
+    val RadarComponent: EChartsExtensionInstaller
 
     /** Installs the single axis component. */
-    val SingleAxisComponent: JsAny
+    val SingleAxisComponent: EChartsExtensionInstaller
 
     /** Installs the thumbnail component. */
-    val ThumbnailComponent: JsAny
+    val ThumbnailComponent: EChartsExtensionInstaller
 
     /** Installs the timeline component. */
-    val TimelineComponent: JsAny
+    val TimelineComponent: EChartsExtensionInstaller
 
     /** Installs the title component. */
-    val TitleComponent: JsAny
+    val TitleComponent: EChartsExtensionInstaller
 
     /** Installs the toolbox component. */
-    val ToolboxComponent: JsAny
+    val ToolboxComponent: EChartsExtensionInstaller
 
     /** Installs the tooltip component. */
-    val TooltipComponent: JsAny
+    val TooltipComponent: EChartsExtensionInstaller
 
     /** Installs the transform component. */
-    val TransformComponent: JsAny
+    val TransformComponent: EChartsExtensionInstaller
 
     /** Installs both visual map variants. */
-    val VisualMapComponent: JsAny
+    val VisualMapComponent: EChartsExtensionInstaller
 
     /** Installs the continuous visual map component. */
-    val VisualMapContinuousComponent: JsAny
+    val VisualMapContinuousComponent: EChartsExtensionInstaller
 
     /** Installs the piecewise visual map component. */
-    val VisualMapPiecewiseComponent: JsAny
+    val VisualMapPiecewiseComponent: EChartsExtensionInstaller
 }
 
 /**
@@ -707,10 +744,10 @@ external object EChartsComponents {
 @JsModule("echarts/renderers")
 external object EChartsRenderers {
     /** Installs the canvas renderer. */
-    val CanvasRenderer: JsAny
+    val CanvasRenderer: EChartsExtensionInstaller
 
     /** Installs the SVG renderer. */
-    val SVGRenderer: JsAny
+    val SVGRenderer: EChartsExtensionInstaller
 }
 
 /**
@@ -719,17 +756,17 @@ external object EChartsRenderers {
 @JsModule("echarts/features")
 external object EChartsFeatures {
     /** Installs the axis break feature. */
-    val AxisBreak: JsAny
+    val AxisBreak: EChartsExtensionInstaller
 
     /** Installs the label layout feature. */
-    val LabelLayout: JsAny
+    val LabelLayout: EChartsExtensionInstaller
 
     /** Installs the legacy grid `containLabel` behaviour. */
-    val LegacyGridContainLabel: JsAny
+    val LegacyGridContainLabel: EChartsExtensionInstaller
 
     /** Installs the scatter jitter feature. */
-    val ScatterJitter: JsAny
+    val ScatterJitter: EChartsExtensionInstaller
 
     /** Installs the universal transition feature. */
-    val UniversalTransition: JsAny
+    val UniversalTransition: EChartsExtensionInstaller
 }

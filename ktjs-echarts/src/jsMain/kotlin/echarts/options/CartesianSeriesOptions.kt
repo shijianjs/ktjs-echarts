@@ -1,6 +1,9 @@
 package echarts.options
 
+import echarts.AnimationEasing
+import echarts.SeriesType
 import kotlin.js.JsAny
+import zrender.ZRColor
 
 /**
  * Common configuration of every series.
@@ -9,15 +12,15 @@ import kotlin.js.JsAny
  * type. Use the factory functions ([lineSeries], [barSeries], ...) to create a series with its
  * `type` field already set.
  */
-external interface SeriesOption : JsAny {
+external interface SeriesOption {
     /** Series id, used by `getOption`, `dispatchAction` and `setOption` merges. */
     var id: String?
 
     /** Series name shown in the legend and the tooltip. */
     var name: String?
 
-    /** Series type, e.g. `"line"` or `"bar"`. Set by the factory functions. */
-    var type: String?
+    /** Series type, set by the factory functions such as [lineSeries]. */
+    var type: SeriesType?
 
     /** How the color is assigned: `"series"`, `"data"` or a custom dimension name. */
     var colorBy: String?
@@ -35,7 +38,7 @@ external interface SeriesOption : JsAny {
     var animationDuration: Double?
 
     /** Easing of the initial animation. */
-    var animationEasing: String?
+    var animationEasing: AnimationEasing?
 
     /** Delay of the initial animation in milliseconds. */
     var animationDelay: Double?
@@ -44,7 +47,7 @@ external interface SeriesOption : JsAny {
     var animationDurationUpdate: Double?
 
     /** Easing of the update animation. */
-    var animationEasingUpdate: String?
+    var animationEasingUpdate: AnimationEasing?
 
     /** Delay of the update animation in milliseconds. */
     var animationDelayUpdate: Double?
@@ -91,8 +94,8 @@ external interface SeriesOption : JsAny {
     /** Cursor shown when hovering the series. */
     var cursor: String?
 
-    /** Series data; the accepted shapes depend on the series type. */
-    var data: Array<JsAny>?
+    /** Series data: values, `[x, y]` tuples or data item objects. */
+    var data: Array<OptionDataItem?>?
 
     /** Index of the dataset used as the data source. */
     var datasetIndex: Double?
@@ -101,16 +104,16 @@ external interface SeriesOption : JsAny {
     var datasetId: String?
 
     /** Mapping between data dimensions and data fields. */
-    var encode: JsAny?
+    var encode: OptionEncode?
 
     /** Dimensions of the data. */
-    var dimensions: Array<JsAny>?
+    var dimensions: Array<DimensionDefinitionLoose>?
 
     /** Tooltip configuration specific to the series. */
     var tooltip: TooltipOption?
 
     /** Universal transition animation between series types. */
-    var universalTransition: JsAny?
+    var universalTransition: BooleanOrUniversalTransitionOption?
 
     /** Number of elements rendered per frame during progressive rendering. */
     var progressive: Double?
@@ -139,7 +142,7 @@ external interface LineSeriesOption : SeriesOption {
     var clip: Boolean?
 
     /** Step shape: `false`, `"start"`, `"middle"` or `"end"`. */
-    var step: JsAny?
+    var step: BooleanOrString?
 
     /** Whether to smooth the line; `0..1` controls the strength. */
     var smooth: BooleanOrDouble?
@@ -169,7 +172,7 @@ external interface LineSeriesOption : SeriesOption {
     var symbolKeepAspect: Boolean?
 
     /** Symbol offset, `[x, y]`. */
-    var symbolOffset: Array<JsAny>?
+    var symbolOffset: SymbolOffset?
 
     /** Label at the end of the line. */
     var endLabel: LabelOption?
@@ -177,8 +180,8 @@ external interface LineSeriesOption : SeriesOption {
     /** Whether hovering the line triggers events. */
     var triggerLineEvent: Boolean?
 
-    /** Whether hovering the line or the area triggers events. */
-    var triggerEvent: JsAny?
+    /** Whether hovering the line or the area triggers events: `true`, `"line"` or `"area"`. */
+    var triggerEvent: BooleanOrString?
 
     /** Stack group name. */
     var stack: String?
@@ -302,7 +305,7 @@ external interface ScatterSeriesOption : SeriesOption {
     var symbolKeepAspect: Boolean?
 
     /** Symbol offset, `[x, y]`. */
-    var symbolOffset: Array<JsAny>?
+    var symbolOffset: SymbolOffset?
 
     /** Whether to enable large-data mode. */
     var large: Boolean?
@@ -352,9 +355,9 @@ external interface EffectScatterSeriesOption : ScatterSeriesOption {
 /**
  * Configuration of the effect scatter ripple.
  */
-external interface RippleEffectOption : JsAny {
+external interface RippleEffectOption {
     /** Color of the ripple. */
-    var color: JsAny?
+    var color: ZRColor?
 
     /** Number of ripples. */
     var number: Double?
@@ -509,7 +512,7 @@ external interface LinesSeriesOption : SeriesOption {
 /**
  * Moving effect of a lines series.
  */
-external interface LinesEffectOption : JsAny {
+external interface LinesEffectOption {
     /** Whether the effect is shown. */
     var show: Boolean?
 
@@ -526,7 +529,7 @@ external interface LinesEffectOption : JsAny {
     var symbolSize: Double?
 
     /** Color of the moving symbol. */
-    var color: JsAny?
+    var color: ZRColor?
 
     /** Constant speed instead of a period per line. */
     var constantSpeed: Double?

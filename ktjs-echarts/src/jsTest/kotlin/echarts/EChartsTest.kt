@@ -1,16 +1,22 @@
 package echarts
 
+import echarts.options.AxisMinMax
 import echarts.options.BooleanOrString
 import echarts.options.CalendarOption
+import echarts.options.CalendarRange
+import echarts.options.DataZoomValue
+import echarts.options.DoubleOrDoubleArray
 import echarts.options.EChartsOption
+import echarts.options.OptionDataValue
+import echarts.options.OptionDataValueOrArray
 import echarts.options.StringOrDouble
 import echarts.options.XAxisOption
 import echarts.options.YAxisOption
-import echarts.options.echartsOption
 import echarts.options.lineSeries
 import echarts.options.numbers
 import echarts.options.one
 import echarts.options.pieSeries
+import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.jsTypeOf
 import kotlin.js.json
@@ -22,9 +28,14 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
+import web.dom.document
+import web.html.HtmlTagName
+import zrender.RendererTypes
+import zrender.ZRColor
+import zrender.ZRElement
 
 /**
- * Lifecycle, echartsOption and rendering tests for the module API and [EChartsInstance].
+ * Lifecycle, option building and rendering tests for the module API and [EChartsInstance].
  *
  * The upstream package has no equivalent unit-test file; these cases cover the wrapper surface
  * against a real Chromium canvas.
@@ -52,7 +63,7 @@ class EChartsTest {
             assertEquals(400.0, chart.getWidth())
             assertEquals(300.0, chart.getHeight())
             chart.resize(
-                echartsOption<ResizeOpts> {
+                unsafeJso<ResizeOpts> {
                     width = StringOrDouble(250.0)
                     height = StringOrDouble(150.0)
                 },
@@ -94,17 +105,17 @@ class EChartsTest {
         val (chart, container) = createChart()
         try {
             chart.setOption(
-                echartsOption<EChartsOption> {
-                    xAxis = one(echartsOption<XAxisOption> { type = "category"; data = numbers(1.0, 2.0) })
-                    yAxis = one(echartsOption<YAxisOption> { type = "value" })
+                unsafeJso<EChartsOption> {
+                    xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = numbers(1.0, 2.0) })
+                    yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
                     series = one(lineSeries { name = "s"; data = numbers(3.0, 4.0) })
                 },
             )
             val stored = chart.getOption().unsafeCast<EChartsOption>()
             assertEquals(1, stored.series?.size)
-            assertEquals("line", stored.series!![0].type)
+            assertEquals(SeriesTypes.line, stored.series!![0].type)
             assertEquals("s", stored.series!![0].name)
-            assertEquals("category", stored.xAxis!![0].type)
+            assertEquals(AxisTypes.category, stored.xAxis!![0].type)
             assertEquals(2, stored.xAxis!![0].data?.size)
         } finally {
             destroyChart(chart, container)
@@ -126,7 +137,7 @@ class EChartsTest {
                 ),
             )
             val stored = chart.getOption().unsafeCast<EChartsOption>()
-            assertEquals("pie", stored.series!![0].type)
+            assertEquals(SeriesTypes.pie, stored.series!![0].type)
         } finally {
             destroyChart(chart, container)
         }
@@ -137,16 +148,16 @@ class EChartsTest {
         val (chart, container) = createChart()
         try {
             chart.setOption(
-                echartsOption<EChartsOption> {
-                    xAxis = one(echartsOption<XAxisOption> { type = "category"; data = numbers(1.0, 2.0) })
-                    yAxis = one(echartsOption<YAxisOption> { type = "value" })
+                unsafeJso<EChartsOption> {
+                    xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = numbers(1.0, 2.0) })
+                    yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
                     series = one(lineSeries { name = "a"; data = numbers(1.0, 2.0) })
                 },
             )
-            chart.setOption(echartsOption<EChartsOption> { series = one(pieSeries { name = "b" }) }, true)
+            chart.setOption(unsafeJso<EChartsOption> { series = one(pieSeries { name = "b" }) }, true)
             val stored = chart.getOption().unsafeCast<EChartsOption>()
             assertEquals(1, stored.series?.size)
-            assertEquals("pie", stored.series!![0].type)
+            assertEquals(SeriesTypes.pie, stored.series!![0].type)
         } finally {
             destroyChart(chart, container)
         }
@@ -187,7 +198,7 @@ class EChartsTest {
     fun registerThemeAppliesAColorsPalette() {
         ECharts.registerTheme(
             "wrapper-test-theme",
-            echartsOption<EChartsOption> { color = arrayOf("#123456") },
+            unsafeJso<EChartsOption> { color = arrayOf(ZRColor("#123456")) },
         )
         val (chart, container) = createChart(theme = "wrapper-test-theme")
         try {
@@ -203,7 +214,7 @@ class EChartsTest {
         val (chart, container) = createChart()
         try {
             chart.setOption(cartesianLineOption(1.0, 2.0))
-            chart.setTheme(echartsOption<EChartsOption> { color = arrayOf("#654321") })
+            chart.setTheme(unsafeJso<EChartsOption> { color = arrayOf(ZRColor("#654321")) })
             assertEquals("#654321", seriesColor(chart))
         } finally {
             destroyChart(chart, container)
@@ -232,7 +243,10 @@ class EChartsTest {
                 ),
             ),
         )
-        ECharts.registerMap("wrapper-test-map", geoJson)
+        ECharts.registerMap(
+            "wrapper-test-map",
+            MapInput(unsafeJso<GeoJSONMapInput> { geoJSON = GeoJSONSourceInput(geoJson.unsafeCast<GeoJSON>()) }),
+        )
         assertNotNull(ECharts.getMap("wrapper-test-map"))
         assertNull(ECharts.getMap("wrapper-test-missing-map"))
     }
@@ -246,9 +260,9 @@ class EChartsTest {
         val (chart, container) = createChart()
         var eventType: String? = null
         try {
-            chart.setOption(echartsOption<EChartsOption> { series = one(pieSeries { data = numbers(1.0, 2.0) }) })
+            chart.setOption(unsafeJso<EChartsOption> { series = one(pieSeries { data = numbers(1.0, 2.0) }) })
             chart.on("wrapperTestActionEvent") { event -> eventType = event.type }
-            chart.dispatchAction(echartsOption { type = "wrapperTestAction"; seriesIndex = 0.0 })
+            chart.dispatchAction(unsafeJso { type = "wrapperTestAction"; seriesIndex = 0.0 })
             assertNotNull(actionPayload)
             assertEquals("wrappertestactionevent", eventType)
             assertEquals("wrapperTestAction", actionPayload.type)
@@ -263,12 +277,12 @@ class EChartsTest {
         val (chart, container) = createChart()
         var calls = 0
         try {
-            chart.setOption(echartsOption<EChartsOption> { series = one(pieSeries { data = numbers(1.0, 2.0) }) })
+            chart.setOption(unsafeJso<EChartsOption> { series = one(pieSeries { data = numbers(1.0, 2.0) }) })
             val handler: (ECElementEvent) -> Unit = { calls += 1 }
             chart.on("wrapperRemovableEvent", handler)
-            chart.dispatchAction(echartsOption { type = "wrapperRemovableAction" })
+            chart.dispatchAction(unsafeJso { type = "wrapperRemovableAction" })
             chart.off("wrapperRemovableEvent", handler)
-            chart.dispatchAction(echartsOption { type = "wrapperRemovableAction" })
+            chart.dispatchAction(unsafeJso { type = "wrapperRemovableAction" })
             assertEquals(1, calls)
         } finally {
             destroyChart(chart, container)
@@ -284,7 +298,7 @@ class EChartsTest {
             chart.onFinished { finished += 1 }
             chart.onRendered { rendered += 1 }
             chart.setOption(
-                echartsOption<EChartsOption> {
+                unsafeJso<EChartsOption> {
                     animation = false
                     series = one(pieSeries { data = numbers(1.0, 2.0) })
                 },
@@ -302,7 +316,7 @@ class EChartsTest {
         var selectedCount = -1
         try {
             chart.setOption(
-                echartsOption<EChartsOption> {
+                unsafeJso<EChartsOption> {
                     series = one(
                         pieSeries {
                             selectedMode = BooleanOrString("multiple")
@@ -312,7 +326,7 @@ class EChartsTest {
                 },
             )
             chart.onSelectChanged { event -> selectedCount = event.selected.size }
-            chart.dispatchAction(echartsOption { type = "select"; seriesIndex = 0.0; dataIndex = 0.0 })
+            chart.dispatchAction(unsafeJso { type = "select"; seriesIndex = 0.0; dataIndex = 0.0 })
             assertEquals(1, selectedCount)
         } finally {
             destroyChart(chart, container)
@@ -324,8 +338,8 @@ class EChartsTest {
         val (chart, container) = createChart()
         try {
             chart.showLoading()
-            chart.showLoading("default", echartsOption<LoadingOpts> { text = "loading" })
-            chart.showLoading(echartsOption<LoadingOpts> { text = "loading" })
+            chart.showLoading("default", unsafeJso<LoadingOpts> { text = "loading" })
+            chart.showLoading(unsafeJso<LoadingOpts> { text = "loading" })
             chart.hideLoading()
         } finally {
             destroyChart(chart, container)
@@ -368,7 +382,7 @@ class EChartsTest {
             assertTrue(chart.getDataURL().startsWith("data:image/png;base64,"))
             // Upstream reads `opts.type` without a default, so `opts` must be an object here.
             assertTrue(
-                chart.getConnectedDataURL(echartsOption<GetConnectedDataURLOpts> { })
+                chart.getConnectedDataURL(unsafeJso<GetConnectedDataURLOpts> { })
                     .startsWith("data:image/png;base64,"),
             )
         } finally {
@@ -378,7 +392,7 @@ class EChartsTest {
 
     @Test
     fun svgRendererProducesSvgOutput() {
-        val (chart, container) = createChart(opts = echartsOption { renderer = "svg" })
+        val (chart, container) = createChart(opts = unsafeJso { renderer = RendererTypes.svg })
         try {
             chart.setOption(cartesianLineOption(1.0, 2.0))
             val svg = chart.renderToSVGString()
@@ -394,23 +408,23 @@ class EChartsTest {
         val (chart, container) = createChart()
         try {
             chart.setOption(
-                echartsOption<EChartsOption> {
-                    xAxis = one(echartsOption<XAxisOption> { type = "value"; min = 0.0; max = 100.0 })
-                    yAxis = one(echartsOption<YAxisOption> { type = "value"; min = 0.0; max = 100.0 })
-                    calendar = one(echartsOption<CalendarOption> { range = "2026-10" })
+                unsafeJso<EChartsOption> {
+                    xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.value; min = AxisMinMax(0.0); max = AxisMinMax(100.0) })
+                    yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value; min = AxisMinMax(0.0); max = AxisMinMax(100.0) })
+                    calendar = one(unsafeJso<CalendarOption> { range = CalendarRange(DataZoomValue("2026-10")) })
                     series = one(lineSeries { data = numbers(0.0, 100.0) })
                 },
             )
-            val finder = ModelFinder(echartsOption<ModelFinderObject> { xAxisIndex = 0.0 })
-            val pixel = chart.convertToPixel(finder, 50.0).unsafeCast<Double>()
-            val value = chart.convertFromPixel(finder, pixel).unsafeCast<Double>()
+            val finder = ModelFinder(unsafeJso<ModelFinderObject> { xAxisIndex = 0.0 })
+            val pixel = chart.convertToPixel(finder, OptionDataValueOrArray(50.0)).unsafeCast<Double>()
+            val value = chart.convertFromPixel(finder, DoubleOrDoubleArray(pixel)).unsafeCast<Double>()
             assertEquals(50.0, value, 0.5)
             // Cartesian grids do not implement `convertToLayout`; calendar does.
             assertEquals("object", jsTypeOf(chart.convertToLayout(ModelFinder("calendar"), "2026-10-15")))
-            val gridFinder = ModelFinder(echartsOption<ModelFinderObject> { gridIndex = 0.0 })
+            val gridFinder = ModelFinder(unsafeJso<ModelFinderObject> { gridIndex = 0.0 })
             val inside = chart.convertToPixel(
                 gridFinder,
-                arrayOf<JsAny>(50.0, 50.0),
+                OptionDataValueOrArray(arrayOf(OptionDataValue(50.0), OptionDataValue(50.0))),
             ).unsafeCast<Array<Double>>()
             assertTrue(chart.containPixel(gridFinder, inside))
             assertFalse(chart.containPixel(gridFinder, arrayOf(-1000.0, -1000.0)))
@@ -423,7 +437,7 @@ class EChartsTest {
     fun getVisualReturnsTheSeriesColor() {
         val (chart, container) = createChart()
         try {
-            chart.setOption(cartesianLineOption(1.0, 2.0) { color = arrayOf("#010203") })
+            chart.setOption(cartesianLineOption(1.0, 2.0) { color = arrayOf(ZRColor("#010203")) })
             assertEquals("#010203", seriesColor(chart))
             assertTrue(jsTypeOf(chart.getVisual(ModelFinder("series"), "symbolSize")) != "undefined")
         } finally {
@@ -436,7 +450,7 @@ class EChartsTest {
         val (chart, container) = createChart()
         try {
             chart.setOption(cartesianLineOption(1.0, 2.0))
-            chart.appendData(echartsOption { seriesIndex = 0.0; data = numbers(3.0, 4.0) })
+            chart.appendData(unsafeJso { seriesIndex = 0.0; data = numbers(3.0, 4.0) })
             chart.updateLabelLayout()
         } finally {
             destroyChart(chart, container)
@@ -451,7 +465,7 @@ class EChartsTest {
             val payload = chart.makeActionFromEvent(
                 json("type" to "highlight", "seriesIndex" to 0).unsafeCast<ECActionEvent>(),
             )
-            assertEquals("highlight", payload.type)
+            assertEquals(EChartsActions.Highlight, payload.type)
         } finally {
             destroyChart(chart, container)
         }
@@ -475,25 +489,28 @@ class EChartsTest {
 
     @Test
     fun registrationsAreCallable() {
-        ECharts.registerPreprocessor { }
-        ECharts.registerProcessor { }
-        ECharts.registerProcessor(10.0) { }
-        ECharts.registerLayout { }
-        ECharts.registerLayout(10.0) { }
-        ECharts.registerVisual { }
-        ECharts.registerVisual(10.0) { }
-        ECharts.registerLoading("wrapper-test-loading", echartsOption<RawOption> { })
+        ECharts.registerPreprocessor { _, _ -> }
+        ECharts.registerProcessor { _, _, _ -> }
+        ECharts.registerProcessor(10.0) { _, _, _ -> }
+        ECharts.registerLayout { _, _, _ -> }
+        ECharts.registerLayout(10.0) { _, _, _ -> }
+        ECharts.registerVisual { _, _, _ -> }
+        ECharts.registerVisual(10.0) { _, _, _ -> }
+        ECharts.registerLoading("wrapper-test-loading") { _, _ ->
+            // Registration does not inspect the element; only showing the effect would.
+            document.createElement(HtmlTagName.div).unsafeCast<ZRElement>()
+        }
         ECharts.registerPostInit { }
-        ECharts.registerPostUpdate { }
+        ECharts.registerPostUpdate { _, _ -> }
         ECharts.registerUpdateLifecycle("afterinit") { }
         ECharts.registerTransform(
-            json(
-                "type" to "wrapper:noop",
-                "transform" to ({ value: JsAny -> value }.unsafeCast<JsAny>()),
-            ),
+            unsafeJso<ExternalTransform> {
+                type = "wrapper:noop"
+                transform = { param -> arrayOf(unsafeJso { data = param.upstream.getRawData() }) }
+            },
         )
-        ECharts.registerLocale("wrapper-test-locale", echartsOption<RawOption> { })
-        ECharts.setPlatformAPI(echartsOption<RawOption> { })
+        ECharts.registerLocale("wrapper-test-locale", unsafeJso<LocaleOption> { })
+        ECharts.setPlatformAPI(unsafeJso<PlatformAPI> { })
         ECharts.use(arrayOf(EChartsFeatures.LabelLayout))
         assertNotNull(ECharts.dataTool)
         assertNotNull(ECharts.matrix)
@@ -517,9 +534,9 @@ class EChartsTest {
         val chart = EChartsCore.init(container, null, null)
         try {
             chart.setOption(
-                echartsOption<EChartsOption> {
-                    xAxis = one(echartsOption<XAxisOption> { type = "category"; data = numbers(1.0, 2.0) })
-                    yAxis = one(echartsOption<YAxisOption> { type = "value" })
+                unsafeJso<EChartsOption> {
+                    xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = numbers(1.0, 2.0) })
+                    yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
                     series = one(lineSeries { data = numbers(1.0, 2.0) })
                 },
             )

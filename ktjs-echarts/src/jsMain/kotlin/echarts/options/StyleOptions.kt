@@ -1,17 +1,30 @@
 package echarts.options
 
+import echarts.AnimationEasing
+import echarts.BlurScope
+import echarts.EmphasisFocus
+import js.objects.Record
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
+import web.canvas.CanvasLineCap
+import web.canvas.CanvasLineJoin
+import web.cssom.FontStyle
+import web.cssom.TextAlign
+import web.cssom.VerticalAlign
+import zrender.TextOverflow
+import zrender.ZRColor
+import zrender.ZRFontWeight
+import zrender.ZRLineType
 
 /**
  * Shadow settings shared by text and shape styles.
  */
-external interface ShadowOption : JsAny {
+external interface ShadowOption {
     /** Shadow blur radius in pixels. */
     var shadowBlur: Double?
 
     /** Shadow color. */
-    var shadowColor: JsAny?
+    var shadowColor: ZRColor?
 
     /** Horizontal shadow offset in pixels. */
     var shadowOffsetX: Double?
@@ -24,41 +37,41 @@ external interface ShadowOption : JsAny {
  * Common text style, used by `textStyle`, axis names, tooltip text and labels.
  */
 external interface TextStyleOption : ShadowOption {
-    /** Text color. */
-    var color: JsAny?
+    /** Text color; `"inherit"` reuses the parent color. */
+    var color: String?
 
-    /** Font style: `"normal"`, `"italic"` or `"oblique"`. */
-    var fontStyle: String?
+    /** Font style, a CSS `font-style` keyword. */
+    var fontStyle: FontStyle?
 
     /** Font weight: `"normal"`, `"bold"`, `"bolder"`, `"lighter"` or `100`..`900`. */
-    var fontWeight: JsAny?
+    var fontWeight: ZRFontWeight?
 
     /** Font family. */
     var fontFamily: String?
 
-    /** Font size in pixels. */
-    var fontSize: Double?
+    /** Font size in pixels or as a string. */
+    var fontSize: StringOrDouble?
 
     /** Line height in pixels. */
     var lineHeight: Double?
 
-    /** Horizontal alignment: `"left"`, `"center"` or `"right"`. */
-    var align: String?
+    /** Horizontal alignment of the text. */
+    var align: TextAlign?
 
-    /** Vertical alignment: `"top"`, `"middle"` or `"bottom"`. */
-    var verticalAlign: String?
+    /** Vertical alignment of the text. */
+    var verticalAlign: VerticalAlign?
 
-    /** Background color of the text block. */
-    var backgroundColor: JsAny?
+    /** Background color of the text block, or an image pattern. */
+    var backgroundColor: ZRColor?
 
     /** Border color of the text block. */
-    var borderColor: JsAny?
+    var borderColor: String?
 
     /** Border width of the text block in pixels. */
     var borderWidth: Double?
 
-    /** Border type: `"solid"`, `"dashed"` or `"dotted"`. */
-    var borderType: String?
+    /** Border type: `"solid"`, `"dashed"`, `"dotted"` or a dash pattern. */
+    var borderType: ZRLineType?
 
     /** Border radius of the text block. */
     var borderRadius: DoubleOrDoubleArray?
@@ -67,25 +80,25 @@ external interface TextStyleOption : ShadowOption {
     var padding: DoubleOrDoubleArray?
 
     /** Block width; only effective when [overflow] is set. */
-    var width: Double?
+    var width: StringOrDouble?
 
     /** Block height. */
     var height: Double?
 
-    /** Overflow behaviour: `"truncate"`, `"break"` or `"breakAll"`. */
-    var overflow: String?
+    /** Overflow behaviour of the text. */
+    var overflow: TextOverflow?
 
     /** Ellipsis shown when [overflow] is `"truncate"`. */
     var ellipsis: String?
 
     /** Text stroke color. */
-    var textBorderColor: JsAny?
+    var textBorderColor: String?
 
     /** Text stroke width. */
     var textBorderWidth: Double?
 
-    /** Text stroke type: `"solid"`, `"dashed"` or `"dotted"`. */
-    var textBorderType: String?
+    /** Text stroke type: `"solid"`, `"dashed"`, `"dotted"` or a dash pattern. */
+    var textBorderType: ZRLineType?
 
     /** Text stroke dash offset. */
     var textBorderDashOffset: Double?
@@ -94,7 +107,7 @@ external interface TextStyleOption : ShadowOption {
     var textShadowBlur: Double?
 
     /** Text shadow color. */
-    var textShadowColor: JsAny?
+    var textShadowColor: String?
 
     /** Text shadow horizontal offset. */
     var textShadowOffsetX: Double?
@@ -106,39 +119,48 @@ external interface TextStyleOption : ShadowOption {
     var opacity: Double?
 
     /** Rich text styles keyed by the tags used in [LabelOption.formatter]. */
-    var rich: JsAny?
+    var rich: Record<String, TextStyleOption>?
 }
 
 /**
  * Item style shared by shapes such as bars, symbols and map areas.
  */
 external interface ItemStyleOption : ShadowOption {
-    /** Fill color. */
-    var color: JsAny?
+    /** Fill color, or a callback computing it from the data item. */
+    var color: ZRColor?
 
     /** Border color. */
-    var borderColor: JsAny?
+    var borderColor: ZRColor?
 
     /** Border width in pixels. */
     var borderWidth: Double?
 
-    /** Border type: `"solid"`, `"dashed"` or `"dotted"`. */
-    var borderType: String?
+    /** Border type: `"solid"`, `"dashed"`, `"dotted"` or a dash pattern. */
+    var borderType: ZRLineType?
+
+    /** Line cap of the border. */
+    var borderCap: CanvasLineCap?
+
+    /** Line join of the border. */
+    var borderJoin: CanvasLineJoin?
 
     /** Dash offset of a dashed border. */
     var borderDashOffset: Double?
 
-    /** Border radius. */
-    var borderRadius: DoubleOrDoubleArray?
+    /** Miter limit of the border. */
+    var borderMiterLimit: Double?
+
+    /** Border radius, or an array of radii. */
+    var borderRadius: StringOrDoubleOrArray?
 
     /** Opacity, `0..1`. */
     var opacity: Double?
 
-    /** Decal pattern applied to the item. */
-    var decal: JsAny?
+    /** Decal pattern applied to the item, or `"none"`. */
+    var decal: DecalSetting?
 
     /** Area fill color, used by map and geo items. */
-    var areaColor: JsAny?
+    var areaColor: ZRColor?
 }
 
 /**
@@ -146,22 +168,22 @@ external interface ItemStyleOption : ShadowOption {
  */
 external interface LineStyleOption : ShadowOption {
     /** Line color. */
-    var color: JsAny?
+    var color: ZRColor?
 
     /** Line width in pixels. */
     var width: Double?
 
-    /** Line type: `"solid"`, `"dashed"`, `"dotted"` or a `[dash, gap]` array. */
-    var type: JsAny?
+    /** Line type: `"solid"`, `"dashed"`, `"dotted"`, a number or a `[dash, gap]` array. */
+    var type: ZRLineType?
 
     /** Dash offset. */
     var dashOffset: Double?
 
-    /** Line cap: `"butt"`, `"round"` or `"square"`. */
-    var cap: String?
+    /** Line cap of the line. */
+    var cap: CanvasLineCap?
 
-    /** Line join: `"bevel"`, `"round"` or `"miter"`. */
-    var join: String?
+    /** Line join of the line. */
+    var join: CanvasLineJoin?
 
     /** Miter limit for `join = "miter"`. */
     var miterLimit: Double?
@@ -178,7 +200,7 @@ external interface LineStyleOption : ShadowOption {
  */
 external interface AreaStyleOption : ShadowOption {
     /** Fill color. */
-    var color: JsAny?
+    var color: ZRColor?
 
     /** Opacity, `0..1`. */
     var opacity: Double?
@@ -186,14 +208,14 @@ external interface AreaStyleOption : ShadowOption {
     /** Fill origin: `"auto"`, `"start"` or `"end"`. */
     var origin: String?
 
-    /** Decal pattern applied to the area. */
-    var decal: JsAny?
+    /** Decal pattern applied to the area, or `"none"`. */
+    var decal: DecalSetting?
 }
 
 /**
  * A label line, used by pie, funnel and graph series.
  */
-external interface LabelLineOption : JsAny {
+external interface LabelLineOption {
     /** Whether to show the label line. */
     var show: Boolean?
 
@@ -227,7 +249,7 @@ external interface LabelOption : TextStyleOption {
      * Label position. The accepted values depend on the series: `"top"`, `"left"`, `"right"`,
      * `"bottom"`, `"inside"`, `"insideLeft"`, `"outside"`, `"center"`, `[x, y]`, ...
      */
-    var position: JsAny?
+    var position: LabelPosition?
 
     /** Distance to the element in pixels. */
     var distance: Double?
@@ -241,11 +263,23 @@ external interface LabelOption : TextStyleOption {
     /** Formatter: a template string such as `"{b}: {c}"` or a callback. */
     var formatter: LabelFormatter?
 
+    /** Whether the label ignores mouse events. */
+    var silent: Boolean?
+
     /** Whether the label should stay visible during the initial animation. */
     var valueAnimation: Boolean?
 
+    /** Precision of the displayed number, or `"auto"`. */
+    var precision: StringOrDouble?
+
     /** Minimum margin between the label and the container, in pixels. */
     var minMargin: Double?
+
+    /** Space kept around the label to avoid overlapping. */
+    var textMargin: DoubleOrDoubleArray?
+
+    /** Overflow behaviour of a single line. */
+    var lineOverflow: String?
 }
 
 /**
@@ -253,7 +287,7 @@ external interface LabelOption : TextStyleOption {
  *
  * Create one with `LabelFormatter("{b}: {c}")` or `LabelFormatter { params -> ... }`.
  */
-external interface LabelFormatter : JsAny
+external interface LabelFormatter
 
 /** Wraps a template string such as `"{b}: {c}"`. */
 fun LabelFormatter(template: String): LabelFormatter = template.unsafeCast<LabelFormatter>()
@@ -264,68 +298,92 @@ fun LabelFormatter(callback: (CallbackDataParams) -> String): LabelFormatter = c
 /**
  * Parameters passed to most formatter callbacks.
  */
-external interface CallbackDataParams : JsAny {
+external interface CallbackDataParams {
     /** Component type, e.g. `"series"`. */
     val componentType: String
 
-    /** Series type, e.g. `"line"`. */
+    /** Component subtype, e.g. `"line"`. */
     val componentSubType: String
 
+    /** Index of the component inside the option. */
+    val componentIndex: Int
+
+    /** Series type, e.g. `"line"`. */
+    val seriesType: String?
+
     /** Series index inside the option. */
-    val seriesIndex: Int
+    val seriesIndex: Int?
 
-    /** Data index inside the series. */
-    val dataIndex: Int
+    /** Series id. */
+    val seriesId: String?
 
-    /** Data index inside the current data transform. */
-    val dataIndexInside: Int
+    /** Series name. */
+    val seriesName: String?
 
     /** Name of the data item. */
     val name: String
 
+    /** Data index inside the series. */
+    val dataIndex: Int
+
     /** Raw value of the data item. */
-    val value: JsAny
+    val value: OptionDataItem
+
+    /** Data item object. */
+    val data: OptionDataItem
+
+    /** Data type: `"node"` or `"edge"`, used by graph and tree series. */
+    val dataType: String?
 
     /** Color assigned to the item. */
-    val color: JsAny
+    val color: ZRColor?
 
-    /** Category (x) value, when the series is on an axis. */
-    val axisValue: JsAny
+    /** Border color assigned to the item. */
+    val borderColor: String?
 
-    /** Label of the category (x) value. */
-    val axisValueLabel: String
+    /** Names of the data dimensions. */
+    val dimensionNames: Array<String>?
 
-    /** Minimum value of the category axis, when applicable. */
-    val axisType: String
-
-    /** Series name. */
-    val seriesName: String
-
-    /** Data item object, when the item was given as an object. */
-    val data: JsAny
+    /** Index of the dimension that provided [value]. */
+    val dimensionIndex: Double?
 
     /** Percent value, used by pie, funnel and gauge series. */
-    val percent: Double
+    val percent: Double?
+
+    /** Tooltip marker markup for this item. */
+    val marker: TooltipMarker?
+
+    /** Display state of the element. */
+    val status: String?
+
+    /** Category (x) value, when the series is on an axis. */
+    val axisValue: OptionDataValue?
+
+    /** Label of the category (x) value. */
+    val axisValueLabel: String?
+
+    /** Type of the axis that provided [axisValue]. */
+    val axisType: String?
 
     /** Whether the item is selected. */
-    val selected: Boolean
+    val selected: Boolean?
 
-    /** Marker markup for tooltips. */
-    fun marker(): String
+    /** Names of the variables available to a template formatter. */
+    val `$vars`: Array<String>
 }
 
 /**
  * Emphasis (hover) state of a series or element.
  */
-external interface EmphasisOption : JsAny {
+external interface EmphasisOption {
     /** Whether the emphasis state is disabled. */
     var disabled: Boolean?
 
-    /** Focus mode: `"none"`, `"self"` or `"series"`. */
-    var focus: String?
+    /** What the emphasis state focuses on. */
+    var focus: EmphasisFocus?
 
-    /** Scope of [focus]: `"coordinateSystem"`, `"series"` or `"global"`. */
-    var blurScope: String?
+    /** Scope that is blurred while [focus] is active. */
+    var blurScope: BlurScope?
 
     /** Whether to scale symbols on hover. */
     var scale: BooleanOrDouble?
@@ -349,7 +407,7 @@ external interface EmphasisOption : JsAny {
 /**
  * Blur (non-focused) state of a series or element.
  */
-external interface BlurOption : JsAny {
+external interface BlurOption {
     /** Label style in the blur state. */
     var label: LabelOption?
 
@@ -369,7 +427,7 @@ external interface BlurOption : JsAny {
 /**
  * Select state of a series or element.
  */
-external interface SelectOption : JsAny {
+external interface SelectOption {
     /** Whether selection is disabled. */
     var disabled: Boolean?
 
@@ -389,7 +447,7 @@ external interface SelectOption : JsAny {
 /**
  * Mark point, line and area styling.
  */
-external interface MarkOption : JsAny {
+external interface MarkOption {
     /** Whether the mark is silent (ignores mouse events). */
     var silent: Boolean?
 
@@ -406,24 +464,24 @@ external interface MarkOption : JsAny {
     var show: Boolean?
 
     /** Symbol used by points and line ends. */
-    var symbol: String?
+    var symbol: StringOrStringArray?
 
     /** Symbol size. */
     var symbolSize: DoubleOrDoubleArray?
 
     /** Symbol rotation in degrees. */
-    var symbolRotate: Double?
+    var symbolRotate: DoubleOrDoubleArray?
 
     /** Whether to keep the symbol upright. */
     var symbolKeepAspect: Boolean?
 
-    /** Symbol offset, `[x, y]`. */
-    var symbolOffset: Array<JsAny>?
+    /** Symbol offset. */
+    var symbolOffset: SymbolOffset?
 
     /** Precision of displayed values. */
     var precision: Double?
 
-    /** Data of the mark. */
+    /** Data of the mark. Upstream types this as `unknown[]`. */
     var data: Array<JsAny>?
 }
 
@@ -438,7 +496,7 @@ external interface MarkPointOption : MarkOption {
     var animationDuration: Double?
 
     /** Animation easing. */
-    var animationEasing: String?
+    var animationEasing: AnimationEasing?
 }
 
 /**
@@ -466,7 +524,7 @@ external interface MarkAreaOption : MarkOption {
 /**
  * Animation configuration shared by series and components.
  */
-external interface AnimationOption : JsAny {
+external interface AnimationOption {
     /** Whether animation is enabled. */
     var animation: Boolean?
 
@@ -480,10 +538,10 @@ external interface AnimationOption : JsAny {
     var animationDurationUpdate: Double?
 
     /** Easing of the initial animation. */
-    var animationEasing: String?
+    var animationEasing: AnimationEasing?
 
     /** Easing of the update animation. */
-    var animationEasingUpdate: String?
+    var animationEasingUpdate: AnimationEasing?
 
     /** Delay of the initial animation in milliseconds. */
     var animationDelay: Double?
@@ -495,7 +553,7 @@ external interface AnimationOption : JsAny {
 /**
  * Animation configuration of state transitions (hover, select, ...).
  */
-external interface StateAnimationOption : JsAny {
+external interface StateAnimationOption {
     /** Duration of the state transition in milliseconds. */
     var duration: Double?
 
@@ -504,42 +562,4 @@ external interface StateAnimationOption : JsAny {
 
     /** Delay of the state transition in milliseconds. */
     var delay: Double?
-}
-
-/**
- * Decal pattern configuration used by `aria.decal.show` and item styles.
- */
-external interface DecalOption : JsAny {
-    /** Symbol of the pattern. */
-    var symbol: String?
-
-    /** Symbol size. */
-    var symbolSize: Double?
-
-    /** Dash spacing of the pattern. */
-    var dashArrayX: DoubleOrDoubleArray?
-
-    /** Dash spacing of the pattern. */
-    var dashArrayY: DoubleOrDoubleArray?
-
-    /** Rotation of the pattern in degrees. */
-    var rotation: Double?
-
-    /** Maximum tile width. */
-    var maxTileWidth: Double?
-
-    /** Maximum tile height. */
-    var maxTileHeight: Double?
-
-    /** Background color. */
-    var backgroundColor: JsAny?
-
-    /** Color of the pattern. */
-    var color: JsAny?
-
-    /** Background color of the pattern. */
-    var decalColor: JsAny?
-
-    /** Whether the pattern is dotted. */
-    var dot: Boolean?
 }

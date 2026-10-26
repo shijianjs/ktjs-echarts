@@ -1,0 +1,828 @@
+package echarts.options
+
+import js.objects.Record
+import kotlin.js.Date
+import kotlin.js.JsAny
+import kotlin.js.unsafeCast
+import zrender.LinearGradientObject
+import zrender.PatternObject
+import zrender.RadialGradientObject
+import zrender.RectLike
+
+/**
+ * A single data value: `string | number | Date | null | undefined`.
+ *
+ * Null and undefined are represented by a Kotlin `null`.
+ */
+external interface OptionDataValue
+
+/** Wraps a string value. */
+fun OptionDataValue(value: String): OptionDataValue = value.unsafeCast<OptionDataValue>()
+
+/** Wraps a numeric value. */
+fun OptionDataValue(value: Double): OptionDataValue = value.unsafeCast<OptionDataValue>()
+
+/** Wraps a date value. */
+fun OptionDataValue(value: Date): OptionDataValue = value.unsafeCast<OptionDataValue>()
+
+/**
+ * `OptionDataValue | OptionDataValue[]`, used by formatter callbacks that may receive a single
+ * value or one value per dimension.
+ */
+external interface OptionDataValueOrArray
+
+/** Wraps a single value. */
+fun OptionDataValueOrArray(value: OptionDataValue): OptionDataValueOrArray =
+    value.unsafeCast<OptionDataValueOrArray>()
+
+/** Wraps a string value. */
+fun OptionDataValueOrArray(value: String): OptionDataValueOrArray =
+    value.unsafeCast<OptionDataValueOrArray>()
+
+/** Wraps a numeric value. */
+fun OptionDataValueOrArray(value: Double): OptionDataValueOrArray =
+    value.unsafeCast<OptionDataValueOrArray>()
+
+/** Wraps a date value. */
+fun OptionDataValueOrArray(value: Date): OptionDataValueOrArray =
+    value.unsafeCast<OptionDataValueOrArray>()
+
+/** Wraps an array of values. */
+fun OptionDataValueOrArray(values: Array<OptionDataValue?>): OptionDataValueOrArray =
+    values.unsafeCast<OptionDataValueOrArray>()
+
+/**
+ * Content returned by a tooltip formatter: an HTML string, an element or an array of elements.
+ */
+external interface TooltipContent
+
+/** Wraps an HTML string. */
+fun TooltipContent(value: String): TooltipContent = value.unsafeCast<TooltipContent>()
+
+/** Wraps an element. */
+fun TooltipContent(value: web.html.HTMLElement): TooltipContent = value.unsafeCast<TooltipContent>()
+
+/** Wraps several elements. */
+fun TooltipContent(values: Array<web.html.HTMLElement>): TooltipContent =
+    values.unsafeCast<TooltipContent>()
+
+/**
+ * Tooltip marker returned by `echarts.format.getTooltipMarker`: an HTML string or, in rich-text
+ * mode, a [RichTextTooltipMarker].
+ */
+external interface TooltipMarker
+
+/** Wraps the HTML markup form. */
+fun TooltipMarker(value: String): TooltipMarker = value.unsafeCast<TooltipMarker>()
+
+/** Wraps the rich-text form. */
+fun TooltipMarker(value: RichTextTooltipMarker): TooltipMarker = value.unsafeCast<TooltipMarker>()
+
+/**
+ * Rich-text tooltip marker.
+ */
+external interface RichTextTooltipMarker {
+    /** Render mode of the marker, `"html"` or `"richText"`. */
+    var renderMode: String
+
+    /** Markup or text content of the marker. */
+    var content: String
+
+    /** Style of the marker. */
+    var style: Record<String, JsAny>
+}
+
+/**
+ * `string | { [key: string]: string }`, used by toolbox titles and icons.
+ */
+external interface StringOrDictionary
+
+/** Wraps a plain string. */
+fun StringOrDictionary(value: String): StringOrDictionary = value.unsafeCast<StringOrDictionary>()
+
+/** Wraps a dictionary keyed by feature name. */
+fun StringOrDictionary(values: Record<String, String>): StringOrDictionary =
+    values.unsafeCast<StringOrDictionary>()
+
+/**
+ * `string | HTMLElement`, used by callbacks that may return text or a node.
+ */
+external interface StringOrHTMLElement
+
+/** Wraps a string. */
+fun StringOrHTMLElement(value: String): StringOrHTMLElement = value.unsafeCast<StringOrHTMLElement>()
+
+/** Wraps an element. */
+fun StringOrHTMLElement(value: web.html.HTMLElement): StringOrHTMLElement =
+    value.unsafeCast<StringOrHTMLElement>()
+
+/**
+ * A series data item: `OptionDataValue | Dictionary<OptionDataValue> | OptionDataValue[] |
+ * OptionDataItemObject`.
+ */
+external interface OptionDataItem
+
+/** Wraps a single value. */
+fun OptionDataItem(value: OptionDataValue): OptionDataItem = value.unsafeCast<OptionDataItem>()
+
+/** Wraps a row of values, for example an `[x, y, ...]` tuple. */
+fun OptionDataItem(values: Array<OptionDataValue?>): OptionDataItem = values.unsafeCast<OptionDataItem>()
+
+/** Wraps a data item object. */
+fun OptionDataItem(value: OptionDataItemObject): OptionDataItem = value.unsafeCast<OptionDataItem>()
+
+/** Wraps a dictionary of named values. */
+fun OptionDataItem(values: Record<String, OptionDataValue>): OptionDataItem = values.unsafeCast<OptionDataItem>()
+
+/** Wraps a category axis data item. */
+fun OptionDataItem(value: CategoryAxisDataItem): OptionDataItem = value.unsafeCast<OptionDataItem>()
+
+/**
+ * Object form of a data item.
+ *
+ * Concrete series extend this interface with their own styling and layout fields.
+ */
+external interface OptionDataItemObject {
+    /** Data item id, used by `setOption` merges and actions. */
+    var id: OptionId?
+
+    /** Data item name, shown in labels and tooltips. */
+    var name: OptionName?
+
+    /** Group id, used by the universal transition. */
+    var groupId: OptionId?
+
+    /** Child group id, used by the universal transition. */
+    var childGroupId: OptionId?
+
+    /** Value of the item. */
+    var value: OptionDataValue?
+
+    /** Whether the item is selected. */
+    var selected: Boolean?
+}
+
+/**
+ * `string | number`, used by component and data item ids.
+ */
+external interface OptionId
+
+/** Wraps a string id. */
+fun OptionId(value: String): OptionId = value.unsafeCast<OptionId>()
+
+/** Wraps a numeric id. */
+fun OptionId(value: Double): OptionId = value.unsafeCast<OptionId>()
+
+/** `string | number`, used by component and data item names. */
+typealias OptionName = OptionId
+
+/**
+ * `boolean | "auto" | number`, describing whether the first row of a dataset contains the
+ * dimension names.
+ */
+external interface OptionSourceHeader
+
+/** Wraps a boolean. */
+fun OptionSourceHeader(value: Boolean): OptionSourceHeader = value.unsafeCast<OptionSourceHeader>()
+
+/** Wraps `"auto"` or another string value. */
+fun OptionSourceHeader(value: String): OptionSourceHeader = value.unsafeCast<OptionSourceHeader>()
+
+/** Wraps a row index. */
+fun OptionSourceHeader(value: Double): OptionSourceHeader = value.unsafeCast<OptionSourceHeader>()
+
+/**
+ * Explicit definition of a data dimension.
+ */
+external interface DimensionDefinition {
+    /** Dimension type: `"number"`, `"ordinal"`, `"time"` or `"float"`. */
+    var type: String?
+
+    /** Dimension name. */
+    var name: String?
+
+    /** Name used by tooltips and axis labels. */
+    var displayName: String?
+}
+
+/**
+ * A dimension definition, either a name or a [DimensionDefinition].
+ */
+external interface DimensionDefinitionLoose
+
+/** Wraps a dimension name. */
+fun DimensionDefinitionLoose(value: String): DimensionDefinitionLoose =
+    value.unsafeCast<DimensionDefinitionLoose>()
+
+/** Wraps an explicit definition. */
+fun DimensionDefinitionLoose(value: DimensionDefinition): DimensionDefinitionLoose =
+    value.unsafeCast<DimensionDefinitionLoose>()
+
+/**
+ * A dimension reference: a name or an index.
+ */
+external interface DimensionLoose
+
+/** Wraps a dimension name. */
+fun DimensionLoose(value: String): DimensionLoose = value.unsafeCast<DimensionLoose>()
+
+/** Wraps a dimension index. */
+fun DimensionLoose(value: Double): DimensionLoose = value.unsafeCast<DimensionLoose>()
+
+/**
+ * Value of one `encode` entry: a dimension or an array of dimensions.
+ */
+external interface OptionEncodeValue
+
+/** Wraps one dimension. */
+fun OptionEncodeValue(value: DimensionLoose): OptionEncodeValue = value.unsafeCast<OptionEncodeValue>()
+
+/** Wraps several dimensions. */
+fun OptionEncodeValue(values: Array<DimensionLoose>): OptionEncodeValue =
+    values.unsafeCast<OptionEncodeValue>()
+
+/**
+ * Mapping between data dimensions and the roles used by a series.
+ */
+external interface OptionEncode {
+    /** Dimensions used by the tooltip. */
+    var tooltip: OptionEncodeValue?
+
+    /** Dimensions used by the label. */
+    var label: OptionEncodeValue?
+
+    /** Dimension used as the item name. */
+    var itemName: OptionEncodeValue?
+
+    /** Dimension used as the item id. */
+    var itemId: OptionEncodeValue?
+
+    /** Dimension used as the series name. */
+    var seriesName: OptionEncodeValue?
+
+    /** Dimension used as the item group id. */
+    var itemGroupId: OptionEncodeValue?
+
+    /** Dimension used as the item child group id. */
+    var childGroupdId: OptionEncodeValue?
+}
+
+/**
+ * Dataset source data.
+ *
+ * The upstream type is a union of several shapes. Because overloads that only differ in their
+ * element type cannot coexist in Kotlin/JS, the non-array branches use dedicated helper functions
+ * instead of `DatasetSource(...)`:
+ *
+ * ```kotlin
+ * source = datasetArrayRows(arrayOf(row))
+ * source = datasetObjectRows(arrayOf(objectRow))
+ * ```
+ */
+external interface DatasetSource
+
+/** Wraps the original shape: an array of values, value arrays or data item objects. */
+fun datasetOriginal(values: Array<OptionDataItem>): DatasetSource =
+    values.unsafeCast<DatasetSource>()
+
+/** Wraps rows in which every row is an object keyed by dimension name. */
+fun datasetObjectRows(rows: Array<Record<String, OptionDataValue>>): DatasetSource =
+    rows.unsafeCast<DatasetSource>()
+
+/** Wraps rows in which every row is an array of values. */
+fun datasetArrayRows(rows: Array<Array<OptionDataValue>>): DatasetSource =
+    rows.unsafeCast<DatasetSource>()
+
+/** Wraps columns keyed by dimension name. */
+fun datasetKeyedColumns(columns: Record<String, Array<OptionDataValue>>): DatasetSource =
+    columns.unsafeCast<DatasetSource>()
+
+/** Wraps a typed array of numbers. Kotlin `DoubleArray` maps to a JavaScript `Float64Array`. */
+fun datasetTypedArray(values: DoubleArray): DatasetSource = values.unsafeCast<DatasetSource>()
+
+/** @see DatasetSource */
+typealias OptionSourceData = DatasetSource
+
+/**
+ * An external data transform used by `dataset.transform`.
+ */
+external interface DataTransformOption {
+    /** Transform type, e.g. `"filter"` or `"sort"`. */
+    var type: String?
+
+    /** Transform-specific configuration. */
+    var config: Record<String, JsAny>?
+
+    /** Whether to print debug information. */
+    var print: Boolean?
+}
+
+/** A pipeline of transforms. */
+typealias PipedDataTransformOption = Array<DataTransformOption>
+
+/**
+ * Limit of the roam zoom level.
+ */
+external interface ScaleLimitOption {
+    /** Minimum zoom. */
+    var min: Double?
+
+    /** Maximum zoom. */
+    var max: Double?
+}
+
+/**
+ * Offset of a symbol: `string | number | (string | number)[] | callback`.
+ */
+external interface SymbolOffset
+
+/** Wraps a percentage-like string. */
+fun SymbolOffset(value: String): SymbolOffset = value.unsafeCast<SymbolOffset>()
+
+/** Wraps an absolute number. */
+fun SymbolOffset(value: Double): SymbolOffset = value.unsafeCast<SymbolOffset>()
+
+/** Wraps an `[x, y]` pair. */
+fun SymbolOffset(values: Array<StringOrDouble>): SymbolOffset = values.unsafeCast<SymbolOffset>()
+
+/** Wraps a callback that computes the offset from the data value. */
+fun SymbolOffset(callback: (value: OptionDataItem, params: CallbackDataParams) -> Array<Double>): SymbolOffset =
+    callback.unsafeCast<SymbolOffset>()
+
+/**
+ * Size of a symbol: `number | number[] | callback`.
+ */
+external interface SymbolSize
+
+/** Wraps a single number. */
+fun SymbolSize(value: Double): SymbolSize = value.unsafeCast<SymbolSize>()
+
+/** Wraps a `[width, height]` pair. */
+fun SymbolSize(values: Array<Double>): SymbolSize = values.unsafeCast<SymbolSize>()
+
+/** Wraps a callback that computes the size from the data value. */
+fun SymbolSize(callback: (value: OptionDataItem, params: CallbackDataParams) -> DoubleOrDoubleArray): SymbolSize =
+    callback.unsafeCast<SymbolSize>()
+
+/**
+ * `number | string | (number | string)[]`, used by radii and similar sizes.
+ */
+external interface StringOrDoubleOrArray
+
+/** Wraps a string. */
+fun StringOrDoubleOrArray(value: String): StringOrDoubleOrArray =
+    value.unsafeCast<StringOrDoubleOrArray>()
+
+/** Wraps a number. */
+fun StringOrDoubleOrArray(value: Double): StringOrDoubleOrArray =
+    value.unsafeCast<StringOrDoubleOrArray>()
+
+/** Wraps an array of numbers and strings. */
+fun StringOrDoubleOrArray(values: Array<StringOrDouble>): StringOrDoubleOrArray =
+    values.unsafeCast<StringOrDoubleOrArray>()
+
+/**
+ * Position of a label: a built-in position name or an `[x, y]` pair.
+ */
+external interface LabelPosition
+
+/** Wraps a built-in position such as `"top"`, `"inside"` or `"insideRight"`. */
+fun LabelPosition(value: String): LabelPosition = value.unsafeCast<LabelPosition>()
+
+/** Wraps an `[x, y]` position. */
+fun LabelPosition(values: Array<StringOrDouble>): LabelPosition = values.unsafeCast<LabelPosition>()
+
+/**
+ * Position of a tooltip: an array, a built-in position, a callback or a box layout.
+ */
+external interface TooltipPosition
+
+/** Wraps a built-in position such as `"inside"`, `"top"` or `"bottom"`. */
+fun TooltipPosition(value: String): TooltipPosition = value.unsafeCast<TooltipPosition>()
+
+/** Wraps an `[x, y]` position. */
+fun TooltipPosition(values: Array<StringOrDouble>): TooltipPosition = values.unsafeCast<TooltipPosition>()
+
+/** Wraps a box layout. */
+fun TooltipPosition(value: TooltipBoxLayoutOption): TooltipPosition = value.unsafeCast<TooltipPosition>()
+
+/** Wraps a callback that computes the position from the pointer and content rect. */
+fun TooltipPosition(
+    callback: (
+        point: Array<Double>,
+        params: CallbackDataParams,
+        el: JsAny?,
+        rect: RectLike?,
+        size: TooltipSize,
+    ) -> TooltipPosition,
+): TooltipPosition = callback.unsafeCast<TooltipPosition>()
+
+/**
+ * Tooltip position expressed as distances to the container edges.
+ */
+external interface TooltipBoxLayoutOption {
+    /** Distance to the top edge. */
+    var top: StringOrDouble?
+
+    /** Distance to the left edge. */
+    var left: StringOrDouble?
+
+    /** Distance to the right edge. */
+    var right: StringOrDouble?
+
+    /** Distance to the bottom edge. */
+    var bottom: StringOrDouble?
+}
+
+/**
+ * Sizes passed to a tooltip position callback.
+ */
+external interface TooltipSize {
+    /** Size of the tooltip content, `[width, height]`. */
+    var contentSize: Array<Double>
+
+    /** Size of the chart view, `[width, height]`. */
+    var viewSize: Array<Double>
+}
+
+/**
+ * `boolean | number | string`, used by options that accept a flag, a number or a named mode.
+ */
+external interface BooleanOrDoubleOrString
+
+/** Wraps a boolean. */
+fun BooleanOrDoubleOrString(value: Boolean): BooleanOrDoubleOrString =
+    value.unsafeCast<BooleanOrDoubleOrString>()
+
+/** Wraps a number. */
+fun BooleanOrDoubleOrString(value: Double): BooleanOrDoubleOrString =
+    value.unsafeCast<BooleanOrDoubleOrString>()
+
+/** Wraps a string. */
+fun BooleanOrDoubleOrString(value: String): BooleanOrDoubleOrString =
+    value.unsafeCast<BooleanOrDoubleOrString>()
+
+/**
+ * `boolean | (string | number)[]`, used by `boundaryGap`.
+ */
+external interface BooleanOrStringArray
+
+/** Wraps a boolean. */
+fun BooleanOrStringArray(value: Boolean): BooleanOrStringArray =
+    value.unsafeCast<BooleanOrStringArray>()
+
+/** Wraps an array of numbers and strings. */
+fun BooleanOrStringArray(values: Array<StringOrDouble>): BooleanOrStringArray =
+    values.unsafeCast<BooleanOrStringArray>()
+
+/**
+ * Minimum or maximum of an axis: a number, a keyword such as `"dataMin"`, or a callback.
+ */
+external interface AxisMinMax
+
+/** Wraps a number. */
+fun AxisMinMax(value: Double): AxisMinMax = value.unsafeCast<AxisMinMax>()
+
+/** Wraps a keyword such as `"dataMin"` or `"dataMax"`. */
+fun AxisMinMax(value: String): AxisMinMax = value.unsafeCast<AxisMinMax>()
+
+/** Wraps a callback that receives the data extent. */
+fun AxisMinMax(callback: (extent: AxisExtent) -> Double): AxisMinMax =
+    callback.unsafeCast<AxisMinMax>()
+
+/**
+ * Extent passed to an [AxisMinMax] callback.
+ */
+external interface AxisExtent {
+    /** Minimum value of the data. */
+    var min: Double
+
+    /** Maximum value of the data. */
+    var max: Double
+}
+
+/**
+ * Interval between axis ticks or labels: a number, `"auto"`, or a callback.
+ */
+external interface AxisInterval
+
+/** Wraps a number. */
+fun AxisInterval(value: Double): AxisInterval = value.unsafeCast<AxisInterval>()
+
+/** Wraps `"auto"` or another keyword. */
+fun AxisInterval(value: String): AxisInterval = value.unsafeCast<AxisInterval>()
+
+/** Wraps a callback that decides whether the tick at [index] is shown. */
+fun AxisInterval(callback: (index: Double, value: String) -> Boolean): AxisInterval =
+    callback.unsafeCast<AxisInterval>()
+
+/**
+ * One or more axis indices controlled by a component.
+ */
+external interface IndexOrIndexArray
+
+/** Wraps a single index. */
+fun IndexOrIndexArray(value: Double): IndexOrIndexArray = value.unsafeCast<IndexOrIndexArray>()
+
+/** Wraps several indices. */
+fun IndexOrIndexArray(values: Array<Double>): IndexOrIndexArray = values.unsafeCast<IndexOrIndexArray>()
+
+/**
+ * Query for the index of one or more components: a number, an array, `"all"`, `"none"` or `false`.
+ */
+external interface ModelFinderIndexQuery
+
+/** Wraps a single index. */
+fun ModelFinderIndexQuery(value: Double): ModelFinderIndexQuery = value.unsafeCast<ModelFinderIndexQuery>()
+
+/** Wraps several indices. */
+fun ModelFinderIndexQuery(values: Array<Double>): ModelFinderIndexQuery =
+    values.unsafeCast<ModelFinderIndexQuery>()
+
+/** Wraps `"all"`, `"none"` or another keyword. */
+fun ModelFinderIndexQuery(value: String): ModelFinderIndexQuery =
+    value.unsafeCast<ModelFinderIndexQuery>()
+
+/** Wraps a boolean. */
+fun ModelFinderIndexQuery(value: Boolean): ModelFinderIndexQuery =
+    value.unsafeCast<ModelFinderIndexQuery>()
+
+/**
+ * A data zoom bound: a percentage number, a value name, a number or a date.
+ */
+external interface DataZoomValue
+
+/** Wraps a percentage number. */
+fun DataZoomValue(value: Double): DataZoomValue = value.unsafeCast<DataZoomValue>()
+
+/** Wraps a category name or a date string. */
+fun DataZoomValue(value: String): DataZoomValue = value.unsafeCast<DataZoomValue>()
+
+/** Wraps a date. */
+fun DataZoomValue(value: Date): DataZoomValue = value.unsafeCast<DataZoomValue>()
+
+/**
+ * Visual style applied by a visual map.
+ */
+external interface VisualOptionUnit {
+    /** Symbol shape. */
+    var symbol: String?
+
+    /** Symbol size. */
+    var symbolSize: Double?
+
+    /** Color. */
+    var color: String?
+
+    /** Alpha of the color, `0..1`. */
+    var colorAlpha: Double?
+
+    /** Opacity, `0..1`. */
+    var opacity: Double?
+
+    /** Lightness of the color, `0..1`. */
+    var colorLightness: Double?
+
+    /** Saturation of the color, `0..1`. */
+    var colorSaturation: Double?
+
+    /** Hue of the color, `0..360`. */
+    var colorHue: Double?
+
+    /** Decal pattern. */
+    var decal: DecalObject?
+
+    /** z-order offset. */
+    var liftZ: Double?
+}
+
+/** @see VisualOptionUnit */
+typealias VisualOptionPiecewise = VisualOptionUnit
+
+/**
+ * One piece of a piecewise visual map.
+ */
+external interface VisualPiece : VisualOptionUnit {
+    /** Lower bound (inclusive). */
+    var min: Double?
+
+    /** Upper bound (inclusive). */
+    var max: Double?
+
+    /** Exclusive lower bound. */
+    var gt: Double?
+
+    /** Exclusive upper bound. */
+    var lt: Double?
+
+    /** Inclusive lower bound. */
+    var gte: Double?
+
+    /** Inclusive upper bound. */
+    var lte: Double?
+
+    /** Exact value. */
+    var value: Double?
+
+    /** Text shown for this piece. */
+    var label: String?
+}
+
+/**
+ * Configuration of the `inRange` / `outOfRange` controllers of a visual map.
+ */
+external interface VisualMapControllerOption {
+    /** Style applied inside the selected range. */
+    var inRange: VisualOptionUnit?
+
+    /** Style applied outside the selected range. */
+    var outOfRange: VisualOptionUnit?
+}
+
+/**
+ * One target of a visual map.
+ */
+external interface VisualMapSeriesTarget {
+    /** Index of the series. */
+    var seriesIndex: Double?
+
+    /** Id of the series. */
+    var seriesId: OptionId?
+
+    /** Dimension of the series. */
+    var dimension: Double
+}
+
+/**
+ * Universal transition animation between series types.
+ */
+external interface UniversalTransitionOption {
+    /** Whether the transition is enabled. */
+    var enabled: Boolean?
+
+    /** Delay of one data item, given its index and the item count. */
+    var delay: ((index: Double, count: Double) -> Double)?
+
+    /** How shapes are divided: `"split"` or `"clone"`. */
+    var divideShape: String?
+
+    /**
+     * Key used to match data items between the old and the new series:
+     * `"id"`, `"name"`, a dimension name or a callback.
+     */
+    var seriesKey: StringOrStringArray?
+}
+
+/**
+ * `boolean | UniversalTransitionOption`.
+ */
+external interface BooleanOrUniversalTransitionOption
+
+/** Wraps a boolean. */
+fun BooleanOrUniversalTransitionOption(value: Boolean): BooleanOrUniversalTransitionOption =
+    value.unsafeCast<BooleanOrUniversalTransitionOption>()
+
+/** Wraps a configuration object. */
+fun BooleanOrUniversalTransitionOption(
+    value: UniversalTransitionOption,
+): BooleanOrUniversalTransitionOption = value.unsafeCast<BooleanOrUniversalTransitionOption>()
+
+/**
+ * Decal pattern configuration accepted by item and area styles.
+ */
+external interface DecalObject {
+    /** Symbol of the pattern. */
+    var symbol: StringOrStringArray?
+
+    /** Size of one tile. */
+    var symbolSize: Double?
+
+    /** Whether to keep the symbol aspect ratio. */
+    var symbolKeepAspect: Boolean?
+
+    /** Color of the pattern. */
+    var color: String?
+
+    /** Background color of the pattern. */
+    var backgroundColor: String?
+
+    /** Horizontal dash spacing. */
+    var dashArrayX: DecalDashArrayX?
+
+    /** Vertical dash spacing. */
+    var dashArrayY: DoubleOrDoubleArray?
+
+    /** Rotation of the pattern in degrees. */
+    var rotation: Double?
+
+    /** Maximum tile width. */
+    var maxTileWidth: Double?
+
+    /** Maximum tile height. */
+    var maxTileHeight: Double?
+}
+
+/**
+ * Horizontal dash spacing of a decal: a number or an array of numbers / number arrays.
+ */
+external interface DecalDashArrayX
+
+/** Wraps a single spacing. */
+fun DecalDashArrayX(value: Double): DecalDashArrayX = value.unsafeCast<DecalDashArrayX>()
+
+/** Wraps an array of spacings, where each entry may itself be an array. */
+fun DecalDashArrayX(values: Array<DoubleOrDoubleArray>): DecalDashArrayX =
+    values.unsafeCast<DecalDashArrayX>()
+
+/**
+ * Setting of an item decal: a [DecalObject] or the string `"none"`.
+ */
+external interface DecalSetting
+
+/** Wraps a decal configuration. */
+fun DecalSetting(value: DecalObject): DecalSetting = value.unsafeCast<DecalSetting>()
+
+/** Wraps `"none"`. */
+fun DecalSetting(value: String): DecalSetting = value.unsafeCast<DecalSetting>()
+
+/**
+ * One decal or a list of decals, used by `aria.decal.decals`.
+ */
+external interface DecalList
+
+/** Wraps a single decal. */
+fun DecalList(value: DecalObject): DecalList = value.unsafeCast<DecalList>()
+
+/** Wraps a list of decals. */
+fun DecalList(values: Array<DecalObject>): DecalList = values.unsafeCast<DecalList>()
+
+/**
+ * `boolean | "single" | "multiple"`, used by selection modes.
+ */
+external interface SelectionMode
+
+/** Wraps a boolean. */
+fun SelectionMode(value: Boolean): SelectionMode = value.unsafeCast<SelectionMode>()
+
+/** Wraps `"single"`, `"multiple"` or another mode name. */
+fun SelectionMode(value: String): SelectionMode = value.unsafeCast<SelectionMode>()
+
+/**
+ * Layout returned by `convertToLayout`.
+ */
+external interface CoordinateSystemDataLayout {
+    /** Layout rectangle. */
+    var rect: RectLike?
+
+    /** Rectangle of the content inside [rect]. */
+    var contentRect: RectLike?
+
+    /** Range of the matrix locators, when the coordinate system is a matrix. */
+    var matrixXYLocatorRange: Array<Array<Double>>?
+}
+
+/**
+ * A visual value returned by `getVisual`: text, a number, a number array, a pattern or a gradient.
+ */
+external interface VisualValue
+
+/** Wraps a text value. */
+fun VisualValue(value: String): VisualValue = value.unsafeCast<VisualValue>()
+
+/** Wraps a number. */
+fun VisualValue(value: Double): VisualValue = value.unsafeCast<VisualValue>()
+
+/** Wraps an array of numbers. */
+fun VisualValue(values: Array<Double>): VisualValue = values.unsafeCast<VisualValue>()
+
+/** Wraps a pattern. */
+fun VisualValue(value: PatternObject): VisualValue = value.unsafeCast<VisualValue>()
+
+/** Wraps a linear gradient. */
+fun VisualValue(value: LinearGradientObject): VisualValue = value.unsafeCast<VisualValue>()
+
+/** Wraps a radial gradient. */
+fun VisualValue(value: RadialGradientObject): VisualValue = value.unsafeCast<VisualValue>()
+
+/**
+ * Layout box of a component, expressed as distances and sizes.
+ */
+external interface BoxLayoutOption {
+    /** Width; a number or a percentage string. */
+    var width: StringOrDouble?
+
+    /** Height; a number or a percentage string. */
+    var height: StringOrDouble?
+
+    /** Distance to the top side. */
+    var top: StringOrDouble?
+
+    /** Distance to the right side. */
+    var right: StringOrDouble?
+
+    /** Distance to the bottom side. */
+    var bottom: StringOrDouble?
+
+    /** Distance to the left side. */
+    var left: StringOrDouble?
+}

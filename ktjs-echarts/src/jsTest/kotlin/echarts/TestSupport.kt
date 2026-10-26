@@ -3,10 +3,10 @@ package echarts
 import echarts.options.EChartsOption
 import echarts.options.XAxisOption
 import echarts.options.YAxisOption
-import echarts.options.echartsOption
 import echarts.options.lineSeries
 import echarts.options.numbers
 import echarts.options.one
+import js.objects.unsafeJso
 import kotlin.js.Promise
 import web.animations.requestAnimationFrame
 import web.dom.document
@@ -58,9 +58,9 @@ internal fun destroyChart(chart: EChartsInstance, container: HTMLElement) {
 internal fun cartesianLineOption(
     vararg values: Double,
     block: EChartsOption.() -> Unit = {},
-): EChartsOption = echartsOption<EChartsOption> {
-    xAxis = one(echartsOption<XAxisOption> { type = "category" })
-    yAxis = one(echartsOption<YAxisOption> { type = "value" })
+): EChartsOption = unsafeJso<EChartsOption> {
+    xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category })
+    yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
     series = one(lineSeries { data = numbers(*values) })
     block()
 }

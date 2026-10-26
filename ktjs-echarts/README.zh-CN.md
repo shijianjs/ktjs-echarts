@@ -22,14 +22,15 @@ dependencies {
 完整包自带所有图表和组件，不需要注册安装器：
 
 ```kotlin
+import echarts.AxisTypes
 import echarts.ECharts
 import echarts.options.EChartsOption
 import echarts.options.XAxisOption
 import echarts.options.YAxisOption
-import echarts.options.echartsOption
 import echarts.options.lineSeries
 import echarts.options.numbers
 import echarts.options.one
+import js.objects.unsafeJso
 import web.dom.document
 import web.html.HtmlTagName
 
@@ -38,9 +39,9 @@ document.body.append(element)
 
 val chart = ECharts.init(element)
 chart.setOption(
-    echartsOption<EChartsOption> {
-        xAxis = one(echartsOption<XAxisOption> { type = "category" })
-        yAxis = one(echartsOption<YAxisOption> { type = "value" })
+    unsafeJso<EChartsOption> {
+        xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category })
+        yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
         series = arrayOf(lineSeries { data = numbers(120.0, 200.0, 150.0) })
     },
 )
@@ -58,15 +59,21 @@ window.onresize = EventHandler { chart.resize() }
 ## Option
 
 ECharts 的 option 是普通 JavaScript 对象，wrapper 用带可空 `var` 属性的
-`external interface` 建模；没设置的属性保持 ECharts 默认值。用 `echartsOption<T> { ... }`
-创建对象字面量并应用接收者代码块：
+`external interface` 建模；没设置的属性保持 ECharts 默认值。用 kotlin-js-plain-objects 的
+`js.objects.unsafeJso<T> { ... }` 创建对象字面量并应用接收者代码块：
 
 ```kotlin
-val title = echartsOption<TitleOption> {
+val title = unsafeJso<TitleOption> {
     text = "Monthly revenue"
     subtext = "In thousands"
 }
 ```
+
+带取值范围的字段用类型而不是裸字符串：`AxisTypes.category`、`SeriesTypes.line`、
+`TooltipTriggers.axis`、`LegendTypes.scroll`、`AxisPointerTypes.cross`、`ImageTypes.png`、
+`AnimationEasings.cubicOut`、`zrender.RendererTypes.svg` 都是各自 sealed 接口的常量，拼错会在编译期
+报错，而不是被 ECharts 静默忽略。CSS 语义的字段直接用 kotlin-wrappers 的类型（`web.cssom.FontStyle`、
+`FontWeight`、`TextAlign`、`VerticalAlign`）以及 canvas 的线端 / 拐角类型。
 
 `echarts.options` 中的辅助函数：
 
@@ -111,7 +118,8 @@ import echarts.EChartsComponents
 import echarts.EChartsCore
 import echarts.EChartsRenderers
 import echarts.EChartsInitOpts
-import echarts.options.echartsOption
+import js.objects.unsafeJso
+import zrender.RendererTypes
 
 EChartsCore.use(
     arrayOf(
@@ -132,7 +140,7 @@ val chart = EChartsCore.init(element)
 val chart = EChartsCore.init(
     element,
     null,
-    echartsOption<EChartsInitOpts> { renderer = "svg" },
+    unsafeJso<EChartsInitOpts> { renderer = RendererTypes.svg },
 )
 ```
 

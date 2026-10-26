@@ -1,0 +1,237 @@
+package echarts
+
+import echarts.options.BooleanOrString
+import echarts.options.EChartsOption
+import echarts.options.GaugeSeriesOption
+import echarts.options.LineSeriesOption
+import echarts.options.PieSeriesOption
+import echarts.options.StringOrDouble
+import echarts.options.StringOrDoubleOrArray
+import echarts.options.SymbolOffset
+import echarts.options.XAxisOption
+import echarts.options.YAxisOption
+import echarts.options.gaugeSeries
+import echarts.options.lineSeries
+import echarts.options.pieSeries
+import echarts.options.numbers
+import echarts.options.one
+import echarts.options.strings
+import js.objects.unsafeJso
+import kotlin.js.unsafeCast
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+import zrender.RendererTypes
+import zrender.TextOverflows
+import zrender.ZRFontWeight
+import zrender.ZRFontWeights
+import zrender.ZRLineType
+import zrender.ZRLineTypes
+
+/**
+ * Tests for the string-literal unions.
+ *
+ * The constants must compile to the bare strings that the upstream TypeScript definitions use, so
+ * every case compares the constant with the literal it replaces. The last cases show that the
+ * typed fields accept the constants and that a chart still receives the literal values.
+ */
+class LiteralsTest {
+    @Test
+    fun axisTypesMatchTheUpstreamNames() {
+        assertEquals("value", AxisTypes.value.unsafeCast<String>())
+        assertEquals("category", AxisTypes.category.unsafeCast<String>())
+        assertEquals("time", AxisTypes.time.unsafeCast<String>())
+        assertEquals("log", AxisTypes.log.unsafeCast<String>())
+    }
+
+    @Test
+    fun componentLiteralsMatchTheUpstreamNames() {
+        assertEquals("horizontal", Orients.horizontal.unsafeCast<String>())
+        assertEquals("vertical", Orients.vertical.unsafeCast<String>())
+        assertEquals("item", TooltipTriggers.item.unsafeCast<String>())
+        assertEquals("axis", TooltipTriggers.axis.unsafeCast<String>())
+        assertEquals("none", TooltipTriggers.none.unsafeCast<String>())
+        assertEquals("plain", LegendTypes.plain.unsafeCast<String>())
+        assertEquals("scroll", LegendTypes.scroll.unsafeCast<String>())
+        assertEquals("inside", DataZoomTypes.inside.unsafeCast<String>())
+        assertEquals("slider", DataZoomTypes.slider.unsafeCast<String>())
+        assertEquals("continuous", VisualMapTypes.continuous.unsafeCast<String>())
+        assertEquals("piecewise", VisualMapTypes.piecewise.unsafeCast<String>())
+        assertEquals("filter", FilterModes.filter.unsafeCast<String>())
+        assertEquals("weakFilter", FilterModes.weakFilter.unsafeCast<String>())
+        assertEquals("empty", FilterModes.empty.unsafeCast<String>())
+        assertEquals("none", FilterModes.none.unsafeCast<String>())
+        assertEquals("none", EmphasisFocuses.none.unsafeCast<String>())
+        assertEquals("self", EmphasisFocuses.self.unsafeCast<String>())
+        assertEquals("series", EmphasisFocuses.series.unsafeCast<String>())
+        assertEquals("coordinateSystem", BlurScopes.coordinateSystem.unsafeCast<String>())
+        assertEquals("series", BlurScopes.series.unsafeCast<String>())
+        assertEquals("global", BlurScopes.global.unsafeCast<String>())
+        assertEquals("line", AxisPointerTypes.line.unsafeCast<String>())
+        assertEquals("shadow", AxisPointerTypes.shadow.unsafeCast<String>())
+        assertEquals("cross", AxisPointerTypes.cross.unsafeCast<String>())
+        assertEquals("none", AxisPointerTypes.none.unsafeCast<String>())
+        assertEquals("radius", RoseTypes.radius.unsafeCast<String>())
+        assertEquals("area", RoseTypes.area.unsafeCast<String>())
+        assertEquals("png", ImageTypes.png.unsafeCast<String>())
+        assertEquals("jpeg", ImageTypes.jpeg.unsafeCast<String>())
+        assertEquals("svg", ImageTypes.svg.unsafeCast<String>())
+    }
+
+    @Test
+    fun everySeriesTypeMatchesTheUpstreamName() {
+        val seriesTypes = arrayOf(
+            Pair("line", SeriesTypes.line),
+            Pair("bar", SeriesTypes.bar),
+            Pair("pie", SeriesTypes.pie),
+            Pair("scatter", SeriesTypes.scatter),
+            Pair("effectScatter", SeriesTypes.effectScatter),
+            Pair("radar", SeriesTypes.radar),
+            Pair("map", SeriesTypes.map),
+            Pair("tree", SeriesTypes.tree),
+            Pair("treemap", SeriesTypes.treemap),
+            Pair("sunburst", SeriesTypes.sunburst),
+            Pair("graph", SeriesTypes.graph),
+            Pair("chord", SeriesTypes.chord),
+            Pair("funnel", SeriesTypes.funnel),
+            Pair("gauge", SeriesTypes.gauge),
+            Pair("pictorialBar", SeriesTypes.pictorialBar),
+            Pair("themeRiver", SeriesTypes.themeRiver),
+            Pair("custom", SeriesTypes.custom),
+            Pair("boxplot", SeriesTypes.boxplot),
+            Pair("candlestick", SeriesTypes.candlestick),
+            Pair("heatmap", SeriesTypes.heatmap),
+            Pair("parallel", SeriesTypes.parallel),
+            Pair("lines", SeriesTypes.lines),
+            Pair("sankey", SeriesTypes.sankey),
+        )
+        seriesTypes.forEach { (name, value) -> assertEquals(name, value.unsafeCast<String>()) }
+    }
+
+    @Test
+    fun everyBuiltInAnimationEasingMatchesTheUpstreamName() {
+        val easings = arrayOf(
+            Pair("linear", AnimationEasings.linear),
+            Pair("quadraticIn", AnimationEasings.quadraticIn),
+            Pair("quadraticOut", AnimationEasings.quadraticOut),
+            Pair("quadraticInOut", AnimationEasings.quadraticInOut),
+            Pair("cubicIn", AnimationEasings.cubicIn),
+            Pair("cubicOut", AnimationEasings.cubicOut),
+            Pair("cubicInOut", AnimationEasings.cubicInOut),
+            Pair("quarticIn", AnimationEasings.quarticIn),
+            Pair("quarticOut", AnimationEasings.quarticOut),
+            Pair("quarticInOut", AnimationEasings.quarticInOut),
+            Pair("quinticIn", AnimationEasings.quinticIn),
+            Pair("quinticOut", AnimationEasings.quinticOut),
+            Pair("quinticInOut", AnimationEasings.quinticInOut),
+            Pair("sinusoidalIn", AnimationEasings.sinusoidalIn),
+            Pair("sinusoidalOut", AnimationEasings.sinusoidalOut),
+            Pair("sinusoidalInOut", AnimationEasings.sinusoidalInOut),
+            Pair("exponentialIn", AnimationEasings.exponentialIn),
+            Pair("exponentialOut", AnimationEasings.exponentialOut),
+            Pair("exponentialInOut", AnimationEasings.exponentialInOut),
+            Pair("circularIn", AnimationEasings.circularIn),
+            Pair("circularOut", AnimationEasings.circularOut),
+            Pair("circularInOut", AnimationEasings.circularInOut),
+            Pair("elasticIn", AnimationEasings.elasticIn),
+            Pair("elasticOut", AnimationEasings.elasticOut),
+            Pair("elasticInOut", AnimationEasings.elasticInOut),
+            Pair("backIn", AnimationEasings.backIn),
+            Pair("backOut", AnimationEasings.backOut),
+            Pair("backInOut", AnimationEasings.backInOut),
+            Pair("bounceIn", AnimationEasings.bounceIn),
+            Pair("bounceOut", AnimationEasings.bounceOut),
+            Pair("bounceInOut", AnimationEasings.bounceInOut),
+        )
+        easings.forEach { (name, value) -> assertEquals(name, value.unsafeCast<String>()) }
+    }
+
+    @Test
+    fun zrenderLiteralsMatchTheUpstreamNames() {
+        assertEquals("canvas", RendererTypes.canvas.unsafeCast<String>())
+        assertEquals("svg", RendererTypes.svg.unsafeCast<String>())
+        assertEquals("truncate", TextOverflows.truncate.unsafeCast<String>())
+        assertEquals("break", TextOverflows.`break`.unsafeCast<String>())
+        assertEquals("breakAll", TextOverflows.breakAll.unsafeCast<String>())
+        assertEquals("none", TextOverflows.none.unsafeCast<String>())
+        assertEquals("solid", ZRLineTypes.solid.unsafeCast<String>())
+        assertEquals("dashed", ZRLineTypes.dashed.unsafeCast<String>())
+        assertEquals("dotted", ZRLineTypes.dotted.unsafeCast<String>())
+        assertEquals("normal", ZRFontWeights.normal.unsafeCast<String>())
+        assertEquals("bold", ZRFontWeights.bold.unsafeCast<String>())
+        assertEquals("bolder", ZRFontWeights.bolder.unsafeCast<String>())
+        assertEquals("lighter", ZRFontWeights.lighter.unsafeCast<String>())
+    }
+
+    @Test
+    fun literalFactoriesRoundTripJavaScriptValues() {
+        assertEquals("category", AxisType("category").unsafeCast<String>())
+        assertEquals(700.0, ZRFontWeight(700.0).unsafeCast<Double>())
+        assertEquals("solid", ZRLineType("solid").unsafeCast<String>())
+    }
+
+    @Test
+    fun typedSeriesFieldsKeepTheirValues() {
+        val option = unsafeJso<EChartsOption> {
+            xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = strings("a", "b") })
+            yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
+            series = arrayOf(
+                pieSeries {
+                    radius = StringOrDoubleOrArray("55%")
+                    roseType = RoseTypes.radius
+                },
+                gaugeSeries { radius = StringOrDouble("80%") },
+                lineSeries {
+                    step = BooleanOrString("middle")
+                    symbolOffset = SymbolOffset(4.0)
+                },
+            )
+        }
+
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(option)
+            val series = chart.getOption().series!!
+            val pie = series[0].unsafeCast<PieSeriesOption>()
+            val gauge = series[1].unsafeCast<GaugeSeriesOption>()
+            val line = series[2].unsafeCast<LineSeriesOption>()
+
+            assertEquals("55%", pie.radius!!.unsafeCast<String>())
+            assertEquals(RoseTypes.radius, pie.roseType)
+            assertEquals("80%", gauge.radius!!.unsafeCast<String>())
+            assertEquals("middle", line.step!!.unsafeCast<String>())
+            assertEquals(4.0, line.symbolOffset!!.unsafeCast<Double>())
+        } finally {
+            destroyChart(chart, container)
+        }
+    }
+
+    @Test
+    fun typedOptionFieldsAcceptTheConstantsAndKeepTheirValue() {
+        val option = unsafeJso<EChartsOption> {
+            animation = false
+            animationEasing = AnimationEasings.cubicOut
+            xAxis = one(
+                unsafeJso<XAxisOption> {
+                    type = AxisTypes.category
+                    data = strings("a", "b")
+                },
+            )
+            yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
+            series = one(lineSeries { data = numbers(1.0, 2.0) })
+        }
+
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(option)
+            val stored = chart.getOption()
+            assertEquals(AxisTypes.category, stored.xAxis!![0].type)
+            assertEquals(AxisTypes.value, stored.yAxis!![0].type)
+            assertEquals(SeriesTypes.line, stored.series!![0].type)
+            assertEquals("cubicOut", stored.animationEasing!!.unsafeCast<String>())
+            assertTrue(stored.xAxis!![0].data?.size == 2)
+        } finally {
+            destroyChart(chart, container)
+        }
+    }
+}

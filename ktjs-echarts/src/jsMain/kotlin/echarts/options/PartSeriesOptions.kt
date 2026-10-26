@@ -1,6 +1,11 @@
 package echarts.options
 
+import echarts.AnimationEasing
+import echarts.Orient
+import echarts.RoseType
+import js.objects.Record
 import kotlin.js.JsAny
+import zrender.ZRColor
 
 /**
  * Pie series.
@@ -10,13 +15,13 @@ external interface PieSeriesOption : SeriesOption {
     override var coordinateSystem: String?
 
     /** Radius of the pie, or `[inner, outer]` for a doughnut chart. */
-    var radius: JsAny?
+    var radius: StringOrDoubleOrArray?
 
     /** Center of the pie, `[x, y]`. */
     var center: Array<StringOrDouble>?
 
-    /** Rose type: `false`, `"radius"` or `"area"`. */
-    var roseType: JsAny?
+    /** Whether the sectors are drawn as roses: `"radius"` or `"area"`. */
+    var roseType: RoseType?
 
     /** Start angle in degrees. */
     var startAngle: Double?
@@ -101,7 +106,7 @@ external interface FunnelSeriesOption : SeriesOption {
  */
 external interface GaugeSeriesOption : SeriesOption {
     /** Radius of the gauge, or `[inner, outer]`. */
-    var radius: JsAny?
+    var radius: StringOrDouble?
 
     /** Center of the gauge, `[x, y]`. */
     var center: Array<StringOrDouble>?
@@ -158,7 +163,7 @@ external interface GaugeSeriesOption : SeriesOption {
 /**
  * Axis line of a gauge series.
  */
-external interface GaugeAxisLineOption : JsAny {
+external interface GaugeAxisLineOption {
     /** Whether the axis line is shown. */
     var show: Boolean?
 
@@ -172,7 +177,7 @@ external interface GaugeAxisLineOption : JsAny {
 /**
  * Progress arc of a gauge series.
  */
-external interface GaugeProgressOption : JsAny {
+external interface GaugeProgressOption {
     /** Whether the progress arc is shown. */
     var show: Boolean?
 
@@ -195,12 +200,12 @@ external interface GaugeProgressOption : JsAny {
 /**
  * Pointer of a gauge series.
  */
-external interface GaugePointerOption : JsAny {
+external interface GaugePointerOption {
     /** Whether the pointer is shown. */
     var show: Boolean?
 
     /** Icon of the pointer. */
-    var icon: JsAny?
+    var icon: String?
 
     /** Length of the pointer. */
     var length: StringOrDouble?
@@ -221,7 +226,7 @@ external interface GaugePointerOption : JsAny {
 /**
  * Anchor of a gauge pointer.
  */
-external interface GaugeAnchorOption : JsAny {
+external interface GaugeAnchorOption {
     /** Whether the anchor is shown. */
     var show: Boolean?
 
@@ -232,7 +237,7 @@ external interface GaugeAnchorOption : JsAny {
     var size: Double?
 
     /** Icon of the anchor. */
-    var icon: JsAny?
+    var icon: String?
 
     /** Offset of the anchor, `[x, y]`. */
     var offsetCenter: Array<StringOrDouble>?
@@ -247,7 +252,7 @@ external interface GaugeAnchorOption : JsAny {
 /**
  * Axis ticks of a gauge series.
  */
-external interface GaugeAxisTickOption : JsAny {
+external interface GaugeAxisTickOption {
     /** Whether the ticks are shown. */
     var show: Boolean?
 
@@ -267,7 +272,7 @@ external interface GaugeAxisTickOption : JsAny {
 /**
  * Split lines of a gauge series.
  */
-external interface GaugeSplitLineOption : JsAny {
+external interface GaugeSplitLineOption {
     /** Whether the split lines are shown. */
     var show: Boolean?
 
@@ -301,7 +306,7 @@ external interface RadarSeriesOption : SeriesOption {
     var symbolKeepAspect: Boolean?
 
     /** Symbol offset, `[x, y]`. */
-    var symbolOffset: Array<JsAny>?
+    var symbolOffset: SymbolOffset?
 
     /** How the data maps to the radar axes. */
     var seriesLayoutBy: String?
@@ -318,16 +323,16 @@ external interface MapSeriesOption : SeriesOption {
     var roam: BooleanOrString?
 
     /** Center of the map. */
-    var center: Array<JsAny>?
+    var center: Array<StringOrDouble>?
 
     /** Initial zoom level. */
     var zoom: Double?
 
     /** Zoom limits. */
-    var scaleLimit: JsAny?
+    var scaleLimit: ScaleLimitOption?
 
     /** Mapping of the names in the map data to display names. */
-    var nameMap: JsAny?
+    var nameMap: Record<String, String>?
 
     /** Selection mode: `false`, `"single"` or `"multiple"`. */
     var selectedMode: BooleanOrString?
@@ -349,6 +354,37 @@ external interface MapSeriesOption : SeriesOption {
 }
 
 /**
+ * Configuration of the force layout of a graph series.
+ */
+external interface GraphForceOption {
+    /** Initial layout: `"circular"` or `"none"`. */
+    var initLayout: String?
+
+    /** Repulsion between the nodes, one value per category or a single value. */
+    var repulsion: DoubleOrDoubleArray?
+
+    /** Gravity towards the center. */
+    var gravity: Double?
+
+    /** Friction of the movement. */
+    var friction: Double?
+
+    /** Ideal edge length, one value per category or a single value. */
+    var edgeLength: DoubleOrDoubleArray?
+
+    /** Whether the layout animates. */
+    var layoutAnimation: Boolean?
+}
+
+/**
+ * Configuration of the circular layout of a graph series.
+ */
+external interface GraphCircularOption {
+    /** Whether the labels are rotated along the node positions. */
+    var rotateLabel: Boolean?
+}
+
+/**
  * Graph series: a node-link diagram.
  */
 external interface GraphSeriesOption : SeriesOption {
@@ -359,22 +395,22 @@ external interface GraphSeriesOption : SeriesOption {
     var layoutAnimation: Boolean?
 
     /** Configuration of the force layout. */
-    var force: JsAny?
+    var force: GraphForceOption?
 
     /** Configuration of the circular layout. */
-    var circular: JsAny?
+    var circular: GraphCircularOption?
 
     /** Whether panning and zooming are enabled. */
     var roam: BooleanOrString?
 
     /** Center of the graph. */
-    var center: Array<JsAny>?
+    var center: Array<StringOrDouble>?
 
     /** Initial zoom level. */
     var zoom: Double?
 
     /** Zoom limits. */
-    var scaleLimit: JsAny?
+    var scaleLimit: ScaleLimitOption?
 
     /** Whether the nodes can be dragged. */
     var draggable: Boolean?
@@ -392,7 +428,7 @@ external interface GraphSeriesOption : SeriesOption {
     var symbolKeepAspect: Boolean?
 
     /** Symbol offset, `[x, y]`. */
-    var symbolOffset: Array<JsAny>?
+    var symbolOffset: SymbolOffset?
 
     /** Symbol of the edges. */
     var edgeSymbol: Array<String>?
@@ -439,7 +475,7 @@ external interface TreeSeriesOption : SeriesOption {
     var layout: String?
 
     /** Orientation of an orthogonal tree: `"LR"`, `"RL"`, `"TB"` or `"BT"`. */
-    var orient: String?
+    var orient: Orient?
 
     /** Distance to the left side. */
     var left: StringOrDouble?
@@ -472,7 +508,7 @@ external interface TreeSeriesOption : SeriesOption {
     var symbolKeepAspect: Boolean?
 
     /** Symbol offset, `[x, y]`. */
-    var symbolOffset: Array<JsAny>?
+    var symbolOffset: SymbolOffset?
 
     /** Depth of the tree that is expanded initially. */
     var initialTreeDepth: Double?
@@ -490,19 +526,19 @@ external interface TreeSeriesOption : SeriesOption {
     override var animationDuration: Double?
 
     /** Easing of the layout animation. */
-    override var animationEasing: String?
+    override var animationEasing: AnimationEasing?
 
     /** Whether panning and zooming are enabled. */
     var roam: BooleanOrString?
 
     /** Center of the tree. */
-    var center: Array<JsAny>?
+    var center: Array<StringOrDouble>?
 
     /** Initial zoom level. */
     var zoom: Double?
 
     /** Zoom limits. */
-    var scaleLimit: JsAny?
+    var scaleLimit: ScaleLimitOption?
 
     /** Shape of the edges: `"curve"`, `"polyline"` or `"line"`. */
     var edgeShape: String?
@@ -588,10 +624,10 @@ external interface TreemapSeriesOption : SeriesOption {
     var childrenVisibleMin: Double?
 
     /** Saturation of the color mapping. */
-    var colorSaturation: JsAny?
+    var colorSaturation: Double?
 
     /** Alpha of the color mapping. */
-    var colorAlpha: JsAny?
+    var colorAlpha: Double?
 }
 
 /**
@@ -602,7 +638,7 @@ external interface SunburstSeriesOption : SeriesOption {
     var center: Array<StringOrDouble>?
 
     /** Radius of the sunburst, or `[inner, outer]`. */
-    var radius: JsAny?
+    var radius: StringOrDoubleOrArray?
 
     /** Sort order of the sectors: `"desc"`, `"asc"` or `null`. */
     var sort: JsAny?
@@ -655,7 +691,7 @@ external interface SankeySeriesOption : SeriesOption {
     var layoutIterations: Double?
 
     /** Orientation: `"horizontal"` or `"vertical"`. */
-    var orient: String?
+    var orient: Orient?
 
     /** Whether the nodes can be dragged. */
     var draggable: Boolean?
@@ -693,7 +729,7 @@ external interface ChordSeriesOption : SeriesOption {
     var layoutIterations: Double?
 
     /** Orientation: `"horizontal"` or `"vertical"`. */
-    var orient: String?
+    var orient: Orient?
 
     /** Whether the nodes can be dragged. */
     var draggable: Boolean?
@@ -734,7 +770,7 @@ external interface ChordSeriesOption : SeriesOption {
  */
 external interface ThemeRiverSeriesOption : SeriesOption {
     /** Color palette of the river bands. */
-    var color: Array<JsAny>?
+    var color: Array<ZRColor>?
 
     /** Coordinate system: `"singleAxis"`. */
     override var coordinateSystem: String?
@@ -763,19 +799,19 @@ external interface PictorialBarSeriesOption : SeriesOption {
     var symbolPosition: String?
 
     /** Symbol offset, `[x, y]`. */
-    var symbolOffset: Array<JsAny>?
+    var symbolOffset: SymbolOffset?
 
     /** Symbol rotation in degrees. */
     var symbolRotate: Double?
 
     /** Whether to repeat the symbol along the bar. */
-    var symbolRepeat: JsAny?
+    var symbolRepeat: BooleanOrDoubleOrString?
 
     /** Direction of the repetition: `"start"` or `"end"`. */
     var symbolRepeatDirection: String?
 
     /** Margin between repeated symbols. */
-    var symbolMargin: JsAny?
+    var symbolMargin: StringOrDoubleOrArray?
 
     /** Whether to clip the symbols to the bar shape. */
     var symbolClip: Boolean?

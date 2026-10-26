@@ -1,20 +1,29 @@
 package echarts
 
+import echarts.options.DimensionLoose
 import echarts.options.EChartsOption
+import echarts.options.ModelFinderIndexQuery
+import echarts.options.OptionDataItem
 import echarts.options.StringOrDouble
 import echarts.options.StringOrStringArray
+import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
+import web.cssom.FontStyle
+import zrender.RendererType
+import zrender.ZRColor
+import zrender.ZRElementEvent
+import zrender.ZRFontWeight
 
 /**
  * Options of [ECharts.init].
  */
-external interface EChartsInitOpts : JsAny {
+external interface EChartsInitOpts {
     /** Locale name or a locale object registered with [ECharts.registerLocale]. */
-    var locale: JsAny?
+    var locale: StringOrLocaleOption?
 
-    /** Renderer: `"canvas"` or `"svg"`. */
-    var renderer: String?
+    /** Renderer used by the chart. */
+    var renderer: RendererType?
 
     /** Device pixel ratio used by the renderer. */
     var devicePixelRatio: Double?
@@ -39,9 +48,349 @@ external interface EChartsInitOpts : JsAny {
 }
 
 /**
+ * Text used by the built-in components in a specific language.
+ *
+ * Pass an instance to [ECharts.init] through [EChartsInitOpts.locale] or register it by name with
+ * [ECharts.registerLocale]. Every section is optional: missing entries are filled from the
+ * default locale.
+ */
+external interface LocaleOption {
+    /** Names of months and weekdays. */
+    var time: LocaleTimeOption?
+
+    /** Legend texts. */
+    var legend: LocaleLegendOption?
+
+    /** Toolbox texts. */
+    var toolbox: LocaleToolboxOption?
+
+    /** Series type names used by the toolbox and by `aria` descriptions. */
+    var series: LocaleSeriesOption?
+
+    /** Accessibility texts. */
+    var aria: LocaleAriaOption?
+}
+
+/** Month and weekday names. */
+external interface LocaleTimeOption {
+    /** Full month names, January first. */
+    var month: Array<String>?
+
+    /** Abbreviated month names, January first. */
+    var monthAbbr: Array<String>?
+
+    /** Full weekday names, Sunday first. */
+    var dayOfWeek: Array<String>?
+
+    /** Abbreviated weekday names, Sunday first. */
+    var dayOfWeekAbbr: Array<String>?
+}
+
+/** Legend texts. */
+external interface LocaleLegendOption {
+    /** Texts of the legend selector. */
+    var selector: LocaleLegendSelectorOption?
+}
+
+/** Texts of the legend selector buttons. */
+external interface LocaleLegendSelectorOption {
+    /** "Select all" button text. */
+    var all: String?
+
+    /** "Invert selection" button text. */
+    var inverse: String?
+}
+
+/** Toolbox texts. */
+external interface LocaleToolboxOption {
+    /** Brush feature texts. */
+    var brush: LocaleToolboxBrushOption?
+
+    /** Data view feature texts. */
+    var dataView: LocaleToolboxDataViewOption?
+
+    /** Data zoom feature texts. */
+    var dataZoom: LocaleToolboxDataZoomOption?
+
+    /** Magic type feature texts. */
+    var magicType: LocaleToolboxMagicTypeOption?
+
+    /** Restore feature texts. */
+    var restore: LocaleToolboxRestoreOption?
+
+    /** Save-as-image feature texts. */
+    var saveAsImage: LocaleToolboxSaveAsImageOption?
+}
+
+/** Brush feature texts. */
+external interface LocaleToolboxBrushOption {
+    /** Titles of the brush modes. */
+    var title: LocaleToolboxBrushTitleOption?
+}
+
+/** Titles of the brush modes. */
+external interface LocaleToolboxBrushTitleOption {
+    /** Rectangular selection. */
+    var rect: String?
+
+    /** Lasso selection. */
+    var polygon: String?
+
+    /** Horizontal selection. */
+    var lineX: String?
+
+    /** Vertical selection. */
+    var lineY: String?
+
+    /** Keep selections. */
+    var keep: String?
+
+    /** Clear selections. */
+    var clear: String?
+}
+
+/** Data view feature texts. */
+external interface LocaleToolboxDataViewOption {
+    /** Title of the feature. */
+    var title: String?
+
+    /** Labels of the data view dialog: title, close and refresh. */
+    var lang: Array<String>?
+}
+
+/** Data zoom feature texts. */
+external interface LocaleToolboxDataZoomOption {
+    /** Titles of the zoom and reset buttons. */
+    var title: LocaleToolboxDataZoomTitleOption?
+}
+
+/** Titles of the data zoom buttons. */
+external interface LocaleToolboxDataZoomTitleOption {
+    /** Zoom button title. */
+    var zoom: String?
+
+    /** Reset button title. */
+    var back: String?
+}
+
+/** Magic type feature texts. */
+external interface LocaleToolboxMagicTypeOption {
+    /** Titles of the target series types. */
+    var title: LocaleToolboxMagicTypeTitleOption?
+}
+
+/** Titles of the magic type buttons. */
+external interface LocaleToolboxMagicTypeTitleOption {
+    /** Line chart. */
+    var line: String?
+
+    /** Bar chart. */
+    var bar: String?
+
+    /** Stacked chart. */
+    var stack: String?
+
+    /** Tiled chart. */
+    var tiled: String?
+}
+
+/** Restore feature texts. */
+external interface LocaleToolboxRestoreOption {
+    /** Title of the feature. */
+    var title: String?
+}
+
+/** Save-as-image feature texts. */
+external interface LocaleToolboxSaveAsImageOption {
+    /** Title of the feature. */
+    var title: String?
+
+    /** Labels of the save dialog: tooltip and message. */
+    var lang: Array<String>?
+}
+
+/** Series texts. */
+external interface LocaleSeriesOption {
+    /** Display names of the series types. */
+    var typeNames: LocaleSeriesTypeNamesOption?
+}
+
+/** Display names of the series types. */
+external interface LocaleSeriesTypeNamesOption {
+    /** Pie series. */
+    var pie: String?
+
+    /** Bar series. */
+    var bar: String?
+
+    /** Line series. */
+    var line: String?
+
+    /** Scatter series. */
+    var scatter: String?
+
+    /** Effect scatter series. */
+    var effectScatter: String?
+
+    /** Radar series. */
+    var radar: String?
+
+    /** Tree series. */
+    var tree: String?
+
+    /** Treemap series. */
+    var treemap: String?
+
+    /** Boxplot series. */
+    var boxplot: String?
+
+    /** Candlestick series. */
+    var candlestick: String?
+
+    /** K-line series. */
+    var k: String?
+
+    /** Heatmap series. */
+    var heatmap: String?
+
+    /** Map series. */
+    var map: String?
+
+    /** Parallel series. */
+    var parallel: String?
+
+    /** Lines series. */
+    var lines: String?
+
+    /** Graph series. */
+    var graph: String?
+
+    /** Sankey series. */
+    var sankey: String?
+
+    /** Funnel series. */
+    var funnel: String?
+
+    /** Gauge series. */
+    var gauge: String?
+
+    /** Pictorial bar series. */
+    var pictorialBar: String?
+
+    /** Theme river series. */
+    var themeRiver: String?
+
+    /** Sunburst series. */
+    var sunburst: String?
+
+    /** Custom series. */
+    var custom: String?
+
+    /** Chart series. */
+    var chart: String?
+}
+
+/** Accessibility texts. */
+external interface LocaleAriaOption {
+    /** General description texts. */
+    var general: LocaleAriaGeneralOption?
+
+    /** Description texts of series data. */
+    var series: LocaleAriaSeriesOption?
+
+    /** Description texts of data values. */
+    var data: LocaleAriaDataOption?
+}
+
+/** General accessibility texts. */
+external interface LocaleAriaGeneralOption {
+    /** Template used when the chart has a title. */
+    var withTitle: String?
+
+    /** Template used when the chart has no title. */
+    var withoutTitle: String?
+}
+
+/** Accessibility texts of series data. */
+external interface LocaleAriaSeriesOption {
+    /** Template used for a single series. */
+    var single: LocaleAriaSeriesSingleOption?
+
+    /** Template used for several series. */
+    var multiple: LocaleAriaSeriesMultipleOption?
+}
+
+/** Accessibility texts of a single series. */
+external interface LocaleAriaSeriesSingleOption {
+    /** Prefix before the series description. */
+    var prefix: String?
+
+    /** Template used when the series has a name. */
+    var withName: String?
+
+    /** Template used when the series has no name. */
+    var withoutName: String?
+}
+
+/** Accessibility texts of several series. */
+external interface LocaleAriaSeriesMultipleOption {
+    /** Prefix before the series description. */
+    var prefix: String?
+
+    /** Template used when the series has a name. */
+    var withName: String?
+
+    /** Template used when the series has no name. */
+    var withoutName: String?
+
+    /** Separators between the series. */
+    var separator: LocaleAriaSeparatorOption?
+}
+
+/** Separators between accessibility descriptions. */
+external interface LocaleAriaSeparatorOption {
+    /** Separator between entries. */
+    var middle: String?
+
+    /** Separator at the end. */
+    var end: String?
+}
+
+/** Accessibility texts of data values. */
+external interface LocaleAriaDataOption {
+    /** Template used when every data item is described. */
+    var allData: String?
+
+    /** Template used when only some data items are described. */
+    var partialData: String?
+
+    /** Template used when the data item has a name. */
+    var withName: String?
+
+    /** Template used when the data item has no name. */
+    var withoutName: String?
+
+    /** Separators between the data descriptions. */
+    var separator: LocaleAriaSeparatorOption?
+}
+
+/**
+ * `string | LocaleOption`, accepted by [EChartsInitOpts.locale] and [ECharts.registerLocale].
+ */
+external interface StringOrLocaleOption
+
+/** Wraps the name of a registered locale. */
+fun StringOrLocaleOption(value: String): StringOrLocaleOption =
+    value.unsafeCast<StringOrLocaleOption>()
+
+/** Wraps an inline locale object. */
+fun StringOrLocaleOption(value: LocaleOption): StringOrLocaleOption =
+    value.unsafeCast<StringOrLocaleOption>()
+
+/**
  * Options of [EChartsInstance.setOption].
  */
-external interface SetOptionOpts : JsAny {
+external interface SetOptionOpts {
     /** Whether to replace the current option instead of merging into it. */
     var notMerge: Boolean?
 
@@ -55,13 +404,13 @@ external interface SetOptionOpts : JsAny {
     var replaceMerge: StringOrStringArray?
 
     /** Transition animation between the old and the new option. */
-    var transition: JsAny?
+    var transition: SetOptionTransition?
 }
 
 /**
  * Options of [EChartsInstance.setTheme].
  */
-external interface SetThemeOpts : JsAny {
+external interface SetThemeOpts {
     /** Whether to suppress events triggered by the repaint. */
     var silent: Boolean?
 }
@@ -69,7 +418,7 @@ external interface SetThemeOpts : JsAny {
 /**
  * Options of [EChartsInstance.resize].
  */
-external interface ResizeOpts : JsAny {
+external interface ResizeOpts {
     /** New width; `"auto"` keeps the container width. */
     var width: StringOrDouble?
 
@@ -86,18 +435,18 @@ external interface ResizeOpts : JsAny {
 /**
  * Options of [EChartsInstance.showLoading].
  */
-external interface LoadingOpts : JsAny {
+external interface LoadingOpts {
     /** Text shown under the spinner. */
     var text: String?
 
-    /** Text color. */
-    var color: JsAny?
+    /** Color of the spinner. */
+    var color: ZRColor?
 
     /** Color of the text. */
-    var textColor: JsAny?
+    var textColor: ZRColor?
 
     /** Color of the mask. */
-    var maskColor: JsAny?
+    var maskColor: ZRColor?
 
     /** z-level of the loading effect. */
     var zlevel: Double?
@@ -115,10 +464,10 @@ external interface LoadingOpts : JsAny {
     var lineWidth: Double?
 
     /** Font weight of the text. */
-    var fontWeight: JsAny?
+    var fontWeight: ZRFontWeight?
 
-    /** Font style of the text. */
-    var fontStyle: String?
+    /** Font style of the text, a CSS `font-style` keyword. */
+    var fontStyle: FontStyle?
 
     /** Font family of the text. */
     var fontFamily: String?
@@ -127,9 +476,9 @@ external interface LoadingOpts : JsAny {
 /**
  * Options of [EChartsInstance.renderToCanvas].
  */
-external interface RenderToCanvasOpts : JsAny {
+external interface RenderToCanvasOpts {
     /** Background color of the rendered canvas. */
-    var backgroundColor: JsAny?
+    var backgroundColor: ZRColor?
 
     /** Pixel ratio of the rendered canvas. */
     var pixelRatio: Double?
@@ -138,7 +487,7 @@ external interface RenderToCanvasOpts : JsAny {
 /**
  * Options of [EChartsInstance.renderToSVGString].
  */
-external interface RenderToSVGStringOpts : JsAny {
+external interface RenderToSVGStringOpts {
     /** Whether to use `viewBox` instead of fixed `width`/`height`. */
     var useViewBox: Boolean?
 }
@@ -146,15 +495,15 @@ external interface RenderToSVGStringOpts : JsAny {
 /**
  * Options of [EChartsInstance.getDataURL].
  */
-external interface GetDataURLOpts : JsAny {
-    /** Image type: `"png"`, `"jpeg"` or `"svg"`. */
-    var type: String?
+external interface GetDataURLOpts {
+    /** Image format of the data URL. */
+    var type: ImageType?
 
     /** Pixel ratio of the image. */
     var pixelRatio: Double?
 
     /** Background color of the image. */
-    var backgroundColor: JsAny?
+    var backgroundColor: ZRColor?
 
     /** Components excluded from the image. */
     var excludeComponents: Array<String>?
@@ -165,13 +514,13 @@ external interface GetDataURLOpts : JsAny {
  */
 external interface GetConnectedDataURLOpts : GetDataURLOpts {
     /** Background color of the connected charts. */
-    var connectedBackgroundColor: JsAny?
+    var connectedBackgroundColor: ZRColor?
 }
 
 /**
  * Options of [EChartsInstance.dispatchAction].
  */
-external interface DispatchActionOpts : JsAny {
+external interface DispatchActionOpts {
     /** Whether to suppress the events triggered by the action. */
     var silent: Boolean?
 
@@ -182,20 +531,43 @@ external interface DispatchActionOpts : JsAny {
 /**
  * Parameters of [EChartsInstance.appendData].
  */
-external interface AppendDataParams : JsAny {
+external interface AppendDataParams {
     /** Index of the target series. */
     var seriesIndex: Double?
 
     /** Data appended to the series. */
-    var data: Array<JsAny>?
+    var data: Array<OptionDataItem?>?
+}
+
+/**
+ * Browser flags detected by zrender.
+ */
+external interface BrowserEnv {
+    /** Whether the browser is Firefox. */
+    val firefox: Boolean
+
+    /** Whether the browser is Internet Explorer. */
+    val ie: Boolean
+
+    /** Whether the browser is the legacy Edge. */
+    val edge: Boolean
+
+    /** Whether the browser is the Chromium-based Edge. */
+    val newEdge: Boolean
+
+    /** Whether the code runs in the WeChat browser. */
+    val weChat: Boolean
+
+    /** Browser version. */
+    val version: StringOrDouble
 }
 
 /**
  * Chart behavior flags of the current runtime.
  */
-external interface Env : JsAny {
-    /** Browser information; `false` outside a browser. */
-    val browser: JsAny
+external interface Env {
+    /** Browser information. */
+    val browser: BrowserEnv
 
     /** Whether the code runs in Node.js. */
     val node: Boolean
@@ -231,7 +603,7 @@ external interface Env : JsAny {
 /**
  * Runtime dependency versions reported by ECharts.
  */
-external interface Dependencies : JsAny {
+external interface Dependencies {
     /** Version of the bundled zrender. */
     val zrender: String
 }
@@ -239,7 +611,7 @@ external interface Dependencies : JsAny {
 /**
  * Well-known stage priorities used by the registration functions.
  */
-external interface Priority : JsAny {
+external interface Priority {
     /** Priorities of processor stages. */
     val PROCESSOR: PriorityProcessor
 
@@ -250,7 +622,7 @@ external interface Priority : JsAny {
 /**
  * Priorities of processor stages.
  */
-external interface PriorityProcessor : JsAny {
+external interface PriorityProcessor {
     /** Priority of the series filter stage. */
     val SERIES_FILTER: Double
 
@@ -270,7 +642,7 @@ external interface PriorityProcessor : JsAny {
 /**
  * Priorities of visual stages.
  */
-external interface PriorityVisual : JsAny {
+external interface PriorityVisual {
     /** Priority of the layout stage. */
     val LAYOUT: Double
 
@@ -307,7 +679,7 @@ external interface PriorityVisual : JsAny {
  *
  * Create one with `ModelFinder("series")` or `ModelFinder { seriesIndex = 0 }`.
  */
-external interface ModelFinder : JsAny
+external interface ModelFinder
 
 /** Wraps a main type name such as `"series"`, `"xAxis"` or `"geo"`. */
 fun ModelFinder(name: String): ModelFinder = name.unsafeCast<ModelFinder>()
@@ -318,7 +690,7 @@ fun ModelFinder(query: ModelFinderObject): ModelFinder = query.unsafeCast<ModelF
 /**
  * Query object accepted by [ModelFinder].
  */
-external interface ModelFinderObject : JsAny {
+external interface ModelFinderObject {
     /** Index of the series. */
     var seriesIndex: Double?
 
@@ -394,7 +766,7 @@ external interface ModelFinderObject : JsAny {
  *
  * Create one with `EventQuery("series")` or `EventQuery { seriesIndex = 0 }`.
  */
-external interface EventQuery : JsAny
+external interface EventQuery
 
 /** Wraps a main type name. */
 fun EventQuery(name: String): EventQuery = name.unsafeCast<EventQuery>()
@@ -409,18 +781,30 @@ external interface ECElementEvent : echarts.options.CallbackDataParams {
     /** Event name, e.g. `"click"`. */
     val type: String
 
-    /** Native DOM event that produced the ECharts event. */
-    val event: JsAny
+    /** Native zrender element event that produced the ECharts event. */
+    val event: ZRElementEvent?
+}
 
-    /** Extra event data, when the event provides one. */
-    val detail: JsAny
+/**
+ * Arbitrary event data published by a custom action.
+ *
+ * Upstream declares an index signature (`[key: string]: any`); read extra fields through a cast.
+ */
+external interface ECEventData
+
+/**
+ * Result of [ActionRefineEvent]: the content of the event published to the user.
+ */
+external interface ActionRefineEventResult {
+    /** Fields published on the event. */
+    var eventContent: ECEventData
 }
 
 /**
  * Payload of an action dispatched with [EChartsInstance.dispatchAction] or handled by a custom
  * action registered with [ECharts.registerAction].
  */
-external interface ECActionEvent : JsAny {
+external interface ECActionEvent {
     /** Action type. */
     val type: String
 
@@ -437,13 +821,13 @@ external interface ECActionEvent : JsAny {
     val escapeConnect: Boolean?
 
     /** Payloads of a batch action. */
-    val batch: Array<JsAny>?
+    val batch: Array<ECEventData>?
 }
 
 /**
  * Payload of the `rendered` event.
  */
-external interface RenderedEventParam : JsAny {
+external interface RenderedEventParam {
     /** Milliseconds elapsed since the last update. */
     val elapsedTime: Double
 }
@@ -451,7 +835,7 @@ external interface RenderedEventParam : JsAny {
 /**
  * One entry of [SelectChangedEvent.selected].
  */
-external interface SelectedInfo : JsAny {
+external interface SelectedInfo {
     /** Index of the series. */
     val seriesIndex: Double
 
@@ -465,7 +849,7 @@ external interface SelectedInfo : JsAny {
 /**
  * Payload of the `selectchanged` event.
  */
-external interface SelectChangedEvent : JsAny {
+external interface SelectChangedEvent {
     /** Always `"selectchanged"`. */
     val type: String
 
@@ -485,7 +869,7 @@ external interface SelectChangedEvent : JsAny {
 /**
  * One break of an [AxisBreakChangedEvent].
  */
-external interface AxisBreakChangedEventBreak : JsAny {
+external interface AxisBreakChangedEventBreak {
     /** Whether the break is expanded. */
     val isExpanded: Boolean
 
@@ -496,7 +880,7 @@ external interface AxisBreakChangedEventBreak : JsAny {
 /**
  * Payload of the `axisbreakchanged` event.
  */
-external interface AxisBreakChangedEvent : JsAny {
+external interface AxisBreakChangedEvent {
     /** Always `"axisbreakchanged"`. */
     val type: String
 
@@ -514,7 +898,7 @@ external interface AxisBreakChangedEvent : JsAny {
  * Payload of an action dispatched with [EChartsInstance.dispatchAction] or received by an action
  * handler.
  */
-external interface Payload : JsAny {
+external interface Payload {
     /** Action type, e.g. `"highlight"`, `"showTip"` or `"select"`. */
     var type: String?
 
@@ -570,7 +954,7 @@ external interface Payload : JsAny {
 /**
  * Animation part of an action payload.
  */
-external interface PayloadAnimationPart : JsAny {
+external interface PayloadAnimationPart {
     /** Duration in milliseconds. */
     var duration: Double?
 
@@ -586,9 +970,9 @@ external interface PayloadAnimationPart : JsAny {
  *
  * Create one with `ActionInfo("myAction")` and set the optional fields.
  */
-external interface ActionInfo : JsAny {
+external interface ActionInfo {
     /** Action type passed to `dispatchAction`. */
-    var type: String?
+    var type: String
 
     /** Event name emitted after the action; defaults to [type]. */
     var event: String?
@@ -597,10 +981,10 @@ external interface ActionInfo : JsAny {
     var update: String?
 
     /** Handler invoked with the action payload. */
-    var action: JsAny?
+    var action: ActionHandler?
 
     /** Callback that builds the public event content. */
-    var refineEvent: JsAny?
+    var refineEvent: ActionRefineEvent?
 
     /** Whether to publish the non-refined event as well. */
     var publishNonRefinedEvent: Boolean?
@@ -612,12 +996,92 @@ external interface ActionInfo : JsAny {
 /**
  * Builds an [ActionInfo] with the given action type.
  */
-fun ActionInfo(type: String): ActionInfo = echarts.options.echartsOption { this.type = type }
+fun ActionInfo(type: String): ActionInfo = unsafeJso { this.type = type }
 
 /**
- * Options object accepted by [EChartsInstance.setOption] when the typed model is not used.
+ * Registration API handed to an [EChartsExtensionInstaller].
+ *
+ * The installer receives the registry object that ECharts uses to add charts, components,
+ * renderers and features; the wrapper keeps it opaque because upstream does not export a public
+ * type for it.
  */
-typealias RawOption = JsAny
+external interface EChartsInstallRegisters
+
+/**
+ * Installs a chart, component, renderer or feature into ECharts.
+ *
+ * The installers exported by `echarts/charts`, `echarts/components`, `echarts/renderers` and
+ * `echarts/features` already have this type; pass them to [ECharts.use].
+ */
+typealias EChartsExtensionInstaller = (EChartsInstallRegisters) -> Unit
+
+/**
+ * Class (constructor) produced by the `extend*` helpers of `echarts/core`.
+ *
+ * Upstream types them as `ComponentModelConstructor`, `SeriesModelConstructor`, ...; the wrapper
+ * keeps the class opaque because Kotlin cannot express `new ()`. A JavaScript class is a function,
+ * so ECharts also accepts the value as an [EChartsExtensionInstaller].
+ */
+external interface EChartsClassConstructor
+
+/**
+ * Object form of an extension, mirroring upstream `EChartsExtension`.
+ */
+external interface EChartsExtension {
+    /** Installs the extension. */
+    val install: EChartsExtensionInstaller
+}
+
+/**
+ * Finder of the series that a `setOption` transition applies to.
+ */
+external interface TransitionSeriesFinder {
+    /** Indices of the series. */
+    var seriesIndex: ModelFinderIndexQuery?
+
+    /** Id of the series. */
+    var seriesId: String?
+
+    /** Dimension used to match the data items. */
+    var dimension: DimensionLoose
+}
+
+/**
+ * One side of a transition rule: a single finder or an array of finders.
+ */
+external interface TransitionSeriesFinderList
+
+/** Wraps a single finder. */
+fun TransitionSeriesFinderList(value: TransitionSeriesFinder): TransitionSeriesFinderList =
+    value.unsafeCast<TransitionSeriesFinderList>()
+
+/** Wraps several finders. */
+fun TransitionSeriesFinderList(values: Array<TransitionSeriesFinder>): TransitionSeriesFinderList =
+    values.unsafeCast<TransitionSeriesFinderList>()
+
+/**
+ * One transition rule of [SetOptionOpts.transition].
+ */
+external interface SetOptionTransitionItem {
+    /** Series the transition starts from. */
+    var from: TransitionSeriesFinderList?
+
+    /** Series the transition ends at. */
+    var to: TransitionSeriesFinderList?
+}
+
+/**
+ * Transition animation between the old and the new option: one rule or an array of rules.
+ */
+external interface SetOptionTransition
+
+/** Wraps a single rule. */
+fun SetOptionTransition(item: SetOptionTransitionItem): SetOptionTransition =
+    item.unsafeCast<SetOptionTransition>()
+
+/** Wraps several rules. */
+fun SetOptionTransition(items: Array<SetOptionTransitionItem>): SetOptionTransition =
+    items.unsafeCast<SetOptionTransition>()
 
 /**
  * Options object accepted by [ECharts.init] when a theme object is given instead of a theme name.

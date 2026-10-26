@@ -23,14 +23,15 @@ dependencies {
 The full bundle registers every chart and component, so it needs no installers:
 
 ```kotlin
+import echarts.AxisTypes
 import echarts.ECharts
 import echarts.options.EChartsOption
 import echarts.options.XAxisOption
 import echarts.options.YAxisOption
-import echarts.options.echartsOption
 import echarts.options.lineSeries
 import echarts.options.numbers
 import echarts.options.one
+import js.objects.unsafeJso
 import web.dom.document
 import web.html.HtmlTagName
 
@@ -39,9 +40,9 @@ document.body.append(element)
 
 val chart = ECharts.init(element)
 chart.setOption(
-    echartsOption<EChartsOption> {
-        xAxis = one(echartsOption<XAxisOption> { type = "category" })
-        yAxis = one(echartsOption<YAxisOption> { type = "value" })
+    unsafeJso<EChartsOption> {
+        xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category })
+        yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
         series = arrayOf(lineSeries { data = numbers(120.0, 200.0, 150.0) })
     },
 )
@@ -60,14 +61,22 @@ window.onresize = EventHandler { chart.resize() }
 
 Options are plain JavaScript objects, so they are modeled as `external interface` types with
 nullable `var` properties. Omitted properties keep the ECharts default. Build them with
-`echartsOption<T> { ... }`, which creates a real object literal and applies the receiver block:
+`js.objects.unsafeJso<T> { ... }` from kotlin-js-plain-objects, which creates a real object literal
+and applies the receiver block:
 
 ```kotlin
-val title = echartsOption<TitleOption> {
+val title = unsafeJso<TitleOption> {
     text = "Monthly revenue"
     subtext = "In thousands"
 }
 ```
+
+Named values are typed instead of being plain strings: `AxisTypes.category`, `SeriesTypes.line`,
+`TooltipTriggers.axis`, `LegendTypes.scroll`, `AxisPointerTypes.cross`, `ImageTypes.png`,
+`AnimationEasings.cubicOut` and `zrender.RendererTypes.svg` are constants of their own sealed
+interfaces, so a typo is a compile error rather than a silently ignored option. Fields that take a
+CSS value use the kotlin-wrappers types (`web.cssom.FontStyle`, `FontWeight`, `TextAlign`,
+`VerticalAlign`) and the canvas line cap / join types.
 
 Helpers in `echarts.options`:
 
@@ -114,7 +123,8 @@ import echarts.EChartsComponents
 import echarts.EChartsCore
 import echarts.EChartsRenderers
 import echarts.EChartsInitOpts
-import echarts.options.echartsOption
+import js.objects.unsafeJso
+import zrender.RendererTypes
 
 EChartsCore.use(
     arrayOf(
@@ -135,7 +145,7 @@ and `EChartsFeatures`. Select the renderer with `EChartsInitOpts.renderer`:
 val chart = EChartsCore.init(
     element,
     null,
-    echartsOption<EChartsInitOpts> { renderer = "svg" },
+    unsafeJso<EChartsInitOpts> { renderer = RendererTypes.svg },
 )
 ```
 

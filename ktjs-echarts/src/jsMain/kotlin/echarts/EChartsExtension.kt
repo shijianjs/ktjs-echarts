@@ -3,6 +3,9 @@
 package echarts
 
 import kotlin.js.JsAny
+import zrender.ZRElement
+import zrender.ZRGroup
+import zrender.ZRenderType
 
 /**
  * Base class of the models that wrap an option fragment.
@@ -142,7 +145,7 @@ external open class SeriesModel : ComponentModel {
     fun getData(dataType: String? = definedExternally): SeriesData
 
     /** Returns every data list of the series (`main`, `node`, `edge`, ...). */
-    fun getAllData(): Array<JsAny>
+    fun getAllData(): Array<SeriesData>
 
     /** Replaces the data list of the series. */
     fun setData(data: SeriesData)
@@ -183,7 +186,7 @@ external open class ChartView {
     var type: String
 
     /** Root group of the rendered elements. */
-    val group: JsAny
+    val group: ZRGroup
 
     /** Unique id of this view instance. */
     val uid: String
@@ -216,7 +219,7 @@ external open class ChartView {
     fun updateVisual(seriesModel: SeriesModel, ecModel: GlobalModel, api: ExtensionAPI, payload: Payload)
 
     /** Traverses the elements rendered in this update. */
-    fun eachRendered(cb: (element: JsAny) -> Boolean?)
+    fun eachRendered(cb: (element: ZRElement) -> Boolean?)
 }
 
 /**
@@ -224,7 +227,7 @@ external open class ChartView {
  */
 external open class ComponentView {
     /** Root group of the rendered elements. */
-    val group: JsAny
+    val group: ZRGroup
 
     /** Unique id of this view instance. */
     val uid: String
@@ -248,7 +251,7 @@ external open class ComponentView {
     fun updateVisual(model: ComponentModel, ecModel: GlobalModel, api: ExtensionAPI, payload: Payload)
 
     /** Traverses the elements rendered in this update. */
-    fun eachRendered(cb: (element: JsAny) -> Boolean?)
+    fun eachRendered(cb: (element: ZRElement) -> Boolean?)
 }
 
 /**
@@ -449,10 +452,10 @@ external open class SeriesData {
     fun clearItemLayouts()
 
     /** Sets the graphic element of the data item at [idx]. */
-    fun setItemGraphicEl(idx: Int, el: JsAny)
+    fun setItemGraphicEl(idx: Int, el: ZRElement)
 
     /** Returns the graphic element of the data item at [idx]. */
-    fun getItemGraphicEl(idx: Int): JsAny
+    fun getItemGraphicEl(idx: Int): ZRElement?
 
     /** Returns a shallow copy of this list. */
     fun cloneShallow(list: SeriesData? = definedExternally): SeriesData
@@ -529,7 +532,7 @@ external open class Axis {
 /**
  * The global model that owns every component and series of a chart instance.
  */
-external interface GlobalModel : JsAny {
+external interface GlobalModel {
     /** Returns the component of [mainType] at [index]. */
     fun getComponent(mainType: String, index: Int): ComponentModel?
 
@@ -552,7 +555,7 @@ external interface GlobalModel : JsAny {
 /**
  * API object passed to views and layout/visual handlers.
  */
-external interface ExtensionAPI : JsAny {
+external interface ExtensionAPI {
     /** Width of the chart, in pixels. */
     fun getWidth(): Double
 
@@ -560,7 +563,7 @@ external interface ExtensionAPI : JsAny {
     fun getHeight(): Double
 
     /** Returns the zrender instance. */
-    fun getZr(): JsAny
+    fun getZr(): ZRenderType
 
     /** Returns the DOM element of the chart. */
     fun getDom(): web.html.HTMLElement?
@@ -579,13 +582,13 @@ external interface ExtensionAPI : JsAny {
 }
 
 /** Creates a component model class from a prototype object. */
-external fun extendComponentModel(proto: JsAny): ComponentModel
+external fun extendComponentModel(proto: JsAny): EChartsClassConstructor
 
 /** Creates a component view class from a prototype object. */
-external fun extendComponentView(proto: JsAny): ComponentView
+external fun extendComponentView(proto: JsAny): EChartsClassConstructor
 
 /** Creates a series model class from a prototype object. */
-external fun extendSeriesModel(proto: JsAny): SeriesModel
+external fun extendSeriesModel(proto: JsAny): EChartsClassConstructor
 
 /** Creates a chart view class from a prototype object. */
-external fun extendChartView(proto: JsAny): ChartView
+external fun extendChartView(proto: JsAny): EChartsClassConstructor

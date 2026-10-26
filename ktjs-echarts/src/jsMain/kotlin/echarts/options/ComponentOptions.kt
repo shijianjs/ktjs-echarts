@@ -1,12 +1,20 @@
 package echarts.options
 
+import echarts.AnimationEasing
+import echarts.AxisType
+import echarts.LegendType
+import echarts.Orient
+import echarts.TooltipTrigger
+import js.objects.Record
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
+import zrender.TextOverflow
+import zrender.ZRColor
 
 /**
  * Title component.
  */
-external interface TitleOption : JsAny {
+external interface TitleOption {
     /** Component id. */
     var id: String?
 
@@ -68,10 +76,10 @@ external interface TitleOption : JsAny {
     var bottom: StringOrDouble?
 
     /** Background color of the title block. */
-    var backgroundColor: JsAny?
+    var backgroundColor: ZRColor?
 
     /** Border color of the title block. */
-    var borderColor: JsAny?
+    var borderColor: ZRColor?
 
     /** Border width of the title block. */
     var borderWidth: Double?
@@ -83,7 +91,7 @@ external interface TitleOption : JsAny {
     var shadowBlur: Double?
 
     /** Shadow color of the title block. */
-    var shadowColor: JsAny?
+    var shadowColor: String?
 
     /** Horizontal shadow offset of the title block. */
     var shadowOffsetX: Double?
@@ -95,15 +103,15 @@ external interface TitleOption : JsAny {
 /**
  * Legend component.
  */
-external interface LegendOption : JsAny {
+external interface LegendOption {
     /** Component id. */
     var id: String?
 
     /** Whether the legend is shown. */
     var show: Boolean?
 
-    /** Type: `"plain"` or `"scroll"`. */
-    var type: String?
+    /** Rendering mode of the legend. */
+    var type: LegendType?
 
     /** z-index of the component. */
     var z: Double?
@@ -130,7 +138,7 @@ external interface LegendOption : JsAny {
     var height: StringOrDouble?
 
     /** Orientation: `"horizontal"` or `"vertical"`. */
-    var orient: String?
+    var orient: Orient?
 
     /** Alignment of the items: `"auto"`, `"left"` or `"right"`. */
     var align: String?
@@ -163,13 +171,16 @@ external interface LegendOption : JsAny {
     var selectedMode: BooleanOrString?
 
     /** Color of unselected items. */
-    var inactiveColor: JsAny?
+    var inactiveColor: String?
 
     /** Border color of unselected items. */
-    var inactiveBorderColor: JsAny?
+    var inactiveBorderColor: String?
 
-    /** Whether to show the chart elements that are unselected. */
-    var selected: JsAny?
+    /** Border width of unselected items, or `"auto"`. */
+    var inactiveBorderWidth: StringOrDouble?
+
+    /** Which legend items are selected, keyed by name. */
+    var selected: Record<String, Boolean>?
 
     /** Style of the legend text. */
     var textStyle: TextStyleOption?
@@ -178,25 +189,25 @@ external interface LegendOption : JsAny {
     var icon: String?
 
     /** Data of the legend items; defaults to the series names. */
-    var data: Array<JsAny>?
+    var data: Array<LegendDataItemOption>?
 
     /** Background color of the component. */
-    var backgroundColor: JsAny?
+    var backgroundColor: ZRColor?
 
     /** Border color of the component. */
-    var borderColor: JsAny?
+    var borderColor: ZRColor?
 
     /** Border width of the component. */
     var borderWidth: Double?
 
     /** Border radius of the component. */
-    var borderRadius: Double?
+    var borderRadius: DoubleOrDoubleArray?
 
     /** Shadow blur radius of the component. */
     var shadowBlur: Double?
 
     /** Shadow color of the component. */
-    var shadowColor: JsAny?
+    var shadowColor: String?
 
     /** Horizontal shadow offset of the component. */
     var shadowOffsetX: Double?
@@ -205,10 +216,10 @@ external interface LegendOption : JsAny {
     var shadowOffsetY: Double?
 
     /** Icon of the scroll buttons. */
-    var pageIconColor: JsAny?
+    var pageIconColor: String?
 
     /** Color of disabled scroll buttons. */
-    var pageIconInactiveColor: JsAny?
+    var pageIconInactiveColor: String?
 
     /** Size of the scroll buttons. */
     var pageIconSize: Double?
@@ -229,19 +240,54 @@ external interface LegendOption : JsAny {
     var animationDuration: Double?
 
     /** Easing of the legend animation. */
-    var animationEasing: String?
+    var animationEasing: AnimationEasing?
 
     /** Duration of the legend update animation. */
     var animationDurationUpdate: Double?
 
     /** Easing of the legend update animation. */
-    var animationEasingUpdate: String?
+    var animationEasingUpdate: AnimationEasing?
+}
+
+/**
+ * One entry of [LegendOption.data].
+ */
+external interface LegendDataItemOption {
+    /** Name of the series this item controls. */
+    var name: String?
+
+    /** Icon of the item. */
+    var icon: String?
+
+    /** Style of the item symbol. */
+    var itemStyle: ItemStyleOption?
+
+    /** Style of the item line. */
+    var lineStyle: LineStyleOption?
+
+    /** Rotation of the item symbol in degrees, or `"inherit"`. */
+    var symbolRotate: StringOrDouble?
+
+    /** Style of the item text. */
+    var textStyle: TextStyleOption?
+
+    /** Color of the item when it is not selected. */
+    var inactiveColor: String?
+
+    /** Border color of the item when it is not selected. */
+    var inactiveBorderColor: String?
+
+    /** Border width of the item when it is not selected, or `"auto"`. */
+    var inactiveBorderWidth: StringOrDouble?
+
+    /** Tooltip specific to this item. Upstream types it as `unknown`. */
+    var tooltip: JsAny?
 }
 
 /**
  * Tooltip component.
  */
-external interface TooltipOption : JsAny {
+external interface TooltipOption {
     /** Component id. */
     var id: String?
 
@@ -249,7 +295,7 @@ external interface TooltipOption : JsAny {
     var show: Boolean?
 
     /** Trigger type: `"item"`, `"axis"` or `"none"`. */
-    var trigger: String?
+    var trigger: TooltipTrigger?
 
     /** Axis pointer configuration when [trigger] is `"axis"`. */
     var axisPointer: AxisPointerOption?
@@ -288,7 +334,7 @@ external interface TooltipOption : JsAny {
     var transitionDuration: Double?
 
     /** Position of the tooltip, absolute or relative to the mouse. */
-    var position: JsAny?
+    var position: TooltipPosition?
 
     /** Formatter of the tooltip content. */
     var formatter: TooltipFormatter?
@@ -297,10 +343,10 @@ external interface TooltipOption : JsAny {
     var valueFormatter: TooltipValueFormatter?
 
     /** Background color of the tooltip. */
-    var backgroundColor: JsAny?
+    var backgroundColor: ZRColor?
 
     /** Border color of the tooltip. */
-    var borderColor: JsAny?
+    var borderColor: ZRColor?
 
     /** Border width of the tooltip. */
     var borderWidth: Double?
@@ -321,31 +367,32 @@ external interface TooltipOption : JsAny {
 /**
  * Tooltip formatter: a template string or a callback.
  */
-external interface TooltipFormatter : JsAny
+external interface TooltipFormatter
 
 /** Wraps a template string such as `"{b}: {c}"`. */
 fun TooltipFormatter(template: String): TooltipFormatter = template.unsafeCast<TooltipFormatter>()
 
-/** Wraps a callback that receives the item parameters and returns HTML or text. */
-fun TooltipFormatter(callback: (Array<CallbackDataParams>) -> String): TooltipFormatter =
+/** Wraps a callback that receives the item parameters and returns HTML, an element or elements. */
+fun TooltipFormatter(callback: (Array<CallbackDataParams>) -> TooltipContent): TooltipFormatter =
     callback.unsafeCast<TooltipFormatter>()
 
 /**
  * Tooltip value formatter: a template string or a callback.
  */
-external interface TooltipValueFormatter : JsAny
+external interface TooltipValueFormatter
 
 /** Wraps a template string. */
 fun TooltipValueFormatter(template: String): TooltipValueFormatter = template.unsafeCast<TooltipValueFormatter>()
 
-/** Wraps a callback that receives the raw value and returns the displayed text. */
-fun TooltipValueFormatter(callback: (JsAny) -> String): TooltipValueFormatter =
-    callback.unsafeCast<TooltipValueFormatter>()
+/** Wraps a callback that receives the raw value and its data index. */
+fun TooltipValueFormatter(
+    callback: (value: OptionDataValueOrArray, dataIndex: Double) -> String,
+): TooltipValueFormatter = callback.unsafeCast<TooltipValueFormatter>()
 
 /**
  * Grid component: the cartesian coordinate system of x and y axes.
  */
-external interface GridOption : JsAny {
+external interface GridOption {
     /** Component id. */
     var id: String?
 
@@ -380,10 +427,10 @@ external interface GridOption : JsAny {
     var containLabel: Boolean?
 
     /** Background color of the grid. */
-    var backgroundColor: JsAny?
+    var backgroundColor: ZRColor?
 
     /** Border color of the grid. */
-    var borderColor: JsAny?
+    var borderColor: ZRColor?
 
     /** Border width of the grid. */
     var borderWidth: Double?
@@ -392,7 +439,7 @@ external interface GridOption : JsAny {
     var shadowBlur: Double?
 
     /** Shadow color of the grid. */
-    var shadowColor: JsAny?
+    var shadowColor: String?
 
     /** Horizontal shadow offset of the grid. */
     var shadowOffsetX: Double?
@@ -400,11 +447,23 @@ external interface GridOption : JsAny {
     /** Vertical shadow offset of the grid. */
     var shadowOffsetY: Double?
 
+    /** Mode of the outer bounds: `"auto"`, `"same"` or `"none"`. */
+    var outerBoundsMode: String?
+
+    /** Outer bounds of the grid. */
+    var outerBounds: BoxLayoutOption?
+
+    /** What the outer bounds contain: `"all"`, `"axisLabel"` or `"auto"`. */
+    var outerBoundsContain: String?
+
+    /** Minimum width of the grid when the outer bounds shrink it. */
+    var outerBoundsClampWidth: StringOrDouble?
+
+    /** Minimum height of the grid when the outer bounds shrink it. */
+    var outerBoundsClampHeight: StringOrDouble?
+
     /** Tooltip configuration specific to the grid. */
     var tooltip: TooltipOption?
-
-    /** Outer bounds of the grid, used when [containLabel] is enabled. */
-    var outerBounds: JsAny?
 }
 
 /**
@@ -413,7 +472,7 @@ external interface GridOption : JsAny {
  * Concrete axis options ([XAxisOption], [YAxisOption], ...) add the fields that are specific to
  * their coordinate system.
  */
-external interface AxisOption : JsAny {
+external interface AxisOption {
     /** Component id. */
     var id: String?
 
@@ -432,8 +491,8 @@ external interface AxisOption : JsAny {
     /** Offset of the axis line in pixels. */
     var offset: Double?
 
-    /** Axis type: `"value"`, `"category"`, `"time"` or `"log"`. */
-    var type: String?
+    /** Type of the axis. */
+    var type: AxisType?
 
     /** Name displayed next to the axis. */
     var name: String?
@@ -442,7 +501,10 @@ external interface AxisOption : JsAny {
     var nameLocation: String?
 
     /** Style of [name]. */
-    var nameTextStyle: TextStyleOption?
+    var nameTextStyle: LabelOption?
+
+    /** Truncation of [name]. */
+    var nameTruncate: NameTruncateOption?
 
     /** Distance between [name] and the axis line in pixels. */
     var nameGap: Double?
@@ -450,20 +512,20 @@ external interface AxisOption : JsAny {
     /** Rotation of [name] in degrees. */
     var nameRotate: Double?
 
-    /** Truncation of [name]. */
-    var nameTruncate: JsAny?
+    /** Whether to move [name] to avoid overlapping the axis labels. */
+    var nameMoveOverlap: BooleanOrString?
 
     /** Whether to invert the axis. */
     var inverse: Boolean?
 
     /** Whether there is a gap at the ends of a category axis. */
-    var boundaryGap: JsAny?
+    var boundaryGap: BooleanOrStringArray?
 
     /** Minimum value of a value axis. */
-    var min: JsAny?
+    var min: AxisMinMax?
 
     /** Maximum value of a value axis. */
-    var max: JsAny?
+    var max: AxisMinMax?
 
     /** Whether the scale is computed from the data extents instead of `0`. */
     var scale: Boolean?
@@ -478,7 +540,7 @@ external interface AxisOption : JsAny {
     var maxInterval: Double?
 
     /** Forced distance between two ticks. */
-    var interval: Double?
+    var interval: AxisInterval?
 
     /** Base of a log axis. */
     var logBase: Double?
@@ -520,7 +582,7 @@ external interface AxisOption : JsAny {
     var animationDuration: Double?
 
     /** Easing of the axis animation. */
-    var animationEasing: String?
+    var animationEasing: AnimationEasing?
 
     /** z-index of the axis. */
     var z: Double?
@@ -528,8 +590,33 @@ external interface AxisOption : JsAny {
     /** z-level of the axis. */
     var zlevel: Double?
 
-    /** Data of a category axis. */
-    var data: Array<JsAny>?
+    /** Data of a category axis: raw values or [CategoryAxisDataItem] objects. */
+    var data: Array<OptionDataItem?>?
+}
+
+/**
+ * One entry of a category axis [AxisOption.data], with an optional text style.
+ */
+external interface CategoryAxisDataItem {
+    /** Value of the category. */
+    var value: OptionDataValue?
+
+    /** Style of the axis label of this category. */
+    var textStyle: TextStyleOption?
+}
+
+/**
+ * Truncation of an axis name.
+ */
+external interface NameTruncateOption {
+    /** Maximum width before truncation. */
+    var maxWidth: Double?
+
+    /** Text appended when the name is truncated. */
+    var ellipsis: String?
+
+    /** Placeholder shown while the name is not available. */
+    var placeholder: String?
 }
 
 /**
@@ -563,7 +650,7 @@ external interface RadiusAxisOption : AxisOption {
  */
 external interface SingleAxisOption : AxisOption {
     /** Orientation: `"horizontal"` or `"vertical"`. */
-    var orient: String?
+    var orient: Orient?
 
     /** Distance to the left side. */
     var left: StringOrDouble?
@@ -591,34 +678,57 @@ external interface ParallelAxisOption : AxisOption {
     /** Index of the parallel coordinate system this axis belongs to. */
     var parallelIndex: Double?
 
-    /** Whether the axis area reacts to mouse events. */
-    var areaSelectStyle: JsAny?
-
     /** Whether the axis can be dragged to reorder. */
     var realtime: Boolean?
+
+    /** Dimensions of the data shown by this axis. */
+    var dim: IndexOrIndexArray?
+
+    /** Style of the area selected by the axis brush. */
+    var areaSelectStyle: AreaSelectStyleOption?
+}
+
+/**
+ * Style of the area selected by a parallel axis.
+ */
+external interface AreaSelectStyleOption {
+    /** Width of the selected band. */
+    var width: Double?
+
+    /** Fill color of the selected band. */
+    var color: ZRColor?
+
+    /** Border color of the selected band. */
+    var borderColor: ZRColor?
+
+    /** Border width of the selected band. */
+    var borderWidth: Double?
+
+    /** Opacity of the selected band. */
+    var opacity: Double?
 }
 
 /**
  * Axis line configuration.
  */
-external interface AxisLineOption : JsAny {
-    /** Whether the axis line is shown. */
-    var show: Boolean?
+external interface AxisLineOption {
+    /** Whether the axis line is shown, or `"auto"`. */
+    var show: BooleanOrString?
 
-    /** Whether the axis line is on the zero value. */
-    var onZero: Boolean?
+    /** Whether the axis line is on the zero value, or `"auto"`. */
+    var onZero: BooleanOrString?
 
     /** Index of the axis the zero line is aligned with. */
     var onZeroAxisIndex: Double?
 
     /** Symbol of the axis line ends. */
-    var symbol: String?
+    var symbol: StringOrStringArray?
 
     /** Size of the axis line symbols. */
     var symbolSize: Array<Double>?
 
-    /** Offset of the axis line symbols, `[x, y]`. */
-    var symbolOffset: Array<JsAny>?
+    /** Offset of the axis line symbols. */
+    var symbolOffset: SymbolOffset?
 
     /** Style of the axis line. */
     var lineStyle: LineStyleOption?
@@ -627,9 +737,9 @@ external interface AxisLineOption : JsAny {
 /**
  * Axis tick configuration.
  */
-external interface AxisTickOption : JsAny {
-    /** Whether the ticks are shown. */
-    var show: Boolean?
+external interface AxisTickOption {
+    /** Whether the ticks are shown, or `"auto"`. */
+    var show: BooleanOrString?
 
     /** Whether the ticks point inside the grid. */
     var inside: Boolean?
@@ -641,13 +751,10 @@ external interface AxisTickOption : JsAny {
     var lineStyle: LineStyleOption?
 
     /** Interval between two ticks. */
-    var interval: JsAny?
+    var interval: AxisInterval?
 
     /** Whether ticks align with the labels. */
     var alignWithLabel: Boolean?
-
-    /** Whether ticks are shown at both ends of the axis. */
-    var showStartLabel: Boolean?
 }
 
 /**
@@ -658,7 +765,7 @@ external interface AxisLabelOption : LabelOption {
     override var show: Boolean?
 
     /** Interval between two labels, or a callback deciding which labels to show. */
-    var interval: JsAny?
+    var interval: AxisInterval?
 
     /** Whether the labels are drawn inside the grid. */
     var inside: Boolean?
@@ -679,35 +786,38 @@ external interface AxisLabelOption : LabelOption {
     override var formatter: LabelFormatter?
 
     /** Number of lines kept when the label overflows. */
-    override var overflow: String?
+    override var overflow: TextOverflow?
 }
 
 /**
  * Split line configuration.
  */
-external interface SplitLineOption : JsAny {
+external interface SplitLineOption {
     /** Whether the split lines are shown. */
     var show: Boolean?
 
     /** Interval between two split lines. */
-    var interval: JsAny?
+    var interval: AxisInterval?
 
     /** Style of the split lines. */
     var lineStyle: LineStyleOption?
 
-    /** Distance between a split line and the axis line. */
-    var distance: Double?
+    /** Whether the split line at the minimum value is shown. */
+    var showMinLine: Boolean?
+
+    /** Whether the split line at the maximum value is shown. */
+    var showMaxLine: Boolean?
 }
 
 /**
  * Split area configuration.
  */
-external interface SplitAreaOption : JsAny {
+external interface SplitAreaOption {
     /** Whether the split areas are shown. */
     var show: Boolean?
 
     /** Interval between two split areas. */
-    var interval: JsAny?
+    var interval: AxisInterval?
 
     /** Style of the split areas. */
     var areaStyle: AreaStyleOption?

@@ -1,6 +1,21 @@
 package echarts.options
 
+import echarts.AnimationEasing
+import echarts.AxisPointerType
+import echarts.DataZoomType
+import echarts.FilterMode
+import echarts.ImageType
+import echarts.NameMap
+import echarts.Orient
+import echarts.VisualMapType
+import js.objects.Record
 import kotlin.js.JsAny
+import web.html.HTMLDivElement
+import zrender.ZRColor
+import zrender.ZRElementEvent
+import zrender.ZRFontWeight
+import zrender.ZRShapeProps
+import zrender.ZRStyleProps
 
 /**
  * The root ECharts option object accepted by `setOption`.
@@ -13,7 +28,7 @@ import kotlin.js.JsAny
  * JavaScript object through `setOption` with a `JsAny` value, or build extra fields with
  * [echartsOption] and assign them to the typed object.
  */
-external interface EChartsOption : JsAny {
+external interface EChartsOption {
     /** Title components. */
     var title: Array<TitleOption>?
 
@@ -93,10 +108,10 @@ external interface EChartsOption : JsAny {
     var series: Array<SeriesOption>?
 
     /** Color palette. */
-    var color: Array<JsAny>?
+    var color: Array<ZRColor>?
 
     /** Background color of the whole chart. */
-    var backgroundColor: JsAny?
+    var backgroundColor: ZRColor?
 
     /** Global text style of the chart. */
     var textStyle: TextStyleOption?
@@ -111,7 +126,7 @@ external interface EChartsOption : JsAny {
     var animationDuration: Double?
 
     /** Easing of the initial animation. */
-    var animationEasing: String?
+    var animationEasing: AnimationEasing?
 
     /** Delay of the initial animation in milliseconds. */
     var animationDelay: Double?
@@ -120,7 +135,7 @@ external interface EChartsOption : JsAny {
     var animationDurationUpdate: Double?
 
     /** Easing of the update animation. */
-    var animationEasingUpdate: String?
+    var animationEasingUpdate: AnimationEasing?
 
     /** Delay of the update animation in milliseconds. */
     var animationDelayUpdate: Double?
@@ -150,7 +165,7 @@ external interface EChartsOption : JsAny {
 /**
  * Dataset component: provides data shared by series.
  */
-external interface DatasetOption : JsAny {
+external interface DatasetOption {
     /** Component id, used by `series.datasetId`. */
     var id: String?
 
@@ -158,16 +173,16 @@ external interface DatasetOption : JsAny {
     var index: Double?
 
     /** Raw data: an array of rows, or an object for keyed data. */
-    var source: JsAny?
+    var source: DatasetSource?
 
     /** Dimensions of the dataset. */
-    var dimensions: Array<JsAny>?
+    var dimensions: Array<DimensionDefinitionLoose>?
 
     /** Whether the first row of [source] contains dimension names. */
-    var sourceHeader: JsAny?
+    var sourceHeader: OptionSourceHeader?
 
     /** Data transform pipeline, e.g. `{ type: "filter", config: { ... } }`. */
-    var transform: JsAny?
+    var transform: PipedDataTransformOption?
 
     /** Index of the source dataset when this dataset is derived from another one. */
     var fromDatasetIndex: Double?
@@ -184,36 +199,36 @@ external interface DatasetOption : JsAny {
  *
  * Set [type] to `"slider"` or `"inside"`.
  */
-external interface DataZoomOption : JsAny {
+external interface DataZoomOption {
     /** Component id. */
     var id: String?
 
     /** Whether the component is shown. */
     var show: Boolean?
 
-    /** Zoom type: `"slider"` or `"inside"`. */
-    var type: String?
+    /** Variant of the data zoom component. */
+    var type: DataZoomType?
 
     /** Background color. */
-    var backgroundColor: JsAny?
+    var backgroundColor: ZRColor?
 
     /** Border color. */
-    var borderColor: JsAny?
+    var borderColor: ZRColor?
 
     /** Fill color of the selected range. */
-    var fillerColor: JsAny?
+    var fillerColor: ZRColor?
 
     /** Data background of the slider. */
-    var dataBackground: JsAny?
+    var dataBackground: DataZoomDataBackgroundOption?
 
     /** Selected data background of the slider. */
-    var selectedDataBackground: JsAny?
+    var selectedDataBackground: DataZoomDataBackgroundOption?
 
     /** Icon of the two handles. */
     var handleIcon: String?
 
     /** Size of the handles. */
-    var handleSize: DoubleOrDoubleArray?
+    var handleSize: StringOrDouble?
 
     /** Style of the handles. */
     var handleStyle: ItemStyleOption?
@@ -231,22 +246,22 @@ external interface DataZoomOption : JsAny {
     var labelFormatter: LabelFormatter?
 
     /** Indices of the x axes controlled by this component. */
-    var xAxisIndex: JsAny?
+    var xAxisIndex: IndexOrIndexArray?
 
     /** Indices of the y axes controlled by this component. */
-    var yAxisIndex: JsAny?
+    var yAxisIndex: IndexOrIndexArray?
 
     /** Indices of the radius axes controlled by this component. */
-    var radiusAxisIndex: JsAny?
+    var radiusAxisIndex: IndexOrIndexArray?
 
     /** Indices of the angle axes controlled by this component. */
-    var angleAxisIndex: JsAny?
+    var angleAxisIndex: IndexOrIndexArray?
 
     /** Indices of the single axes controlled by this component. */
-    var singleAxisIndex: JsAny?
+    var singleAxisIndex: IndexOrIndexArray?
 
-    /** Filter mode: `"filter"`, `"weakFilter"`, `"empty"` or `"none"`. */
-    var filterMode: String?
+    /** How the data outside the window is handled. */
+    var filterMode: FilterMode?
 
     /** Start percentage of the window. */
     var start: Double?
@@ -255,10 +270,10 @@ external interface DataZoomOption : JsAny {
     var end: Double?
 
     /** Start value of the window. */
-    var startValue: JsAny?
+    var startValue: DataZoomValue?
 
     /** End value of the window. */
-    var endValue: JsAny?
+    var endValue: DataZoomValue?
 
     /** Minimum span percentage. */
     var minSpan: Double?
@@ -267,13 +282,13 @@ external interface DataZoomOption : JsAny {
     var maxSpan: Double?
 
     /** Minimum span of the window. */
-    var minValueSpan: JsAny?
+    var minValueSpan: Double?
 
     /** Maximum span of the window. */
-    var maxValueSpan: JsAny?
+    var maxValueSpan: Double?
 
     /** Orientation of the slider: `"horizontal"` or `"vertical"`. */
-    var orient: String?
+    var orient: Orient?
 
     /** Whether zooming is locked. */
     var zoomLock: Boolean?
@@ -301,9 +316,20 @@ external interface DataZoomOption : JsAny {
 }
 
 /**
+ * Data background of a data zoom slider.
+ */
+external interface DataZoomDataBackgroundOption {
+    /** Style of the lines of the data shadow. */
+    var lineStyle: LineStyleOption?
+
+    /** Style of the areas of the data shadow. */
+    var areaStyle: AreaStyleOption?
+}
+
+/**
  * Toolbox component: a row of feature buttons.
  */
-external interface ToolboxOption : JsAny {
+external interface ToolboxOption {
     /** Component id. */
     var id: String?
 
@@ -311,7 +337,7 @@ external interface ToolboxOption : JsAny {
     var show: Boolean?
 
     /** Orientation: `"horizontal"` or `"vertical"`. */
-    var orient: String?
+    var orient: Orient?
 
     /** Distance to the left side. */
     var left: StringOrDouble?
@@ -344,7 +370,7 @@ external interface ToolboxOption : JsAny {
     var feature: ToolboxFeature?
 
     /** Icon style shared by all features. */
-    var iconStyle: ItemStyleOption?
+    var iconStyle: ToolboxIconStyleOption?
 
     /** Emphasis style of the feature icons. */
     var emphasis: EmphasisOption?
@@ -362,7 +388,7 @@ external interface ToolboxOption : JsAny {
 /**
  * Buttons of the toolbox.
  */
-external interface ToolboxFeature : JsAny {
+external interface ToolboxFeature {
     /** Save the chart as an image. */
     var saveAsImage: SaveAsImageOption?
 
@@ -385,47 +411,96 @@ external interface ToolboxFeature : JsAny {
 /**
  * Common configuration of a toolbox feature.
  */
-external interface ToolboxFeatureOption : JsAny {
+external interface ToolboxFeatureOption {
     /** Whether the feature is shown. */
     var show: Boolean?
 
-    /** Title shown on hover. */
-    var title: String?
+    /** Title shown on hover, or one title per feature key. */
+    var title: StringOrDictionary?
 
-    /** Icon of the feature; a built-in name or an image URL. */
-    var icon: JsAny?
+    /** Icon of the feature, or one icon per feature key. */
+    var icon: StringOrDictionary?
 
     /** Style of the feature icon. */
-    var iconStyle: ItemStyleOption?
+    var iconStyle: ToolboxIconStyleOption?
 
     /** Emphasis style of the feature icon. */
-    var emphasis: EmphasisOption?
+    var emphasis: ToolboxEmphasisOption?
+
+    /** Status of each icon key. */
+    var iconStatus: Record<String, String>?
 
     /** Callback invoked when the feature is clicked. */
-    var onclick: JsAny?
+    var onclick: (() -> Unit)?
+}
+
+/**
+ * Icon style of a toolbox feature: an item style plus text-specific fields.
+ */
+external interface ToolboxIconStyleOption : ItemStyleOption {
+    /** Fill color of the feature text. */
+    var textFill: ZRColor?
+
+    /** Background color of the feature text. */
+    var textBackgroundColor: ZRColor?
+
+    /** Position of the feature text. */
+    var textPosition: LabelPosition?
+
+    /** Horizontal alignment of the feature text. */
+    var textAlign: String?
+
+    /** Border radius of the feature text. */
+    var textBorderRadius: StringOrDoubleOrArray?
+
+    /** Padding of the feature text. */
+    var textPadding: DoubleOrDoubleArray?
+
+    /** Font family of the feature text. */
+    var textFontFamily: String?
+
+    /** Font size of the feature text. */
+    var textFontSize: StringOrDouble?
+
+    /** Font weight of the feature text. */
+    var textFontWeight: ZRFontWeight?
+
+    /** Font style of the feature text. */
+    var textFontStyle: String?
+}
+
+/**
+ * Emphasis style of a toolbox feature.
+ */
+external interface ToolboxEmphasisOption {
+    /** Icon style in the emphasis state. */
+    var iconStyle: ToolboxIconStyleOption?
 }
 
 /**
  * `saveAsImage` toolbox feature.
  */
 external interface SaveAsImageOption : ToolboxFeatureOption {
-    /** File type: `"png"` or `"jpeg"`. */
-    var type: String?
+    /** File type of the saved image. */
+    var type: ImageType?
 
     /** File name without extension. */
     var name: String?
 
     /** Background color of the saved image. */
-    var backgroundColor: JsAny?
+    var backgroundColor: ZRColor?
 
     /** Whether to save all charts of the connected group. */
-    var connectedBackgroundColor: JsAny?
+    var connectedBackgroundColor: ZRColor?
 
     /** Pixel ratio of the saved image; the chart's device pixel ratio when omitted. */
     var pixelRatio: Double?
 
     /** Components excluded from the saved image, e.g. `["toolbox"]`. */
     var excludeComponents: Array<String>?
+
+    /** Languages available in the save dialog. */
+    var lang: Array<String>?
 }
 
 /**
@@ -439,28 +514,28 @@ external interface DataViewOption : ToolboxFeatureOption {
     var lang: Array<String>?
 
     /** Background color of the data view. */
-    var backgroundColor: JsAny?
+    var backgroundColor: String?
 
     /** Text color of the data view. */
-    var textareaColor: JsAny?
+    var textareaColor: String?
 
     /** Border color of the data view. */
-    var textareaBorderColor: JsAny?
+    var textareaBorderColor: String?
 
     /** Text color of the data view. */
-    var textColor: JsAny?
+    var textColor: String?
 
     /** Button color of the data view. */
-    var buttonColor: JsAny?
+    var buttonColor: String?
 
     /** Button text color of the data view. */
-    var buttonTextColor: JsAny?
+    var buttonTextColor: String?
 
-    /** Formatter of the displayed data. */
-    var optionToContent: JsAny?
+    /** Converts the option to the content shown in the data view. */
+    var optionToContent: ((option: EChartsOption) -> StringOrHTMLElement)?
 
-    /** Parser of the edited data. */
-    var contentToOption: JsAny?
+    /** Parses the edited content back into an option. */
+    var contentToOption: ((viewMain: HTMLDivElement, oldOption: EChartsOption) -> EChartsOption)?
 
     /** Callback invoked when the data view is refreshed. */
     var refreshRate: Double?
@@ -474,10 +549,10 @@ external interface MagicTypeOption : ToolboxFeatureOption {
     var type: Array<String>?
 
     /** Option fragments applied for each chart type, keyed by type name. */
-    var option: JsAny?
+    var option: Record<String, SeriesOption>?
 
-    /** Series index the magic type applies to. */
-    var seriesIndex: JsAny?
+    /** Series index the magic type applies to, keyed by type name. */
+    var seriesIndex: Record<String, Double>?
 }
 
 /**
@@ -485,15 +560,15 @@ external interface MagicTypeOption : ToolboxFeatureOption {
  *
  * Set [type] to `"continuous"` or `"piecewise"`.
  */
-external interface VisualMapOption : JsAny {
+external interface VisualMapOption {
     /** Component id. */
     var id: String?
 
     /** Whether the component is shown. */
     var show: Boolean?
 
-    /** Type: `"continuous"` or `"piecewise"`. */
-    var type: String?
+    /** Variant of the visual map. */
+    var type: VisualMapType?
 
     /** Minimum value of the mapping range. */
     var min: Double?
@@ -511,7 +586,7 @@ external interface VisualMapOption : JsAny {
     var calculable: Boolean?
 
     /** Orientation: `"vertical"` or `"horizontal"`. */
-    var orient: String?
+    var orient: Orient?
 
     /** Distance to the left side. */
     var left: StringOrDouble?
@@ -547,25 +622,31 @@ external interface VisualMapOption : JsAny {
     var textGap: Double?
 
     /** Style of the text. */
-    var textStyle: TextStyleOption?
+    var textStyle: LabelOption?
 
     /** Formatter of the range labels. */
     var formatter: LabelFormatter?
 
     /** Visual style for values inside the range. */
-    var inRange: JsAny?
+    var inRange: VisualOptionUnit?
 
     /** Visual style for values outside the range. */
-    var outOfRange: JsAny?
+    var outOfRange: VisualOptionUnit?
 
     /** Configuration of the controller. */
-    var controller: JsAny?
+    var controller: VisualMapControllerOption?
+
+    /** Visual style applied to the target element. */
+    var target: VisualMapControllerOption?
 
     /** Series indices controlled by this component. */
-    var seriesIndex: JsAny?
+    var seriesIndex: IndexOrIndexArray?
+
+    /** Series targets with specific dimensions. */
+    var seriesTargets: Array<VisualMapSeriesTarget>?
 
     /** Dimension of the data used for the mapping. */
-    var dimension: String?
+    var dimension: Double?
 
     /** Whether hovering a value highlights the related data. */
     var hoverLink: Boolean?
@@ -574,10 +655,10 @@ external interface VisualMapOption : JsAny {
     var splitNumber: Double?
 
     /** Pieces of a piecewise visual map. */
-    var pieces: Array<JsAny>?
+    var pieces: Array<VisualPiece>?
 
-    /** Categories of a piecewise visual map. */
-    var categories: Array<String>?
+    /** Categories of a piecewise visual map. Upstream types this as `unknown`. */
+    var categories: JsAny?
 
     /** How to select the piece style: `"auto"` or `"all"`. */
     var selectedMode: String?
@@ -586,13 +667,28 @@ external interface VisualMapOption : JsAny {
     var itemGap: Double?
 
     /** Background color of the component. */
-    var backgroundColor: JsAny?
+    var backgroundColor: ZRColor?
 
     /** Border color of the component. */
-    var borderColor: JsAny?
+    var borderColor: ZRColor?
 
     /** Border width of the component. */
     var borderWidth: Double?
+
+    /** Color of the text content. */
+    var contentColor: ZRColor?
+
+    /** Color of the text of inactive items. */
+    var inactiveColor: ZRColor?
+
+    /** Color palette of the visual map. */
+    var color: Array<String>?
+
+    /** Padding of the component. */
+    var padding: DoubleOrDoubleArray?
+
+    /** Whether the component updates while the range is dragged. */
+    var realtime: Boolean?
 
     /** Whether to show the labels. */
     var showLabel: Boolean?
@@ -604,7 +700,7 @@ external interface VisualMapOption : JsAny {
 /**
  * Geo component: draws a map without needing a series.
  */
-external interface GeoOption : JsAny {
+external interface GeoOption {
     /** Component id. */
     var id: String?
 
@@ -618,19 +714,28 @@ external interface GeoOption : JsAny {
     var roam: BooleanOrString?
 
     /** Center of the map, e.g. `[104.0, 35.0]`. */
-    var center: Array<JsAny>?
+    var center: Array<StringOrDouble>?
 
     /** Initial zoom level. */
     var zoom: Double?
 
     /** Zoom limits. */
-    var scaleLimit: JsAny?
+    var scaleLimit: ScaleLimitOption?
 
     /** Mapping of the names in the map data to display names. */
-    var nameMap: JsAny?
+    var nameMap: NameMap?
+
+    /** Property of the GeoJSON feature used as the region name. */
+    var nameProperty: String?
+
+    /** Aspect ratio of the map. */
+    var aspectScale: Double?
 
     /** Selection mode: `false`, `"single"` or `"multiple"`. */
     var selectedMode: BooleanOrString?
+
+    /** Selection state per region name. */
+    var selectedMap: Record<String, Boolean>?
 
     /** Style of the labels. */
     var label: LabelOption?
@@ -648,16 +753,16 @@ external interface GeoOption : JsAny {
     var select: SelectOption?
 
     /** Per-region configuration. */
-    var regions: Array<JsAny>?
+    var regions: Array<RegionOption>?
 
     /** Region layout: `"center"` for [layoutCenter]/[layoutSize]. */
-    var layoutCenter: Array<String>?
+    var layoutCenter: Array<StringOrDouble>?
 
     /** Size of the map when [layoutCenter] is used. */
     var layoutSize: StringOrDouble?
 
     /** Bounding coordinates of the map, `[[left, top], [right, bottom]]`. */
-    var boundingCoords: JsAny?
+    var boundingCoords: Array<Array<Double>>?
 
     /** z-index of the component. */
     var z: Double?
@@ -673,9 +778,52 @@ external interface GeoOption : JsAny {
 }
 
 /**
+ * Configuration of one region of a map or geo component.
+ */
+external interface RegionOption {
+    /** Name of the region. */
+    var name: String?
+
+    /** Whether the region is selected. */
+    var selected: Boolean?
+
+    /** Whether the region ignores mouse events. */
+    var silent: Boolean?
+
+    /** Style of the region. */
+    var itemStyle: ItemStyleOption?
+
+    /** Label style of the region. */
+    var label: LabelOption?
+
+    /** Emphasis style of the region. */
+    var emphasis: RegionStateOption?
+
+    /** Blur style of the region. */
+    var blur: RegionStateOption?
+
+    /** Select style of the region. */
+    var select: RegionStateOption?
+
+    /** Tooltip specific to the region. */
+    var tooltip: TooltipOption?
+}
+
+/**
+ * State style of a map region.
+ */
+external interface RegionStateOption {
+    /** Style of the region. */
+    var itemStyle: ItemStyleOption?
+
+    /** Label style of the region. */
+    var label: LabelOption?
+}
+
+/**
  * Polar coordinate system.
  */
-external interface PolarOption : JsAny {
+external interface PolarOption {
     /** Component id. */
     var id: String?
 
@@ -689,7 +837,7 @@ external interface PolarOption : JsAny {
     var center: Array<StringOrDouble>?
 
     /** Radius of the polar coordinate system, or `[inner, outer]`. */
-    var radius: JsAny?
+    var radius: StringOrDoubleOrArray?
 
     /** Index of the tooltip that describes this component. */
     var tooltip: TooltipOption?
@@ -698,7 +846,7 @@ external interface PolarOption : JsAny {
 /**
  * Radar coordinate system.
  */
-external interface RadarOption : JsAny {
+external interface RadarOption {
     /** Component id. */
     var id: String?
 
@@ -720,34 +868,55 @@ external interface RadarOption : JsAny {
     /** Start angle in degrees. */
     var startAngle: Double?
 
+    /** Whether the radar is drawn clockwise. */
+    var clockwise: Boolean?
+
     /** Indicator definitions, one per radar axis. */
     var indicator: Array<RadarIndicator>?
 
     /** Configuration of the axis names. */
     var axisName: LabelOption?
 
+    /** Distance between the axis name and the axis line. */
+    var axisNameGap: Double?
+
+    /** Whether axes with a zero minimum are shared. */
+    var scale: Boolean?
+
+    /** Whether the radar emits mouse events. */
+    var triggerEvent: Boolean?
+
+    /** Gap at the ends of a category axis. */
+    var boundaryGap: BooleanOrStringArray?
+
     /** Number of split areas. */
     var splitNumber: Double?
 
     /** Style of the axis lines. */
-    var axisLine: LineStyleOption?
+    var axisLine: AxisLineOption?
+
+    /** Style of the axis ticks. */
+    var axisTick: AxisTickOption?
+
+    /** Style of the axis labels. */
+    var axisLabel: AxisLabelOption?
 
     /** Style of the split lines. */
-    var splitLine: LineStyleOption?
+    var splitLine: SplitLineOption?
 
     /** Style of the split areas. */
-    var splitArea: AreaStyleOption?
-
-    /** Style of the symbols on the axis lines. */
-    var axisTick: JsAny?
+    var splitArea: SplitAreaOption?
 }
 
 /**
  * One axis of a radar coordinate system.
  */
-external interface RadarIndicator : JsAny {
+external interface RadarIndicator {
     /** Display name. */
     var name: String?
+
+    /** Deprecated display name; use [name]. */
+    var text: String?
 
     /** Maximum value. */
     var max: Double?
@@ -756,16 +925,16 @@ external interface RadarIndicator : JsAny {
     var min: Double?
 
     /** Fixed color of the indicator, overriding the series color. */
-    var color: JsAny?
+    var color: String?
 
-    /** Axis-specific label style. */
-    var axisName: LabelOption?
+    /** Type of the indicator axis: `"value"` or `"log"`. */
+    var axisType: String?
 }
 
 /**
  * Calendar coordinate system.
  */
-external interface CalendarOption : JsAny {
+external interface CalendarOption {
     /** Component id. */
     var id: String?
 
@@ -794,34 +963,84 @@ external interface CalendarOption : JsAny {
     var height: StringOrDouble?
 
     /** Orientation: `"horizontal"` or `"vertical"`. */
-    var orient: String?
+    var orient: Orient?
 
     /** Date range, e.g. `"2017"` or `["2017-01-01", "2017-12-31"]`. */
-    var range: JsAny?
+    var range: CalendarRange?
 
     /** Size of a day cell in pixels or as a percentage. */
-    var cellSize: DoubleOrDoubleArray?
+    var cellSize: StringOrDoubleOrArray?
 
     /** Configuration of the day labels. */
-    var dayLabel: JsAny?
+    var dayLabel: CalendarDayLabelOption?
 
     /** Configuration of the month labels. */
-    var monthLabel: JsAny?
+    var monthLabel: CalendarMonthLabelOption?
 
     /** Configuration of the year labels. */
-    var yearLabel: JsAny?
+    var yearLabel: CalendarYearLabelOption?
 
     /** Style of the day cells. */
     var itemStyle: ItemStyleOption?
 
     /** Style of the split lines. */
-    var splitLine: LineStyleOption?
+    var splitLine: SplitLineOption?
+}
+
+/**
+ * Range of a calendar: one date or two dates bounding the range.
+ */
+external interface CalendarRange
+
+/** Wraps one date. */
+fun CalendarRange(value: DataZoomValue): CalendarRange = value.unsafeCast<CalendarRange>()
+
+/** Wraps two dates. */
+fun CalendarRange(values: Array<DataZoomValue>): CalendarRange = values.unsafeCast<CalendarRange>()
+
+/**
+ * Day labels of a calendar.
+ */
+external interface CalendarDayLabelOption : LabelOption {
+    /** First day of the week, `0` for Sunday. */
+    var firstDay: Double?
+
+    /** Margin between the label and the axis line. */
+    var margin: StringOrDouble?
+
+    /** Names of the days, starting with Sunday. */
+    var nameMap: StringOrStringArray?
+}
+
+/**
+ * Month labels of a calendar.
+ */
+external interface CalendarMonthLabelOption : LabelOption {
+    /** Margin between the label and the axis line. */
+    var margin: Double?
+
+    /** Names of the months, starting with January. */
+    var nameMap: StringOrStringArray?
+
+    /** Formatter of the month labels. */
+    override var formatter: LabelFormatter?
+}
+
+/**
+ * Year labels of a calendar.
+ */
+external interface CalendarYearLabelOption : LabelOption {
+    /** Margin between the label and the axis line. */
+    var margin: Double?
+
+    /** Formatter of the year labels. */
+    override var formatter: LabelFormatter?
 }
 
 /**
  * Timeline component: switches between several options over time.
  */
-external interface TimelineOption : JsAny {
+external interface TimelineOption {
     /** Component id. */
     var id: String?
 
@@ -868,7 +1087,7 @@ external interface TimelineOption : JsAny {
     var padding: DoubleOrDoubleArray?
 
     /** Orientation: `"horizontal"` or `"vertical"`. */
-    var orient: String?
+    var orient: Orient?
 
     /** Whether to invert the axis. */
     var inverse: Boolean?
@@ -880,31 +1099,143 @@ external interface TimelineOption : JsAny {
     var symbolSize: DoubleOrDoubleArray?
 
     /** Style of the axis line. */
-    var lineStyle: LineStyleOption?
+    var lineStyle: TimelineLineStyleOption?
 
     /** Style of the axis labels. */
-    var label: LabelOption?
+    var label: TimelineLabelOption?
 
     /** Style of the timeline points. */
     var itemStyle: ItemStyleOption?
 
     /** Style of the current timeline point. */
-    var checkpointStyle: ItemStyleOption?
+    var checkpointStyle: TimelineCheckpointStyle?
 
     /** Style of the play controls. */
-    var controlStyle: ItemStyleOption?
+    var controlStyle: TimelineControlStyle?
 
     /** Style of the progress bar. */
-    var progress: JsAny?
+    var progress: TimelineProgressOption?
 
     /** Data of the timeline points. */
-    var data: Array<JsAny>?
+    var data: Array<OptionDataItem?>?
+
+    /** Background color of the component. */
+    var backgroundColor: ZRColor?
+
+    /** Border color of the component. */
+    var borderColor: String?
+
+    /** Border width of the component. */
+    var borderWidth: Double?
+
+    /** Interval between two points during playback, in milliseconds. */
+    var playInterval: Double?
+
+    /** Whether the component updates in realtime. */
+    var realtime: Boolean?
+}
+
+/**
+ * Line style of a timeline axis.
+ */
+external interface TimelineLineStyleOption : LineStyleOption {
+    /** Whether the line is shown. */
+    var show: Boolean?
+}
+
+/**
+ * Label style of a timeline axis.
+ */
+external interface TimelineLabelOption : LabelOption {
+    /** Whether the label is shown. */
+    override var show: Boolean?
+
+    /** Interval between two labels. */
+    var interval: AxisInterval?
+}
+
+/**
+ * Style of the current point of a timeline.
+ */
+external interface TimelineCheckpointStyle : ItemStyleOption {
+    /** Whether the point animates. */
+    var animation: Boolean?
+
+    /** Duration of the animation in milliseconds. */
+    var animationDuration: Double?
+
+    /** Easing of the animation. */
+    var animationEasing: AnimationEasing?
+}
+
+/**
+ * Style of the play controls of a timeline.
+ */
+external interface TimelineControlStyle : ItemStyleOption {
+    /** Whether the controls are shown. */
+    var show: Boolean?
+
+    /** Whether the play button is shown. */
+    var showPlayBtn: Boolean?
+
+    /** Whether the previous button is shown. */
+    var showPrevBtn: Boolean?
+
+    /** Whether the next button is shown. */
+    var showNextBtn: Boolean?
+
+    /** Size of the buttons. */
+    var itemSize: Double?
+
+    /** Gap between the buttons. */
+    var itemGap: Double?
+
+    /** Position of the controls. */
+    var position: String?
+
+    /** Icon of the play button. */
+    var playIcon: String?
+
+    /** Icon of the stop button. */
+    var stopIcon: String?
+
+    /** Icon of the previous button. */
+    var prevIcon: String?
+
+    /** Icon of the next button. */
+    var nextIcon: String?
+
+    /** Size of the play button. */
+    var playBtnSize: StringOrDouble?
+
+    /** Size of the stop button. */
+    var stopBtnSize: StringOrDouble?
+
+    /** Size of the next button. */
+    var nextBtnSize: StringOrDouble?
+
+    /** Size of the previous button. */
+    var prevBtnSize: StringOrDouble?
+}
+
+/**
+ * Progress bar style of a timeline.
+ */
+external interface TimelineProgressOption {
+    /** Style of the progress line. */
+    var lineStyle: TimelineLineStyleOption?
+
+    /** Style of the progress area. */
+    var itemStyle: ItemStyleOption?
+
+    /** Style of the progress label. */
+    var label: TimelineLabelOption?
 }
 
 /**
  * A graphic element drawn directly on the canvas.
  */
-external interface GraphicElement : JsAny {
+external interface GraphicElement {
     /** Element type, e.g. `"group"`, `"text"`, `"rect"`, `"circle"` or `"image"`. */
     var type: String?
 
@@ -948,10 +1279,10 @@ external interface GraphicElement : JsAny {
     var cursor: String?
 
     /** Shape definition of the element. */
-    var shape: JsAny?
+    var shape: ZRShapeProps?
 
     /** Style of the element. */
-    var style: JsAny?
+    var style: ZRStyleProps?
 
     /** Position offset, `[x, y]`. */
     var position: Array<Double>?
@@ -969,13 +1300,13 @@ external interface GraphicElement : JsAny {
     var children: Array<GraphicElement>?
 
     /** Callback invoked when the element is clicked. */
-    var onclick: JsAny?
+    var onclick: ((event: ZRElementEvent) -> Unit)?
 }
 
 /**
  * Accessibility settings.
  */
-external interface AriaOption : JsAny {
+external interface AriaOption {
     /** Whether screen-reader support is enabled. */
     var enabled: Boolean?
 
@@ -989,18 +1320,18 @@ external interface AriaOption : JsAny {
 /**
  * Decal settings of the accessibility module.
  */
-external interface AriaDecalOption : JsAny {
+external interface AriaDecalOption {
     /** Whether to show decal patterns. */
     var show: Boolean?
 
-    /** Default decal settings. */
-    var decal: DecalOption?
+    /** Default decal configurations, or a single one. */
+    var decals: DecalList?
 }
 
 /**
  * Screen-reader description of the chart.
  */
-external interface AriaLabelOption : JsAny {
+external interface AriaLabelOption {
     /** Whether the description is enabled. */
     var enabled: Boolean?
 
@@ -1011,7 +1342,7 @@ external interface AriaLabelOption : JsAny {
 /**
  * Brush component: selects a region and emits `brushSelected`.
  */
-external interface BrushOption : JsAny {
+external interface BrushOption {
     /** Button configuration for the toolbox. */
     var toolbox: Array<String>?
 
@@ -1025,7 +1356,7 @@ external interface BrushOption : JsAny {
     var transformable: Boolean?
 
     /** Style of the brush shape. */
-    var brushStyle: ItemStyleOption?
+    var brushStyle: BrushStyleOption?
 
     /** Throttle type of the `brushselected` event: `"debounce"` or `"fixRate"`. */
     var throttleType: String?
@@ -1037,30 +1368,59 @@ external interface BrushOption : JsAny {
     var removeOnClick: Boolean?
 
     /** Selected indices per brush area. */
-    var geoIndex: JsAny?
+    var geoIndex: ModelFinderIndexQuery?
 
     /** Style of the elements inside the selection. */
-    var inBrush: JsAny?
+    var inBrush: VisualOptionUnit?
 
     /** Style of the elements outside the selection. */
-    var outOfBrush: JsAny?
+    var outOfBrush: VisualOptionUnit?
 
     /** Index of the x axes the brush applies to. */
-    var xAxisIndex: JsAny?
+    var xAxisIndex: ModelFinderIndexQuery?
 
     /** Index of the y axes the brush applies to. */
-    var yAxisIndex: JsAny?
+    var yAxisIndex: ModelFinderIndexQuery?
+
+    /** Links the brush areas of several components. */
+    var brushLink: ModelFinderIndexQuery?
+}
+
+/**
+ * Style of a brush area.
+ */
+external interface BrushStyleOption {
+    /** Border width of the brush area. */
+    var borderWidth: Double?
+
+    /** Fill color of the brush area. */
+    var color: ZRColor?
+
+    /** Border color of the brush area. */
+    var borderColor: ZRColor?
 }
 
 /**
  * Axis pointer: the crosshair shown by tooltip and axis triggers.
  */
-external interface AxisPointerOption : JsAny {
-    /** Whether the axis pointer is shown. */
-    var show: Boolean?
+external interface AxisPointerOption {
+    /** Whether the axis pointer is shown, or `"auto"`. */
+    var show: BooleanOrString?
 
-    /** Type: `"line"`, `"shadow"`, `"none"`. */
-    var type: String?
+    /** Shape of the pointer. */
+    var type: AxisPointerType?
+
+    /** How the pointer is triggered. */
+    var triggerOn: String?
+
+    /** Whether hovering highlights the related series. */
+    var triggerEmphasis: Boolean?
+
+    /** Current value of the pointer. */
+    var value: OptionDataValue?
+
+    /** `"show"` or `"hide"`; drives the pointer from `dispatchAction`. */
+    var status: String?
 
     /** Whether the pointer snaps to data points. */
     var snap: Boolean?
@@ -1072,7 +1432,13 @@ external interface AxisPointerOption : JsAny {
     var z: Double?
 
     /** Style of the label. */
-    var label: JsAny?
+    var label: AxisPointerLabelOption?
+
+    /** Handle of the pointer. */
+    var handle: AxisPointerHandleOption?
+
+    /** Axes linked to this pointer. */
+    var link: Array<AxisPointerLink>?
 
     /** Style of the line pointer. */
     var lineStyle: LineStyleOption?
@@ -1084,19 +1450,118 @@ external interface AxisPointerOption : JsAny {
     var crossStyle: LineStyleOption?
 
     /** Animation of the pointer. */
-    var animation: Boolean?
+    var animation: BooleanOrString?
 
     /** Duration of the pointer animation. */
     var animationDuration: Double?
 
     /** Easing of the pointer animation. */
-    var animationEasing: String?
+    var animationEasing: AnimationEasing?
+}
+
+/**
+ * Label of an axis pointer.
+ */
+external interface AxisPointerLabelOption : LabelOption {
+    /** Precision of the displayed value, or `"auto"`. */
+    override var precision: StringOrDouble?
+
+    /** Margin between the label and the pointer. */
+    var margin: Double?
+
+    /** Formatter of the label. */
+    override var formatter: LabelFormatter?
+}
+
+/**
+ * Handle of an axis pointer.
+ */
+external interface AxisPointerHandleOption {
+    /** Whether the handle is shown. */
+    var show: Boolean?
+
+    /** Icon of the handle. */
+    var icon: String?
+
+    /** Size of the handle. */
+    var size: DoubleOrDoubleArray?
+
+    /** Distance between the handle and the axis. */
+    var margin: Double?
+
+    /** Color of the handle. */
+    var color: String?
+
+    /** Throttle delay for mobile devices. */
+    var throttle: Double?
+
+    /** Shadow blur radius of the handle. */
+    var shadowBlur: Double?
+
+    /** Shadow color of the handle. */
+    var shadowColor: String?
+
+    /** Horizontal shadow offset of the handle. */
+    var shadowOffsetX: Double?
+
+    /** Vertical shadow offset of the handle. */
+    var shadowOffsetY: Double?
+}
+
+/**
+ * One linked axis group of an axis pointer.
+ */
+external interface AxisPointerLink {
+    /** X axes of the link. */
+    var xAxisIndex: ModelFinderIndexQuery?
+
+    /** Y axes of the link. */
+    var yAxisIndex: ModelFinderIndexQuery?
+
+    /** Ids of the x axes of the link. */
+    var xAxisId: Array<String>?
+
+    /** Ids of the y axes of the link. */
+    var yAxisId: Array<String>?
+
+    /** Names of the x axes of the link. */
+    var xAxisName: StringOrStringArray?
+
+    /** Names of the y axes of the link. */
+    var yAxisName: StringOrStringArray?
+
+    /** Radius axes of the link. */
+    var radiusAxisIndex: ModelFinderIndexQuery?
+
+    /** Angle axes of the link. */
+    var angleAxisIndex: ModelFinderIndexQuery?
+
+    /** Radius axis ids of the link. */
+    var radiusAxisId: Array<String>?
+
+    /** Angle axis ids of the link. */
+    var angleAxisId: Array<String>?
+
+    /** Radius axis names of the link. */
+    var radiusAxisName: StringOrStringArray?
+
+    /** Angle axis names of the link. */
+    var angleAxisName: StringOrStringArray?
+
+    /** Single axes of the link. */
+    var singleAxisIndex: ModelFinderIndexQuery?
+
+    /** Single axis ids of the link. */
+    var singleAxisId: Array<String>?
+
+    /** Single axis names of the link. */
+    var singleAxisName: StringOrStringArray?
 }
 
 /**
  * Matrix coordinate system introduced in ECharts 6.
  */
-external interface MatrixOption : JsAny {
+external interface MatrixOption {
     /** Component id. */
     var id: String?
 
@@ -1124,29 +1589,138 @@ external interface MatrixOption : JsAny {
     /** Height of the component. */
     var height: StringOrDouble?
 
-    /** Border width of the matrix cells. */
-    var borderWidth: Double?
+    /** x dimension (header row) of the matrix. */
+    var x: MatrixDimensionOption?
 
-    /** Border color of the matrix cells. */
-    var borderColor: JsAny?
+    /** y dimension (header column) of the matrix. */
+    var y: MatrixDimensionOption?
 
-    /** Background color of the matrix cells. */
-    var backgroundColor: JsAny?
+    /** Body cells of the matrix. */
+    var body: MatrixBodyOption?
 
-    /** Corner radius of the matrix cells. */
-    var borderRadius: Double?
+    /** Top-left corner cells of the matrix. */
+    var corner: MatrixCornerOption?
 
-    /** Matrix body configuration. */
-    var matrix: JsAny?
+    /** Background style of the matrix. */
+    var backgroundStyle: ItemStyleOption?
 
-    /** Label style of the matrix cells. */
+    /** z-order of the cell borders. */
+    var borderZ2: Double?
+
+    /** Tooltip of the matrix. */
+    var tooltip: TooltipOption?
+
+    /** Whether the matrix emits mouse events. */
+    var triggerEvent: Boolean?
+}
+
+/**
+ * One dimension of a matrix.
+ */
+external interface MatrixDimensionOption {
+    /** Dimension type; only `"category"` is supported. */
+    var type: String?
+
+    /** Whether the dimension is shown. */
+    var show: Boolean?
+
+    /** Cells of the dimension. */
+    var data: Array<MatrixDimensionCellOption>?
+
+    /** Length of the dimension, in pixels or as a percentage. */
+    var length: StringOrDouble?
+
+    /** Sizes of the nested levels. */
+    var levels: Array<MatrixDimensionLevelOption>?
+
+    /** Style of the divider lines. */
+    var dividerLineStyle: LineStyleOption?
+
+    /** Label style of the cells. */
     var label: LabelOption?
+
+    /** Item style of the cells. */
+    var itemStyle: ItemStyleOption?
+
+    /** Cursor shown on hover. */
+    var cursor: String?
+
+    /** Whether the cells ignore mouse events. */
+    var silent: Boolean?
+}
+
+/**
+ * One cell of a matrix dimension.
+ */
+external interface MatrixDimensionCellOption {
+    /** Value of the cell. */
+    var value: OptionDataValue?
+
+    /** Nested child values. */
+    var children: Array<OptionDataValue>?
+
+    /** Label style of the cell. */
+    var label: LabelOption?
+
+    /** Item style of the cell. */
+    var itemStyle: ItemStyleOption?
+}
+
+/**
+ * Size of one nested level of a matrix dimension.
+ */
+external interface MatrixDimensionLevelOption {
+    /** Length of the level. */
+    var levelSize: StringOrDouble?
+}
+
+/**
+ * Cells of the matrix body or corner.
+ */
+external interface MatrixBodyCornerOption {
+    /** Cells with a specific coordinate. */
+    var data: Array<MatrixBodyCornerCellOption>?
+
+    /** Label style of the cells. */
+    var label: LabelOption?
+
+    /** Item style of the cells. */
+    var itemStyle: ItemStyleOption?
+
+    /** Cursor shown on hover. */
+    var cursor: String?
+
+    /** Whether the cells ignore mouse events. */
+    var silent: Boolean?
+}
+
+/** Body cells of a matrix. */
+typealias MatrixBodyOption = MatrixBodyCornerOption
+
+/** Corner cells of a matrix. */
+typealias MatrixCornerOption = MatrixBodyCornerOption
+
+/**
+ * One cell of the matrix body or corner.
+ */
+external interface MatrixBodyCornerCellOption {
+    /** Coordinates of the cell, `[x, y]`. */
+    var coord: Array<OptionDataValue>?
+
+    /** Whether the cell is merged with its neighbours. */
+    var mergeCells: Boolean?
+
+    /** Label style of the cell. */
+    var label: LabelOption?
+
+    /** Item style of the cell. */
+    var itemStyle: ItemStyleOption?
 }
 
 /**
  * Parallel coordinate system.
  */
-external interface ParallelOption : JsAny {
+external interface ParallelOption {
     /** Component id. */
     var id: String?
 
@@ -1178,5 +1752,5 @@ external interface ParallelOption : JsAny {
     var layout: String?
 
     /** Index of the parallel axes used by this coordinate system. */
-    var parallelAxisDefault: JsAny?
+    var parallelAxisDefault: ParallelAxisOption?
 }

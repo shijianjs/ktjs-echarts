@@ -1,10 +1,15 @@
 package echarts
 
+import echarts.options.CoordinateSystemDataLayout
+import echarts.options.DoubleOrDoubleArray
 import echarts.options.EChartsOption
+import echarts.options.OptionDataValueOrArray
+import echarts.options.VisualValue
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
 import web.html.HTMLCanvasElement
 import web.html.HTMLElement
+import zrender.ZRenderType
 
 /**
  * Chart instance returned by [ECharts.init].
@@ -37,10 +42,11 @@ external interface EChartsInstance {
     /**
      * Returns the underlying zrender instance, or `null` in server-side rendering mode.
      *
-     * The `zrender` package is not a dependency of this wrapper, so the instance is untyped; use
-     * [ECharts.zrender] for its runtime API.
+     * Use the returned instance to add custom graphic elements or to listen to raw zrender
+     * events. The `zrender` npm package is not a dependency of this wrapper, so only the members
+     * modelled by [ZRenderType] are available.
      */
-    fun getZr(): JsAny?
+    fun getZr(): ZRenderType?
 
     /**
      * Whether the chart runs in server-side rendering mode (`init(null, ..., ssr = true)`).
@@ -83,10 +89,12 @@ external interface EChartsInstance {
     fun setTheme(theme: ThemeOption, opts: SetThemeOpts? = definedExternally)
 
     /**
-     * Returns the normalized option currently held by the chart. The result is the full option
-     * including defaults, so it is intentionally untyped.
+     * Returns the normalized option currently held by the chart.
+     *
+     * The returned object is the full option including defaults. Cast it to a concrete option
+     * type when the extra fields are needed.
      */
-    fun getOption(): JsAny
+    fun getOption(): EChartsOption
 
     /**
      * Returns the chart width in CSS pixels.
@@ -140,18 +148,26 @@ external interface EChartsInstance {
      * Converts a logical coordinate to a pixel coordinate.
      *
      * @param finder `ModelFinder("series")`, or a query object such as `{ seriesIndex: 0 }`.
+     * @param value a data value such as a number, a date, or an array with one value per axis.
      */
-    fun convertToPixel(finder: ModelFinder, value: JsAny): JsAny
+    fun convertToPixel(finder: ModelFinder, value: OptionDataValueOrArray): DoubleOrDoubleArray
 
     /**
      * Converts a logical coordinate to a layout coordinate.
+     *
+     * @param value a coordinate accepted by the target coordinate system. Nested arrays are
+     * allowed by matrix coordinate systems, so the parameter stays untyped.
      */
-    fun convertToLayout(finder: ModelFinder, value: JsAny, opt: JsAny? = definedExternally): JsAny
+    fun convertToLayout(
+        finder: ModelFinder,
+        value: JsAny,
+        opt: JsAny? = definedExternally,
+    ): CoordinateSystemDataLayout
 
     /**
      * Converts a pixel coordinate to a logical coordinate.
      */
-    fun convertFromPixel(finder: ModelFinder, value: JsAny): JsAny
+    fun convertFromPixel(finder: ModelFinder, value: DoubleOrDoubleArray): DoubleOrDoubleArray
 
     /**
      * Whether the given pixel point is inside the finder's coordinate system or component.
@@ -161,7 +177,7 @@ external interface EChartsInstance {
     /**
      * Returns a visual value (`"color"`, `"symbol"`, `"symbolSize"`, ...) of a series or data item.
      */
-    fun getVisual(finder: ModelFinder, visualType: String): JsAny
+    fun getVisual(finder: ModelFinder, visualType: String): VisualValue
 
     /**
      * Whether the chart has been disposed.

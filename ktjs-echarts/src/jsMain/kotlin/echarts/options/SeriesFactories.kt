@@ -1,139 +1,211 @@
 package echarts.options
 
+import echarts.SeriesTypes
+import js.objects.unsafeJso
+
 /**
- * Creates a [LineSeriesOption] with `type = "line"`.
+ * Creates a [LineSeriesOption] with `type = [SeriesTypes.line]`.
  */
 inline fun lineSeries(block: LineSeriesOption.() -> Unit = {}): LineSeriesOption =
-    echartsOption<LineSeriesOption> { type = "line"; block() }
+    unsafeJso {
+        type = SeriesTypes.`line`
+        block()
+    }
 
 /**
- * Creates a [BarSeriesOption] with `type = "bar"`.
+ * Creates a [BarSeriesOption] with `type = [SeriesTypes.bar]`.
  */
 inline fun barSeries(block: BarSeriesOption.() -> Unit = {}): BarSeriesOption =
-    echartsOption<BarSeriesOption> { type = "bar"; block() }
+    unsafeJso {
+        type = SeriesTypes.`bar`
+        block()
+    }
 
 /**
- * Creates a [PieSeriesOption] with `type = "pie"`.
+ * Creates a [PieSeriesOption] with `type = [SeriesTypes.pie]`.
  */
 inline fun pieSeries(block: PieSeriesOption.() -> Unit = {}): PieSeriesOption =
-    echartsOption<PieSeriesOption> { type = "pie"; block() }
+    unsafeJso {
+        type = SeriesTypes.`pie`
+        block()
+    }
 
 /**
- * Creates a [ScatterSeriesOption] with `type = "scatter"`.
+ * Creates a [ScatterSeriesOption] with `type = [SeriesTypes.scatter]`.
  */
 inline fun scatterSeries(block: ScatterSeriesOption.() -> Unit = {}): ScatterSeriesOption =
-    echartsOption<ScatterSeriesOption> { type = "scatter"; block() }
+    unsafeJso {
+        type = SeriesTypes.`scatter`
+        block()
+    }
 
 /**
- * Creates an [EffectScatterSeriesOption] with `type = "effectScatter"`.
+ * Creates a [EffectScatterSeriesOption] with `type = [SeriesTypes.effectScatter]`.
  */
 inline fun effectScatterSeries(block: EffectScatterSeriesOption.() -> Unit = {}): EffectScatterSeriesOption =
-    echartsOption<EffectScatterSeriesOption> { type = "effectScatter"; block() }
+    unsafeJso {
+        type = SeriesTypes.`effectScatter`
+        block()
+    }
 
 /**
- * Creates a [RadarSeriesOption] with `type = "radar"`.
+ * Creates a [RadarSeriesOption] with `type = [SeriesTypes.radar]`.
  */
 inline fun radarSeries(block: RadarSeriesOption.() -> Unit = {}): RadarSeriesOption =
-    echartsOption<RadarSeriesOption> { type = "radar"; block() }
+    unsafeJso {
+        type = SeriesTypes.`radar`
+        block()
+    }
 
 /**
- * Creates a [MapSeriesOption] with `type = "map"`.
+ * Creates a [MapSeriesOption] with `type = [SeriesTypes.map]`.
  */
 inline fun mapSeries(block: MapSeriesOption.() -> Unit = {}): MapSeriesOption =
-    echartsOption<MapSeriesOption> { type = "map"; block() }
+    unsafeJso {
+        type = SeriesTypes.`map`
+        block()
+    }
 
 /**
- * Creates a [TreeSeriesOption] with `type = "tree"`.
+ * Creates a [TreeSeriesOption] with `type = [SeriesTypes.tree]`.
  */
 inline fun treeSeries(block: TreeSeriesOption.() -> Unit = {}): TreeSeriesOption =
-    echartsOption<TreeSeriesOption> { type = "tree"; block() }
+    unsafeJso {
+        type = SeriesTypes.`tree`
+        block()
+    }
 
 /**
- * Creates a [TreemapSeriesOption] with `type = "treemap"`.
+ * Creates a [TreemapSeriesOption] with `type = [SeriesTypes.treemap]`.
  */
 inline fun treemapSeries(block: TreemapSeriesOption.() -> Unit = {}): TreemapSeriesOption =
-    echartsOption<TreemapSeriesOption> { type = "treemap"; block() }
+    unsafeJso {
+        type = SeriesTypes.`treemap`
+        block()
+    }
 
 /**
- * Creates a [SunburstSeriesOption] with `type = "sunburst"`.
+ * Creates a [SunburstSeriesOption] with `type = [SeriesTypes.sunburst]`.
  */
 inline fun sunburstSeries(block: SunburstSeriesOption.() -> Unit = {}): SunburstSeriesOption =
-    echartsOption<SunburstSeriesOption> { type = "sunburst"; block() }
+    unsafeJso {
+        type = SeriesTypes.`sunburst`
+        block()
+    }
 
 /**
- * Creates a [GraphSeriesOption] with `type = "graph"`.
+ * Creates a [GraphSeriesOption] with `type = [SeriesTypes.graph]`.
  */
 inline fun graphSeries(block: GraphSeriesOption.() -> Unit = {}): GraphSeriesOption =
-    echartsOption<GraphSeriesOption> { type = "graph"; block() }
+    unsafeJso {
+        type = SeriesTypes.`graph`
+        block()
+    }
 
 /**
- * Creates a [ChordSeriesOption] with `type = "chord"`.
+ * Creates a [ChordSeriesOption] with `type = [SeriesTypes.chord]`.
  */
 inline fun chordSeries(block: ChordSeriesOption.() -> Unit = {}): ChordSeriesOption =
-    echartsOption<ChordSeriesOption> { type = "chord"; block() }
+    unsafeJso {
+        type = SeriesTypes.`chord`
+        block()
+    }
 
 /**
- * Creates a [FunnelSeriesOption] with `type = "funnel"`.
+ * Creates a [FunnelSeriesOption] with `type = [SeriesTypes.funnel]`.
  */
 inline fun funnelSeries(block: FunnelSeriesOption.() -> Unit = {}): FunnelSeriesOption =
-    echartsOption<FunnelSeriesOption> { type = "funnel"; block() }
+    unsafeJso {
+        type = SeriesTypes.`funnel`
+        block()
+    }
 
 /**
- * Creates a [GaugeSeriesOption] with `type = "gauge"`.
+ * Creates a [GaugeSeriesOption] with `type = [SeriesTypes.gauge]`.
  */
 inline fun gaugeSeries(block: GaugeSeriesOption.() -> Unit = {}): GaugeSeriesOption =
-    echartsOption<GaugeSeriesOption> { type = "gauge"; block() }
+    unsafeJso {
+        type = SeriesTypes.`gauge`
+        block()
+    }
 
 /**
- * Creates a [PictorialBarSeriesOption] with `type = "pictorialBar"`.
+ * Creates a [PictorialBarSeriesOption] with `type = [SeriesTypes.pictorialBar]`.
  */
 inline fun pictorialBarSeries(block: PictorialBarSeriesOption.() -> Unit = {}): PictorialBarSeriesOption =
-    echartsOption<PictorialBarSeriesOption> { type = "pictorialBar"; block() }
+    unsafeJso {
+        type = SeriesTypes.`pictorialBar`
+        block()
+    }
 
 /**
- * Creates a [ThemeRiverSeriesOption] with `type = "themeRiver"`.
+ * Creates a [ThemeRiverSeriesOption] with `type = [SeriesTypes.themeRiver]`.
  */
 inline fun themeRiverSeries(block: ThemeRiverSeriesOption.() -> Unit = {}): ThemeRiverSeriesOption =
-    echartsOption<ThemeRiverSeriesOption> { type = "themeRiver"; block() }
+    unsafeJso {
+        type = SeriesTypes.`themeRiver`
+        block()
+    }
 
 /**
- * Creates a [CustomSeriesOption] with `type = "custom"`.
+ * Creates a [CustomSeriesOption] with `type = [SeriesTypes.custom]`.
  */
 inline fun customSeries(block: CustomSeriesOption.() -> Unit = {}): CustomSeriesOption =
-    echartsOption<CustomSeriesOption> { type = "custom"; block() }
+    unsafeJso {
+        type = SeriesTypes.`custom`
+        block()
+    }
 
 /**
- * Creates a [BoxplotSeriesOption] with `type = "boxplot"`.
+ * Creates a [BoxplotSeriesOption] with `type = [SeriesTypes.boxplot]`.
  */
 inline fun boxplotSeries(block: BoxplotSeriesOption.() -> Unit = {}): BoxplotSeriesOption =
-    echartsOption<BoxplotSeriesOption> { type = "boxplot"; block() }
+    unsafeJso {
+        type = SeriesTypes.`boxplot`
+        block()
+    }
 
 /**
- * Creates a [CandlestickSeriesOption] with `type = "candlestick"`.
+ * Creates a [CandlestickSeriesOption] with `type = [SeriesTypes.candlestick]`.
  */
 inline fun candlestickSeries(block: CandlestickSeriesOption.() -> Unit = {}): CandlestickSeriesOption =
-    echartsOption<CandlestickSeriesOption> { type = "candlestick"; block() }
+    unsafeJso {
+        type = SeriesTypes.`candlestick`
+        block()
+    }
 
 /**
- * Creates a [HeatmapSeriesOption] with `type = "heatmap"`.
+ * Creates a [HeatmapSeriesOption] with `type = [SeriesTypes.heatmap]`.
  */
 inline fun heatmapSeries(block: HeatmapSeriesOption.() -> Unit = {}): HeatmapSeriesOption =
-    echartsOption<HeatmapSeriesOption> { type = "heatmap"; block() }
+    unsafeJso {
+        type = SeriesTypes.`heatmap`
+        block()
+    }
 
 /**
- * Creates a [ParallelSeriesOption] with `type = "parallel"`.
+ * Creates a [ParallelSeriesOption] with `type = [SeriesTypes.parallel]`.
  */
 inline fun parallelSeries(block: ParallelSeriesOption.() -> Unit = {}): ParallelSeriesOption =
-    echartsOption<ParallelSeriesOption> { type = "parallel"; block() }
+    unsafeJso {
+        type = SeriesTypes.`parallel`
+        block()
+    }
 
 /**
- * Creates a [LinesSeriesOption] with `type = "lines"`.
+ * Creates a [LinesSeriesOption] with `type = [SeriesTypes.lines]`.
  */
 inline fun linesSeries(block: LinesSeriesOption.() -> Unit = {}): LinesSeriesOption =
-    echartsOption<LinesSeriesOption> { type = "lines"; block() }
+    unsafeJso {
+        type = SeriesTypes.`lines`
+        block()
+    }
 
 /**
- * Creates a [SankeySeriesOption] with `type = "sankey"`.
+ * Creates a [SankeySeriesOption] with `type = [SeriesTypes.sankey]`.
  */
 inline fun sankeySeries(block: SankeySeriesOption.() -> Unit = {}): SankeySeriesOption =
-    echartsOption<SankeySeriesOption> { type = "sankey"; block() }
+    unsafeJso {
+        type = SeriesTypes.`sankey`
+        block()
+    }

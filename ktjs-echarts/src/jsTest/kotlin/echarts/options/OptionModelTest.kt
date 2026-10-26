@@ -1,6 +1,10 @@
 package echarts.options
 
-import kotlin.js.JsAny
+import echarts.AxisTypes
+import echarts.LegendTypes
+import echarts.SeriesTypes
+import echarts.TooltipTriggers
+import js.objects.unsafeJso
 import kotlin.js.jsTypeOf
 import kotlin.js.unsafeCast
 import kotlin.test.Test
@@ -8,21 +12,27 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import zrender.LinearGradientObject
+import zrender.RadialGradientObject
+import zrender.ZRColor
+import zrender.gradientColorStop
+import zrender.linearGradient
+import zrender.radialGradient
 
 /**
- * Tests for the option builder, the union wrappers, the gradient helpers and the series factories.
+ * Tests for the option builders, the union wrappers, the gradient helpers and the series factories.
  *
  * These types are plain JavaScript objects, so the assertions read the values back through
- * [unsafeCast] the same way a JavaScript caller would.
+ * `unsafeCast` the same way a JavaScript caller would.
  */
 class OptionModelTest {
     @Test
-    fun echartsOptionCreatesAJavaScriptObjectAndAppliesTheBlock() {
-        val option = echartsOption<EChartsOption> {
-            backgroundColor = "#f5f5f5"
+    fun unsafeJsoCreatesAJavaScriptObjectAndAppliesTheBlock() {
+        val option = unsafeJso<EChartsOption> {
+            backgroundColor = ZRColor("#f5f5f5")
             animation = false
             animationDuration = 1200.0
-            color = arrayOf("#111111", "#222222")
+            color = arrayOf(ZRColor("#111111"), ZRColor("#222222"))
         }
 
         assertEquals("object", jsTypeOf(option))
@@ -35,31 +45,31 @@ class OptionModelTest {
 
     @Test
     fun optionBuilderSupportsNestedComponents() {
-        val option = echartsOption<EChartsOption> {
-            title = one(echartsOption<TitleOption> { text = "Sales"; subtext = "2026" })
-            tooltip = echartsOption<TooltipOption> { show = true; trigger = "axis" }
-            legend = one(echartsOption<LegendOption> { show = true; type = "scroll" })
-            grid = one(echartsOption<GridOption> { left = StringOrDouble("5%"); containLabel = true })
-            xAxis = one(echartsOption<XAxisOption> { type = "category"; data = numbers(1.0, 2.0, 3.0) })
-            yAxis = one(echartsOption<YAxisOption> { type = "value" })
+        val option = unsafeJso<EChartsOption> {
+            title = one(unsafeJso<TitleOption> { text = "Sales"; subtext = "2026" })
+            tooltip = unsafeJso<TooltipOption> { show = true; trigger = TooltipTriggers.axis }
+            legend = one(unsafeJso<LegendOption> { show = true; type = LegendTypes.scroll })
+            grid = one(unsafeJso<GridOption> { left = StringOrDouble("5%"); containLabel = true })
+            xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = numbers(1.0, 2.0, 3.0) })
+            yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
             series = one(lineSeries { name = "orders"; data = numbers(3.0, 5.0, 8.0) })
         }
 
         assertEquals("Sales", option.title!![0].text)
         assertEquals("2026", option.title!![0].subtext)
-        assertEquals("axis", option.tooltip!!.trigger)
-        assertEquals("scroll", option.legend!![0].type)
+        assertEquals(TooltipTriggers.axis, option.tooltip!!.trigger)
+        assertEquals(LegendTypes.scroll, option.legend!![0].type)
         assertTrue(option.grid!![0].containLabel!!)
-        assertEquals("category", option.xAxis!![0].type)
+        assertEquals(AxisTypes.category, option.xAxis!![0].type)
         assertEquals(3, option.xAxis!![0].data?.size)
-        assertEquals("line", option.series!![0].type)
+        assertEquals(SeriesTypes.line, option.series!![0].type)
         assertEquals("orders", option.series!![0].name)
         assertEquals(3, option.series!![0].data?.size)
     }
 
     @Test
     fun oneWrapsASingleValueInAJavaScriptArray() {
-        val title = echartsOption<TitleOption> { text = "single" }
+        val title = unsafeJso<TitleOption> { text = "single" }
         val array = one(title)
         assertEquals(1, array.size)
         assertEquals("single", array[0].text)
@@ -88,11 +98,11 @@ class OptionModelTest {
     @Test
     fun itemsWrapsExistingObjects() {
         val data = items(
-            echartsOption<ItemStyleOption> { color = "#123456" },
-            echartsOption<ItemStyleOption> { color = "#654321" },
+            unsafeJso<OptionDataItemObject> { name = OptionId("first") },
+            unsafeJso<OptionDataItemObject> { name = OptionId("second") },
         )
         assertEquals(2, data.size)
-        assertEquals("#123456", data[0].unsafeCast<ItemStyleOption>().color)
+        assertEquals("first", data[0].unsafeCast<OptionDataItemObject>().name!!.unsafeCast<String>())
     }
 
     @Test
@@ -173,35 +183,35 @@ class OptionModelTest {
 
     @Test
     fun seriesFactoriesSetTheTypeAndKeepTheBlock() {
-        assertEquals("line", lineSeries { name = "l" }.also { assertEquals("l", it.name) }.type)
-        assertEquals("bar", barSeries().type)
-        assertEquals("pie", pieSeries().type)
-        assertEquals("scatter", scatterSeries().type)
-        assertEquals("effectScatter", effectScatterSeries().type)
-        assertEquals("radar", radarSeries().type)
-        assertEquals("map", mapSeries().type)
-        assertEquals("tree", treeSeries().type)
-        assertEquals("treemap", treemapSeries().type)
-        assertEquals("sunburst", sunburstSeries().type)
-        assertEquals("graph", graphSeries().type)
-        assertEquals("chord", chordSeries().type)
-        assertEquals("funnel", funnelSeries().type)
-        assertEquals("gauge", gaugeSeries().type)
-        assertEquals("pictorialBar", pictorialBarSeries().type)
-        assertEquals("themeRiver", themeRiverSeries().type)
-        assertEquals("custom", customSeries().type)
-        assertEquals("boxplot", boxplotSeries().type)
-        assertEquals("candlestick", candlestickSeries().type)
-        assertEquals("heatmap", heatmapSeries().type)
-        assertEquals("parallel", parallelSeries().type)
-        assertEquals("lines", linesSeries().type)
-        assertEquals("sankey", sankeySeries().type)
+        assertEquals(SeriesTypes.line, lineSeries { name = "l" }.also { assertEquals("l", it.name) }.type)
+        assertEquals(SeriesTypes.bar, barSeries().type)
+        assertEquals(SeriesTypes.pie, pieSeries().type)
+        assertEquals(SeriesTypes.scatter, scatterSeries().type)
+        assertEquals(SeriesTypes.effectScatter, effectScatterSeries().type)
+        assertEquals(SeriesTypes.radar, radarSeries().type)
+        assertEquals(SeriesTypes.map, mapSeries().type)
+        assertEquals(SeriesTypes.tree, treeSeries().type)
+        assertEquals(SeriesTypes.treemap, treemapSeries().type)
+        assertEquals(SeriesTypes.sunburst, sunburstSeries().type)
+        assertEquals(SeriesTypes.graph, graphSeries().type)
+        assertEquals(SeriesTypes.chord, chordSeries().type)
+        assertEquals(SeriesTypes.funnel, funnelSeries().type)
+        assertEquals(SeriesTypes.gauge, gaugeSeries().type)
+        assertEquals(SeriesTypes.pictorialBar, pictorialBarSeries().type)
+        assertEquals(SeriesTypes.themeRiver, themeRiverSeries().type)
+        assertEquals(SeriesTypes.custom, customSeries().type)
+        assertEquals(SeriesTypes.boxplot, boxplotSeries().type)
+        assertEquals(SeriesTypes.candlestick, candlestickSeries().type)
+        assertEquals(SeriesTypes.heatmap, heatmapSeries().type)
+        assertEquals(SeriesTypes.parallel, parallelSeries().type)
+        assertEquals(SeriesTypes.lines, linesSeries().type)
+        assertEquals(SeriesTypes.sankey, sankeySeries().type)
     }
 
     @Test
     fun seriesFactoriesAcceptTypedNestedOptions() {
         val series = lineSeries {
-            itemStyle = echartsOption<ItemStyleOption> {
+            itemStyle = unsafeJso<ItemStyleOption> {
                 color = linearGradient(
                     0.0,
                     0.0,
@@ -210,7 +220,7 @@ class OptionModelTest {
                     arrayOf(gradientColorStop(0.0, "#fff"), gradientColorStop(1.0, "#000")),
                 )
             }
-            label = echartsOption<LabelOption> {
+            label = unsafeJso<LabelOption> {
                 show = true
                 formatter = LabelFormatter("{b}: {c}")
             }
@@ -232,10 +242,10 @@ class OptionModelTest {
 
         val tooltipTemplate = TooltipFormatter("{b}")
         assertEquals("{b}", tooltipTemplate.unsafeCast<String>())
-        assertEquals("function", jsTypeOf(TooltipFormatter { arrayOfParams -> "${arrayOfParams.size}" }))
+        assertEquals("function", jsTypeOf(TooltipFormatter { arrayOfParams -> TooltipContent("${arrayOfParams.size}") }))
 
         val valueFormatter = TooltipValueFormatter("{c}")
         assertEquals("{c}", valueFormatter.unsafeCast<String>())
-        assertEquals("function", jsTypeOf(TooltipValueFormatter { value: JsAny -> value.toString() }))
+        assertEquals("function", jsTypeOf(TooltipValueFormatter { value, _ -> value.toString() }))
     }
 }

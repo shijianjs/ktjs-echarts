@@ -1,6 +1,6 @@
 package echarts
 
-import echarts.options.echartsOption
+import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.jsTypeOf
 import kotlin.js.json
@@ -8,6 +8,7 @@ import kotlin.js.unsafeCast
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
+import zrender.RendererTypes
 
 /**
  * Tests for the modular entry point, the installer exports and the extension classes.
@@ -18,7 +19,7 @@ import kotlin.test.assertTrue
 class InstallerTest {
     @Test
     fun chartsComponentsRenderersAndFeaturesCanBeInstalled() {
-        EChartsCore.use(arrayOf<JsAny>(
+        EChartsCore.use(arrayOf(
             EChartsCharts.BarChart,
             EChartsCharts.BoxplotChart,
             EChartsCharts.CandlestickChart,
@@ -43,7 +44,7 @@ class InstallerTest {
             EChartsCharts.TreeChart,
             EChartsCharts.TreemapChart,
         ))
-        EChartsCore.use(arrayOf<JsAny>(
+        EChartsCore.use(arrayOf(
             EChartsComponents.AriaComponent,
             EChartsComponents.AxisPointerComponent,
             EChartsComponents.BrushComponent,
@@ -77,8 +78,8 @@ class InstallerTest {
             EChartsComponents.VisualMapContinuousComponent,
             EChartsComponents.VisualMapPiecewiseComponent,
         ))
-        EChartsCore.use(arrayOf<JsAny>(EChartsRenderers.CanvasRenderer, EChartsRenderers.SVGRenderer))
-        EChartsCore.use(arrayOf<JsAny>(
+        EChartsCore.use(arrayOf(EChartsRenderers.CanvasRenderer, EChartsRenderers.SVGRenderer))
+        EChartsCore.use(arrayOf(
             EChartsFeatures.AxisBreak,
             EChartsFeatures.LabelLayout,
             EChartsFeatures.LegacyGridContainLabel,
@@ -101,7 +102,7 @@ class InstallerTest {
         EChartsCore.use(EChartsComponents.GridComponent)
         EChartsCore.use(EChartsRenderers.SVGRenderer)
         val (chart, container) = createChart(
-            opts = echartsOption<EChartsInitOpts> { renderer = "svg" },
+            opts = unsafeJso<EChartsInitOpts> { renderer = RendererTypes.svg },
         )
         try {
             chart.setOption(cartesianLineOption(1.0))
@@ -134,8 +135,8 @@ class InstallerTest {
             ),
         )
 
-        val upperCase = ECharts.parseGeoJSON(geoJson, "name")
-        val lowerCase = ECharts.parseGeoJson(geoJson, "name")
+        val upperCase = ECharts.parseGeoJSON(geoJson.unsafeCast<GeoJSON>(), "name")
+        val lowerCase = ECharts.parseGeoJson(geoJson.unsafeCast<GeoJSON>(), "name")
         assertEquals(upperCase.size, lowerCase.size)
         assertEquals(1, upperCase.size)
     }
@@ -149,7 +150,8 @@ class InstallerTest {
         // The returned constructor is an extension in its own right, so `use` accepts it directly.
         val seriesModel = extendSeriesModel(json("type" to "wrapperTestSeries"))
         assertEquals("function", jsTypeOf(seriesModel))
-        EChartsCore.use(seriesModel)
+        // A class is a JavaScript function, which is what `use` accepts at runtime.
+        EChartsCore.use(seriesModel.unsafeCast<EChartsExtensionInstaller>())
     }
 
     @Test
@@ -166,8 +168,8 @@ class InstallerTest {
         val data = SeriesData(arrayOf("x", "y"), model)
         data.initData(
             arrayOf(
-                arrayOf<JsAny>(1.0.unsafeCast<JsAny>(), 2.0.unsafeCast<JsAny>()),
-                arrayOf<JsAny>(3.0.unsafeCast<JsAny>(), 4.0.unsafeCast<JsAny>()),
+                arrayOf(1.0.unsafeCast<JsAny>(), 2.0.unsafeCast<JsAny>()),
+                arrayOf(3.0.unsafeCast<JsAny>(), 4.0.unsafeCast<JsAny>()),
             ).unsafeCast<JsAny>(),
             arrayOf("a", "b"),
         )

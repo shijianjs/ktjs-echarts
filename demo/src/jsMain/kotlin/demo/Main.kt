@@ -1,33 +1,32 @@
 package demo
 
+import echarts.AxisTypes
+import echarts.ECElementEvent
 import echarts.ECharts
 import echarts.EChartsEvents
-import echarts.EChartsInstance
-import echarts.ECElementEvent
+import echarts.TooltipTriggers
+import echarts.options.BooleanOrDouble
 import echarts.options.EChartsOption
 import echarts.options.GridOption
 import echarts.options.LegendOption
 import echarts.options.SeriesOption
+import echarts.options.StringOrDouble
 import echarts.options.TitleOption
 import echarts.options.TooltipOption
 import echarts.options.XAxisOption
 import echarts.options.YAxisOption
-import echarts.options.BooleanOrDouble
-import echarts.options.StringOrDouble
 import echarts.options.barSeries
-import echarts.options.echartsOption
 import echarts.options.lineSeries
 import echarts.options.numbers
 import echarts.options.one
-import kotlin.js.JsAny
-import kotlin.js.unsafeCast
+import echarts.options.strings
+import js.objects.unsafeJso
 import web.cssom.ClassName
 import web.dom.ElementId
 import web.dom.document
 import web.events.EventHandler
 import web.html.ButtonType
 import web.html.HTMLButtonElement
-import web.html.HTMLDivElement
 import web.html.HTMLElement
 import web.html.HtmlTagName
 import web.html.button
@@ -97,7 +96,7 @@ fun main() {
             revenue[index] = 40.0 + (seed + index * 13.0) % 60.0
             orders[index] = 20.0 + (seed + index * 7.0) % 40.0
         }
-        chart.setOption(echartsOption<EChartsOption> { series = seriesOptions(revenue, orders) })
+        chart.setOption(unsafeJso<EChartsOption> { series = seriesOptions(revenue, orders) })
         setStatus(status, "Randomized ${revenue.size} months of data.")
     }
 
@@ -106,8 +105,8 @@ fun main() {
         revenue += 45.0 + (months.size * 11.0) % 55.0
         orders += 24.0 + (months.size * 5.0) % 35.0
         chart.setOption(
-            echartsOption<EChartsOption> {
-                xAxis = one(echartsOption<XAxisOption> { type = "category"; data = toJsArray(months) })
+            unsafeJso<EChartsOption> {
+                xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = strings(*months.toTypedArray()) })
                 series = seriesOptions(revenue, orders)
             },
         )
@@ -132,25 +131,25 @@ private fun buildOption(
     months: List<String>,
     revenue: List<Double>,
     orders: List<Double>,
-): EChartsOption = echartsOption {
-    title = one(echartsOption<TitleOption> {
+): EChartsOption = unsafeJso {
+    title = one(unsafeJso<TitleOption> {
         text = "Monthly revenue"
         subtext = "Revenue and orders, in thousands"
     })
-    tooltip = echartsOption<TooltipOption> { trigger = "axis" }
-    legend = one(echartsOption<LegendOption> { top = StringOrDouble(6.0) })
-    grid = one(echartsOption<GridOption> {
+    tooltip = unsafeJso<TooltipOption> { trigger = TooltipTriggers.axis }
+    legend = one(unsafeJso<LegendOption> { top = StringOrDouble(6.0) })
+    grid = one(unsafeJso<GridOption> {
         top = StringOrDouble(96.0)
         left = StringOrDouble(48.0)
         right = StringOrDouble(24.0)
         bottom = StringOrDouble(36.0)
         containLabel = true
     })
-    xAxis = one(echartsOption<XAxisOption> {
-        type = "category"
-        data = toJsArray(months)
+    xAxis = one(unsafeJso<XAxisOption> {
+        type = AxisTypes.category
+        data = strings(*months.toTypedArray())
     })
-    yAxis = one(echartsOption<YAxisOption> { type = "value" })
+    yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
     series = seriesOptions(revenue, orders)
 }
 
@@ -166,5 +165,3 @@ private fun seriesOptions(revenue: List<Double>, orders: List<Double>): Array<Se
     },
 )
 
-private fun toJsArray(values: List<String>): Array<JsAny> =
-    values.map { value -> value.unsafeCast<JsAny>() }.toTypedArray()

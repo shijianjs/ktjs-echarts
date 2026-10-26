@@ -1,9 +1,10 @@
 package echarts.options
 
 import echarts.AnimationEasing
+import echarts.CustomSeriesRenderItem
 import echarts.SeriesType
-import kotlin.js.JsAny
 import zrender.ZRColor
+import zrender.ZRFontWeight
 
 /**
  * Common configuration of every series.
@@ -129,6 +130,21 @@ external interface SeriesOption {
 
     /** Whether the series participates in the legend. */
     var legendHoverLink: Boolean?
+
+    /** Group id of the data, used by the drill-down animation of hierarchy series. */
+    var dataGroupId: OptionId?
+
+    /** Blend mode of the elements of the series. */
+    var blendMode: String?
+
+    /** Layout of the labels of the series. */
+    var labelLayout: LabelLayout?
+
+    /** Animation of the state transitions of the series. */
+    var stateAnimation: StateAnimationOption?
+
+    /** Number of elements above which a separate hover layer is used. */
+    var hoverLayerThreshold: Double?
 }
 
 /**
@@ -575,7 +591,7 @@ external interface CustomSeriesOption : SeriesOption {
     override var coordinateSystem: String?
 
     /** Function that returns the graphic elements of one data item. */
-    var renderItem: JsAny?
+    var renderItem: CustomSeriesRenderItem?
 
     /** Whether to clip the elements to the coordinate system. */
     var clip: Boolean?
@@ -598,3 +614,68 @@ external interface CustomSeriesOption : SeriesOption {
     /** Index of the calendar coordinate system. */
     var calendarIndex: Double?
 }
+
+/**
+ * Font members accepted by `CustomSeriesRenderItemAPI.font`.
+ *
+ * Upstream `Pick<TextCommonOption, 'fontStyle' | 'fontWeight' | 'fontSize' | 'fontFamily'>`.
+ */
+external interface CustomSeriesFontOption {
+    /** Font style, a CSS `font-style` keyword. */
+    var fontStyle: web.cssom.FontStyle?
+
+    /** Font weight. */
+    var fontWeight: ZRFontWeight?
+
+    /** Font size in pixels or as a string. */
+    var fontSize: StringOrDouble?
+
+    /** Font family. */
+    var fontFamily: String?
+}
+
+/**
+ * Arguments of `CustomSeriesRenderItemAPI.barLayout`.
+ */
+external interface BarGridLayoutOptionForCustomSeries {
+    /** Number of bars. */
+    var count: Double
+
+    /** Width of one bar. */
+    var barWidth: StringOrDouble?
+
+    /** Maximum width of one bar. */
+    var barMaxWidth: StringOrDouble?
+
+    /** Minimum width of one bar. */
+    var barMinWidth: StringOrDouble?
+
+    /** Gap between the bars of different series. */
+    var barGap: StringOrDouble?
+
+    /** Gap between the bar categories. */
+    var barCategoryGap: StringOrDouble?
+}
+
+/**
+ * One entry of a `CustomSeriesRenderItemAPI.barLayout` result.
+ */
+external interface BarGridLayoutResultItem {
+    /** Width of the band of one category. */
+    var bandWidth: Double
+
+    /** Offset of the bar from the left of the band. */
+    var offset: Double
+
+    /** Width of the bar. */
+    var width: Double
+
+    /** Offset of the center of the bar from the left of the band. */
+    var offsetCenter: Double
+}
+
+/**
+ * Result of `CustomSeriesRenderItemAPI.barLayout`; `null`/`undefined` when the series is not on a
+ * cartesian coordinate system.
+ */
+typealias BarGridLayoutResultForCustomSeries = Array<BarGridLayoutResultItem>

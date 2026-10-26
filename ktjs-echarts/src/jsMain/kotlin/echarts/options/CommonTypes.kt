@@ -1,5 +1,7 @@
 package echarts.options
 
+import echarts.MarkerStatisticType
+import echarts.SortOrder
 import js.objects.Record
 import kotlin.js.Date
 import kotlin.js.JsAny
@@ -8,6 +10,7 @@ import zrender.LinearGradientObject
 import zrender.PatternObject
 import zrender.RadialGradientObject
 import zrender.RectLike
+import zrender.ZRColor
 
 /**
  * A single data value: `string | number | Date | null | undefined`.
@@ -826,3 +829,90 @@ external interface BoxLayoutOption {
     /** Distance to the left side. */
     var left: StringOrDouble?
 }
+
+/**
+ * A value that can be placed on a scale: `number | string | Date`.
+ *
+ * Used by the axis-related members of marker position options.
+ */
+external interface ScaleDataValue
+
+/** Wraps a number. */
+fun ScaleDataValue(value: Double): ScaleDataValue = value.unsafeCast<ScaleDataValue>()
+
+/** Wraps a category name or a date string. */
+fun ScaleDataValue(value: String): ScaleDataValue = value.unsafeCast<ScaleDataValue>()
+
+/** Wraps a date. */
+fun ScaleDataValue(value: Date): ScaleDataValue = value.unsafeCast<ScaleDataValue>()
+
+/**
+ * `ScaleDataValue | MarkerStatisticType`, used by `MarkerPositionOption.coord`.
+ */
+external interface ScaleDataValueOrMarkerStatisticType
+
+/** Wraps an explicit value. */
+fun ScaleDataValueOrMarkerStatisticType(value: ScaleDataValue): ScaleDataValueOrMarkerStatisticType =
+    value.unsafeCast<ScaleDataValueOrMarkerStatisticType>()
+
+/** Wraps a statistic such as `"average"`. */
+fun ScaleDataValueOrMarkerStatisticType(value: MarkerStatisticType): ScaleDataValueOrMarkerStatisticType =
+    value.unsafeCast<ScaleDataValueOrMarkerStatisticType>()
+
+/**
+ * `number | '-'`, used by data values that may be explicitly empty.
+ */
+external interface OptionDataValueNumeric
+
+/** Wraps a number. */
+fun OptionDataValueNumeric(value: Double): OptionDataValueNumeric =
+    value.unsafeCast<OptionDataValueNumeric>()
+
+/** Wraps `"-"`, which marks the value as empty. */
+fun OptionDataValueNumeric(value: String): OptionDataValueNumeric =
+    value.unsafeCast<OptionDataValueNumeric>()
+
+/**
+ * `number[] | "none"`, used by the visual options of a treemap level.
+ */
+external interface DoubleArrayOrNone
+
+/** Wraps an array of numbers. */
+fun DoubleArrayOrNone(values: Array<Double>): DoubleArrayOrNone = values.unsafeCast<DoubleArrayOrNone>()
+
+/** Wraps `"none"`. */
+fun DoubleArrayOrNone(value: String): DoubleArrayOrNone = value.unsafeCast<DoubleArrayOrNone>()
+
+/**
+ * `ColorString[] | "none"`, used by the color of a treemap level or node.
+ */
+external interface ColorArrayOrNone
+
+/** Wraps an array of colors. */
+fun ColorArrayOrNone(values: Array<ZRColor>): ColorArrayOrNone = values.unsafeCast<ColorArrayOrNone>()
+
+/** Wraps `"none"`. */
+fun ColorArrayOrNone(value: String): ColorArrayOrNone = value.unsafeCast<ColorArrayOrNone>()
+
+/**
+ * `DecalObject[] | "none"`, used by the decal of a treemap level or node.
+ */
+external interface DecalArrayOrNone
+
+/** Wraps an array of decals. */
+fun DecalArrayOrNone(values: Array<DecalObject>): DecalArrayOrNone =
+    values.unsafeCast<DecalArrayOrNone>()
+
+/** Wraps `"none"`. */
+fun DecalArrayOrNone(value: String): DecalArrayOrNone = value.unsafeCast<DecalArrayOrNone>()
+
+/**
+ * `boolean | SortOrder`, used by the `sort` option of a treemap.
+ */
+external interface BooleanOrSortOrder
+
+/** Wraps a boolean. */
+fun BooleanOrSortOrder(value: Boolean): BooleanOrSortOrder = value.unsafeCast<BooleanOrSortOrder>()
+
+/** Wraps a sort order. */
+fun BooleanOrSortOrder(value: SortOrder): BooleanOrSortOrder = value.unsafeCast<BooleanOrSortOrder>()

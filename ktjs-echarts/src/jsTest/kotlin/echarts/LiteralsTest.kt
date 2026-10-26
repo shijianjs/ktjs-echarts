@@ -20,6 +20,7 @@ import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import zrender.RendererTypes
 import zrender.TextOverflows
@@ -233,5 +234,51 @@ class LiteralsTest {
         } finally {
             destroyChart(chart, container)
         }
+    }
+
+    @Test
+    fun markerLiteralsMatchTheUpstreamNames() {
+        assertEquals("average", MarkerStatisticTypes.average.unsafeCast<String>())
+        assertEquals("min", MarkerStatisticTypes.min.unsafeCast<String>())
+        assertEquals("max", MarkerStatisticTypes.max.unsafeCast<String>())
+        assertEquals("median", MarkerStatisticTypes.median.unsafeCast<String>())
+        assertEquals("container", MarkerRelativeTos.container.unsafeCast<String>())
+        assertEquals("coordinate", MarkerRelativeTos.coordinate.unsafeCast<String>())
+    }
+
+    @Test
+    fun hierarchyLiteralsMatchTheUpstreamNames() {
+        assertEquals("asc", SortOrders.asc.unsafeCast<String>())
+        assertEquals("desc", SortOrders.desc.unsafeCast<String>())
+        assertEquals("value", ColorMappingBys.`value`.unsafeCast<String>())
+        assertEquals("index", ColorMappingBys.index.unsafeCast<String>())
+        assertEquals("id", ColorMappingBys.id.unsafeCast<String>())
+        assertEquals("origin", ClipWindows.origin.unsafeCast<String>())
+        assertEquals("fullscreen", ClipWindows.fullscreen.unsafeCast<String>())
+        assertEquals("zoomToNode", NodeClickBehaviors.zoomToNode.unsafeCast<String>())
+        assertEquals("rootToNode", NodeClickBehaviors.rootToNode.unsafeCast<String>())
+        assertEquals("link", NodeClickBehaviors.link.unsafeCast<String>())
+        assertFalse(NodeClickBehaviors.none.unsafeCast<Boolean>())
+        assertEquals("expansion", AnimationTypes.expansion.unsafeCast<String>())
+        assertEquals("scale", AnimationTypes.scale.unsafeCast<String>())
+    }
+
+    @Test
+    fun relationLiteralsMatchTheUpstreamNames() {
+        assertEquals("justify", NodeAligns.justify.unsafeCast<String>())
+        assertEquals("left", NodeAligns.left.unsafeCast<String>())
+        assertEquals("right", NodeAligns.right.unsafeCast<String>())
+        assertEquals("inEdges", FocusNodeAdjacencies.inEdges.unsafeCast<String>())
+        assertEquals("outEdges", FocusNodeAdjacencies.outEdges.unsafeCast<String>())
+        assertEquals("allEdges", FocusNodeAdjacencies.allEdges.unsafeCast<String>())
+        assertTrue(FocusNodeAdjacency(true).unsafeCast<Boolean>())
+    }
+
+    @Test
+    fun labelLayoutLiteralsMatchTheUpstreamNames() {
+        assertEquals("shiftX", MoveOverlaps.shiftX.unsafeCast<String>())
+        assertEquals("shiftY", MoveOverlaps.shiftY.unsafeCast<String>())
+        assertEquals("shuffleX", MoveOverlaps.shuffleX.unsafeCast<String>())
+        assertEquals("shuffleY", MoveOverlaps.shuffleY.unsafeCast<String>())
     }
 }

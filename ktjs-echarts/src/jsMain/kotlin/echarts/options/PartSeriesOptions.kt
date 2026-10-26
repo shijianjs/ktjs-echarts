@@ -1,11 +1,17 @@
 package echarts.options
 
-import echarts.AnimationEasing
-import echarts.Orient
 import echarts.RoseType
 import js.objects.Record
-import kotlin.js.JsAny
+import kotlin.js.unsafeCast
+import web.canvas.CanvasLineCap
+import web.canvas.CanvasLineJoin
 import zrender.ZRColor
+import zrender.ZRLineType
+
+/*
+ * Series that are neither cartesian, hierarchical nor relational: pie, funnel, gauge, radar, map,
+ * theme river and pictorial bar.
+ */
 
 /**
  * Pie series.
@@ -161,6 +167,59 @@ external interface GaugeSeriesOption : SeriesOption {
 }
 
 /**
+ * A color stop of the axis line of a gauge: upstream declares the tuple `[offset, color]`, where
+ * the offset is a ratio between `0` and `1`.
+ *
+ * Because the value is a JavaScript array, only the [gaugeColorStop] factory creates one.
+ */
+external interface GaugeColorStop
+
+/**
+ * Creates a `[offset, color]` color stop for [GaugeAxisLineStyleOption.color].
+ *
+ * @param offset position of the stop between `0` and `1`.
+ * @param color CSS color at that position.
+ */
+fun gaugeColorStop(offset: Double, color: String): GaugeColorStop =
+    arrayOf<Any>(offset, color).unsafeCast<GaugeColorStop>()
+
+/**
+ * Style of the axis line of a gauge.
+ *
+ * Upstream declares `Omit<LineStyleOption, 'color'> & { color?: GaugeColorStop[] }`, so the color
+ * is a list of `[offset, color]` stops instead of a single color; the other members are the ones
+ * of [LineStyleOption].
+ */
+external interface GaugeAxisLineStyleOption : ShadowOption {
+    /** Color stops of the axis line. */
+    var color: Array<GaugeColorStop>?
+
+    /** Line width in pixels. */
+    var width: Double?
+
+    /** Line type: `"solid"`, `"dashed"`, `"dotted"`, a number or a `[dash, gap]` array. */
+    var type: ZRLineType?
+
+    /** Dash offset. */
+    var dashOffset: Double?
+
+    /** Line cap of the line. */
+    var cap: CanvasLineCap?
+
+    /** Line join of the line. */
+    var join: CanvasLineJoin?
+
+    /** Miter limit for `join = "miter"`. */
+    var miterLimit: Double?
+
+    /** Opacity, `0..1`. */
+    var opacity: Double?
+
+    /** Curvature of the line. */
+    var curveness: Double?
+}
+
+/**
  * Axis line of a gauge series.
  */
 external interface GaugeAxisLineOption {
@@ -171,7 +230,7 @@ external interface GaugeAxisLineOption {
     var roundCap: Boolean?
 
     /** Style of the axis line. */
-    var lineStyle: JsAny?
+    var lineStyle: GaugeAxisLineStyleOption?
 }
 
 /**
@@ -341,7 +400,7 @@ external interface MapSeriesOption : SeriesOption {
     override var label: LabelOption?
 
     /** Per-region configuration. */
-    var regions: Array<JsAny>?
+    var regions: Array<RegionOption>?
 
     /** Index of the geo coordinate system, when the map is drawn by geo. */
     var geoIndex: Double?
@@ -351,418 +410,6 @@ external interface MapSeriesOption : SeriesOption {
 
     /** Whether to show the legend symbol. */
     var showLegendSymbol: Boolean?
-}
-
-/**
- * Configuration of the force layout of a graph series.
- */
-external interface GraphForceOption {
-    /** Initial layout: `"circular"` or `"none"`. */
-    var initLayout: String?
-
-    /** Repulsion between the nodes, one value per category or a single value. */
-    var repulsion: DoubleOrDoubleArray?
-
-    /** Gravity towards the center. */
-    var gravity: Double?
-
-    /** Friction of the movement. */
-    var friction: Double?
-
-    /** Ideal edge length, one value per category or a single value. */
-    var edgeLength: DoubleOrDoubleArray?
-
-    /** Whether the layout animates. */
-    var layoutAnimation: Boolean?
-}
-
-/**
- * Configuration of the circular layout of a graph series.
- */
-external interface GraphCircularOption {
-    /** Whether the labels are rotated along the node positions. */
-    var rotateLabel: Boolean?
-}
-
-/**
- * Graph series: a node-link diagram.
- */
-external interface GraphSeriesOption : SeriesOption {
-    /** Layout: `"none"`, `"circular"` or `"force"`. */
-    var layout: String?
-
-    /** Whether the layout animates. */
-    var layoutAnimation: Boolean?
-
-    /** Configuration of the force layout. */
-    var force: GraphForceOption?
-
-    /** Configuration of the circular layout. */
-    var circular: GraphCircularOption?
-
-    /** Whether panning and zooming are enabled. */
-    var roam: BooleanOrString?
-
-    /** Center of the graph. */
-    var center: Array<StringOrDouble>?
-
-    /** Initial zoom level. */
-    var zoom: Double?
-
-    /** Zoom limits. */
-    var scaleLimit: ScaleLimitOption?
-
-    /** Whether the nodes can be dragged. */
-    var draggable: Boolean?
-
-    /** Symbol shape of the nodes. */
-    var symbol: String?
-
-    /** Symbol size of the nodes. */
-    var symbolSize: DoubleOrDoubleArray?
-
-    /** Symbol rotation in degrees. */
-    var symbolRotate: Double?
-
-    /** Whether to keep the symbol aspect ratio. */
-    var symbolKeepAspect: Boolean?
-
-    /** Symbol offset, `[x, y]`. */
-    var symbolOffset: SymbolOffset?
-
-    /** Symbol of the edges. */
-    var edgeSymbol: Array<String>?
-
-    /** Symbol size of the edges. */
-    var edgeSymbolSize: DoubleOrDoubleArray?
-
-    /** Label of the edges. */
-    var edgeLabel: LabelOption?
-
-    /** Categories of the nodes. */
-    var categories: Array<JsAny>?
-
-    /** Edges of the graph. */
-    var links: Array<JsAny>?
-
-    /** Whether the edges are directed. */
-    var directed: Boolean?
-
-    /** Curvature of the edges. */
-    var autoCurveness: BooleanOrDouble?
-
-    /** Shape of the edges: `"line"` or `"curve"`. */
-    var edgeShape: String?
-
-    /** Position of the fork in a `"curve"` edge. */
-    var edgeForkPosition: String?
-
-    /** Scale ratio of the nodes. */
-    var nodeScaleRatio: Double?
-
-    /** Whether to highlight the adjacent nodes on hover. */
-    var focusNodeAdjacency: Boolean?
-
-    /** Selection mode: `false`, `"single"` or `"multiple"`. */
-    var selectedMode: BooleanOrString?
-}
-
-/**
- * Tree series.
- */
-external interface TreeSeriesOption : SeriesOption {
-    /** Layout: `"orthogonal"` or `"radial"`. */
-    var layout: String?
-
-    /** Orientation of an orthogonal tree: `"LR"`, `"RL"`, `"TB"` or `"BT"`. */
-    var orient: Orient?
-
-    /** Distance to the left side. */
-    var left: StringOrDouble?
-
-    /** Distance to the top side. */
-    var top: StringOrDouble?
-
-    /** Distance to the right side. */
-    var right: StringOrDouble?
-
-    /** Distance to the bottom side. */
-    var bottom: StringOrDouble?
-
-    /** Width of the tree. */
-    var width: StringOrDouble?
-
-    /** Height of the tree. */
-    var height: StringOrDouble?
-
-    /** Symbol shape of the tree nodes. */
-    var symbol: String?
-
-    /** Symbol size of the tree nodes. */
-    var symbolSize: DoubleOrDoubleArray?
-
-    /** Symbol rotation in degrees. */
-    var symbolRotate: Double?
-
-    /** Whether to keep the symbol aspect ratio. */
-    var symbolKeepAspect: Boolean?
-
-    /** Symbol offset, `[x, y]`. */
-    var symbolOffset: SymbolOffset?
-
-    /** Depth of the tree that is expanded initially. */
-    var initialTreeDepth: Double?
-
-    /** Label layout of the nodes. */
-    var labelLayout: JsAny?
-
-    /** Whether to show the leaves. */
-    var leaves: JsAny?
-
-    /** Whether to expand or collapse a node on click. */
-    var expandAndCollapse: Boolean?
-
-    /** Duration of the layout animation. */
-    override var animationDuration: Double?
-
-    /** Easing of the layout animation. */
-    override var animationEasing: AnimationEasing?
-
-    /** Whether panning and zooming are enabled. */
-    var roam: BooleanOrString?
-
-    /** Center of the tree. */
-    var center: Array<StringOrDouble>?
-
-    /** Initial zoom level. */
-    var zoom: Double?
-
-    /** Zoom limits. */
-    var scaleLimit: ScaleLimitOption?
-
-    /** Shape of the edges: `"curve"`, `"polyline"` or `"line"`. */
-    var edgeShape: String?
-
-    /** Position of the fork in a `"curve"` edge. */
-    var edgeForkPosition: String?
-}
-
-/**
- * Treemap series.
- */
-external interface TreemapSeriesOption : SeriesOption {
-    /** Ratio between the width and the height of the tiles. */
-    var squareRatio: Double?
-
-    /** Depth of the tree that can be drilled down. */
-    var leafDepth: Double?
-
-    /** Icon of the drill-down button. */
-    var drillDownIcon: String?
-
-    /** Whether clicking a node drills down. */
-    var nodeClick: BooleanOrString?
-
-    /** Ratio of the zoom after a drill-down. */
-    var zoomToNodeRatio: Double?
-
-    /** Whether panning and zooming are enabled. */
-    var roam: BooleanOrString?
-
-    /** Gap between nodes in pixels. */
-    var nodeGap: Double?
-
-    /** Width of the nodes. */
-    var nodeWidth: Double?
-
-    /** Distance to the left side. */
-    var left: StringOrDouble?
-
-    /** Distance to the top side. */
-    var top: StringOrDouble?
-
-    /** Distance to the right side. */
-    var right: StringOrDouble?
-
-    /** Distance to the bottom side. */
-    var bottom: StringOrDouble?
-
-    /** Width of the treemap. */
-    var width: StringOrDouble?
-
-    /** Height of the treemap. */
-    var height: StringOrDouble?
-
-    /** Breadcrumb navigation. */
-    var breadcrumb: JsAny?
-
-    /** Style of the labels. */
-    override var label: LabelOption?
-
-    /** Style of the labels of parent nodes. */
-    var upperLabel: LabelOption?
-
-    /** Per-level configuration. */
-    var levels: Array<JsAny>?
-
-    /** Dimension used for the color mapping. */
-    var visualDimension: Double?
-
-    /** Minimum value of the color mapping. */
-    var visualMin: Double?
-
-    /** Maximum value of the color mapping. */
-    var visualMax: Double?
-
-    /** How the color is mapped: `"value"`, `"index"` or `"id"`. */
-    var colorMappingBy: String?
-
-    /** Minimum area for a node to be visible. */
-    var visibleMin: Double?
-
-    /** Minimum area for the children of a node to be visible. */
-    var childrenVisibleMin: Double?
-
-    /** Saturation of the color mapping. */
-    var colorSaturation: Double?
-
-    /** Alpha of the color mapping. */
-    var colorAlpha: Double?
-}
-
-/**
- * Sunburst series.
- */
-external interface SunburstSeriesOption : SeriesOption {
-    /** Center of the sunburst. */
-    var center: Array<StringOrDouble>?
-
-    /** Radius of the sunburst, or `[inner, outer]`. */
-    var radius: StringOrDoubleOrArray?
-
-    /** Sort order of the sectors: `"desc"`, `"asc"` or `null`. */
-    var sort: JsAny?
-
-    /** Start angle in degrees. */
-    var startAngle: Double?
-
-    /** End angle in degrees. */
-    var endAngle: Double?
-
-    /** Minimum angle of a sector in degrees. */
-    var minAngle: Double?
-
-    /** Minimum angle for the label to be shown, in degrees. */
-    var minShowLabelAngle: Double?
-
-    /** Whether clicking a node drills down. */
-    var nodeClick: BooleanOrString?
-
-    /** Whether panning and zooming are enabled. */
-    var roam: BooleanOrString?
-
-    /** Gap between nodes in pixels. */
-    var nodeGap: Double?
-
-    /** Width of the nodes. */
-    var nodeWidth: Double?
-
-    /** Per-level configuration. */
-    var levels: Array<JsAny>?
-
-    /** Precision of the percentage values. */
-    var percentPrecision: Double?
-}
-
-/**
- * Sankey series.
- */
-external interface SankeySeriesOption : SeriesOption {
-    /** Width of the nodes. */
-    var nodeWidth: Double?
-
-    /** Gap between nodes in pixels. */
-    var nodeGap: Double?
-
-    /** Alignment of the nodes: `"justify"`, `"left"` or `"right"`. */
-    var nodeAlign: String?
-
-    /** Number of layout iterations. */
-    var layoutIterations: Double?
-
-    /** Orientation: `"horizontal"` or `"vertical"`. */
-    var orient: Orient?
-
-    /** Whether the nodes can be dragged. */
-    var draggable: Boolean?
-
-    /** Label of the edges. */
-    var edgeLabel: LabelOption?
-
-    /** Per-level configuration. */
-    var levels: Array<JsAny>?
-
-    /** Whether to highlight the adjacent nodes on hover. */
-    var focusNodeAdjacency: Boolean?
-
-    /** Edges of the graph. */
-    var links: Array<JsAny>?
-
-    /** Whether panning and zooming are enabled. */
-    var roam: BooleanOrString?
-}
-
-/**
- * Chord series introduced in ECharts 6.
- */
-external interface ChordSeriesOption : SeriesOption {
-    /** Width of the nodes. */
-    var nodeWidth: Double?
-
-    /** Gap between nodes in pixels. */
-    var nodeGap: Double?
-
-    /** Alignment of the nodes: `"justify"`, `"left"` or `"right"`. */
-    var nodeAlign: String?
-
-    /** Number of layout iterations. */
-    var layoutIterations: Double?
-
-    /** Orientation: `"horizontal"` or `"vertical"`. */
-    var orient: Orient?
-
-    /** Whether the nodes can be dragged. */
-    var draggable: Boolean?
-
-    /** Center of the chord diagram. */
-    var center: Array<StringOrDouble>?
-
-    /** Radius of the chord diagram. */
-    var radius: StringOrDouble?
-
-    /** Start angle in degrees. */
-    var startAngle: Double?
-
-    /** End angle in degrees. */
-    var endAngle: Double?
-
-    /** Minimum angle of a sector in degrees. */
-    var minAngle: Double?
-
-    /** Padding angle between sectors, in degrees. */
-    var padAngle: Double?
-
-    /** Whether the sectors are drawn clockwise. */
-    var clockwise: Boolean?
-
-    /** Label of the edges. */
-    var edgeLabel: LabelOption?
-
-    /** Edges of the graph. */
-    var links: Array<JsAny>?
-
-    /** Whether panning and zooming are enabled. */
-    var roam: BooleanOrString?
 }
 
 /**
@@ -776,7 +423,7 @@ external interface ThemeRiverSeriesOption : SeriesOption {
     override var coordinateSystem: String?
 
     /** Whether the axis has gaps at both ends. */
-    var boundaryGap: Array<String>?
+    var boundaryGap: Array<StringOrDouble>?
 
     /** Index of the single axis. */
     var singleAxisIndex: Double?
@@ -802,7 +449,7 @@ external interface PictorialBarSeriesOption : SeriesOption {
     var symbolOffset: SymbolOffset?
 
     /** Symbol rotation in degrees. */
-    var symbolRotate: Double?
+    var symbolRotate: DoubleOrDoubleArray?
 
     /** Whether to repeat the symbol along the bar. */
     var symbolRepeat: BooleanOrDoubleOrString?

@@ -3,14 +3,15 @@ package echarts.options
 import echarts.AnimationEasing
 import echarts.BlurScope
 import echarts.EmphasisFocus
+import echarts.MoveOverlap
 import js.objects.Record
-import kotlin.js.JsAny
 import kotlin.js.unsafeCast
 import web.canvas.CanvasLineCap
 import web.canvas.CanvasLineJoin
 import web.cssom.FontStyle
 import web.cssom.TextAlign
 import web.cssom.VerticalAlign
+import zrender.RectLike
 import zrender.TextOverflow
 import zrender.ZRColor
 import zrender.ZRFontWeight
@@ -296,6 +297,104 @@ fun LabelFormatter(template: String): LabelFormatter = template.unsafeCast<Label
 fun LabelFormatter(callback: (CallbackDataParams) -> String): LabelFormatter = callback.unsafeCast<LabelFormatter>()
 
 /**
+ * Layout of the labels of a series, used by `labelLayout`.
+ *
+ * Every member is optional; the callback form receives [LabelLayoutCallbackParams] and returns the
+ * layout of one label.
+ */
+external interface LabelLayoutOption {
+    /** How overlapped labels are moved apart. */
+    var moveOverlap: MoveOverlap?
+
+    /** Whether overlapped labels are hidden after they were moved. */
+    var hideOverlap: Boolean?
+
+    /** Whether the label can be dragged with the mouse. */
+    var draggable: Boolean?
+
+    /** Absolute x position, a pixel number or a percentage string. */
+    var x: StringOrDouble?
+
+    /** Absolute y position, a pixel number or a percentage string. */
+    var y: StringOrDouble?
+
+    /** Offset on the x axis based on the original position. */
+    var dx: Double?
+
+    /** Offset on the y axis based on the original position. */
+    var dy: Double?
+
+    /** Rotation in degrees. */
+    var rotate: Double?
+
+    /** Horizontal alignment of the text. */
+    var align: TextAlign?
+
+    /** Vertical alignment of the text. */
+    var verticalAlign: VerticalAlign?
+
+    /** Width of the label box. */
+    var width: Double?
+
+    /** Height of the label box. */
+    var height: Double?
+
+    /** Font size in pixels. */
+    var fontSize: Double?
+
+    /** Points of the label line, `[[x, y], ...]`. */
+    var labelLinePoints: Array<Array<Double>>?
+}
+
+/**
+ * Parameters passed to a [LabelLayout] callback.
+ */
+external interface LabelLayoutCallbackParams {
+    /** Index of the data the label represents, or `null` when it represents no data. */
+    val dataIndex: Double?
+
+    /** Type of the data: `"node"` or `"edge"`, used by graph and tree series. */
+    val dataType: String?
+
+    /** Index of the series. */
+    val seriesIndex: Double
+
+    /** Text of the label. */
+    val text: String
+
+    /** Horizontal alignment of the text. */
+    val align: TextAlign?
+
+    /** Vertical alignment of the text. */
+    val verticalAlign: VerticalAlign?
+
+    /** Rectangle of the element the label belongs to. */
+    val rect: RectLike?
+
+    /** Rectangle of the label itself. */
+    val labelRect: RectLike?
+
+    /** Points of the label line, `[[x, y], ...]`. */
+    val labelLinePoints: Array<Array<Double>>?
+}
+
+/**
+ * Callback that computes the layout of one label.
+ */
+typealias LabelLayoutCallback = (params: LabelLayoutCallbackParams) -> LabelLayoutOption
+
+/**
+ * Layout of the labels of a series: a fixed [LabelLayoutOption] or a callback.
+ */
+external interface LabelLayout
+
+/** Wraps a fixed layout. */
+fun LabelLayout(value: LabelLayoutOption): LabelLayout = value.unsafeCast<LabelLayout>()
+
+/** Wraps a callback that computes the layout of every label. */
+fun LabelLayout(value: LabelLayoutCallback): LabelLayout = value.unsafeCast<LabelLayout>()
+
+/**
  * Parameters passed to most formatter callbacks.
  */
 external interface CallbackDataParams {
@@ -402,6 +501,9 @@ external interface EmphasisOption {
 
     /** Area style in the emphasis state. */
     var areaStyle: AreaStyleOption?
+
+    /** Label of the edges in the emphasis state, used by graph and chord series. */
+    var edgeLabel: LabelOption?
 }
 
 /**
@@ -422,6 +524,9 @@ external interface BlurOption {
 
     /** Area style in the blur state. */
     var areaStyle: AreaStyleOption?
+
+    /** Label of the edges in the blur state, used by graph and chord series. */
+    var edgeLabel: LabelOption?
 }
 
 /**
@@ -442,10 +547,20 @@ external interface SelectOption {
 
     /** Area style in the selected state. */
     var areaStyle: AreaStyleOption?
+
+    /** Label of the edges in the selected state, used by graph and chord series. */
+    var edgeLabel: LabelOption?
 }
 
 /**
  * Mark point, line and area styling.
+ *
+ * The `data` field of each mark type is declared on the concrete interface, because upstream
+ * narrows `MarkerOption.data` (`unknown[]`) to the item type of the mark.
+ *
+ * @see MarkPointOption
+ * @see MarkLineOption
+ * @see MarkAreaOption
  */
 external interface MarkOption {
     /** Whether the mark is silent (ignores mouse events). */
@@ -481,8 +596,13 @@ external interface MarkOption {
     /** Precision of displayed values. */
     var precision: Double?
 
-    /** Data of the mark. Upstream types this as `unknown[]`. */
-    var data: Array<JsAny>?
+    /**
+     * Tooltip specific to the mark.
+     *
+     * Upstream `CommonTooltipOption<unknown> & { trigger?: 'item' | 'axis' | boolean | 'none' }`;
+     * the boolean form of `trigger` is not modelled.
+     */
+    var tooltip: TooltipOption?
 }
 
 /**
@@ -497,6 +617,9 @@ external interface MarkPointOption : MarkOption {
 
     /** Animation easing. */
     var animationEasing: AnimationEasing?
+
+    /** Position and style of every mark point. */
+    var data: Array<MarkPointDataItemOption>?
 }
 
 /**
@@ -511,6 +634,12 @@ external interface MarkLineOption : MarkOption {
 
     /** Whether to display the two end labels. */
     override var label: LabelOption?
+
+    /**
+     * Position of every mark line: a single definition `{ xAxis: 0 }` or a pair of them
+     * `[{ coord: [0, 0] }, { coord: [1, 1] }]`.
+     */
+    var data: Array<MarkLineDataItem?>?
 }
 
 /**
@@ -519,6 +648,12 @@ external interface MarkLineOption : MarkOption {
 external interface MarkAreaOption : MarkOption {
     /** Whether the mark area is silent. */
     override var silent: Boolean?
+
+    /**
+     * Position of every mark area: a single definition `{ xAxis: 0 }` or a pair of them
+     * `[{ coord: [0, 0] }, { coord: [1, 1] }]`.
+     */
+    var data: Array<MarkAreaDataItem?>?
 }
 
 /**

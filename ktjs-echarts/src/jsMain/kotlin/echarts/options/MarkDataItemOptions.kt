@@ -1,0 +1,223 @@
+package echarts.options
+
+import echarts.MarkerRelativeTo
+import echarts.MarkerStatisticType
+import kotlin.js.unsafeCast
+
+/**
+ * Symbol members shared by mark items, graph nodes, tree nodes and similar option objects.
+ *
+ * Upstream `SymbolOptionMixin`: besides the shapes modelled here, `symbol`, `symbolSize` and
+ * `symbolRotate` also accept a callback over the data item upstream.
+ */
+external interface SymbolOptionMixin {
+    /** Symbol shape: a built-in name such as `"circle"` or `"path://..."`. */
+    var symbol: StringOrStringArray?
+
+    /** Symbol size, or `[width, height]`. */
+    var symbolSize: DoubleOrDoubleArray?
+
+    /** Symbol rotation in degrees. */
+    var symbolRotate: DoubleOrDoubleArray?
+
+    /** Whether to keep the symbol aspect ratio. */
+    var symbolKeepAspect: Boolean?
+
+    /** Symbol offset, `[x, y]`. */
+    var symbolOffset: SymbolOffset?
+}
+
+/**
+ * Where a marker is placed.
+ *
+ * Upstream `MarkerPositionOption`; a marker is positioned by an explicit `x`/`y` pair, by a
+ * coordinate on the series coordinate system, or by a statistic of the data.
+ */
+external interface MarkerPositionOption {
+    /** Horizontal position, a pixel number or a percentage string. */
+    var x: StringOrDouble?
+
+    /** Vertical position, a pixel number or a percentage string. */
+    var y: StringOrDouble?
+
+    /** What [x] and [y] are relative to. */
+    var relativeTo: MarkerRelativeTo?
+
+    /** Coordinate on the coordinate system of the series. */
+    var coord: Array<ScaleDataValueOrMarkerStatisticType>?
+
+    /** Position on the x axis. */
+    var xAxis: ScaleDataValue?
+
+    /** Position on the y axis. */
+    var yAxis: ScaleDataValue?
+
+    /** Position on the radius axis. */
+    var radiusAxis: ScaleDataValue?
+
+    /** Position on the angle axis. */
+    var angleAxis: ScaleDataValue?
+
+    /** Statistic of the data used to place the marker. */
+    var type: MarkerStatisticType?
+
+    /** Index of the dimension [type] is computed from. */
+    var valueIndex: Double?
+
+    /** Name of the dimension [type] is computed from. */
+    var valueDim: String?
+
+    /** Value shown as the label of the marker. */
+    var value: StringOrDouble?
+}
+
+/**
+ * State options of one mark point.
+ */
+external interface MarkPointStateOption {
+    /** Item style. */
+    var itemStyle: ItemStyleOption?
+
+    /** Label style. */
+    var label: LabelOption?
+
+    /** z-index of the mark point inside its z-level. */
+    var z2: Double?
+}
+
+/**
+ * One mark point of [MarkPointOption].
+ */
+external interface MarkPointDataItemOption : MarkPointStateOption, MarkerPositionOption, SymbolOptionMixin {
+    /** Name of the mark point; required upstream. */
+    var name: String
+}
+
+/**
+ * State options of one mark line.
+ */
+external interface MarkLineStateOption {
+    /** Line style. */
+    var lineStyle: LineStyleOption?
+
+    /** Style of the symbols at both ends of the line. */
+    var itemStyle: ItemStyleOption?
+
+    /** Style of the two end labels. */
+    var label: LabelOption?
+
+    /** z-index of the mark line inside its z-level. */
+    var z2: Double?
+}
+
+/**
+ * Members shared by the two shapes of a mark line definition.
+ */
+external interface MarkLineDataItemOptionBase : MarkLineStateOption, SymbolOptionMixin {
+    /** Name of the mark line. */
+    var name: String?
+}
+
+/**
+ * A mark line defined on one axis, e.g. `{ yAxis: "average" }`.
+ */
+external interface MarkLine1DDataItemOption : MarkLineDataItemOptionBase {
+    /** Position on the x axis. */
+    var xAxis: StringOrDouble?
+
+    /** Position on the y axis. */
+    var yAxis: StringOrDouble?
+
+    /** Statistic of the data used when no axis position is set. */
+    var type: MarkerStatisticType?
+
+    /** Index of the dimension [type] is computed from. */
+    var valueIndex: Double?
+
+    /** Name of the dimension [type] is computed from. */
+    var valueDim: String?
+}
+
+/**
+ * One end of a mark line defined by two points.
+ */
+external interface MarkLine2DDataItemDimOption : MarkLineDataItemOptionBase, MarkerPositionOption
+
+/**
+ * One entry of `MarkLineOption.data`: a single definition or a pair of them.
+ *
+ * Create a pair with a JavaScript array of two [MarkLine2DDataItemDimOption] values:
+ *
+ * ```kotlin
+ * data = arrayOf(MarkLineDataItem(arrayOf(unsafeJso { coord = ... }, unsafeJso { coord = ... })))
+ * ```
+ */
+external interface MarkLineDataItem
+
+/** Wraps a definition on one axis. */
+fun MarkLineDataItem(value: MarkLine1DDataItemOption): MarkLineDataItem =
+    value.unsafeCast<MarkLineDataItem>()
+
+/** Wraps a `[from, to]` pair. */
+fun MarkLineDataItem(values: Array<MarkLine2DDataItemDimOption>): MarkLineDataItem =
+    values.unsafeCast<MarkLineDataItem>()
+
+/**
+ * State options of one mark area.
+ */
+external interface MarkAreaStateOption {
+    /** Item style. */
+    var itemStyle: ItemStyleOption?
+
+    /** Label style. */
+    var label: LabelOption?
+
+    /** z-index of the mark area inside its z-level. */
+    var z2: Double?
+}
+
+/**
+ * Members shared by the two shapes of a mark area definition.
+ */
+external interface MarkAreaDataItemOptionBase : MarkAreaStateOption {
+    /** Name of the mark area. */
+    var name: String?
+}
+
+/**
+ * A mark area defined on one axis, e.g. `{ yAxis: 10 }`.
+ */
+external interface MarkArea1DDataItemOption : MarkAreaDataItemOptionBase {
+    /** Position on the x axis. */
+    var xAxis: Double?
+
+    /** Position on the y axis. */
+    var yAxis: Double?
+
+    /** Statistic of the data used when no axis position is set. */
+    var type: MarkerStatisticType?
+
+    /** Index of the dimension [type] is computed from. */
+    var valueIndex: Double?
+
+    /** Name of the dimension [type] is computed from. */
+    var valueDim: String?
+}
+
+/**
+ * One corner of a mark area defined by two points.
+ */
+external interface MarkArea2DDataItemDimOption : MarkAreaDataItemOptionBase, MarkerPositionOption
+
+/**
+ * One entry of `MarkAreaOption.data`: a single definition or a pair of them.
+ */
+external interface MarkAreaDataItem
+
+/** Wraps a definition on one axis. */
+fun MarkAreaDataItem(value: MarkArea1DDataItemOption): MarkAreaDataItem =
+    value.unsafeCast<MarkAreaDataItem>()
+
+/** Wraps a `[from, to]` pair. */
+fun MarkAreaDataItem(values: Array<MarkArea2DDataItemDimOption>): MarkAreaDataItem =
+    values.unsafeCast<MarkAreaDataItem>()

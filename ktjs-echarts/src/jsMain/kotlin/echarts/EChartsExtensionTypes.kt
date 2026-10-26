@@ -1,9 +1,14 @@
 package echarts
 
+import echarts.options.BarGridLayoutOptionForCustomSeries
+import echarts.options.BarGridLayoutResultForCustomSeries
+import echarts.options.CustomSeriesFontOption
 import echarts.options.DimensionDefinitionLoose
 import echarts.options.DimensionLoose
 import echarts.options.GraphicElement
 import echarts.options.OptionDataValue
+import echarts.options.StringOrDouble
+import js.objects.Record
 import kotlin.js.JsAny
 import web.html.HTMLCanvasElement
 import web.html.HTMLImageElement
@@ -227,7 +232,7 @@ typealias LoadingEffectCreator = (api: ExtensionAPI, cfg: JsAny) -> ZRElement
  */
 external interface CustomSeriesRenderItemParams {
     /** Context of the render item. */
-    val context: JsAny?
+    val context: Record<String, JsAny>?
 
     /** Index of the data item. */
     val dataIndex: Double
@@ -244,8 +249,8 @@ external interface CustomSeriesRenderItemParams {
     /** Coordinate system of the series. */
     val coordSys: CustomSeriesRenderItemCoordSys
 
-    /** Encoding of the data dimensions. */
-    val encode: JsAny?
+    /** Indices of the data dimensions used by each encoding role. */
+    val encode: Record<String, Array<Double>>?
 
     /** Index of the data item inside the current data. */
     val dataIndexInside: Double
@@ -254,7 +259,7 @@ external interface CustomSeriesRenderItemParams {
     val dataInsideLength: Double
 
     /** Payload of the data item. */
-    val itemPayload: JsAny?
+    val itemPayload: Record<String, JsAny>?
 
     /** Type of the action that triggered the render. */
     val actionType: String?
@@ -285,10 +290,10 @@ external interface CustomSeriesRenderItemAPI {
     fun getDevicePixelRatio(): Double
 
     /** Returns the value of [dim]. */
-    fun value(dim: String, dataIndexInside: Double? = definedExternally): JsAny?
+    fun value(dim: DimensionLoose, dataIndexInside: Double? = definedExternally): OptionDataValue?
 
     /** Returns the raw ordinal value of [dim]. */
-    fun ordinalRawValue(dim: String, dataIndexInside: Double? = definedExternally): JsAny?
+    fun ordinalRawValue(dim: DimensionLoose, dataIndexInside: Double? = definedExternally): StringOrDouble?
 
     /** Returns the style of the data item. */
     fun style(userProps: ZRStyleProps? = definedExternally, dataIndexInside: Double? = definedExternally): ZRStyleProps
@@ -300,13 +305,13 @@ external interface CustomSeriesRenderItemAPI {
     fun visual(visualType: String, dataIndexInside: Double? = definedExternally): JsAny?
 
     /** Computes the bar layout of the data item. */
-    fun barLayout(opt: JsAny): JsAny
+    fun barLayout(opt: BarGridLayoutOptionForCustomSeries): BarGridLayoutResultForCustomSeries?
 
     /** Returns the indices of the current series. */
     fun currentSeriesIndices(): Array<Double>
 
     /** Builds a CSS font string. */
-    fun font(opt: JsAny): String
+    fun font(opt: CustomSeriesFontOption): String
 }
 
 /**

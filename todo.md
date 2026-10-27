@@ -240,7 +240,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（139 个示例 / 23 个家族 + 文档示例组 + 总览页）
+### 已落地（144 个示例 / 24 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -261,6 +261,12 @@
 - 第五批（4 个）：`line-polar`、`line-polar2`、`line-function`（`LineExtra.kt`）、
   `gauge-stage`、`gauge-temperature`（`GaugeExtra.kt`，官方的 setInterval 未移植，显示初始值）。
 - 第六批（2 个）：`doc-example/text-block-fragment`、`doc-example/text-options`（scatter 的 label 富文本，`rich` 用法与官方一致），以及 `dataset-encode-simple0`、`scatter-tutorial-dataZoom-1`。
+
+- 第七批（5 个 + 静态数据基础设施）：`treemap-disk`、`lines-airline`（65k 航线 + world GeoJSON，
+  新增 `Groups.LINES`）、`graph-life-expectancy`、`custom-hexbin`（d3-hexbin 分箱 + 球场图形）、
+  `dataset-encode1`（四宫格编码矩阵）。数据集不再抄进 Kotlin，改为
+  `demo/src/jsMain/resources/data/` 下的静态 JSON（来源与许可见该目录 `SOURCE.md`），
+  页面用 `demo.ui.loadJson` 异步加载；e2e 的像素断言改成轮询等待。
 
 ### 下一批（按可做性排序）
 

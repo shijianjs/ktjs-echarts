@@ -24,6 +24,17 @@ import zrender.ZRLineTypes
  * handle, which the demo's theme does not use.
  */
 
+/** The seven pre-sold seats of the flight seatmap, coloured red and non-interactive. */
+private fun takenRegions(): Array<RegionOption> {
+    val names = arrayOf("26E", "26D", "26C", "25D", "23C", "21A", "20F")
+    return Array(names.size) { index ->
+        unsafeJso<RegionOption> {
+            name = names[index]
+            silent = true
+            itemStyle = unsafeJso<ItemStyleOption> { color = ZRColor("#bf0e08") }
+        }
+    }
+}
 private val geoExamples = Category(Groups.GEO, "examples/GeoExtra.kt")
 
 /** The eight population centres of the example: `[lng, lat, population]`. */
@@ -458,6 +469,33 @@ val geoExtraEntries: List<CatalogEntry> =
                                                     )
                                             },
                                         )
+                                },
+                            )
+                    },
+                )
+                null
+            }
+        },
+        geoExamples.interactive("geo-seatmap-flight", "航班选座（SVG）", "Flight Seatmap") { chart ->
+            loadText("data/flight-seats.svg").then { svg ->
+                ECharts.registerMap(
+                    "flight-seats",
+                    MapInput(unsafeJso<SVGMapInput> { this.svg = GeoSVGSourceInput(svg) }),
+                )
+                chart.setOption(
+                    unsafeJso<EChartsOption> {
+                        tooltip = one(unsafeJso<TooltipOption> {})
+                        geo =
+                            one(
+                                unsafeJso<GeoOption> {
+                                    map = "flight-seats"
+                                    roam = BooleanOrString(true)
+                                    selectedMode = SelectionMode("multiple")
+                                    layoutCenter = arrayOf(StringOrDouble("50%"), StringOrDouble("50%"))
+                                    layoutSize = StringOrDouble("95%")
+                                    tooltip = unsafeJso<TooltipOption> { show = true }
+                                    itemStyle = unsafeJso<ItemStyleOption> { color = ZRColor("#fff") }
+                                    regions = takenRegions()
                                 },
                             )
                     },

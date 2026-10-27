@@ -24,6 +24,7 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `ch.geo.json` | `geo/` | `geo-graph` |
 | `Map_of_Iceland.svg` | `geo/` | `geo-svg-scatter-simple` |
 | `MacOdrum-LV5-floorplan-web.svg` | `geo/` | `geo-svg-lines` |
+| `flight-seats.svg` | `geo/` | `geo-seatmap-flight` |
 | `Beef_cuts_France.svg` | `geo/` | `geo-beef-cuts` |
 | `obama_budget_proposal_2012.json` | `data/` | `treemap-obama` |
 | `wind-barb-hobart.json` | `data/` | (not ported yet, `custom-wind`) |

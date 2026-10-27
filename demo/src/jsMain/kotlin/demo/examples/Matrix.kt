@@ -2,9 +2,18 @@ package demo.examples
 
 import demo.CatalogEntry
 import demo.Groups
+import echarts.CustomSeriesRenderItem
 import echarts.Orients
 import echarts.VisualMapTypes
 import echarts.options.CoordinateSystemDataCoord
+import echarts.options.CustomGroupOption
+import echarts.options.CustomTextOption
+import echarts.options.DatasetOption
+import echarts.options.OptionDataValue
+import echarts.options.OptionEncode
+import echarts.options.OptionEncodeValue
+import echarts.options.customSeries
+import echarts.options.datasetArrayRows
 import echarts.options.CustomPathOption
 import echarts.options.CustomSeriesOption
 import echarts.options.DimensionLoose
@@ -45,6 +54,7 @@ import echarts.options.one
 import echarts.options.pieSeries
 import echarts.options.scatterSeries
 import js.objects.unsafeJso
+import kotlin.js.unsafeCast
 import zrender.ZRFontWeights
 import zrender.ZRColor
 import zrender.ZRShapeProps
@@ -529,7 +539,128 @@ val matrixEntries: List<CatalogEntry> =
                     )
             }
         },
+        matrix.chart(
+            "matrix-mini-bar-data-collection",
+            "矩阵坐标系表头数据自动收集（以微型条形图为例）",
+            "Matrix Header Data Collection (Mini Bar)",
+        ) {
+            unsafeJso<EChartsOption> {
+                dataset =
+                    one(
+                        unsafeJso<DatasetOption> {
+                            source =
+                                datasetArrayRows(
+                                    arrayOf(
+                                        row("2021-02-01", "amount", 1212.0, "file", 2321.0, "Q", 1412.0),
+                                        row("2021-02-02", "amount", 7181.0, "file", 2114.0, "Q", 1402.0),
+                                        row("2021-02-03", "amount", 2763.0, "file", 4212.0, "Q", 8172.0),
+                                        row("2021-02-04", "amount", 6122.0, "file", 2942.0, "Q", 6121.0),
+                                        row("2021-02-05", "amount", 4221.0, "file", 3411.0, "Q", 1987.0),
+                                        row("2021-02-06", "amount", 7221.0, "file", 5121.0, "Q", 1303.0),
+                                        row("2021-02-07", "amount", 5121.0, "file", 4121.0, "Q", 1819.0),
+                                        row("2021-02-08", "amount", 6121.0, "file", 3121.0, "Q", 2303.0),
+                                        row("2021-02-09", "amount", 7121.0, "file", 2121.0, "Q", 3303.0),
+                                        row("2021-02-10", "amount", 8121.0, "file", 1121.0, "Q", 4303.0),
+                                    ).unsafeCast<Array<Array<OptionDataValue>>>(),
+                                )
+                        },
+                    )
+                this.matrix =
+                    matrixOption {
+                        // `x` / `y` data are collected from the dataset dimensions named by each
+                        // series' `encode`; only the layout of the header is set here.
+                        x =
+                            dimension {
+                                levelSize = StringOrDouble(50.0)
+                                itemStyle = unsafeJso<ItemStyleOption> { color = ZRColor("#f0f8ff") }
+                                label = unsafeJso<LabelOption> { fontWeight = ZRFontWeights.bold }
+                            }
+                    }
+                series =
+                    arrayOf<SeriesOption>(
+                        miniBarSeries(1, 0, 2),
+                        miniBarSeries(3, 0, 4),
+                        miniBarSeries(5, 0, 6),
+                    )
+            }
+        },
     )
+
+/** One `custom` series of the mini-bar example, placed on the matrix cell of `encode.x` / `encode.y`. */
+private fun miniBarSeries(xDim: Int, yDim: Int, valueDim: Int): CustomSeriesOption =
+    customSeries {
+        coordinateSystem = "matrix"
+        encode =
+            unsafeJso<OptionEncode> {
+                x = OptionEncodeValue(DimensionLoose(xDim.toDouble()))
+                y = OptionEncodeValue(DimensionLoose(yDim.toDouble()))
+            }
+        renderItem = miniBarRenderItem(xDim, yDim, valueDim)
+    }
+
+/** The value extent the mini bars are scaled to, as in the original example. */
+private val miniBarExtent = doubleArrayOf(0.0, 10000.0)
+
+/** Draws one mini bar plus its value next to the bar, inside the cell the layout returns. */
+private fun miniBarRenderItem(xDim: Int, yDim: Int, valueDim: Int): CustomSeriesRenderItem =
+    { _, api ->
+        val xValue = api.value(DimensionLoose(xDim.toDouble()))
+        val yValue = api.value(DimensionLoose(yDim.toDouble()))
+        val labelValue = api.value(DimensionLoose(valueDim.toDouble())).unsafeCast<Double?>()
+        val rect = api.layout(CoordinateSystemDataCoord(arrayOf(xValue, yValue))).rect
+        if (rect == null || labelValue == null) {
+            null
+        } else {
+            val rectY = rect.y!!
+            val rectHeight = rect.height!!
+            val rectWidth = rect.width!!
+            val height = rectHeight * 0.2
+            val barY = rectY + (rectHeight - height) / 4 * 3
+            val barX = rect.x!! + rectWidth * 0.15
+            val width = linearMap(labelValue, miniBarExtent, doubleArrayOf(0.0, rectWidth * 0.5))
+            unsafeJso<CustomGroupOption> {
+                type = "group"
+                children =
+                    arrayOf(
+                        unsafeJso<CustomPathOption> {
+                            type = "rect"
+                            shape =
+                                unsafeJso<ZRShapeProps> {
+                                    x = barX
+                                    y = barY
+                                    this.width = width
+                                    this.height = height
+                                }
+                            style = api.style(unsafeJso<ZRStyleProps> { fill = ZRColor("#0ca8df") })
+                        },
+                        unsafeJso<CustomTextOption> {
+                            type = "text"
+                            x = barX
+                            y = rectY + rectHeight / 4 * 1.5
+                            style =
+                                unsafeJso<ZRStyleProps> {
+                                    text = valueText(labelValue)
+                                    fill = ZRColor("#333")
+                                    align = web.cssom.TextAlign.left
+                                    verticalAlign = web.cssom.VerticalAlign.middle
+                                }
+                        },
+                    )
+            }
+        }
+    }
+
+/** Maps [value] from [domain] onto [range], the way the original `linearMap` helper does. */
+private fun linearMap(value: Double, domain: DoubleArray, range: DoubleArray): Double {
+    val subDomain = domain[1] - domain[0]
+    val subRange = range[1] - range[0]
+    return when {
+        subDomain == 0.0 -> if (subRange == 0.0) range[0] else (range[0] + range[1]) / 2
+        value == domain[0] -> range[0]
+        value == domain[1] -> range[1]
+        else -> (value - domain[0]) / subDomain * subRange + range[0]
+    }
+}
 
 /** A `text` element of a `graphic` component, optionally rotated in degrees. */
 private fun textElement(text: String, x: StringOrDouble, y: StringOrDouble, rotation: Double): echarts.options.GraphicElement =

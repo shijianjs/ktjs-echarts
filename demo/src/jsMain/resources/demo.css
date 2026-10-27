@@ -6,6 +6,7 @@
     --page-border: #d9e2ec;
     --page-accent: #2f6fed;
     --page-accent-soft: #eaf1ff;
+    --switch-on-fg: #ffffff;
     --page-surface: #f7f9fb;
     --nav-bg: #f7f9fb;
     --topbar-bg: rgba(255, 255, 255, 0.92);
@@ -19,6 +20,8 @@
     --page-border: #2b3648;
     --page-accent: #7aa2ff;
     --page-accent-soft: #1b2740;
+    /* The dark accent is a light blue, so its label has to be dark, not white. */
+    --switch-on-fg: #0b1220;
     --page-surface: #161d27;
     --nav-bg: #131a23;
     --topbar-bg: rgba(16, 21, 28, 0.92);
@@ -234,10 +237,10 @@ body {
 .lang-switch button.is-on,
 .theme-switch button.is-on {
     background: var(--page-accent);
-    color: #fff;
+    color: var(--switch-on-fg);
 }
 
-.theme-switch button.is-off {
+.theme-switch button:not(.is-on) {
     color: var(--page-muted);
 }
 

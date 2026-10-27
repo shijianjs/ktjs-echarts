@@ -230,33 +230,42 @@
 
 ### 状态
 
-- 提交：`0a1f9ca feat(demo): 复刻官方示例库，新增示例站与 69 个示例`（本地 `main`，第一批）；
-  第二批（tree / sunburst / dataset / calendar / matrix / custom，41 个示例）在本轮工作区里，尚未提交。
+- 提交：`0a1f9ca`（第一批 69 个）、`6edff97`（第二批 tree / sunburst / dataset / calendar / matrix /
+  custom，41 个）；第三批（文档示例 15 个 + `matrix-mini-bar-data-collection`）在本轮工作区里。
 - **`git push` 一直未成功**：本机到 `github.com:443` 连接被重置/超时，重试多次仍失败；下一次先
-  `git push`（含第二批）。
+  `git push`（含后面两批）。
 - 目录：`demo/src/jsMain/kotlin/demo/`（shell/router/主题/语言/ui/examples），
   e2e 在 `demo/src/jvmTest/kotlin/demo/e2e/DemoPageTest.kt`。
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（109 个示例 / 23 个家族 + 总览页）
+### 已落地（125 个示例 / 23 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
   themeRiver 2。
 - 第二批（41 个）：tree 7（`TreeData.kt` 的内联 flare 表）、sunburst 7（`SunburstData.kt`）、
   dataset 7、calendar 7、matrix 7（含 graph / confusion）、custom 6。
+- 第三批（16 个）：`examples/DocExamples.kt` 的 15 个 `doc-example/*`（极坐标角度三件套、
+  getting-started、aria-pie、sunburst-color、sunburst-label-align、line-stack-tiled、
+  axis-label-align-min-max、tutorial-styling-step0..5），以及 matrix 的
+  `matrix-mini-bar-data-collection`。文档示例单独成组（`Groups.DOC`），路由保留 `doc-example/` 前缀。
+- 同批修掉：右上角亮色/暗色按钮切换后两个按钮都高亮（`syncThemeButtons` 用 `withClass` 累加，
+  改成 `classList.toggle`），暗色主题下选中按钮白字压在浅蓝底上看不清（新增 `--switch-on-fg`），
+  e2e 增加「只有一个按钮高亮 + 对比度 ≥ 4.5」的断言。
 
 ### 下一批（按可做性排序）
 
 1. **无外部依赖、可直接做**：
-   - `doc-example`（61 个）：官方文档里的小例子，多数很短，可整批做；`map-*`/`geo-*` 除外。
-   - `custom` 剩余：`custom-hexbin`、`custom-calendar-icon`、`custom-spiral-race`、
-     `custom-gantt-flight`（后两个是长动画）；`custom-gauge` / `custom-polar-heatmap` 需要极坐标中心
-     `params.coordSys.cx` / `cy`，先补 wrapper 再动。
-   - `matrix` 剩余：`matrix-sparkline`（25 个网格 + `dataZoom` 覆盖全部 x 轴）、
-     `matrix-mini-bar-data-collection`、`matrix-mini-bar-geo`、`matrix-mbti`、`matrix-periodic-table`、
-     `matrix-stock`（`body.data` 单元格 + `graphic` 标题）。
+   - `doc-example` 剩余（约 45 个）：`tutorial-styling` 之后的教程页、`text-*`、`title-block`、
+     `label-position`、`grid-outerBounds`、`parallel-all`、`radar`、`sunburst-highlight-*`（需要
+     `dispatchAction`）、`pictorialBar-*`、`aria-decal*`；`map-*`/`geo-*` 除外。
+   - `custom` 剩余：`custom-calendar-icon`（需要 `params.coordSys.cellWidth/cellHeight`）、
+     `custom-gauge` / `custom-polar-heatmap`（需要极坐标中心 `params.coordSys.cx` / `cy`）；
+     `custom-hexbin`、`custom-spiral-race`、`custom-gantt-flight` 是长动画或大数据。
+   - `matrix` 剩余：`matrix-sparkline`（25 个网格 + `dataZoom` 覆盖全部 x 轴）、`matrix-mbti`、
+     `matrix-periodic-table`、`matrix-stock`（`body.data` 单元格 + `graphic` 标题）、
+     `matrix-mini-bar-geo`（需要 geo）。
    - 已移植家族的长尾：`bar-race`/`bar-race-country`/`bar-drilldown`/`bar-multi-drilldown`/`bar-gradient`/
      `bar-large`/`bar-breaks-simple`/`bar-breaks-brush`/`bar-label-rotation`/`bar-polar-*`/`polar-*`、
      `line-easing`/`line-fisheye-lens`/`line-graphic`/`line-pen`/`line-draggable`/`line-race`/`line-polar*`/
@@ -315,8 +324,7 @@
 ## 待办
 
 - 类型建模：暂无未完成项（见上面各轮）。
-- 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 `doc-example` 批量、`custom` / `matrix`
-  剩余项与各家族长尾；极坐标 `renderItem` 需要先补 `params.coordSys.cx/cy`。
-- 提交：demo 第二批（tree / sunburst / dataset / calendar / matrix / custom）与对应的 wrapper 补充
-  （matrix 类型、`renderItem` 的 `coord` / `size` / `layout`、graphic 组件、`clipRectByRect` 收紧）都还在
-  工作区里，先 `git push` 之前的提交，再一起提交这一批。
+- 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 `doc-example` 剩余约 45 页、`custom` /
+  `matrix` 剩余项与各家族长尾；极坐标 `renderItem` 需要先补 `params.coordSys.cx/cy`，
+  `custom-calendar-icon` 需要 `params.coordSys.cellWidth/cellHeight`。
+- 提交：`git push` 仍未成功，本地已积两批（`6edff97` 与第三批），恢复网络后一并推送。

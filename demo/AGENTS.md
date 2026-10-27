@@ -42,6 +42,11 @@ demo/src/jvmTest/kotlin/demo/e2e/
 - **数据项名称与取值走联合工厂**：`name` 是 `string | number`、`value` 是 `string | number | Date`，
   所以写 `OptionId("x")`、`OptionDataValue(1.0)`；`examples/Items.kt` 收了这批常用构造器
   （`pieItem`、`radarItem`、`row`、`doubleRow`、`recordOf`、`toolbox`、`every`…）。
+- **KDoc 里别写 `/*`**：Kotlin 的块注释可嵌套，注释里写 `doc-example/*.js` 会开一个内层注释，
+  整个文件后半段都被当成注释，报错位置还不在这一行。写目录时用 `doc-example/` 就好。
+- **`Array<Double>` 不能顶 `vararg Double`**：`numbers(*values)` 要求 `DoubleArray`，集合先
+  `toDoubleArray()`；反过来 `Array<T?>`（`strings` / `numbers` / `dataItems` 的返回）也不能直接赋给
+  需要非空元素的字段。
 
 ## 选例范围
 
@@ -54,7 +59,10 @@ demo/src/jvmTest/kotlin/demo/e2e/
 - 依赖官方站点图片素材的（`image://` 图标、纹理贴图、`data:image/...` 大块 base64），
 - 依赖真实键鼠序列的（拖拽、触摸、`sendInput`）。
 
-筛选后仍有 250+ 个候选，目前已落地 **109 个**（覆盖 23 个家族），其余按批推进。
+筛选后仍有 250+ 个候选，目前已落地 **125 个**（覆盖 23 个家族 + 一个「文档示例」组），其余按批推进。
+
+「文档示例」组（`Groups.DOC`，`examples/DocExamples.kt`）对应官方清单里的 `doc-example/*` 条目：它们
+不属于任何家族，一个例子只讲一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。
 
 ### 未移植的家族与原因
 
@@ -69,8 +77,14 @@ demo/src/jvmTest/kotlin/demo/e2e/
 
 同样的原因，个别被移植家族内的长尾示例（大数据量、动画竞速、下钻、极坐标变体、真实指针交互）也留待
 下一批，例如 `bar-race`、`bar-drilldown`、`line-easing`、`scatter-clustering`、`candlestick-sh`、
-`custom-gauge`、`custom-polar-heatmap`（需要极坐标中心 `params.coordSys.cx/cy`）、`matrix-sparkline`
-（25 个网格落在矩阵上，需要 `dataZoom` 覆盖全部 x 轴）。
+`custom-gauge`、`custom-polar-heatmap`（需要极坐标中心 `params.coordSys.cx/cy`）、`custom-calendar-icon`
+（需要 `params.coordSys.cellWidth/cellHeight`）、`matrix-sparkline`（25 个网格落在矩阵上，需要 `dataZoom`
+覆盖全部 x 轴）。
+
+`doc-example/*` 里还没有移植的：`pie-highlight` 与 `barGrid-barGap`（`setInterval` 驱动，
+需要定时器生命周期）、`canvas-vs-svg`（第二个渲染器）、`tutorial-async` / `tutorial-loading`
+（异步设 option）、`value-animation-*`、以及 `aria-decal*`、`map-*`、`geo-*`、`graphic-*`、
+`pictorialBar-*` 这些较长的文档页。
 
 ## 移植过程中修掉的 wrapper 缺口
 
@@ -99,6 +113,12 @@ demo/src/jvmTest/kotlin/demo/e2e/
 - `CustomSeriesRenderItemAPI`：补 `coord` / `size` / `layout`（新增 `CoordinateSystemDataCoord` 联合），
   `params.coordSys` 补矩形布局的 `x` / `y` / `width` / `height`；`CustomSeriesOption` 补 `itemPayload`。
 - `GraphicNamespace.clipRectByRect` / `clipPointsByRect`：参数与返回值从 `JsAny` 收紧到 `RectLike`。
+- `AngleAxisOption`：补上游声明的 `startAngle` / `endAngle` / `clockwise` / `polarId`（极坐标的三个角度
+  示例就靠它们）；`RadiusAxisOption` 补 `polarId`。
+- `AxisLabelOption`：补 `alignMinLabel` / `alignMaxLabel` / `verticalAlignMinLabel` /
+  `verticalAlignMaxLabel`（`axis-label-align-min-max`）。
+- `MatrixOption` 的单元格数据（`matrix-mini-bar-data-collection`）：`MatrixDimensionOption.data` 支持由
+  `dataset` 自动收集，只需按上游写法只给 `levelSize` / `itemStyle` / `label`。
 
 ## 兜底说明：图表与主题
 

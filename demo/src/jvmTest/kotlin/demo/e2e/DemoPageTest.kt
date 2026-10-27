@@ -3,6 +3,7 @@ package demo.e2e
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.junit.UsePlaywright
 import com.microsoft.playwright.options.WaitUntilState
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
 import org.junitpioneer.jupiter.RetryingTest
@@ -88,6 +89,60 @@ class DemoPageTest {
 
         assertChartRendered(page)
     }
+
+    /**
+     * The two theme buttons share one highlighted style, so exactly one of them may carry `is-on`,
+     * and its label has to stay readable against the accent of the current theme.
+     */
+    @RetryingTest(maxAttempts = 2)
+    fun `exactly one theme button is highlighted and stays readable`(page: Page) {
+        openPage(page)
+        page.evaluate("() => { localStorage.clear(); location.hash = '#/bar-simple' }")
+
+        assertEquals(1, page.locator(".theme-switch button.is-on").count(), "one highlighted theme button")
+
+        page.locator(".theme-switch button").nth(1).click()
+        page.waitForFunction("() => document.documentElement.getAttribute('data-theme') === 'dark'")
+        assertEquals(1, page.locator(".theme-switch button.is-on").count(), "one highlighted theme button after switching")
+        assertTrue(
+            page.locator(".theme-switch button.is-on").textContent()!!.contains("暗色"),
+            "the dark button is the highlighted one",
+        )
+        assertTrue(contrast(page, ".theme-switch button.is-on") >= 4.5, "the highlighted label contrasts with its background")
+
+        page.locator(".theme-switch button").nth(0).click()
+        page.waitForFunction("() => document.documentElement.getAttribute('data-theme') !== 'dark'")
+        assertEquals(1, page.locator(".theme-switch button.is-on").count(), "one highlighted theme button after switching back")
+        assertTrue(
+            page.locator(".theme-switch button.is-on").textContent()!!.contains("亮色"),
+            "the light button is the highlighted one",
+        )
+        assertTrue(contrast(page, ".theme-switch button.is-on") >= 4.5, "the highlighted label contrasts with its background")
+    }
+
+    /** Computes the WCAG contrast ratio between the text and the background of [selector]. */
+    private fun contrast(page: Page, selector: String): Double =
+        page.locator(selector).first().evaluate(
+            """
+            (node) => {
+                const parse = (value) => {
+                    const parts = value.match(/[\d.]+/g).map(Number);
+                    return parts.length >= 3 ? parts.slice(0, 3) : [0, 0, 0];
+                };
+                const channel = (value) => {
+                    const c = value / 255;
+                    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+                };
+                const luminance = (rgb) => 0.2126 * channel(rgb[0]) + 0.7152 * channel(rgb[1]) + 0.0722 * channel(rgb[2]);
+                const style = getComputedStyle(node);
+                const foreground = luminance(parse(style.color));
+                const background = luminance(parse(style.backgroundColor));
+                const lighter = Math.max(foreground, background);
+                const darker = Math.min(foreground, background);
+                return (lighter + 0.05) / (darker + 0.05);
+            }
+            """,
+        ) as Double
 
     @RetryingTest(maxAttempts = 2)
     fun `the gallery logs no console errors or failed requests`(page: Page) {

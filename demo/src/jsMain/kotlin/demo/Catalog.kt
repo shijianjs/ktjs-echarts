@@ -7,6 +7,7 @@ import demo.examples.candlestickEntries
 import demo.examples.chordEntries
 import demo.examples.customEntries
 import demo.examples.datasetEntries
+import demo.examples.docExampleEntries
 import demo.examples.funnelEntries
 import demo.examples.gaugeEntries
 import demo.examples.graphEntries
@@ -70,6 +71,9 @@ object Groups {
     val CHORD = Group("chord", "和弦图", "Chord")
     val SANKEY = Group("sankey", "桑基图", "Sankey")
     val THEME_RIVER = Group("theme-river", "主题河流", "Theme river")
+
+    /** The short examples of the official documentation, `doc-example/` entries of the manifest. */
+    val DOC = Group("doc-example", "文档示例", "Doc examples")
 }
 
 /**
@@ -119,6 +123,7 @@ val catalog: List<CatalogEntry> =
         chordEntries,
         sankeyEntries,
         themeRiverEntries,
+        docExampleEntries,
     ).flatten()
 
 private val catalogById: Map<String, CatalogEntry> = catalog.associateBy { it.id }

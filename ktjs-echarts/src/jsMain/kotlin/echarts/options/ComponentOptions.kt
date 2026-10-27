@@ -20,6 +20,7 @@ import kotlin.js.JsAny
 import kotlin.js.unsafeCast
 import web.canvas.CanvasLineCap
 import web.canvas.CanvasLineJoin
+import web.cssom.TextAlign
 import web.cssom.VerticalAlign
 import web.html.HTMLElement
 import zrender.TextOverflow
@@ -942,6 +943,18 @@ external interface YAxisOption : AxisOption
 external interface AngleAxisOption : AxisOption {
     /** Index of the polar coordinate system this axis belongs to. */
     var polarIndex: Double?
+
+    /** Id of the polar coordinate system this axis belongs to. */
+    var polarId: String?
+
+    /** Angle the axis starts at, in degrees. */
+    var startAngle: Double?
+
+    /** Angle the axis ends at, in degrees. */
+    var endAngle: Double?
+
+    /** Whether the axis is laid out clockwise; the polar coordinate system is counter-clockwise. */
+    var clockwise: Boolean?
 }
 
 /**
@@ -950,6 +963,9 @@ external interface AngleAxisOption : AxisOption {
 external interface RadiusAxisOption : AxisOption {
     /** Index of the polar coordinate system this axis belongs to. */
     var polarIndex: Double?
+
+    /** Id of the polar coordinate system this axis belongs to. */
+    var polarId: String?
 }
 
 /**
@@ -1088,6 +1104,18 @@ external interface AxisLabelOption : LabelOption {
 
     /** Whether to show the label of the maximum tick. */
     var showMaxLabel: Boolean?
+
+    /** Horizontal alignment of the first label; upstream `alignMinLabel`. */
+    var alignMinLabel: TextAlign?
+
+    /** Horizontal alignment of the last label; upstream `alignMaxLabel`. */
+    var alignMaxLabel: TextAlign?
+
+    /** Vertical alignment of the first label; upstream `verticalAlignMinLabel`. */
+    var verticalAlignMinLabel: VerticalAlign?
+
+    /** Vertical alignment of the last label; upstream `verticalAlignMaxLabel`. */
+    var verticalAlignMaxLabel: VerticalAlign?
 
     /** Formatter of the axis labels. */
     override var formatter: LabelFormatter?

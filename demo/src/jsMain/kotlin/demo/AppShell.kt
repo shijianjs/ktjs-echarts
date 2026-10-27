@@ -160,8 +160,10 @@ class AppShell {
 
     private fun syncThemeButtons() {
         val dark = Theme.isDark
-        lightButton.withClass(if (dark) "is-off" else "is-on")
-        darkButton.withClass(if (dark) "is-on" else "is-off")
+        // Toggle, not add: the two buttons share one highlighted style, so a switch has to clear
+        // the previous pick or both of them stay highlighted.
+        lightButton.classList.toggle(ClassName("is-on"), !dark)
+        darkButton.classList.toggle(ClassName("is-on"), dark)
         lightButton.ariaPressed = if (dark) "false" else "true"
         darkButton.ariaPressed = if (dark) "true" else "false"
     }

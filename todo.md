@@ -161,7 +161,7 @@
 - `TYPE-MAPPING.md` 补「同一个联合有两个上游名字」「`number | callback`」两节，并把 `T | T[]`
   一条改成统一用 `Array<T>`（模板仓库同步）。
 
-### ⑨ 各系列数据项类型与 `data` 的只读视图
+### ⑨ 各系列数据项类型与 `data` 的只读视图（提交 `76fe8b0`，已推送）
 
 - `SeriesOption.data` 改为**只读** `val data: Array<OptionDataItem?>?`；23 个系列接口各自新增
   `@JsName("data") var typedData`，类型是该系列上游收窄后的 item 联合。两个属性读写同一个 JS 属性，
@@ -183,7 +183,9 @@
   `typedData =`（脚本一次性改写 117 处 + demo 2 处）。浏览器用例 224 → 230，全过；`./gradlew build`
   （含 detekt）通过。
 - `TYPE-MAPPING.md` §12 的 `data?: unknown` 一节按新写法重写，「继承来的 `var` 需要收窄」补了三种收窄
-  形态，反模式速查同步（模板仓库提交 `b863493`，推送待网络恢复）。
+  形态，反模式速查同步（模板仓库提交 `b863493`，已推送）。
+- 顺带收紧：`GaugeSeriesOption.axisLabel` 直接用 `GaugeAxisLabelOption?`（去掉中转的 `typedAxisLabel`），
+  `SunburstSeriesOption` 补 `@JsName("label") var typedLabel`。
 
 ### 遗留提醒
 

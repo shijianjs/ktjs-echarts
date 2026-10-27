@@ -744,4 +744,78 @@ val docExampleEntries: List<CatalogEntry> =
                     )
             }
         },
+        docExample.chart("doc-example/dataset-encode-simple0", "数据集编码（简单）", "Dataset encode (simple)") {
+            unsafeJso<EChartsOption> {
+                dataset =
+                    one(
+                        unsafeJso<DatasetOption> {
+                            source =
+                                datasetArrayRows(
+                                    arrayOf(
+                                        row("score", "amount", "product"),
+                                        row(89.3, 58212.0, "Matcha Latte"),
+                                        row(57.1, 78254.0, "Milk Tea"),
+                                        row(74.4, 41032.0, "Cheese Cocoa"),
+                                        row(50.1, 12755.0, "Cheese Brownie"),
+                                        row(89.7, 20145.0, "Matcha Cocoa"),
+                                        row(68.1, 79146.0, "Tea"),
+                                        row(19.6, 91852.0, "Orange Juice"),
+                                        row(10.6, 101852.0, "Lemon Juice"),
+                                        row(32.7, 20112.0, "Walnut Brownie"),
+                                    ).unsafeCast<Array<Array<OptionDataValue>>>(),
+                                )
+                        },
+                    )
+                grid = one(unsafeJso<GridOption> { containLabel = true })
+                xAxis = one(unsafeJso<XAxisOption> {})
+                yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.category })
+                series =
+                    arrayOf<SeriesOption>(
+                        barSeries {
+                            // The dataset columns drive both axes; nothing is encoded on the data.
+                            encode =
+                                unsafeJso<OptionEncode> {
+                                    this.x = OptionEncodeValue(DimensionLoose("amount"))
+                                    this.y = OptionEncodeValue(DimensionLoose("product"))
+                                }
+                        },
+                    )
+            }
+        },
+        docExample.chart("doc-example/scatter-tutorial-dataZoom-1", "散点图与缩放（一）", "Scatter with dataZoom (1)") {
+            val values =
+                arrayOf(
+                    doubleArrayOf(14.616, 7.241, 0.896),
+                    doubleArrayOf(3.958, 5.701, 0.955),
+                    doubleArrayOf(2.768, 8.971, 0.669),
+                    doubleArrayOf(9.051, 9.710, 0.171),
+                    doubleArrayOf(14.046, 4.182, 0.536),
+                    doubleArrayOf(12.295, 1.429, 0.962),
+                    doubleArrayOf(4.417, 8.167, 0.113),
+                    doubleArrayOf(0.492, 4.771, 0.785),
+                    doubleArrayOf(7.632, 2.605, 0.645),
+                    doubleArrayOf(14.242, 5.042, 0.368),
+                )
+            unsafeJso<EChartsOption> {
+                xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.value })
+                yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
+                dataZoom =
+                    arrayOf(
+                        unsafeJso<DataZoomOption> {
+                            type = DataZoomTypes.slider
+                            start = 1.0
+                            end = 35.0
+                        },
+                    )
+                series =
+                    arrayOf<SeriesOption>(
+                        scatterSeries {
+                            name = "scatter"
+                            itemStyle = unsafeJso<ItemStyleOption> { opacity = 0.8 }
+                            symbolSize = SymbolSize { value, _ -> DoubleOrDoubleArray(numberAt(value, 2) * 40) }
+                            typedData = points(*values)
+                        },
+                    )
+            }
+        },
     )

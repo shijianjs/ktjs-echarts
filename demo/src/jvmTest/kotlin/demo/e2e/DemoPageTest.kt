@@ -206,6 +206,7 @@ class DemoPageTest {
                 "custom-bar-trend",
                 "custom-wind",
                 "custom-hexbin",
+                "custom-profile",
                 "geo-svg-custom-effect",
                 "custom-polar-heatmap",
                 "matrix-covariance",

@@ -7,6 +7,7 @@ import demo.Groups
 import js.objects.unsafeJso
 import web.cssom.TextAlign
 import zrender.ZRColor
+import zrender.ZRLineTypes
 
 /*
  * The small examples of the official documentation, ported from
@@ -435,6 +436,137 @@ val docExampleEntries: List<CatalogEntry> =
                                 }
                         },
                     )
+            }
+        },
+        docExample.chart("doc-example/aria-decal-simple", "无障碍花纹（简单）", "Aria decal (simple)") {
+            unsafeJso<EChartsOption> {
+                xAxis =
+                    one(
+                        unsafeJso<XAxisOption> {
+                            type = AxisTypes.category
+                            data = strings("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+                        },
+                    )
+                yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
+                series =
+                    arrayOf<SeriesOption>(
+                        barSeries { typedData = numbers(120.0, 200.0, 150.0, 80.0, 70.0, 110.0, 130.0) },
+                        barSeries { typedData = numbers(20.0, 40.0, 90.0, 40.0, 30.0, 70.0, 120.0) },
+                        barSeries { typedData = numbers(140.0, 230.0, 120.0, 50.0, 30.0, 150.0, 120.0) },
+                    )
+                aria =
+                    unsafeJso<AriaOption> {
+                        enabled = true
+                        decal = unsafeJso<AriaDecalOption> { show = true }
+                    }
+            }
+        },
+        docExample.chart("doc-example/aria-decal-newspaper", "无障碍花纹（报纸风格）", "Aria decal (newspaper)") {
+            val blackBorder = unsafeJso<ItemStyleOption> {
+                borderColor = ZRColor("black")
+                borderWidth = 2.0
+            }
+            unsafeJso<EChartsOption> {
+                color =
+                    arrayOf(
+                        ZRColor("white"),
+                        ZRColor("black"),
+                        ZRColor("white"),
+                        ZRColor("white"),
+                    )
+                xAxis =
+                    one(
+                        unsafeJso<XAxisOption> {
+                            data = strings("Q1", "Q2", "Q3", "Q4")
+                            axisLine = unsafeJso<AxisLineOption> { lineStyle = unsafeJso<LineStyleOption> { color = ZRColor("black") } }
+                            axisTick = unsafeJso<AxisTickOption> { lineStyle = unsafeJso<LineStyleOption> { color = ZRColor("black") } }
+                            axisLabel = unsafeJso<AxisLabelOption> { color = "black" }
+                        },
+                    )
+                yAxis =
+                    one(
+                        unsafeJso<YAxisOption> {
+                            axisLine = unsafeJso<AxisLineOption> { lineStyle = unsafeJso<LineStyleOption> { color = ZRColor("black") } }
+                            axisTick = unsafeJso<AxisTickOption> { lineStyle = unsafeJso<LineStyleOption> { color = ZRColor("black") } }
+                            axisLabel = unsafeJso<AxisLabelOption> { color = "black" }
+                            splitLine =
+                                unsafeJso<SplitLineOption> {
+                                    lineStyle =
+                                        unsafeJso<SplitLineStyleOption> {
+                                            color = ZRColor("black")
+                                            type = ZRLineTypes.dashed
+                                        }
+                                }
+                        },
+                    )
+                series =
+                    arrayOf<SeriesOption>(
+                        barSeries {
+                            name = "Apples"
+                            typedData = numbers(108.0, 26.0, 39.0, 24.0)
+                            itemStyle = blackBorder
+                        },
+                        barSeries {
+                            name = "Oranges"
+                            typedData = numbers(23.0, 40.0, 60.0, 70.0)
+                            itemStyle = blackBorder
+                        },
+                        barSeries {
+                            name = "Bananas"
+                            typedData = numbers(129.0, 40.0, 40.0, 50.0)
+                            itemStyle = blackBorder
+                        },
+                        barSeries {
+                            name = "Pears"
+                            typedData = numbers(40.0, 60.0, 50.0, 89.0)
+                            itemStyle = blackBorder
+                        },
+                    )
+                aria =
+                    unsafeJso<AriaOption> {
+                        decal =
+                            unsafeJso<AriaDecalOption> {
+                                show = true
+                                decals =
+                                    DecalList(
+                                        arrayOf(
+                                            unsafeJso<DecalObject> {
+                                                dashArrayX = DecalDashArrayX(0.0)
+                                                dashArrayY = DoubleOrDoubleArray(0.0)
+                                                color = "black"
+                                            },
+                                            unsafeJso<DecalObject> {
+                                                dashArrayX = DecalDashArrayX(0.0)
+                                                dashArrayY = DoubleOrDoubleArray(0.0)
+                                                color = "black"
+                                            },
+                                            unsafeJso<DecalObject> {
+                                                dashArrayX =
+                                                    DecalDashArrayX(
+                                                        arrayOf(DoubleOrDoubleArray(1.0), DoubleOrDoubleArray(0.0)),
+                                                    )
+                                                dashArrayY = DoubleOrDoubleArray(arrayOf(2.0, 5.0))
+                                                symbolSize = 1.0
+                                                rotation = kotlin.math.PI / 6
+                                                color = "black"
+                                            },
+                                            unsafeJso<DecalObject> {
+                                                symbol = StringOrStringArray("circle")
+                                                dashArrayX =
+                                                    DecalDashArrayX(
+                                                        arrayOf(
+                                                            DoubleOrDoubleArray(arrayOf(8.0, 8.0)),
+                                                            DoubleOrDoubleArray(arrayOf(0.0, 8.0, 8.0, 0.0)),
+                                                        ),
+                                                    )
+                                                dashArrayY = DoubleOrDoubleArray(arrayOf(6.0, 0.0))
+                                                symbolSize = 0.8
+                                                color = "black"
+                                            },
+                                        ),
+                                    )
+                            }
+                    }
             }
         },
     )

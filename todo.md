@@ -231,7 +231,8 @@
 ### 状态
 
 - 提交：`0a1f9ca`（第一批 69 个）、`6edff97`（第二批 tree / sunburst / dataset / calendar / matrix /
-  custom，41 个）；第三批（文档示例 15 个 + `matrix-mini-bar-data-collection`）在本轮工作区里。
+  custom，41 个）；`588381b`（第三批：文档示例 17 个 + `matrix-mini-bar-data-collection` + 主题按钮修复），
+  已推送到 `origin/main`。
 - **`git push` 一直未成功**：本机到 `github.com:443` 连接被重置/超时，重试多次仍失败；下一次先
   `git push`（含后面两批）。
 - 目录：`demo/src/jsMain/kotlin/demo/`（shell/router/主题/语言/ui/examples），
@@ -239,16 +240,16 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（125 个示例 / 23 个家族 + 文档示例组 + 总览页）
+### 已落地（127 个示例 / 23 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
   themeRiver 2。
 - 第二批（41 个）：tree 7（`TreeData.kt` 的内联 flare 表）、sunburst 7（`SunburstData.kt`）、
   dataset 7、calendar 7、matrix 7（含 graph / confusion）、custom 6。
-- 第三批（16 个）：`examples/DocExamples.kt` 的 15 个 `doc-example/*`（极坐标角度三件套、
+- 第三批（18 个）：`examples/DocExamples.kt` 的 17 个 `doc-example/*`（极坐标角度三件套、
   getting-started、aria-pie、sunburst-color、sunburst-label-align、line-stack-tiled、
-  axis-label-align-min-max、tutorial-styling-step0..5），以及 matrix 的
+  axis-label-align-min-max、tutorial-styling-step0..5、aria-decal-simple、aria-decal-newspaper），以及 matrix 的
   `matrix-mini-bar-data-collection`。文档示例单独成组（`Groups.DOC`），路由保留 `doc-example/` 前缀。
 - 同批修掉：右上角亮色/暗色按钮切换后两个按钮都高亮（`syncThemeButtons` 用 `withClass` 累加，
   改成 `classList.toggle`），暗色主题下选中按钮白字压在浅蓝底上看不清（新增 `--switch-on-fg`），
@@ -327,4 +328,4 @@
 - 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 `doc-example` 剩余约 45 页、`custom` /
   `matrix` 剩余项与各家族长尾；极坐标 `renderItem` 需要先补 `params.coordSys.cx/cy`，
   `custom-calendar-icon` 需要 `params.coordSys.cellWidth/cellHeight`。
-- 提交：`git push` 仍未成功，本地已积两批（`6edff97` 与第三批），恢复网络后一并推送。
+- 提交：`6edff97` / `588381b` 已推送到 `origin/main`；本轮的 aria-decal 两个页面与文档更新待提交。

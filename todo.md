@@ -223,7 +223,92 @@
 `GraphSeriesOption` 里原 `directed` / `edgeShape` / `edgeForkPosition` / `selectedMode` 在 6.1.0 的
 `.d.ts` 中查不到，已按上游删除；上游若加回来则按新 `.d.ts` 恢复。
 
+## 示例站（demo）移植进度
+
+本轮的 demo 工作（官方 ECharts 示例库的 Kotlin/JS 移植）**已完成第一批量、已提交、尚未推送**，
+后续按批继续。项目约定与目录说明见 `demo/AGENTS.md`，这里只记「还差什么」和「下次怎么接着做」。
+
+### 状态
+
+- 提交：`0a1f9ca feat(demo): 复刻官方示例库，新增示例站与 69 个示例`（本地 `main`）。
+- **`git push` 未成功**：本机到 `github.com:443` 连接被重置/超时，重试 3 次仍失败；下一次先
+  `git push`（含下面这条 todo 的后续提交）。
+- 目录：`demo/src/jsMain/kotlin/demo/`（shell/router/主题/语言/ui/examples），
+  e2e 在 `demo/src/jvmTest/kotlin/demo/e2e/DemoPageTest.kt`。
+- 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
+  e2e 会打包站点并用 Playwright 抽样逐页断言画布。
+
+### 本批已落地（69 个示例 / 18 个家族）
+
+bar 13、line 11、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、parallel 1、
+heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、themeRiver 2，外加总览页。
+
+### 下一批（按可做性排序）
+
+1. **无外部依赖、可直接做**：
+   - `tree`：`tree-legend`、`tree-polyline`（都用同一份 flare 表，可抽成一个 helper 复用）。
+   - `sunburst`：`sunburst-simple`、`sunburst-borderRadius`、`sunburst-label-rotate`、
+     `sunburst-monochrome`、`sunburst-visualMap`、`sunburst-book`。
+   - `dataset`：`dataset-simple0/1`、`dataset-default`、`dataset-encode0`、`dataset-link`、
+     `data-transform-sort-bar`、`data-transform-multiple-pie`。
+   - `calendar`：`calendar-simple`、`calendar-heatmap`、`calendar-vertical`、`calendar-horizontal`、
+     `calendar-graph`、`calendar-pie`、`calendar-charts`（`calendar-lunar` 需要农历表，最后再看）。
+   - `matrix`：`matrix-simple`、`matrix-pie`、`matrix-correlation-heatmap`、`matrix-correlation-scatter`、
+     `matrix-covariance`、`matrix-confusion`、`matrix-graph`、`matrix-sparkline`、
+     `matrix-mini-bar-data-collection`。
+   - `custom`：12 个，`renderItem` 返回元素树，逐个对着 `shared.d.ts` 的 `CustomElementOptions` 核。
+   - 已移植家族的长尾：`bar-race`/`bar-race-country`/`bar-drilldown`/`bar-multi-drilldown`/`bar-gradient`/
+     `bar-large`/`bar-breaks-simple`/`bar-breaks-brush`/`bar-label-rotation`/`bar-polar-*`/`polar-*`、
+     `line-easing`/`line-fisheye-lens`/`line-graphic`/`line-pen`/`line-draggable`/`line-race`/`line-polar*`/
+     `area-pieces`/`area-time-axis`/`dynamic-data`/`dynamic-data2`/`bump-chart`/`confidence-band`/
+     `grid-multiple`/`multiple-x-axis`/`line-aqi`（需要 AQI 表，数据在官方示例文件里内联）、
+     `candlestick-sh`（26KB 内联表）/`candlestick-large`/`candlestick-brush`/`intraday-breaks-1|2`、
+     `graph-force2` 之外的 graph 变体、`gauge-clock`/`gauge-speed`/`gauge-stage`/`gauge-temperature`/
+     `gauge-barometer`/`gauge-multi-title`、`radar` 家族已全、`treemap` 只剩需要外部数据的、
+     `pie-labelLine-adjust`/`pie-legend`/`pie-pattern`（图案需要贴图）等。
+   - `doc-example`（61 个）：官方文档里的小例子，多数很短，可整批做；`map-*`/`geo-*` 除外。
+2. **需要先补 wrapper 建模**：
+   - `graphic`：`EChartsOption.graphic` 现在被建模成 `Array<GraphicElement>`，把「graphic **组件**」和
+     「元素」混成了一个类型（上游是 `GraphicComponentOption | GraphicComponentOption[]`，组件才带
+     `elements`）。要做 `graphic-loading` / `graphic-stroke-animation` / `line-graphic` /
+     `doc-example/graphic-bounding`，得先加组件类型并给元素补 `keyframeAnimation`
+     （`ElementKeyframeAnimationOption` 已有，元素侧要用）。
+3. **明确排除，不要重复尝试**（原因记在 `demo/AGENTS.md`）：
+   - 地图 / `geo` / GeoJSON、百度地图（`tags: ["bmap"]`）、`echarts-gl`（`public/examples/ts/gl`）。
+   - 运行时取数：`$.get` / `XMLHttpRequest` / `fetch` + `ROOT_PATH`、`*.json`、`*.bin`。
+   - 官方站点图片素材：`image://` 图标、纹理贴图、大块 `data:image/...base64`。
+   - 真实键鼠序列：拖拽、触摸、`sendInput`（`line-draggable`、`candlestick-touch`、`bar-brush` 之类
+     需要真交互的，若要做得先想清楚怎么用 `dispatchAction` 替代表演）。
+
+### 下次接着做的具体做法
+
+1. 选例：读 `S:\workspace\github\apache\echarts-examples\src\data\chart-list-data.js`（清单里有
+   `id` / `category` / `title` / `titleCN`），按上面的排除条件过一遍。一次性筛选脚本的思路：对
+   `public/examples/ts/<id>.ts|.js` 扫 `$.get` / `XMLHttpRequest` / `fetch(` / `ROOT_PATH` /
+   `registerMap` / `echarts-gl` / `.json` / `noise`，再按文件大小去掉超大内联数据的。
+2. 落地：在 `demo/src/jsMain/kotlin/demo/examples/<Family>.kt` 里用
+   `Category(Groups.X, "examples/X.kt")` + `chart(...)` / `interactive(...)` 写；
+   中文标题抄 `titleCN`（脚本可核对），数据原样搬，`Math.random()` 换成固定序列。
+   新家族要在 `Catalog.kt` 加一行 import 和一行 `listOf(...)`。
+3. 常见坑：
+   - 数据项 `name` 是 `string | number`、`value` 是 `string | number | Date`：用 `OptionId("x")` /
+     `OptionDataValue(1.0)`，共用 helper 在 `examples/Items.kt`。
+   - `axisTick` / `axisLine` 的 `show` 是 `BooleanOrString`，而 `alignWithLabel` 是普通 `Boolean`。
+   - 回调用 `js("(params) => ...")` 适配的情况（gauge 的 detail/axisLabel formatter 上游签名是
+     `(value: number) => string`、`symbolSize` 回调收的是 data item 而不是 params），
+     各处 KDoc 已说明原因，别照抄模板。
+   - 内联示例里别把局部变量叫 `data`：会遮蔽 `unsafeJso` 接收者的同名成员（`scatter-jitter` 踩过）。
+4. 收尾：`./gradlew build` + `:demo:e2eTest` 都要过；e2e 抽样会覆盖新页面，若新增路由很多可以调
+   `DemoPageTest` 里的抽样步长；截图目视核对至少一两个新页面。
+
+### 踩过的坑（跨会话提醒）
+
+- **不要用 PowerShell 的 `Set-Content` 改仓库里的源码文件**：它按 ANSI 落盘，会把 UTF-8 的中文注释/
+  字符串写坏（本轮一次批量小改就把 7 个文件写成了乱码，靠官方清单反推 `titleCN` 才修回来；
+  仓库里 `ContainPixelTest.kt` 那个早已损坏的破折号也是同一个原因）。要批量改文件用 Node/Python
+  读写 UTF-8，或者直接用编辑工具。
+
 ## 待办
 
-
-
+- 类型建模：暂无未完成项（见上面各轮）。
+- 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 tree / sunburst / dataset / calendar / matrix / custom / doc-example 与各家族长尾；`graphic` 需先补 wrapper 的 graphic 组件建模。

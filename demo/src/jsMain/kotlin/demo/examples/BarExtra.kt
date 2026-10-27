@@ -98,6 +98,97 @@ private fun axisBreak(start: Double, end: Double): AxisBreakOption =
         gap = StringOrDouble("1.5%")
     }
 
+/** The four categories of `bar-polar-label-radial` / `bar-polar-label-tangential`. */
+private fun polarLabelCategories(): Array<OptionDataItem?> = strings("a", "b", "c", "d")
+
+/**
+ * The label of the polar bars of `bar-polar-label-radial` / `bar-polar-label-tangential`.
+ *
+ * Upstream comments the position as a teaching point: `"middle"`, or `"start"`, `"insideStart"`,
+ * `"end"`, `"insideEnd"`.
+ */
+private fun polarBarLabel(): LabelOption =
+    unsafeJso {
+        show = true
+        position = LabelPosition("middle")
+        formatter = LabelFormatter("{b}: {c}")
+    }
+
+/** The values of the polar bars of `bar-polar-label-radial` / `bar-polar-label-tangential`. */
+private fun polarLabelValues(): Array<BarDataItem?> = numbers(2.0, 1.2, 2.4, 3.6)
+
+/** One series of `bar-polar-stack` / `bar-polar-stack-radial`, which share the `stack` group `a`. */
+private fun polarStackSeries(name: String, values: Array<BarDataItem?>): BarSeriesOption =
+    barSeries {
+        this.name = name
+        stack = "a"
+        coordinateSystem = "polar"
+        emphasis = unsafeJso<EmphasisOption> { focus = EmphasisFocuses.series }
+        typedData = values
+    }
+
+/** The cities of `bar-polar-real-estate`; they are also the categories of its angle axis. */
+private val realEstateCities =
+    arrayOf(
+        "北京", "上海", "深圳", "广州", "苏州", "杭州", "南京", "福州", "青岛", "济南",
+        "长春", "大连", "温州", "郑州", "武汉", "成都", "东莞", "沈阳", "烟台",
+    )
+
+/** `[lowest, highest, average]` monthly rent per city of `bar-polar-real-estate`. */
+private val realEstateRows =
+    arrayOf(
+        doubleArrayOf(5000.0, 10000.0, 6785.71),
+        doubleArrayOf(4000.0, 10000.0, 6825.0),
+        doubleArrayOf(3000.0, 6500.0, 4463.33),
+        doubleArrayOf(2500.0, 5600.0, 3793.83),
+        doubleArrayOf(2000.0, 4000.0, 3060.0),
+        doubleArrayOf(2000.0, 4000.0, 3222.33),
+        doubleArrayOf(2500.0, 4000.0, 3133.33),
+        doubleArrayOf(1800.0, 4000.0, 3100.0),
+        doubleArrayOf(2000.0, 3500.0, 2750.0),
+        doubleArrayOf(2000.0, 3000.0, 2500.0),
+        doubleArrayOf(1800.0, 3000.0, 2433.33),
+        doubleArrayOf(2000.0, 2700.0, 2375.0),
+        doubleArrayOf(1500.0, 2800.0, 2150.0),
+        doubleArrayOf(1500.0, 2300.0, 2100.0),
+        doubleArrayOf(1600.0, 3500.0, 2057.14),
+        doubleArrayOf(1500.0, 2600.0, 2037.5),
+        doubleArrayOf(1500.0, 2417.54, 1905.85),
+        doubleArrayOf(1500.0, 2000.0, 1775.0),
+        doubleArrayOf(1500.0, 1800.0, 1650.0),
+    )
+
+/** Thickness of the average band of `bar-polar-real-estate`, in data units. */
+private const val REAL_ESTATE_BAR_HEIGHT = 50.0
+
+/**
+ * One polar bar of `bar-polar-real-estate`.
+ *
+ * The chart draws two stacked bands: a transparent base up to the lower value, then the visible
+ * segment, so the two series of a band share one `stack` group. [value] picks the number out of the
+ * `[lowest, highest, average]` row of one city.
+ */
+private fun realEstateSeries(
+    name: String?,
+    value: (DoubleArray) -> Double,
+    transparent: Boolean,
+    stack: String,
+    barGap: String? = null,
+    z: Double? = null,
+): BarSeriesOption =
+    barSeries {
+        this.name = name
+        this.stack = stack
+        coordinateSystem = "polar"
+        this.z = z
+        typedData = numbers(*realEstateRows.map(value).toDoubleArray())
+        if (transparent) {
+            silent = true
+            itemStyle = unsafeJso<ItemStyleOption> { color = ZRColor("transparent") }
+        }
+        if (barGap != null) this.barGap = StringOrDouble(barGap)
+    }
+
 val barExtraEntries: List<CatalogEntry> =
     listOf(
         barExtra.chart("bar-label-rotation", "柱状图标签旋转", "Bar Label Rotation") {
@@ -350,6 +441,284 @@ val barExtraEntries: List<CatalogEntry> =
                             name = "Data D"
                             emphasis = unsafeJso<EmphasisOption> { focus = EmphasisFocuses.series }
                             typedData = numbers(3106212.0, 3102118.0, 3102643.0, 3104631.0, 3106679.0, 3100130.0, 3107022.0)
+                        },
+                    )
+            }
+        },
+        barExtra.chart(
+            "bar-polar-label-radial",
+            "极坐标柱状图标签（角度轴为类别轴）",
+            "Radial Polar Bar Label Position",
+        ) {
+            unsafeJso<EChartsOption> {
+                title = one(unsafeJso<TitleOption> { text = "Radial Polar Bar Label Position (middle)" })
+                polar =
+                    one(
+                        unsafeJso<PolarOption> {
+                            radius = StringOrDoubleOrArray(arrayOf(StringOrDouble(30.0), StringOrDouble("80%")))
+                        },
+                    )
+                radiusAxis = one(unsafeJso<RadiusAxisOption> { max = AxisMinMax(4.0) })
+                angleAxis =
+                    one(
+                        unsafeJso<AngleAxisOption> {
+                            type = AxisTypes.category
+                            data = polarLabelCategories()
+                            startAngle = 75.0
+                        },
+                    )
+                tooltip = one(unsafeJso<TooltipOption> {})
+                series =
+                    one(
+                        barSeries {
+                            coordinateSystem = "polar"
+                            label = polarBarLabel()
+                            typedData = polarLabelValues()
+                        },
+                    )
+                animation = false
+            }
+        },
+        barExtra.chart(
+            "bar-polar-label-tangential",
+            "极坐标柱状图标签（半径轴为类别轴）",
+            "Tangential Polar Bar Label Position",
+        ) {
+            unsafeJso<EChartsOption> {
+                title = one(unsafeJso<TitleOption> { text = "Tangential Polar Bar Label Position (middle)" })
+                polar =
+                    one(
+                        unsafeJso<PolarOption> {
+                            radius = StringOrDoubleOrArray(arrayOf(StringOrDouble(30.0), StringOrDouble("80%")))
+                        },
+                    )
+                angleAxis =
+                    one(
+                        unsafeJso<AngleAxisOption> {
+                            max = AxisMinMax(4.0)
+                            startAngle = 75.0
+                        },
+                    )
+                radiusAxis =
+                    one(
+                        unsafeJso<RadiusAxisOption> {
+                            type = AxisTypes.category
+                            data = polarLabelCategories()
+                        },
+                    )
+                tooltip = one(unsafeJso<TooltipOption> {})
+                series =
+                    one(
+                        barSeries {
+                            coordinateSystem = "polar"
+                            label = polarBarLabel()
+                            typedData = polarLabelValues()
+                        },
+                    )
+            }
+        },
+        barExtra.chart("bar-polar-stack", "极坐标系下的堆叠柱状图", "Stacked Bar Chart on Polar") {
+            unsafeJso<EChartsOption> {
+                angleAxis = one(unsafeJso<AngleAxisOption> {})
+                radiusAxis =
+                    one(
+                        unsafeJso<RadiusAxisOption> {
+                            type = AxisTypes.category
+                            data = strings("Mon", "Tue", "Wed", "Thu")
+                            z = 10.0
+                        },
+                    )
+                polar = one(unsafeJso<PolarOption> {})
+                series =
+                    arrayOf<SeriesOption>(
+                        polarStackSeries("A", numbers(1.0, 2.0, 3.0, 4.0)),
+                        polarStackSeries("B", numbers(2.0, 4.0, 6.0, 8.0)),
+                        polarStackSeries("C", numbers(1.0, 2.0, 3.0, 4.0)),
+                    )
+                legend = one(unsafeJso<LegendOption> { show = true; data = legendNames("A", "B", "C") })
+            }
+        },
+        barExtra.chart(
+            "bar-polar-stack-radial",
+            "极坐标系下的堆叠柱状图（径向）",
+            "Stacked Bar Chart on Polar (Radial)",
+        ) {
+            unsafeJso<EChartsOption> {
+                angleAxis =
+                    one(
+                        unsafeJso<AngleAxisOption> {
+                            type = AxisTypes.category
+                            data = strings("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+                        },
+                    )
+                radiusAxis = one(unsafeJso<RadiusAxisOption> {})
+                polar = one(unsafeJso<PolarOption> {})
+                series =
+                    arrayOf<SeriesOption>(
+                        polarStackSeries("A", numbers(1.0, 2.0, 3.0, 4.0, 3.0, 5.0, 1.0)),
+                        polarStackSeries("B", numbers(2.0, 4.0, 6.0, 1.0, 3.0, 2.0, 1.0)),
+                        polarStackSeries("C", numbers(1.0, 2.0, 3.0, 4.0, 1.0, 2.0, 5.0)),
+                    )
+                legend = one(unsafeJso<LegendOption> { show = true; data = legendNames("A", "B", "C") })
+            }
+        },
+        barExtra.chart("bar-polar-real-estate", "极坐标系下的房租区间图", "Bar Chart on Polar") {
+            unsafeJso<EChartsOption> {
+                title =
+                    one(
+                        unsafeJso<TitleOption> {
+                            text = "How expensive is it to rent an apartment in China?"
+                            subtext = "Data from https://www.numbeo.com"
+                        },
+                    )
+                legend =
+                    one(
+                        unsafeJso<LegendOption> {
+                            show = true
+                            top = StringOrDouble("bottom")
+                            data = legendNames("Range", "Average")
+                        },
+                    )
+                grid = one(unsafeJso<GridOption> { top = StringOrDouble(100.0) })
+                angleAxis =
+                    one(
+                        unsafeJso<AngleAxisOption> {
+                            type = AxisTypes.category
+                            data = strings(*realEstateCities)
+                        },
+                    )
+                tooltip =
+                    one(
+                        unsafeJso<TooltipOption> {
+                            show = true
+                            formatter =
+                                TooltipFormatter { params ->
+                                    val index = params.unsafeCast<CallbackDataParams>().dataIndex
+                                    val row = realEstateRows[index]
+                                    TooltipContent(
+                                        realEstateCities[index] +
+                                            "<br>Lowest：" + textOf(row[0]) +
+                                            "<br>Highest：" + textOf(row[1]) +
+                                            "<br>Average：" + textOf(row[2]),
+                                    )
+                                }
+                        },
+                    )
+                radiusAxis = one(unsafeJso<RadiusAxisOption> {})
+                polar = one(unsafeJso<PolarOption> {})
+                series =
+                    arrayOf<SeriesOption>(
+                        realEstateSeries(null, { it[0] }, transparent = true, stack = "Min Max"),
+                        realEstateSeries("Range", { it[1] - it[0] }, transparent = false, stack = "Min Max"),
+                        realEstateSeries(
+                            null,
+                            { it[2] - REAL_ESTATE_BAR_HEIGHT },
+                            transparent = true,
+                            stack = "Average",
+                            z = 10.0,
+                        ),
+                        realEstateSeries(
+                            "Average",
+                            { REAL_ESTATE_BAR_HEIGHT * 2 },
+                            transparent = false,
+                            stack = "Average",
+                            barGap = "-100%",
+                            z = 10.0,
+                        ),
+                    )
+            }
+        },
+        barExtra.chart("polar-roundCap", "圆角极坐标柱状图", "Rounded Bar on Polar") {
+            unsafeJso<EChartsOption> {
+                angleAxis =
+                    one(
+                        unsafeJso<AngleAxisOption> {
+                            max = AxisMinMax(2.0)
+                            startAngle = 30.0
+                            splitLine = unsafeJso<SplitLineOption> { show = false }
+                        },
+                    )
+                radiusAxis =
+                    one(
+                        unsafeJso<RadiusAxisOption> {
+                            type = AxisTypes.category
+                            data = strings("v", "w", "x", "y", "z")
+                            z = 10.0
+                        },
+                    )
+                polar = one(unsafeJso<PolarOption> {})
+                series =
+                    arrayOf<SeriesOption>(
+                        barSeries {
+                            name = "Without Round Cap"
+                            coordinateSystem = "polar"
+                            typedData = numbers(4.0, 3.0, 2.0, 1.0, 0.0)
+                            itemStyle =
+                                unsafeJso<ItemStyleOption> {
+                                    borderColor = ZRColor("red")
+                                    opacity = 0.8
+                                    borderWidth = 1.0
+                                }
+                        },
+                        barSeries {
+                            name = "With Round Cap"
+                            coordinateSystem = "polar"
+                            roundCap = true
+                            typedData = numbers(4.0, 3.0, 2.0, 1.0, 0.0)
+                            itemStyle =
+                                unsafeJso<ItemStyleOption> {
+                                    borderColor = ZRColor("green")
+                                    opacity = 0.8
+                                    borderWidth = 1.0
+                                }
+                        },
+                    )
+                legend =
+                    one(
+                        unsafeJso<LegendOption> {
+                            show = true
+                            data = legendNames("Without Round Cap", "With Round Cap")
+                        },
+                    )
+            }
+        },
+        barExtra.chart("polar-endAngle", "极坐标系 endAngle", "Polar endAngle") {
+            unsafeJso<EChartsOption> {
+                tooltip = one(unsafeJso<TooltipOption> {})
+                angleAxis =
+                    arrayOf(
+                        unsafeJso<AngleAxisOption> {
+                            type = AxisTypes.category
+                            polarIndex = 0.0
+                            startAngle = 90.0
+                            endAngle = 0.0
+                            data = strings("S1", "S2", "S3")
+                        },
+                        unsafeJso<AngleAxisOption> {
+                            type = AxisTypes.category
+                            polarIndex = 1.0
+                            startAngle = -90.0
+                            endAngle = -180.0
+                            data = strings("T1", "T2", "T3")
+                        },
+                    )
+                radiusAxis =
+                    arrayOf(
+                        unsafeJso<RadiusAxisOption> { polarIndex = 0.0 },
+                        unsafeJso<RadiusAxisOption> { polarIndex = 1.0 },
+                    )
+                polar = arrayOf(unsafeJso<PolarOption> {}, unsafeJso<PolarOption> {})
+                series =
+                    arrayOf<SeriesOption>(
+                        barSeries {
+                            polarIndex = 0.0
+                            coordinateSystem = "polar"
+                            typedData = numbers(1.0, 2.0, 3.0)
+                        },
+                        barSeries {
+                            polarIndex = 1.0
+                            coordinateSystem = "polar"
+                            typedData = numbers(1.0, 2.0, 3.0)
                         },
                     )
             }

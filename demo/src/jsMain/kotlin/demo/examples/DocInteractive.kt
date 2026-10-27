@@ -5,6 +5,7 @@ import demo.Groups
 import demo.ui.loadJson
 import echarts.*
 import echarts.options.*
+import js.objects.Record
 import js.objects.unsafeJso
 import kotlin.js.Date
 import kotlin.js.JsAny
@@ -51,6 +52,9 @@ import zrender.ZRStyleProps
  * - `grid-outerBounds` is driven by a floating control panel upstream. This site has no panel, so the
  *   port runs with the defaults of that panel, and the two tutorial rectangles are repainted from the
  *   container size through the holder's `onResize` instead of the panel's `onChange` callback.
+ * - `mix-timeline-all` keeps the legacy `calculable: true` out: ECharts 6 removed the flag, the data
+ *   zoom it once implied is not part of the page, and the macro-economic table is inlined in
+ *   `MixTimelineData.kt` instead of being fetched, because the site ships no `ROOT_PATH`.
  */
 
 private val docInteractive = Category(Groups.DOC, "examples/DocInteractive.kt")
@@ -639,7 +643,191 @@ val docInteractiveEntries: List<CatalogEntry> =
             repaint()
             holder.onResize(::repaint)
         },
+        docInteractive.chart(
+            "doc-example/mix-timeline-all",
+            "时间轴：全国宏观经济指标",
+            "Timeline of the national macro-economic indicators",
+        ) {
+            unsafeJso {
+                baseOption = mixTimelineBaseOption()
+                options = Array(mixTimelineYears.size) { index -> mixTimelineYearOption(index) }
+            }
+        },
     )
+
+/**
+ * The `baseOption` of `doc-example/mix-timeline-all`.
+ *
+ * It declares the timeline axis, the axes, the legend and the seven series *names*; the data of every
+ * series arrives through one option per year in [mixTimelineYearOption], merged by index.
+ */
+private fun mixTimelineBaseOption(): EChartsOption =
+    unsafeJso {
+        timeline =
+            unsafeJso<TimelineOption> {
+                axisType = "category"
+                autoPlay = true
+                playInterval = 1000.0
+                data = mixTimelinePoints()
+                label =
+                    unsafeJso<TimelineLabelOption> {
+                        // The points are dates, the labels are years.
+                        formatter = LabelFormatter(mixTimelineYearLabel())
+                    }
+            }
+        title = one(unsafeJso<TitleOption> { subtext = "数据来自国家统计局" })
+        tooltip = one(unsafeJso<TooltipOption> {})
+        legend =
+            one(
+                unsafeJso<LegendOption> {
+                    left = StringOrDouble("right")
+                    top = StringOrDouble(10.0)
+                    data = legendNames("第一产业", "第二产业", "第三产业")
+                    selected =
+                        recordOf(
+                            "GDP" to (false.unsafeCast<JsAny>()),
+                            "金融" to (false.unsafeCast<JsAny>()),
+                            "房地产" to (false.unsafeCast<JsAny>()),
+                        ).unsafeCast<Record<String, Boolean>?>()
+                },
+            )
+        grid =
+            one(
+                unsafeJso<GridOption> {
+                    top = StringOrDouble(80.0)
+                    bottom = StringOrDouble(100.0)
+                },
+            )
+        xAxis =
+            one(
+                unsafeJso<XAxisOption> {
+                    type = AxisTypes.category
+                    // 31 provinces do not fit side by side; the labels are printed in two rows.
+                    axisLabel = unsafeJso<AxisLabelOption> { interval = AxisInterval(0.0) }
+                    data = strings(*mixTimelineAxisCategories())
+                    splitLine = unsafeJso<SplitLineOption> { show = false }
+                },
+            )
+        yAxis =
+            one(
+                unsafeJso<YAxisOption> {
+                    type = AxisTypes.value
+                    name = "GDP（亿元）"
+                    max = AxisMinMax(30000.0)
+                },
+            )
+        series =
+            arrayOf<SeriesOption>(
+                mixTimelineBar("GDP"),
+                mixTimelineBar("金融"),
+                mixTimelineBar("房地产"),
+                mixTimelineBar("第一产业"),
+                mixTimelineBar("第二产业"),
+                mixTimelineBar("第三产业"),
+                unsafeJso<PieSeriesOption> {
+                    name = "GDP占比"
+                    center = arrayOf(StringOrDouble("75%"), StringOrDouble("35%"))
+                    radius = StringOrDoubleOrArray("28%")
+                },
+            )
+    }
+
+/**
+ * The [index]th timeline point of [mixTimelineYears] as its own option: the title carries the year
+ * and every series carries only its data, so the declaration in the base option is reused.
+ */
+private fun mixTimelineYearOption(index: Int): EChartsOption =
+    unsafeJso {
+        title = one(unsafeJso<TitleOption> { text = "${mixTimelineYears[index]}全国宏观经济指标" })
+        series =
+            arrayOf<SeriesOption>(
+                mixTimelineBarData(mixTimelineGdp[index]),
+                mixTimelineBarData(mixTimelineFinancial[index]),
+                mixTimelineBarData(mixTimelineEstate[index]),
+                mixTimelineBarData(mixTimelinePrimaryIndustry[index]),
+                mixTimelineBarData(mixTimelineSecondaryIndustry[index]),
+                mixTimelineBarData(mixTimelineTertiaryIndustry[index]),
+                unsafeJso<PieSeriesOption> {
+                    typedData =
+                        arrayOf(
+                            pieItem("第一产业", mixTimelinePrimaryIndustry[index].sum()),
+                            pieItem("第二产业", mixTimelineSecondaryIndustry[index].sum()),
+                            pieItem("第三产业", mixTimelineTertiaryIndustry[index].sum()),
+                        )
+                },
+            )
+    }
+
+/** A bar series of the base option: a name, no data. */
+private fun mixTimelineBar(name: String): SeriesOption = barSeries { this.name = name }
+
+/**
+ * A bar series of one year: the values of [values] as named items, which is what upstream's
+ * `dataFormatter` produces so a tooltip and the labels know the province.
+ */
+private fun mixTimelineBarData(values: DoubleArray): SeriesOption =
+    unsafeJso<BarSeriesOption> {
+        typedData =
+            Array(values.size) { index ->
+                BarDataItem(
+                    unsafeJso<BarDataItemOption> {
+                        name = OptionId(mixTimelineProvinces[index])
+                        value = OptionDataValue(values[index])
+                    },
+                )
+            }
+    }
+
+/** The ten points of the timeline axis; the third and the last are diamonds with their own tooltip. */
+private fun mixTimelinePoints(): Array<OptionDataItem?> =
+    Array(mixTimelineYears.size) { index ->
+        val value = "${mixTimelineYears[index]}-01-01"
+        when (index) {
+            3 -> OptionDataItem(mixTimelineDiamond(value, 16.0, TooltipFormatter("{b} GDP达到一个高度")))
+            mixTimelineYears.lastIndex ->
+                OptionDataItem(
+                    mixTimelineDiamond(
+                        value,
+                        18.0,
+                        TooltipFormatter { params ->
+                            val name = params.unsafeCast<CallbackDataParams>().name
+                            TooltipContent("${name}GDP达到又一个高度")
+                        },
+                    ),
+                )
+            else -> OptionDataItem(OptionDataValue(value))
+        }
+    }
+
+/** One highlighted point of the timeline axis. */
+private fun mixTimelineDiamond(
+    value: String,
+    size: Double,
+    tooltip: TooltipFormatter,
+): TimelineDataItemOption =
+    unsafeJso {
+        this.value = OptionDataValue(value)
+        symbol = SymbolShape("diamond")
+        symbolSize = SymbolSize(size)
+        this.tooltip = BooleanOrTooltipOption(unsafeJso<TooltipOption> { formatter = tooltip })
+    }
+
+/** The categories of the x axis, with a forced line break in front of every second province. */
+private fun mixTimelineAxisCategories(): Array<String> =
+    Array(mixTimelineProvinces.size) { index ->
+        val name = mixTimelineProvinces[index]
+        if (index % 2 == 1) "\n$name" else name
+    }
+
+/**
+ * The timeline label formatter: `(value) => new Date(value).getFullYear()`.
+ *
+ * A value axis hands the label formatter the raw axis value rather than the params object of a
+ * series, and [LabelFormatter] is typed with [CallbackDataParams] for the series case, so the year
+ * is read from the date string in JavaScript the way upstream reads it.
+ */
+private fun mixTimelineYearLabel(): LabelFormatterCallback =
+    js("(value) => String(new Date(value).getFullYear())") as LabelFormatterCallback
 
 /** Shape of `data/obama_budget_proposal_2012.list.json`. */
 private external interface ObamaBudgetJson {

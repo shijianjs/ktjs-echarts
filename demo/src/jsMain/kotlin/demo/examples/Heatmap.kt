@@ -34,33 +34,13 @@ import zrender.ZRColor
 
 private val heatmap = Category(Groups.HEATMAP, "examples/Heatmap.kt")
 
-private val hours =
-    arrayOf(
-        "12a", "1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a",
-        "12p", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p",
-    )
-
-private val days = arrayOf("Saturday", "Friday", "Thursday", "Wednesday", "Tuesday", "Monday", "Sunday")
-
-/** One row of the punch card, in the original `[day, hour, value]` order. */
-private val punchCardValues =
-    listOf(
-        doubleArrayOf(5.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 4.0, 1.0, 1.0, 3.0, 4.0, 6.0, 4.0, 4.0, 3.0, 3.0, 2.0, 5.0),
-        doubleArrayOf(7.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0, 2.0, 2.0, 6.0, 9.0, 11.0, 6.0, 7.0, 8.0, 12.0, 5.0, 5.0, 7.0, 2.0),
-        doubleArrayOf(1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 2.0, 1.0, 9.0, 8.0, 10.0, 6.0, 5.0, 5.0, 5.0, 7.0, 4.0, 2.0, 4.0),
-        doubleArrayOf(7.0, 3.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 5.0, 4.0, 7.0, 14.0, 13.0, 12.0, 9.0, 5.0, 5.0, 10.0, 6.0, 4.0, 4.0, 1.0),
-        doubleArrayOf(1.0, 3.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 2.0, 4.0, 4.0, 2.0, 4.0, 4.0, 14.0, 12.0, 1.0, 8.0, 5.0, 3.0, 7.0, 3.0, 0.0),
-        doubleArrayOf(2.0, 1.0, 0.0, 3.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, 4.0, 1.0, 5.0, 10.0, 5.0, 7.0, 11.0, 6.0, 0.0, 5.0, 3.0, 4.0, 2.0, 0.0),
-        doubleArrayOf(1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 2.0, 1.0, 3.0, 4.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 2.0, 6.0),
-    )
-
 /** The original maps every row to `[hour, day, value || "-"]`. */
 private fun punchCard(): Array<HeatmapDataItem?> =
     dataItems(
         *punchCardValues
             .flatMapIndexed { day, values ->
                 values.mapIndexed { hour, value ->
-                    HeatmapDataItem(row(hour.toDouble(), day.toDouble(), if (value > 0.0) value else "-"))
+                    HeatmapDataItem(row(hour.toDouble(), day.toDouble(), if (value > 0) value else "-"))
                 }
             }.toTypedArray(),
     )
@@ -81,7 +61,7 @@ val heatmapEntries: List<CatalogEntry> =
                     one(
                         unsafeJso<XAxisOption> {
                             type = AxisTypes.category
-                            data = strings(*hours)
+                            data = strings(*punchCardHours)
                             splitArea = unsafeJso<SplitAreaOption> { show = true }
                         },
                     )
@@ -89,7 +69,7 @@ val heatmapEntries: List<CatalogEntry> =
                     one(
                         unsafeJso<YAxisOption> {
                             type = AxisTypes.category
-                            data = strings(*days)
+                            data = strings(*punchCardDays)
                             splitArea = unsafeJso<SplitAreaOption> { show = true }
                         },
                     )

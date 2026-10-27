@@ -88,14 +88,15 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **199 个**（覆盖 25 个家族 + 一个「文档示例」组），其余按批推进。
+筛选后仍有 250+ 个候选，目前已落地 **206 个示例**（覆盖 25 个家族 + 一个「文档示例」组，另有一张总览页），
+其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
 一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。这批页面按依赖分三个文件：
 `examples/DocExamples.kt`（静态页，28 个）、`examples/DocMore.kt`（象形柱图教程、dataZoom 散点、
 文本 / 标签、动画、旭日图 / 矩形树图入门与 `baseOption` + `media` 教程，16 个）与
 `examples/DocInteractive.kt`（首次绘制后还要 `setOption` / `dispatchAction` / 起定时器，或使用 timeline
-组件的 10 个）。
+组件的 11 个）。
 
 ### 尚未移植的家族与原因
 
@@ -113,7 +114,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `bar-drilldown`、`line-easing`、`scatter-clustering`、`custom-gantt-flight`、
 `custom-gauge`（需要 `path://` 面板图）、`custom-calendar-icon`（图标是 `path://` 素材）。
 
-`doc-example/` 里还没有移植的（24 条，其中 `bar-large` / `pie-highlight` 已按家族 id 落地）：
+`doc-example/` 里还没有移植的（上游 79 个文件、已按 `doc-example/` id 落地 55 个、`bar-large` /
+`pie-highlight` 按家族 id 落地，剩 22 条）：
 
 - 象形柱图长尾：`pictorialBar-graphicType`、`pictorialBar-patternSize`、
   `pictorialBar-repeatDirection`、`pictorialBar-repeatLayout`；
@@ -123,7 +125,6 @@ demo/src/jvmTest/kotlin/demo/e2e/
   `map-visualMap-pieces`、`map-visualMap-piecewise-text`、`scatter-visualMap-categories`、
   `scatter-visualMap-piecewise`、`geo-svg-label-basic`、`geo-svg-layout-basic`、
   `geo-svg-named-basic`、`geo-roam-indicator`、`graph-roam-indicator`；
-- timeline 组件：`mix-timeline-all`；
 - 外部图片素材：`axisPointer-handle-image`。
 
 ## 移植过程中修掉的 wrapper 缺口

@@ -230,7 +230,9 @@ class DemoPageTest {
      * the first frame, and `bar-dataZoom-filterMode` / `candlestick-axisPointer` set the option only
      * once their data file has been fetched. Sampling once right after the route switch would miss all
      * of that, so each page is left running long enough for at least one tick of its timer; an
-     * exception in a timer callback is what the console assertion catches.
+     * exception in a timer callback is what the console assertion catches. `mix-timeline-all` is
+     * checked one step further: its timeline autoplays, so a frame sampled after the play interval
+     * must differ from the first one, which is what proves the per-year options reached the chart.
      */
     @Test
     fun `the interactive doc examples paint and run their timers`(page: Page) {
@@ -252,6 +254,7 @@ class DemoPageTest {
                 "doc-example/bar-dataZoom-filterMode",
                 "doc-example/candlestick-axisPointer",
                 "doc-example/grid-outerBounds",
+                "doc-example/mix-timeline-all",
             )
         for (route in routes) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)
@@ -261,6 +264,13 @@ class DemoPageTest {
                 // The loading effect occupies the canvas until the faked request resolves.
                 page.waitForTimeout(3300.0)
                 assertChartRendered(page)
+            }
+            if (route == "doc-example/mix-timeline-all") {
+                // The timeline autoplays one year per second, so a year must reach the canvas.
+                val before = paintedFrame(page)
+                page.waitForTimeout(1600.0)
+                val after = paintedFrame(page)
+                assertTrue(before != after, "the timeline of $route did not switch to the next year")
             }
         }
         assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
@@ -301,6 +311,33 @@ class DemoPageTest {
             throw AssertionError("route $route did not paint any pixel", error)
         }
     }
+
+    /**
+     * Fingerprint of what the chart canvas currently holds.
+     *
+     * Only the pixels that carry content contribute, so a page that repaints with different data
+     * changes the value while an idle page does not.
+     */
+    private fun paintedFrame(page: Page): Double =
+        page.evaluate(
+            """
+            () => {
+                const canvas = document.querySelector('.chart canvas');
+                const context = canvas.getContext('2d');
+                const { width, height } = canvas;
+                const data = context.getImageData(0, 0, width, height).data;
+                let hash = 0;
+                let painted = 0;
+                for (let index = 3; index < data.length; index += 4 * 7) {
+                    if (data[index] !== 0) {
+                        painted++;
+                        hash = (hash * 31 + data[index - 3] + data[index - 2] * 7 + data[index - 1] * 13) % 1000000007;
+                    }
+                }
+                return painted * 1000000007 + hash;
+            }
+            """,
+        ) as Double
 
     /** Opens [route] through the sidebar, the way a visitor reaches it. */
     private fun openFromSidebar(page: Page, group: String, route: String) {

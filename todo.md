@@ -240,7 +240,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（192 个示例 / 25 个家族 + 文档示例组 + 总览页）
+### 已落地（206 个示例 / 25 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -274,6 +274,20 @@
 - 第九批（2 个）：`geo-graph`（瑞士 GeoJSON 上的 graph 系列，节点用经纬度定位）、
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
+
+- 第二十一批（9 个，极坐标长尾）：`examples/BarExtra.kt` 的 `bar-polar-label-radial` /
+  `bar-polar-label-tangential` / `bar-polar-stack` / `bar-polar-stack-radial` /
+  `bar-polar-real-estate`（numbeo 房价区间，透明底柱 + `barGap: '-100%'` 叠出区间）/
+  `polar-roundCap` / `polar-endAngle`，`examples/Scatter.kt` 的 `scatter-polar-punchCard`（极坐标打卡
+  气泡图，与 `custom-polar-heatmap`、`heatmap-punchCard` 共用 `CustomExtra.kt` 里改成 `internal` 的
+  同一份打卡数据），`examples/DocInteractive.kt` 的 `doc-example/mix-timeline-all`（`baseOption` +
+  十年 option 合并，上游 25KB 宏观表用脚本转成 `MixTimelineData.kt`，`calculable: true` 已随 6.x
+  移除不再保留）。同批去掉 `Custom.kt` 里与 `CustomExtra.kt` 同路由的旧版 `custom-profile`（两条目录
+  项指向同一个 id，`catalogById` 只留得下一张），并在 e2e 里断言该页时间轴自动播放后画面会变。
+
+- 第二十批（7 个）：doc-example 的 `bar-dataZoom-filterMode` / `candlestick-axisPointer` /
+  `grid-outerBounds` / `pie-media` / `aria-decal`，家族长尾 `line-markline`（12 个标签位置）与
+  `pie-legend`（可滚动图例）；`ChartHolder` 新增 `onResize`。
 
 - 第十九批（8 个，`examples/DocInteractive.kt`，文档示例的交互页）：
   `barGrid-barGap`（定时切换同轴柱间距）、`tutorial-dynamic-data`（500ms 追加一天的滚动折线）、
@@ -319,11 +333,10 @@
 ### 下一批（按可做性排序）
 
 1. **无外部依赖、可直接做**：
-   - `doc-example` 剩余（24 个）：象形柱图长尾 `pictorialBar-graphicType` /
+   - `doc-example` 剩余（22 个，见 `demo/AGENTS.md`）：象形柱图长尾 `pictorialBar-graphicType` /
      `pictorialBar-patternSize` / `pictorialBar-repeatDirection` / `pictorialBar-repeatLayout`；
-     `title-block`；timeline 组件 `mix-timeline-all` /
-     `bar-media-timeline`；其余是地图 / visualMap 组合、第二个渲染器与异步设 option 的页面
-     （清单见 `demo/AGENTS.md`）。
+     单字段小页 `title-block` / `bar-media-timeline`；其余是地图 / visualMap 组合、第二个渲染器与
+     异步设 option 的页面（清单见 `demo/AGENTS.md`）。
    - `custom` 剩余：     `custom-calendar-icon`（`params.coordSys.cellWidth/cellHeight` 已补，可直接做）、
      `custom-gantt-flight`（长动画）、`custom-gauge`
      （`path://` 面板图，`params.coordSys.cx/cy` 已补）。
@@ -331,9 +344,9 @@
      需要先写一个把上游数组转成 Kotlin 的小脚本）、`matrix-mini-bar-geo`（需要 geo）。
    - 已移植家族的长尾里可直接做的：`line-markarea`、`line-smooth` 之外的 line 变体、
      `gauge-clock`/`gauge-speed`/`gauge-barometer`（`path://` 图标，需先决定是否搬运
-     几 KB 的 path 字符串）、`bar-polar-*`、`polar-*`。
+     几 KB 的 path 字符串）。
    - 已移植家族的长尾：`bar-race`/`bar-race-country`/`bar-drilldown`/`bar-multi-drilldown`/
-     `bar-breaks-brush`/`bar-polar-*`/`polar-*`、
+     `bar-breaks-brush`、
      `line-easing`/`line-fisheye-lens`/`line-graphic`/`line-pen`/`line-draggable`/`line-race`/`line-polar*`/
      `area-pieces`/`area-time-axis`/`dynamic-data`/`dynamic-data2`/`bump-chart`/`confidence-band`/
      `grid-multiple`/`multiple-x-axis`/`candlestick-sh`（26KB 内联表）/`candlestick-large`/

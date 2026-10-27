@@ -1,6 +1,7 @@
 package demo
 
 import demo.examples.barEntries
+import demo.examples.barExtraEntries
 import demo.examples.boxplotEntries
 import demo.examples.calendarEntries
 import demo.examples.candlestickEntries
@@ -14,6 +15,7 @@ import demo.examples.gaugeEntries
 import demo.examples.graphEntries
 import demo.examples.heatmapEntries
 import demo.examples.lineEntries
+import demo.examples.lineExtraEntries
 import demo.examples.matrixEntries
 import demo.examples.matrixExtraEntries
 import demo.examples.overviewEntries
@@ -103,7 +105,9 @@ val catalog: List<CatalogEntry> =
     listOf(
         overviewEntries,
         barEntries,
+        barExtraEntries,
         lineEntries,
+        lineExtraEntries,
         pieEntries,
         scatterEntries,
         candlestickEntries,

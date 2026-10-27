@@ -14,6 +14,7 @@ import demo.examples.funnelEntries
 import demo.examples.gaugeEntries
 import demo.examples.gaugeExtraEntries
 import demo.examples.graphEntries
+import demo.examples.graphExtraEntries
 import demo.examples.heatmapEntries
 import demo.examples.lineEntries
 import demo.examples.linesExtraEntries
@@ -137,6 +138,7 @@ val catalog: List<CatalogEntry> =
         customEntries,
         customExtraEntries,
         graphEntries,
+        graphExtraEntries,
         chordEntries,
         sankeyEntries,
         themeRiverEntries,

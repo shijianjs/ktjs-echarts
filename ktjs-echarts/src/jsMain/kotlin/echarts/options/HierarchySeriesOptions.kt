@@ -2,8 +2,8 @@ package echarts.options
 
 import echarts.TreeLayout
 import echarts.TreeEdgeShape
+import echarts.TreeOrient
 import echarts.SortOrder
-import echarts.Orient
 import echarts.NodeClickBehavior
 import echarts.EmphasisFocus
 import echarts.ColorMappingBy
@@ -70,7 +70,7 @@ external interface TreeSeriesOption :
     var layout: TreeLayout?
 
     /** Orientation of an orthogonal tree. */
-    var orient: Orient?
+    var orient: TreeOrient?
 
     /** Distance to the left side. */
     var left: StringOrDouble?

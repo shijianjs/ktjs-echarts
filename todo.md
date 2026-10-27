@@ -225,38 +225,38 @@
 
 ## 示例站（demo）移植进度
 
-本轮的 demo 工作（官方 ECharts 示例库的 Kotlin/JS 移植）**已完成第一批量、已提交、尚未推送**，
-后续按批继续。项目约定与目录说明见 `demo/AGENTS.md`，这里只记「还差什么」和「下次怎么接着做」。
+本轮的 demo 工作（官方 ECharts 示例库的 Kotlin/JS 移植）按批推进。项目约定与目录说明见
+`demo/AGENTS.md`，这里只记「还差什么」和「下次怎么接着做」。
 
 ### 状态
 
-- 提交：`0a1f9ca feat(demo): 复刻官方示例库，新增示例站与 69 个示例`（本地 `main`）。
-- **`git push` 未成功**：本机到 `github.com:443` 连接被重置/超时，重试 3 次仍失败；下一次先
-  `git push`（含下面这条 todo 的后续提交）。
+- 提交：`0a1f9ca feat(demo): 复刻官方示例库，新增示例站与 69 个示例`（本地 `main`，第一批）；
+  第二批（tree / sunburst / dataset / calendar / matrix / custom，41 个示例）在本轮工作区里，尚未提交。
+- **`git push` 一直未成功**：本机到 `github.com:443` 连接被重置/超时，重试多次仍失败；下一次先
+  `git push`（含第二批）。
 - 目录：`demo/src/jsMain/kotlin/demo/`（shell/router/主题/语言/ui/examples），
   e2e 在 `demo/src/jvmTest/kotlin/demo/e2e/DemoPageTest.kt`。
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
-  e2e 会打包站点并用 Playwright 抽样逐页断言画布。
+  e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 本批已落地（69 个示例 / 18 个家族）
+### 已落地（109 个示例 / 23 个家族 + 总览页）
 
-bar 13、line 11、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、parallel 1、
-heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、themeRiver 2，外加总览页。
+- 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
+  parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
+  themeRiver 2。
+- 第二批（41 个）：tree 7（`TreeData.kt` 的内联 flare 表）、sunburst 7（`SunburstData.kt`）、
+  dataset 7、calendar 7、matrix 7（含 graph / confusion）、custom 6。
 
 ### 下一批（按可做性排序）
 
 1. **无外部依赖、可直接做**：
-   - `tree`：`tree-legend`、`tree-polyline`（都用同一份 flare 表，可抽成一个 helper 复用）。
-   - `sunburst`：`sunburst-simple`、`sunburst-borderRadius`、`sunburst-label-rotate`、
-     `sunburst-monochrome`、`sunburst-visualMap`、`sunburst-book`。
-   - `dataset`：`dataset-simple0/1`、`dataset-default`、`dataset-encode0`、`dataset-link`、
-     `data-transform-sort-bar`、`data-transform-multiple-pie`。
-   - `calendar`：`calendar-simple`、`calendar-heatmap`、`calendar-vertical`、`calendar-horizontal`、
-     `calendar-graph`、`calendar-pie`、`calendar-charts`（`calendar-lunar` 需要农历表，最后再看）。
-   - `matrix`：`matrix-simple`、`matrix-pie`、`matrix-correlation-heatmap`、`matrix-correlation-scatter`、
-     `matrix-covariance`、`matrix-confusion`、`matrix-graph`、`matrix-sparkline`、
-     `matrix-mini-bar-data-collection`。
-   - `custom`：12 个，`renderItem` 返回元素树，逐个对着 `shared.d.ts` 的 `CustomElementOptions` 核。
+   - `doc-example`（61 个）：官方文档里的小例子，多数很短，可整批做；`map-*`/`geo-*` 除外。
+   - `custom` 剩余：`custom-hexbin`、`custom-calendar-icon`、`custom-spiral-race`、
+     `custom-gantt-flight`（后两个是长动画）；`custom-gauge` / `custom-polar-heatmap` 需要极坐标中心
+     `params.coordSys.cx` / `cy`，先补 wrapper 再动。
+   - `matrix` 剩余：`matrix-sparkline`（25 个网格 + `dataZoom` 覆盖全部 x 轴）、
+     `matrix-mini-bar-data-collection`、`matrix-mini-bar-geo`、`matrix-mbti`、`matrix-periodic-table`、
+     `matrix-stock`（`body.data` 单元格 + `graphic` 标题）。
    - 已移植家族的长尾：`bar-race`/`bar-race-country`/`bar-drilldown`/`bar-multi-drilldown`/`bar-gradient`/
      `bar-large`/`bar-breaks-simple`/`bar-breaks-brush`/`bar-label-rotation`/`bar-polar-*`/`polar-*`、
      `line-easing`/`line-fisheye-lens`/`line-graphic`/`line-pen`/`line-draggable`/`line-race`/`line-polar*`/
@@ -266,13 +266,10 @@ heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sanke
      `graph-force2` 之外的 graph 变体、`gauge-clock`/`gauge-speed`/`gauge-stage`/`gauge-temperature`/
      `gauge-barometer`/`gauge-multi-title`、`radar` 家族已全、`treemap` 只剩需要外部数据的、
      `pie-labelLine-adjust`/`pie-legend`/`pie-pattern`（图案需要贴图）等。
-   - `doc-example`（61 个）：官方文档里的小例子，多数很短，可整批做；`map-*`/`geo-*` 除外。
 2. **需要先补 wrapper 建模**：
-   - `graphic`：`EChartsOption.graphic` 现在被建模成 `Array<GraphicElement>`，把「graphic **组件**」和
-     「元素」混成了一个类型（上游是 `GraphicComponentOption | GraphicComponentOption[]`，组件才带
-     `elements`）。要做 `graphic-loading` / `graphic-stroke-animation` / `line-graphic` /
-     `doc-example/graphic-bounding`，得先加组件类型并给元素补 `keyframeAnimation`
-     （`ElementKeyframeAnimationOption` 已有，元素侧要用）。
+   - `calendar-lunar`：366 行农历表（数据而非 API）。
+   - 极坐标的 `renderItem`：`params.coordSys` 的 `cx` / `cy` 还没有 Kotlin 声明（`.d.ts` 只写了
+     `type`），要补才能做 `custom-gauge` / `custom-polar-heatmap`。
 3. **明确排除，不要重复尝试**（原因记在 `demo/AGENTS.md`）：
    - 地图 / `geo` / GeoJSON、百度地图（`tags: ["bmap"]`）、`echarts-gl`（`public/examples/ts/gl`）。
    - 运行时取数：`$.get` / `XMLHttpRequest` / `fetch` + `ROOT_PATH`、`*.json`、`*.bin`。
@@ -293,13 +290,20 @@ heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sanke
 3. 常见坑：
    - 数据项 `name` 是 `string | number`、`value` 是 `string | number | Date`：用 `OptionId("x")` /
      `OptionDataValue(1.0)`，共用 helper 在 `examples/Items.kt`。
+   - 轴 / 系列 `data` 用 `strings(...)` / `numbers(...)` / `points(...)` / `items(...)`：元素类型从目标
+     属性推断，别自己写 `Array(...) { OptionDataValue(...) }`（得到的是 `Array<OptionDataValue>`，赋不
+     进 `Array<OptionDataItem?>`）。
    - `axisTick` / `axisLine` 的 `show` 是 `BooleanOrString`，而 `alignWithLabel` 是普通 `Boolean`。
    - 回调用 `js("(params) => ...")` 适配的情况（gauge 的 detail/axisLabel formatter 上游签名是
      `(value: number) => string`、`symbolSize` 回调收的是 data item 而不是 params），
      各处 KDoc 已说明原因，别照抄模板。
-   - 内联示例里别把局部变量叫 `data`：会遮蔽 `unsafeJso` 接收者的同名成员（`scatter-jitter` 踩过）。
-4. 收尾：`./gradlew build` + `:demo:e2eTest` 都要过；e2e 抽样会覆盖新页面，若新增路由很多可以调
-   `DemoPageTest` 里的抽样步长；截图目视核对至少一两个新页面。
+   - `js(...)` 里不要写箭头函数返回对象字面量（`=> ({...})`）：Kotlin/JS 会重新打印函数体、吃掉括号，
+     要写成 `function (a, b) { return {...} }`（`styledItem` 踩过）。
+   - 内联示例里别把局部变量叫 `data` / `legend`：会遮蔽 `unsafeJso` 接收者的同名成员（`scatter-jitter`、
+     `custom-error-scatter` 踩过）。
+   - 表驱动示例要检查表长与名称表长度是否一致：`themeRiver-lastfm` 的表比专辑名长，越界会让整页不渲染。
+4. 收尾：`./gradlew build` + `:demo:e2eTest` 都要过；e2e 现在逐页检查，新增页面自动覆盖；截图目视
+   核对至少一两个新页面。
 
 ### 踩过的坑（跨会话提醒）
 
@@ -311,4 +315,8 @@ heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sanke
 ## 待办
 
 - 类型建模：暂无未完成项（见上面各轮）。
-- 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 tree / sunburst / dataset / calendar / matrix / custom / doc-example 与各家族长尾；`graphic` 需先补 wrapper 的 graphic 组件建模。
+- 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 `doc-example` 批量、`custom` / `matrix`
+  剩余项与各家族长尾；极坐标 `renderItem` 需要先补 `params.coordSys.cx/cy`。
+- 提交：demo 第二批（tree / sunburst / dataset / calendar / matrix / custom）与对应的 wrapper 补充
+  （matrix 类型、`renderItem` 的 `coord` / `size` / `layout`、graphic 组件、`clipRectByRect` 收紧）都还在
+  工作区里，先 `git push` 之前的提交，再一起提交这一批。

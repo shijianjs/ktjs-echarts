@@ -58,6 +58,12 @@ external interface MediaQueryOption {
 
     /** Maximum container height, in pixels. */
     var maxHeight: Double?
+
+    /** Minimum ratio of the container width to its height. */
+    var minAspectRatio: Double?
+
+    /** Maximum ratio of the container width to its height. */
+    var maxAspectRatio: Double?
 }
 
 /**
@@ -149,8 +155,8 @@ external interface EChartsOption {
     /** Timeline component. */
     var timeline: TimelineOption?
 
-    /** Graphic elements drawn without a coordinate system. */
-    var graphic: Array<GraphicElement>?
+    /** Graphic components or graphic elements drawn without a coordinate system. */
+    var graphic: Array<GraphicComponentLooseOption>?
 
     /** Accessibility settings. */
     var aria: AriaOption?
@@ -1367,6 +1373,23 @@ external interface GraphicElement {
     /** Distance to the bottom side. */
     var bottom: StringOrDouble?
 
+    /**
+     * X coordinate of the element.
+     *
+     * The upstream element option inherits it from the zrender element props (`TextProps.x` and
+     * friends), where it is a number; the graphic component also accepts a percentage string.
+     */
+    var x: StringOrDouble?
+
+    /** Y coordinate of the element; see [x]. */
+    var y: StringOrDouble?
+
+    /** Width of a `"group"` element, in pixels. */
+    var width: Double?
+
+    /** Height of a `"group"` element, in pixels. */
+    var height: Double?
+
     /** Bounding box used to position the element: `"raw"` or `"all"`. */
     var bounding: GraphicBounding?
 
@@ -1423,6 +1446,49 @@ external interface GraphicElement {
     /** Callback invoked when the element is clicked. */
     var onclick: ((event: ZRElementEvent) -> Unit)?
 }
+
+/**
+ * Graphic component: a group of elements that is positioned and animated as a whole.
+ *
+ * Upstream `GraphicComponentOption`. Use [GraphicComponentLooseOption] to put it into
+ * [EChartsOption.graphic].
+ */
+external interface GraphicComponentOption : AnimationOption {
+    /** Component id. */
+    var id: String?
+
+    /** z-index of the component. */
+    var z: Double?
+
+    /** z-level of the component. */
+    var zlevel: Double?
+
+    /** Elements of the group. */
+    var elements: Array<GraphicElement>?
+
+    /**
+     * How the group reacts when the option is merged: `"merge"`, `"replace"` or `"remove"`.
+     *
+     * Upstream property is `$action`.
+     */
+    @JsName("\$action")
+    var action: GraphicAction?
+}
+
+/**
+ * One entry of the `graphic` option: a [GraphicComponentOption] or a bare [GraphicElement].
+ *
+ * Upstream `GraphicComponentLooseOption`.
+ */
+external interface GraphicComponentLooseOption
+
+/** Wraps a graphic component. */
+fun GraphicComponentLooseOption(value: GraphicComponentOption): GraphicComponentLooseOption =
+    value.unsafeCast<GraphicComponentLooseOption>()
+
+/** Wraps a bare element. */
+fun GraphicComponentLooseOption(value: GraphicElement): GraphicComponentLooseOption =
+    value.unsafeCast<GraphicComponentLooseOption>()
 
 /**
  * Accessibility settings.
@@ -1738,25 +1804,35 @@ external interface MatrixOption {
 /**
  * One dimension of a matrix.
  */
-external interface MatrixDimensionOption {
+external interface MatrixDimensionOption : MatrixCellStyleOption {
     /** Dimension type; only `"category"` is supported. */
     var type: MatrixDimensionType?
 
     /** Whether the dimension is shown. */
     var show: Boolean?
 
-    /** Cells of the dimension. */
-    var data: Array<MatrixDimensionCellOption>?
+    /** Cells of the dimension; a plain string is a leaf cell. */
+    var data: Array<MatrixDimensionCellLooseOption>?
 
-    /** Length of the dimension, in pixels or as a percentage. */
-    var length: StringOrDouble?
+    /** Length of the dimension, in pixels. */
+    var length: Double?
 
-    /** Sizes of the nested levels. */
-    var levels: Array<MatrixDimensionLevelOption>?
+    /** Size of the outermost level of the dimension; same as `levels[0].levelSize`. */
+    var levelSize: StringOrDouble?
+
+    /** Sizes of the nested levels, or `null` for a level with the default size. */
+    var levels: Array<MatrixDimensionLevelOption?>?
 
     /** Style of the divider lines. */
     var dividerLineStyle: LineStyleOption?
+}
 
+/**
+ * Style shared by the cells of a matrix: dimensions, the body and the corner.
+ *
+ * Upstream `MatrixCellStyleOption`.
+ */
+external interface MatrixCellStyleOption {
     /** Label style of the cells. */
     var label: LabelOption?
 
@@ -1768,24 +1844,39 @@ external interface MatrixDimensionOption {
 
     /** Whether the cells ignore mouse events. */
     var silent: Boolean?
+
+    /** z-order of the cells. */
+    var z2: Double?
 }
 
 /**
  * One cell of a matrix dimension.
  */
-external interface MatrixDimensionCellOption {
+external interface MatrixDimensionCellOption : MatrixCellStyleOption {
     /** Value of the cell. */
-    var value: OptionDataValue?
+    var value: String?
 
-    /** Nested child values. */
-    var children: Array<OptionDataValue>?
+    /** Size of the cell. */
+    var size: StringOrDouble?
 
-    /** Label style of the cell. */
-    var label: LabelOption?
-
-    /** Item style of the cell. */
-    var itemStyle: ItemStyleOption?
+    /** Nested child cells of a non-leaf cell. */
+    var children: Array<MatrixDimensionCellOption>?
 }
+
+/**
+ * A cell of a matrix dimension: either a cell object or the plain value of a leaf cell.
+ *
+ * Upstream `MatrixDimensionCellLooseOption`.
+ */
+external interface MatrixDimensionCellLooseOption
+
+/** Wraps a cell object. */
+fun MatrixDimensionCellLooseOption(value: MatrixDimensionCellOption): MatrixDimensionCellLooseOption =
+    value.unsafeCast<MatrixDimensionCellLooseOption>()
+
+/** Wraps the value of a leaf cell. */
+fun MatrixDimensionCellLooseOption(value: String): MatrixDimensionCellLooseOption =
+    value.unsafeCast<MatrixDimensionCellLooseOption>()
 
 /**
  * Size of one nested level of a matrix dimension.
@@ -1798,21 +1889,9 @@ external interface MatrixDimensionLevelOption {
 /**
  * Cells of the matrix body or corner.
  */
-external interface MatrixBodyCornerOption {
+external interface MatrixBodyCornerOption : MatrixCellStyleOption {
     /** Cells with a specific coordinate. */
     var data: Array<MatrixBodyCornerCellOption>?
-
-    /** Label style of the cells. */
-    var label: LabelOption?
-
-    /** Item style of the cells. */
-    var itemStyle: ItemStyleOption?
-
-    /** Cursor shown on hover. */
-    var cursor: String?
-
-    /** Whether the cells ignore mouse events. */
-    var silent: Boolean?
 }
 
 /** Body cells of a matrix. */
@@ -1824,19 +1903,39 @@ typealias MatrixCornerOption = MatrixBodyCornerOption
 /**
  * One cell of the matrix body or corner.
  */
-external interface MatrixBodyCornerCellOption {
-    /** Coordinates of the cell, `[x, y]`. */
-    var coord: Array<OptionDataValue>?
+external interface MatrixBodyCornerCellOption : MatrixCellStyleOption {
+    /** Value of the cell. */
+    var value: String?
+
+    /**
+     * Coordinates of the cell, one entry per dimension.
+     *
+     * Upstream `MatrixCoordRangeOption[]`: `["A", 2]` locates one cell, `[["A", "C"], 2]` a range
+     * of columns, and `null` means the dimension is not relevant.
+     */
+    var coord: Array<MatrixCoordRangeOption?>?
+
+    /** Whether the coordinates are clamped to the matrix bounds. */
+    var coordClamp: Boolean?
 
     /** Whether the cell is merged with its neighbours. */
     var mergeCells: Boolean?
-
-    /** Label style of the cell. */
-    var label: LabelOption?
-
-    /** Item style of the cell. */
-    var itemStyle: ItemStyleOption?
 }
+
+/**
+ * One coordinate of a matrix cell: a value, a `[min, max]` range, or `null` for "not relevant".
+ *
+ * Upstream `MatrixCoordRangeOption`.
+ */
+external interface MatrixCoordRangeOption
+
+/** Wraps a single coordinate value. */
+fun MatrixCoordRangeOption(value: OptionDataValue): MatrixCoordRangeOption =
+    value.unsafeCast<MatrixCoordRangeOption>()
+
+/** Wraps a coordinate range. */
+fun MatrixCoordRangeOption(values: Array<OptionDataValue?>): MatrixCoordRangeOption =
+    values.unsafeCast<MatrixCoordRangeOption>()
 
 /**
  * Parallel coordinate system.

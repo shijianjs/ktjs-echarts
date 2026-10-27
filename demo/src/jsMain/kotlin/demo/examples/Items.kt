@@ -4,6 +4,7 @@ import echarts.options.FunnelDataItem
 import echarts.options.FunnelDataItemOption
 import echarts.options.GaugeDataItem
 import echarts.options.GaugeDataItemOption
+import echarts.options.OptionDataItem
 import echarts.options.OptionDataValue
 import echarts.options.OptionId
 import echarts.options.PieDataItem
@@ -112,6 +113,49 @@ internal fun radarItem(name: String, vararg values: Double): RadarSeriesDataItem
             typedValue = Array(values.size) { index -> OptionDataValue(values[index]) }
         },
     )
+
+/**
+ * `item[index]` of a tuple data item, as a number.
+ *
+ * A data item is a `string | number | Date | array | object` union in the wrapper, so a tuple such
+ * as the `[date, value]` points of the calendar examples has no typed accessor; the element is read
+ * in JavaScript and converted here.
+ */
+internal fun numberAt(item: JsAny?, index: Int): Double =
+    js("(item, index) => Number(item[index])")(item, index) as Double
+
+/** `String(item[index])` of a tuple data item; see [numberAt]. */
+internal fun textAt(item: JsAny?, index: Int): String =
+    js("(item, index) => String(item[index])")(item, index) as String
+
+/** `String(value)` of a single value that is typed as a union in Kotlin. */
+internal fun textOf(value: JsAny?): String = js("(value) => String(value)")(value) as String
+
+/** `Number(value)` of a single value that is typed as a union in Kotlin. */
+internal fun numeric(value: JsAny?): Double = js("(value) => Number(value)")(value) as Double
+
+/** `Number(value).toFixed(digits)`, the formatting the official examples use for labels. */
+internal fun fixed(value: JsAny?, digits: Int): String =
+    js("(value, digits) => Number(value).toFixed(digits)")(value, digits) as String
+
+/**
+ * Reads a `number | number[]` result as an array.
+ *
+ * `renderItem`'s `api.size` returns `number | number[]`; the examples always ask for one number per
+ * dimension, so the result is indexed here.
+ */
+internal fun numberArray(value: Any?): Array<Double> = js("(value) => value")(value) as Array<Double>
+
+/**
+ * A custom series data item that carries its own color.
+ *
+ * Upstream types the data of a custom series as `unknown[]` because `renderItem` consumes it, so
+ * the wrapper keeps the generic data item shape; the item styles of the official examples are
+ * therefore built here.
+ */
+internal fun styledItem(values: Array<OptionDataValue?>, color: String): OptionDataItem =
+    js("function (values, color) { return { value: values, itemStyle: { color: color } } }")(values, color)
+        as OptionDataItem
 
 /**
  * Renders a data value for a label or tooltip formatter.

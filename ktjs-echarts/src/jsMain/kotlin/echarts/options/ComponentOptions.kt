@@ -565,6 +565,15 @@ external interface GridOption {
     /** Whether the grid is shown. */
     var show: Boolean?
 
+    /** Coordinate system the grid is laid out on, e.g. `"matrix"` or `"calendar"`. */
+    var coordinateSystem: String?
+
+    /**
+     * Cells of that coordinate system the grid is laid out on; see
+     * [CoordinateSystemDataCoord][echarts.options.CoordinateSystemDataCoord].
+     */
+    var coord: CoordinateSystemDataCoord?
+
     /** z-index of the component. */
     var z: Double?
 

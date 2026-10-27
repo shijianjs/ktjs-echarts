@@ -2,13 +2,17 @@ package demo
 
 import demo.examples.barEntries
 import demo.examples.boxplotEntries
+import demo.examples.calendarEntries
 import demo.examples.candlestickEntries
 import demo.examples.chordEntries
+import demo.examples.customEntries
+import demo.examples.datasetEntries
 import demo.examples.funnelEntries
 import demo.examples.gaugeEntries
 import demo.examples.graphEntries
 import demo.examples.heatmapEntries
 import demo.examples.lineEntries
+import demo.examples.matrixEntries
 import demo.examples.overviewEntries
 import demo.examples.parallelEntries
 import demo.examples.pictorialBarEntries
@@ -16,7 +20,9 @@ import demo.examples.pieEntries
 import demo.examples.radarEntries
 import demo.examples.sankeyEntries
 import demo.examples.scatterEntries
+import demo.examples.sunburstEntries
 import demo.examples.themeRiverEntries
+import demo.examples.treeEntries
 import demo.examples.treemapEntries
 import demo.ui.PageMeta
 import demo.ui.PageView
@@ -53,6 +59,12 @@ object Groups {
     val GAUGE = Group("gauge", "仪表盘", "Gauge")
     val FUNNEL = Group("funnel", "漏斗图", "Funnel")
     val RADAR = Group("radar", "雷达图", "Radar")
+    val TREE = Group("tree", "树图", "Tree")
+    val DATASET = Group("dataset", "数据集", "Dataset")
+    val SUNBURST = Group("sunburst", "旭日图", "Sunburst")
+    val CALENDAR = Group("calendar", "日历图", "Calendar")
+    val MATRIX = Group("matrix", "矩阵坐标系", "Matrix")
+    val CUSTOM = Group("custom", "自定义系列", "Custom series")
     val TREEMAP = Group("treemap", "矩形树图", "Treemap")
     val GRAPH = Group("graph", "关系图", "Graph")
     val CHORD = Group("chord", "和弦图", "Chord")
@@ -96,7 +108,13 @@ val catalog: List<CatalogEntry> =
         gaugeEntries,
         funnelEntries,
         radarEntries,
+        treeEntries,
         treemapEntries,
+        sunburstEntries,
+        datasetEntries,
+        calendarEntries,
+        matrixEntries,
+        customEntries,
         graphEntries,
         chordEntries,
         sankeyEntries,

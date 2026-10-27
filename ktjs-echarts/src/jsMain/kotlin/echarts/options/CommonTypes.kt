@@ -1051,6 +1051,36 @@ external interface CoordinateSystemDataLayout {
 }
 
 /**
+ * A data coordinate handed to a coordinate system: one value, one value per dimension, or one
+ * value-or-range per dimension.
+ *
+ * Upstream `CoordinateSystemDataCoord`. Used by `renderItem`'s `api.coord` / `api.layout` and by
+ * the `coord` field of components placed on another coordinate system (a grid on a matrix, ...).
+ *
+ * ```kotlin
+ * api.coord(CoordinateSystemDataCoord(arrayOf(OptionDataValue(1.0), OptionDataValue(2.0))))
+ * ```
+ */
+external interface CoordinateSystemDataCoord
+
+/** Wraps a single value. */
+fun CoordinateSystemDataCoord(value: OptionDataValue): CoordinateSystemDataCoord =
+    value.unsafeCast<CoordinateSystemDataCoord>()
+
+/** Wraps one value per dimension. */
+fun CoordinateSystemDataCoord(values: Array<OptionDataValue?>): CoordinateSystemDataCoord =
+    values.unsafeCast<CoordinateSystemDataCoord>()
+
+/**
+ * Wraps one value or one `[min, max]` range per dimension.
+ *
+ * Upstream is `(value | value[])[]`; the nested array form cannot share the name of the flat form
+ * in Kotlin/JS, so it is expressed as a separate factory.
+ */
+fun CoordinateSystemDataCoordRanges(values: Array<Array<OptionDataValue?>>): CoordinateSystemDataCoord =
+    values.unsafeCast<CoordinateSystemDataCoord>()
+
+/**
  * A visual value returned by `getVisual`: text, a number, a number array, a pattern or a gradient.
  */
 external interface VisualValue

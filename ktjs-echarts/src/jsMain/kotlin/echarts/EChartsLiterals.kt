@@ -42,6 +42,37 @@ object AxisTypes {
 }
 
 /**
+ * Orientation of the orthogonal layout of a tree series.
+ */
+sealed external interface TreeOrient
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [TreeOrients]. */
+inline fun TreeOrient(value: String): TreeOrient = value.unsafeCast<TreeOrient>()
+
+/**
+ * The documented values of [TreeOrient].
+ */
+object TreeOrients {
+    /** Left to right. */
+    inline val leftToRight: TreeOrient get() = TreeOrient("LR")
+
+    /** Top to bottom. */
+    inline val topToBottom: TreeOrient get() = TreeOrient("TB")
+
+    /** Right to left. */
+    inline val rightToLeft: TreeOrient get() = TreeOrient("RL")
+
+    /** Bottom to top. */
+    inline val bottomToTop: TreeOrient get() = TreeOrient("BT")
+
+    /** Horizontal; equivalent to [leftToRight]. */
+    inline val horizontal: TreeOrient get() = TreeOrient("horizontal")
+
+    /** Vertical; equivalent to [topToBottom]. */
+    inline val vertical: TreeOrient get() = TreeOrient("vertical")
+}
+
+/**
  * Orientation of a layout that can run along either axis.
  */
 sealed external interface Orient

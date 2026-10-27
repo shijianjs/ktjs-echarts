@@ -118,13 +118,22 @@ private val lastFmRaw =
         doubleArrayOf(1.0, 1.0, 7.0, 6.0, 1.0, 1.0, 15.0, 1.0, 1.0, 2.0, 1.0, 3.0, 1.0, 1.0, 9.0, 1.0, 1.0, 25.0, 1.0, 72.0),
     )
 
-/** Flattens the last.fm table into the `[step, value, album]` tuples the series expects. */
+/**
+ * Flattens the last.fm table into the `[step, value, album]` tuples the series expects.
+ *
+ * The upstream table has more rows than album names; the original reads them as a band without a
+ * name (`labels[i]` is `undefined`), so the rows without a name are dropped here.
+ */
 private fun lastFmData(): Array<ThemeRiverDataItem?> =
     dataItems(
         *lastFmRaw
-            .flatMapIndexed { album, values ->
-                values.mapIndexed { step, value -> river(step.toString(), value, lastFmAlbums[album]) }
-            }.toTypedArray(),
+            .mapIndexedNotNull { album, values ->
+                lastFmAlbums.getOrNull(album)?.let { name ->
+                    values.mapIndexed { step, value -> river(step.toString(), value, name) }
+                }
+            }
+            .flatten()
+            .toTypedArray(),
     )
 
 val themeRiverEntries: List<CatalogEntry> =

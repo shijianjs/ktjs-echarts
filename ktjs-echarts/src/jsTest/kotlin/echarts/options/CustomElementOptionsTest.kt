@@ -234,4 +234,54 @@ class CustomElementOptionsTest {
             destroyChart(chart, container)
         }
     }
+
+    @Test
+    fun renderItemCanConvertCoordinates() {
+        val (chart, container) = createChart()
+        var point: Array<Double>? = null
+        var size: DoubleOrDoubleArray? = null
+        var coordWidth: Double? = null
+        try {
+            chart.setOption(
+                unsafeJso<EChartsOption> {
+                    xAxis = one(unsafeJso<XAxisOption> { type = echarts.AxisTypes.value })
+                    yAxis = one(unsafeJso<YAxisOption> { type = echarts.AxisTypes.value })
+                    series =
+                        one(
+                            customSeries {
+                                typedData = points(doubleArrayOf(0.0, 1.0))
+                                renderItem = { params, api ->
+                                    val data = CoordinateSystemDataCoord(
+                                        arrayOf(OptionDataValue(0.0), OptionDataValue(1.0)),
+                                    )
+                                    point = api.coord(data)
+                                    size =
+                                        api.size(
+                                            OptionDataValueOrArray(
+                                                arrayOf(OptionDataValue(1.0), OptionDataValue(0.0)),
+                                            ),
+                                        )
+                                    coordWidth = params.coordSys.width
+                                    unsafeJso<CustomPathOption> {
+                                        type = "circle"
+                                        shape =
+                                            unsafeJso<ZRShapeProps> {
+                                                cx = point!![0]
+                                                cy = point!![1]
+                                                r = 2.0
+                                            }
+                                    }
+                                }
+                            },
+                        )
+                },
+            )
+        } finally {
+            destroyChart(chart, container)
+        }
+
+        assertEquals(2, point!!.size)
+        assertEquals(2, size!!.unsafeCast<Array<Double>>().size)
+        assertTrue(coordWidth!! > 0.0)
+    }
 }

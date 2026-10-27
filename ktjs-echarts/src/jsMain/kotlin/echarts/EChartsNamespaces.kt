@@ -3,6 +3,7 @@ package echarts
 import echarts.options.StringOrDouble
 import kotlin.js.Date
 import kotlin.js.JsAny
+import zrender.RectLike
 
 /**
  * The `echarts.format` namespace: string and number formatting helpers.
@@ -237,10 +238,10 @@ external interface GraphicNamespace {
     fun getTransform(targetEl: JsAny, ancestorEl: JsAny): JsAny
 
     /** Clips a list of points to a rectangle. */
-    fun clipPointsByRect(points: Array<DoubleArray>, rect: JsAny): Array<DoubleArray>
+    fun clipPointsByRect(points: Array<DoubleArray>, rect: RectLike): Array<DoubleArray>
 
-    /** Clips a rectangle to another rectangle. */
-    fun clipRectByRect(targetRect: JsAny, rect: JsAny): JsAny
+    /** Clips a rectangle to another rectangle; `null` when the two do not intersect. */
+    fun clipRectByRect(targetRect: RectLike, rect: RectLike): RectLike?
 
     /** Registers a custom shape class. */
     fun registerShape(shapeType: String, shapeClass: JsAny)

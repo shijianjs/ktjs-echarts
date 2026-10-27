@@ -111,11 +111,12 @@ class DemoPageTest {
     }
 
     /**
-     * Walks a sample of the catalog (every sixth example) and asserts that each route renders a
-     * sized canvas, which catches a page that throws while building its option.
+     * Walks the whole catalog and asserts that each route renders a sized canvas, which catches a
+     * page that throws while building its option. Every route is visited: a sample missed a page
+     * whose option builder indexed past the end of a table.
      */
     @Test
-    fun `a sample of the catalog renders without errors`(page: Page) {
+    fun `every example of the catalog renders without errors`(page: Page) {
         val consoleErrors = mutableListOf<String>()
         page.onConsoleMessage { message ->
             if (message.type() == "error") consoleErrors += message.text()
@@ -125,12 +126,46 @@ class DemoPageTest {
         val routes =
             (page.locator(".example-card").evaluateAll("(nodes) => nodes.map((node) => node.dataset.route)") as List<*>)
                 .filterIsInstance<String>()
-                .filterIndexed { index, _ -> index % 6 == 0 }
-        assertTrue(routes.size >= 8, "the sample covers the catalog, got ${routes.size} routes")
+        assertTrue(routes.size >= 100, "the catalog should ship every example, got ${routes.size} routes")
 
         routes.forEach { route -> assertChartRendered(page, route) }
         assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
     }
+
+    /**
+     * Asserts that the newest coordinate systems really paint: a canvas that exists but stays
+     * transparent would pass [assertChartRendered] on its own.
+     */
+    @RetryingTest(maxAttempts = 2)
+    fun `the matrix and custom series pages draw content`(page: Page) {
+        openPage(page, "#/matrix-simple")
+        assertChartRendered(page)
+        assertTrue(hasDrawnPixels(page), "matrix-simple should paint the matrix cells")
+
+        page.evaluate("() => { location.hash = '#/custom-bar-trend' }")
+        assertChartRendered(page)
+        assertTrue(hasDrawnPixels(page), "custom-bar-trend should paint the bars and the trend line")
+    }
+
+    /** Samples the alpha channel of the chart canvas; `false` when nothing was painted. */
+    private fun hasDrawnPixels(page: Page): Boolean =
+        page.locator(".chart canvas").first().evaluate(
+            """
+            (canvas) => {
+                const context = canvas.getContext('2d');
+                if (!context) {
+                    return false;
+                }
+                const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
+                for (let index = 3; index < data.length; index += 4 * 97) {
+                    if (data[index] !== 0) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+            """,
+        ) as Boolean
 
     /** Opens [route] through the sidebar, the way a visitor reaches it. */
     private fun openFromSidebar(page: Page, group: String, route: String) {
@@ -153,10 +188,14 @@ class DemoPageTest {
         if (route != null) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)
         }
-        page.waitForFunction("() => document.querySelector('.chart canvas') !== null")
+        try {
+            page.waitForFunction("() => document.querySelector('.chart canvas') !== null")
+        } catch (error: com.microsoft.playwright.TimeoutError) {
+            throw AssertionError("route $route did not mount a chart canvas", error)
+        }
         val canvas = page.locator(".chart canvas").first()
         val box = canvas.boundingBox()
-        assertTrue(box != null && box.width > 0 && box.height > 0, "chart canvas box: $box")
+        assertTrue(box != null && box.width > 0 && box.height > 0, "chart canvas box of $route: $box")
     }
 
     private fun openPage(page: Page, hash: String = "") {

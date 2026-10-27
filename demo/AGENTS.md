@@ -54,23 +54,23 @@ demo/src/jvmTest/kotlin/demo/e2e/
 - 依赖官方站点图片素材的（`image://` 图标、纹理贴图、`data:image/...` 大块 base64），
 - 依赖真实键鼠序列的（拖拽、触摸、`sendInput`）。
 
-筛选后仍有 250+ 个候选，本次先落地 **69 个**（覆盖 18 个家族），其余按批推进。
+筛选后仍有 250+ 个候选，目前已落地 **109 个**（覆盖 23 个家族），其余按批推进。
 
-### 本次未移植的家族与原因
+### 未移植的家族与原因
 
 | 家族 | 情况 |
 | --- | --- |
 | `lines`（路径图） | 现存示例全部依赖 `flights.json` 或 `.bin` 分片 |
-| `map` / `geo` | 需要 GeoJSON，本轮按约定排除 |
-| `tree` / `sunburst` | 主要是 `flare` 大表与外部数据；下一批补 |
-| `custom` | `renderItem` 返回元素树，逐个需要手工核对手册 |
-| `dataset` / `transform` | 多数依赖 `dataset` + `transform` 组合，下一批补 |
-| `matrix` / `calendar` | 需要 6.x 矩阵组件与日历的新写法，下一批补 |
-| `graphic` | 需要 wrapper 先补「graphic 组件 + keyframeAnimation」建模 |
+| `map` / `geo` | 需要 GeoJSON，按约定排除 |
+| `bmap` / `echarts-gl` | 需要百度地图或 WebGL 渲染器，wrapper 没有覆盖 |
+| `graphic` | `EChartsOption.graphic` 已能表达组件与元素，但官方 `graphic` 家族的多数示例还配合
+  真实交互或外部素材，未成批移植 |
 | `visualMap` / `dataZoom` 单列家族 | 官方清单里这几条恰好都属上面被排除的类别；能力已由其它示例覆盖 |
 
-同样的原因，个别被移植家族内的长尾示例（大数据量、动画竞速、下钻、极坐标变体）也留待下一批，
-例如 `bar-race`、`bar-drilldown`、`line-easing`、`scatter-clustering`、`candlestick-sh`。
+同样的原因，个别被移植家族内的长尾示例（大数据量、动画竞速、下钻、极坐标变体、真实指针交互）也留待
+下一批，例如 `bar-race`、`bar-drilldown`、`line-easing`、`scatter-clustering`、`candlestick-sh`、
+`custom-gauge`、`custom-polar-heatmap`（需要极坐标中心 `params.coordSys.cx/cy`）、`matrix-sparkline`
+（25 个网格落在矩阵上，需要 `dataZoom` 覆盖全部 x 轴）。
 
 ## 移植过程中修掉的 wrapper 缺口
 
@@ -87,6 +87,18 @@ demo/src/jvmTest/kotlin/demo/e2e/
 - `DataZoomOption`：补 `BoxLayoutOptionMixin`（上游只有 slider 变体带盒子布局，wrapper 合成了一个）。
 - `EmphasisFocuses`：补 `adjacency` / `ancestor` / `descendant`（sankey、chord、graph、tree 专用取值）。
 - `OptionEncode`：上游是开放索引签名，补上文档列出的坐标维度 `x` / `y` / `value` / `radius` / `angle`。
+- `TreeSeriesOption.orient`：上游是 `TreeOrient`（`LR` / `TB` / `RL` / `BT` / `horizontal` / `vertical`
+  或 `number`），之前错用了通用的 `Orient`；新增 `TreeOrient` / `TreeOrients`。
+- `MatrixOption` 系列：`MatrixDimensionOption.data` 改成上游的 `MatrixDimensionCellLooseOption[]`（单元格
+  对象或纯字符串），补 `MatrixCellStyleOption`（`label` / `itemStyle` / `cursor` / `silent` / `z2`）、
+  `MatrixDimensionOption.levelSize`、`MatrixBodyCornerCellOption.coord`（`MatrixCoordRangeOption[]`）、
+  `coordClamp`、递归的 `children`。
+- `GridOption`：补 `ComponentOption` 继承来的 `coordinateSystem` / `coord`（矩阵布局的网格需要）。
+- `EChartsOption.graphic`：从 `Array<GraphicElement>` 改成上游的 `GraphicComponentLooseOption[]`
+  （`GraphicComponentOption` 带 `elements`，或裸元素），元素补 `x` / `y` / `width` / `height`。
+- `CustomSeriesRenderItemAPI`：补 `coord` / `size` / `layout`（新增 `CoordinateSystemDataCoord` 联合），
+  `params.coordSys` 补矩形布局的 `x` / `y` / `width` / `height`；`CustomSeriesOption` 补 `itemPayload`。
+- `GraphicNamespace.clipRectByRect` / `clipPointsByRect`：参数与返回值从 `JsAny` 收紧到 `RectLike`。
 
 ## 兜底说明：图表与主题
 
@@ -100,5 +112,6 @@ ECharts 实例在**页面可见时才创建**（`ChartHolder.mount()`），换�
 ```
 
 它打包 `jsBrowserDistribution`，用 Playwright 驱动 Chromium：走侧边栏、切换语言与主题、过滤索引，
-并对目录抽样（每 6 个取 1 个）逐个断言画布有实际尺寸且控制台无报错。`jvmTest` 本身被禁用，
-以免 `build` / `check` 依赖浏览器。
+并**逐页**打开目录里的每个示例，断言画布有实际尺寸且控制台无报错。早先按 1/6 抽样，结果漏掉了
+`themeRiver-lastfm`（表比专辑名长，构造 option 时越界）这类只在个别页出现的问题。`jvmTest` 本身被
+禁用，以免 `build` / `check` 依赖浏览器。

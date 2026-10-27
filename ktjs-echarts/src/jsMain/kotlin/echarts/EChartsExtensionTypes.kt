@@ -2,11 +2,15 @@ package echarts
 
 import echarts.options.BarGridLayoutOptionForCustomSeries
 import echarts.options.BarGridLayoutResultForCustomSeries
+import echarts.options.CoordinateSystemDataCoord
+import echarts.options.CoordinateSystemDataLayout
 import echarts.options.CustomRootElementOption
 import echarts.options.CustomSeriesFontOption
 import echarts.options.DimensionDefinitionLoose
 import echarts.options.DimensionLoose
+import echarts.options.DoubleOrDoubleArray
 import echarts.options.OptionDataValue
+import echarts.options.OptionDataValueOrArray
 import echarts.options.StringOrDouble
 import js.objects.Record
 import kotlin.js.JsAny
@@ -267,10 +271,26 @@ external interface CustomSeriesRenderItemParams {
 
 /**
  * Coordinate system description passed to a custom series `renderItem` callback.
+ *
+ * The upstream type only declares [type]; the members of the coordinate systems that are laid out
+ * as a rectangle (`cartesian2d`, `matrix`, `calendar`, ...) are documented in the handbook and are
+ * available at run time, so they are modeled here as optional members.
  */
 external interface CustomSeriesRenderItemCoordSys {
     /** Type of the coordinate system. */
     val type: String
+
+    /** X coordinate of the layout rectangle of a cartesian coordinate system. */
+    val x: Double?
+
+    /** Y coordinate of the layout rectangle of a cartesian coordinate system. */
+    val y: Double?
+
+    /** Width of the layout rectangle of a cartesian coordinate system. */
+    val width: Double?
+
+    /** Height of the layout rectangle of a cartesian coordinate system. */
+    val height: Double?
 }
 
 /**
@@ -288,6 +308,15 @@ external interface CustomSeriesRenderItemAPI {
 
     /** Returns the device pixel ratio. */
     fun getDevicePixelRatio(): Double
+
+    /** Converts a data coordinate to a pixel coordinate. */
+    fun coord(data: CoordinateSystemDataCoord, opt: JsAny? = definedExternally): Array<Double>
+
+    /** Returns the size of a data extent in pixels, e.g. the size of one category band. */
+    fun size(dataSize: OptionDataValueOrArray, dataItem: OptionDataValueOrArray? = definedExternally): DoubleOrDoubleArray
+
+    /** Returns the layout of a data coordinate. */
+    fun layout(data: CoordinateSystemDataCoord, opt: JsAny? = definedExternally): CoordinateSystemDataLayout
 
     /** Returns the value of [dim]. */
     fun value(dim: DimensionLoose, dataIndexInside: Double? = definedExternally): OptionDataValue?

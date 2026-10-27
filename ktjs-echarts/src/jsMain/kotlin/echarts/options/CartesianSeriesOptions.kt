@@ -8,6 +8,8 @@ import echarts.CartesianPolarCoordinateSystem
 import echarts.CartesianCoordinateSystem
 import echarts.HeatmapCoordinateSystem
 import echarts.AnimationEasing
+import js.objects.Record
+import kotlin.js.JsAny
 import kotlin.js.JsName
 import zrender.ZRColor
 import zrender.ZRFontWeight
@@ -668,6 +670,9 @@ external interface CustomSeriesOption :
 
     /** Whether to clip the elements to the coordinate system. */
     var clip: Boolean?
+
+    /** Payload attached to the series; readable from `renderItem` through `params.itemPayload`. */
+    var itemPayload: Record<String, JsAny>?
 
     /**
      * Typed view of [SeriesOption.data] with the item type of a custom series.

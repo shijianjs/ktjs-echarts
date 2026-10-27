@@ -26,6 +26,7 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `MacOdrum-LV5-floorplan-web.svg` | `geo/` | `geo-svg-lines` |
 | `flight-seats.svg` | `geo/` | `geo-seatmap-flight` |
 | `Veins_Medical_Diagram_clip_art.svg` | `geo/` | `geo-organ` |
+| `ksia-ext-plan-min.svg` | `geo/` | `geo-svg-traffic` |
 | `Beef_cuts_France.svg` | `geo/` | `geo-beef-cuts` |
 | `obama_budget_proposal_2012.json` | `data/` | `treemap-obama` |
 | `wind-barb-hobart.json` | `data/` | (not ported yet, `custom-wind`) |

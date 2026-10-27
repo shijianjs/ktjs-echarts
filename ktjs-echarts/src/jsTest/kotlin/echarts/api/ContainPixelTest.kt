@@ -292,7 +292,7 @@ class ContainPixelTest {
  * Builds a graph node with fixed coordinates.
  *
  * `GraphNodeItemOption` keeps its own `value` instead of extending `OptionDataItemObject`, so the
- * `data` slot needs an explicit cast �?the same thing upstream does with its `GraphNodeItemOption`
+ * `data` slot needs an explicit cast - the same thing upstream does with its `GraphNodeItemOption`
  * union.
  */
 private fun node(x: Double, y: Double): GraphDataItem? =

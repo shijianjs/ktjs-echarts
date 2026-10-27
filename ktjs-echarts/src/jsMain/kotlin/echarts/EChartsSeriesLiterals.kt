@@ -698,3 +698,25 @@ object VisualProps {
     /** The decal pattern of the item. */
     inline val decal: VisualProp get() = VisualProp("decal")
 }
+
+/**
+ * Update animation of a pie series: `"transition" | "expansion"`.
+ *
+ * Upstream `PieSeriesOption["animationTypeUpdate"]`; the appear animation uses the wider
+ * [AnimationType] instead.
+ */
+sealed external interface PieAnimationTypeUpdate
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [PieAnimationTypeUpdates]. */
+inline fun PieAnimationTypeUpdate(value: String): PieAnimationTypeUpdate = value.unsafeCast<PieAnimationTypeUpdate>()
+
+/**
+ * The documented values of [PieAnimationTypeUpdate].
+ */
+object PieAnimationTypeUpdates {
+    /** The sectors transition to their new geometry. */
+    inline val transition: PieAnimationTypeUpdate get() = PieAnimationTypeUpdate("transition")
+
+    /** The sectors expand or shrink in place. */
+    inline val expansion: PieAnimationTypeUpdate get() = PieAnimationTypeUpdate("expansion")
+}

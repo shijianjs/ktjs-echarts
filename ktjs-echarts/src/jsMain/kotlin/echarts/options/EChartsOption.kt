@@ -286,7 +286,7 @@ external interface DatasetOption {
  *
  * Set [type] to `"slider"` or `"inside"`.
  */
-external interface DataZoomOption {
+external interface DataZoomOption : BoxLayoutOptionMixin {
     /** Component id. */
     var id: String?
 

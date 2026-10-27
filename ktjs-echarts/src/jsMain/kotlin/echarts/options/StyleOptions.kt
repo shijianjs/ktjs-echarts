@@ -7,6 +7,7 @@ import echarts.EmphasisFocus
 import echarts.LabelLineOverflow
 import echarts.MoveOverlap
 import js.objects.Record
+import kotlin.js.JsName
 import kotlin.js.unsafeCast
 import web.canvas.CanvasLineCap
 import web.canvas.CanvasLineJoin
@@ -571,7 +572,32 @@ external interface BlurOption {
 }
 
 /**
- * Select state of a series or element.
+ * Line style whose `color` may also be a palette.
+ *
+ * Upstream types the split lines of an axis as `LineStyleOption<ZRColor | ZRColor[]>`, i.e. the same
+ * line style with a wider colour parameter. Kotlin cannot re-instantiate the parameter, so the
+ * wider colour lives on [typedColor], which maps to the same JavaScript `color` property as the
+ * inherited one.
+ */
+external interface SplitLineStyleOption : LineStyleOption {
+    /** Colour of the line, or a palette cycled between the lines. */
+    @JsName("color")
+    var typedColor: ZRColorOrArray?
+}
+
+/**
+ * Area style whose `color` is a palette: upstream `AreaStyleOption<ZRColor[]>`.
+ *
+ * See [SplitLineStyleOption] for why the wider colour is a separate property.
+ */
+external interface SplitAreaStyleOption : AreaStyleOption {
+    /** Colours of the areas, cycled by the area index. */
+    @JsName("color")
+    var typedColor: Array<ZRColor>?
+}
+
+/**
+ * Label line style of a series, e.g. of a pie or a funnel.
  */
 external interface SelectOption {
     /** Whether selection is disabled. */

@@ -2,6 +2,8 @@ package echarts.options
 
 import echarts.SeriesLayoutBy
 import echarts.RoseType
+import echarts.AnimationType
+import echarts.PieAnimationTypeUpdate
 import echarts.PictorialBarSymbolRepeatDirection
 import echarts.PictorialBarSymbolPosition
 import echarts.FunnelSort
@@ -30,7 +32,8 @@ external interface PieSeriesOption :
     SeriesOnGeoOptionMixin,
     SeriesOnCartesianOptionMixin,
     ComponentOnCalendarOptionMixin,
-    ComponentOnMatrixOptionMixin
+    ComponentOnMatrixOptionMixin,
+    BoxLayoutOptionMixin
 {
     /** Coordinate system, always `"none"` for pie charts. */
     override var coordinateSystem: String?
@@ -77,6 +80,12 @@ external interface PieSeriesOption :
     /** Padding angle between sectors, in degrees. */
     var padAngle: Double?
 
+    /** Animation of the first appear: the sectors expand in place, or the chart scales. */
+    var animationType: AnimationType?
+
+    /** Animation of an update: the sectors transition, or expand in place. */
+    var animationTypeUpdate: PieAnimationTypeUpdate?
+
     /** Whether to show an empty circle when there is no data. */
     var showEmptyCircle: Boolean?
 
@@ -105,7 +114,12 @@ external interface PieSeriesOption :
 /**
  * Funnel series.
  */
-external interface FunnelSeriesOption : SeriesOption, ComponentOnCalendarOptionMixin, ComponentOnMatrixOptionMixin {
+external interface FunnelSeriesOption :
+    SeriesOption,
+    ComponentOnCalendarOptionMixin,
+    ComponentOnMatrixOptionMixin,
+    BoxLayoutOptionMixin
+{
     /** Minimum value of the funnel. */
     var min: Double?
 
@@ -559,7 +573,7 @@ fun themeRiverDataItem(date: OptionDataValue, value: OptionDataValue, name: Opti
 /**
  * Theme river series.
  */
-external interface ThemeRiverSeriesOption : SeriesOption, SeriesOnSingleOptionMixin {
+external interface ThemeRiverSeriesOption : SeriesOption, SeriesOnSingleOptionMixin, BoxLayoutOptionMixin {
     /** Color palette of the river bands. */
     var color: Array<ZRColor>?
 

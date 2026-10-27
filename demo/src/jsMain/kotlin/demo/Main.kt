@@ -1,167 +1,22 @@
 package demo
 
-import echarts.AxisTypes
-import echarts.ECElementEvent
-import echarts.ECharts
-import echarts.EChartsEvents
-import echarts.TooltipTriggers
-import echarts.options.BooleanOrDouble
-import echarts.options.EChartsOption
-import echarts.options.GridOption
-import echarts.options.LegendOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.TitleOption
-import echarts.options.TooltipOption
-import echarts.options.XAxisOption
-import echarts.options.YAxisOption
-import echarts.options.barSeries
-import echarts.options.lineSeries
-import echarts.options.numbers
-import echarts.options.one
-import echarts.options.strings
-import js.objects.unsafeJso
-import web.cssom.ClassName
-import web.dom.ElementId
 import web.dom.document
-import web.events.EventHandler
-import web.html.ButtonType
-import web.html.HTMLButtonElement
-import web.html.HTMLElement
-import web.html.HtmlTagName
-import web.html.button
-import web.window.window
-
-private const val PROJECT_NAME = "ktjs-echarts"
 
 /**
- * Entry point of the demo page.
+ * Entry point of the example gallery.
  *
- * The page builds its DOM once with `document.createElement` and then only mutates the nodes it
- * owns: the chart option is updated through `setOption` with the data that changed, and the status
- * line is written with `textContent`. Nothing is re-rendered from a template string.
+ * The site is a single-page application: the shell is built once and the router swaps the page
+ * inside it on every fragment change. Nothing is assembled from markup strings — every node is
+ * created with `document.createElement` and configured through typed properties.
  */
 fun main() {
-    val months = mutableListOf("Jan", "Feb", "Mar", "Apr", "May", "Jun")
-    val revenue = mutableListOf(42.0, 58.0, 51.0, 74.0, 68.0, 91.0)
-    val orders = mutableListOf(28.0, 33.0, 30.0, 45.0, 41.0, 52.0)
+    // Pages resolve their copy when they are built, and charts pick their theme at mount time, so
+    // both have to be settled before the first page is created.
+    LanguageState.init()
+    Theme.applyStored()
 
-    val page = document.createElement(HtmlTagName.div)
-    page.className = ClassName("page")
+    val shell = AppShell()
+    document.body.appendChild(shell.root)
 
-    val heading = document.createElement(HtmlTagName.h1)
-    heading.textContent = "$PROJECT_NAME demo"
-
-    val lead = document.createElement(HtmlTagName.p)
-    lead.className = ClassName("lead")
-    lead.textContent =
-        "A chart built entirely with the typed Kotlin/JS wrapper: options, series factories and " +
-            "events are regular Kotlin declarations."
-
-    val toolbar = document.createElement(HtmlTagName.div)
-    toolbar.className = ClassName("toolbar")
-
-    val randomizeButton = createButton("randomize", "Randomize data")
-    val appendButton = createButton("append", "Add month")
-    val status = document.createElement(HtmlTagName.span)
-    status.className = ClassName("status")
-    status.id = ElementId("status")
-    status.ariaLive = "polite"
-    status.textContent = "Click a chart item to inspect it."
-
-    toolbar.append(randomizeButton, appendButton, status)
-
-    val chartElement = document.createElement(HtmlTagName.div)
-    chartElement.className = ClassName("chart")
-    chartElement.id = ElementId("chart")
-    chartElement.role = "img"
-    chartElement.ariaLabel = "Revenue and orders per month"
-
-    page.append(heading, lead, toolbar, chartElement)
-    document.body.append(page)
-
-    val chart = ECharts.init(chartElement, null, null)
-    chart.setOption(buildOption(months, revenue, orders))
-
-    chart.on(EChartsEvents.Click) { event: ECElementEvent ->
-        setStatus(status, "Clicked ${event.seriesName}: ${event.name} = ${event.value}")
-    }
-
-    // A chart cannot observe its container, so the page forwards resize events to it.
-    window.onresize = EventHandler { chart.resize() }
-
-    randomizeButton.onclick = EventHandler {
-        val seed = (months.size * 17 + revenue.size * 31).toDouble()
-        for (index in revenue.indices) {
-            revenue[index] = 40.0 + (seed + index * 13.0) % 60.0
-            orders[index] = 20.0 + (seed + index * 7.0) % 40.0
-        }
-        chart.setOption(unsafeJso<EChartsOption> { series = seriesOptions(revenue, orders) })
-        setStatus(status, "Randomized ${revenue.size} months of data.")
-    }
-
-    appendButton.onclick = EventHandler {
-        months += "M${months.size + 1}"
-        revenue += 45.0 + (months.size * 11.0) % 55.0
-        orders += 24.0 + (months.size * 5.0) % 35.0
-        chart.setOption(
-            unsafeJso<EChartsOption> {
-                xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = strings(*months.toTypedArray()) })
-                series = seriesOptions(revenue, orders)
-            },
-        )
-        setStatus(status, "Now showing ${months.size} months.")
-    }
+    Router(shell::show).start()
 }
-
-private fun createButton(id: String, label: String): HTMLButtonElement {
-    val button = document.createElement(HtmlTagName.button)
-    button.className = ClassName("action")
-    button.id = ElementId(id)
-    button.type = ButtonType.button
-    button.textContent = label
-    return button
-}
-
-private fun setStatus(element: HTMLElement, text: String) {
-    element.textContent = text
-}
-
-private fun buildOption(
-    months: List<String>,
-    revenue: List<Double>,
-    orders: List<Double>,
-): EChartsOption = unsafeJso {
-    title = one(unsafeJso<TitleOption> {
-        text = "Monthly revenue"
-        subtext = "Revenue and orders, in thousands"
-    })
-    tooltip = one(unsafeJso<TooltipOption> { trigger = TooltipTriggers.axis })
-    legend = one(unsafeJso<LegendOption> { top = StringOrDouble(6.0) })
-    grid = one(unsafeJso<GridOption> {
-        top = StringOrDouble(96.0)
-        left = StringOrDouble(48.0)
-        right = StringOrDouble(24.0)
-        bottom = StringOrDouble(36.0)
-        containLabel = true
-    })
-    xAxis = one(unsafeJso<XAxisOption> {
-        type = AxisTypes.category
-        data = strings(*months.toTypedArray())
-    })
-    yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
-    series = seriesOptions(revenue, orders)
-}
-
-private fun seriesOptions(revenue: List<Double>, orders: List<Double>): Array<SeriesOption> = arrayOf(
-    lineSeries {
-        name = "Revenue"
-        smooth = BooleanOrDouble(true)
-        typedData = numbers(*revenue.toDoubleArray())
-    },
-    barSeries {
-        name = "Orders"
-        typedData = numbers(*orders.toDoubleArray())
-    },
-)
-

@@ -307,6 +307,7 @@ external interface ChordEdgeItemOption : ChordEdgeStateOption, OptionDataItemObj
 external interface ChordSeriesOption :
     SeriesOption,
     SymbolOptionMixin,
+    BoxLayoutOptionMixin,
     SeriesOnCartesianOptionMixin,
     SeriesOnPolarOptionMixin,
     ComponentOnCalendarOptionMixin,
@@ -342,8 +343,8 @@ external interface ChordSeriesOption :
     /** Center of the chord diagram. */
     var center: Array<StringOrDouble>?
 
-    /** Radius of the chord diagram. */
-    var radius: StringOrDouble?
+    /** Radius of the chord diagram, or `[inner, outer]`. */
+    var radius: StringOrDoubleOrArray?
 
     /** Start angle in degrees. */
     var startAngle: Double?
@@ -473,7 +474,12 @@ external interface SankeyLevelOption : SankeyNodeStateOption, SankeyEdgeStateOpt
 /**
  * Sankey diagram.
  */
-external interface SankeySeriesOption : SeriesOption, ComponentOnCalendarOptionMixin, ComponentOnMatrixOptionMixin {
+external interface SankeySeriesOption :
+    SeriesOption,
+    BoxLayoutOptionMixin,
+    ComponentOnCalendarOptionMixin,
+    ComponentOnMatrixOptionMixin
+{
     /** Coordinate system, always `"view"`. */
     override var coordinateSystem: String?
 

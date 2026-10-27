@@ -55,7 +55,9 @@ tasks.register<Test>("e2eTest") {
     classpath = files(jvmE2eCompilation.output.allOutputs, jvmE2eCompilation.runtimeDependencyFiles)
     systemProperty("demo.dist", layout.buildDirectory.dir("dist/js/productionExecutable").get().asFile.absolutePath)
     systemProperty("e2e.output", layout.buildDirectory.dir("e2e-results").get().asFile.absolutePath)
-    systemProperty("junit.jupiter.execution.timeout.default", "30 s")
+    // The suite walks the gallery, switches language and theme and mounts charts, so a test needs
+    // more than the default budget.
+    systemProperty("junit.jupiter.execution.timeout.default", "90 s")
 
     outputs.upToDateWhen { false }
 }

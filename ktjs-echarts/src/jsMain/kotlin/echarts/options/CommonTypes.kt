@@ -286,6 +286,27 @@ external interface OptionEncode {
 
     /** Dimension used as the item child group id. */
     var childGroupdId: OptionEncodeValue?
+
+    /**
+     * Dimension used as the x coordinate, or as the category of a category axis.
+     *
+     * Upstream declares this together with the other coordinate dimensions through the index
+     * signature `[coordDim: string]`; the documented ones live here because Kotlin has no index
+     * signature on an external interface.
+     */
+    var x: OptionEncodeValue?
+
+    /** Dimension used as the y coordinate. */
+    var y: OptionEncodeValue?
+
+    /** Dimension used as the value of the item, e.g. by pie and map series. */
+    var value: OptionEncodeValue?
+
+    /** Dimension used as the radius, e.g. by polar series. */
+    var radius: OptionEncodeValue?
+
+    /** Dimension used as the angle, e.g. by polar series. */
+    var angle: OptionEncodeValue?
 }
 
 /**
@@ -1138,6 +1159,20 @@ fun ColorArrayOrNone(values: Array<ZRColor>): ColorArrayOrNone = values.unsafeCa
 
 /** Wraps `"none"`. */
 fun ColorArrayOrNone(value: String): ColorArrayOrNone = value.unsafeCast<ColorArrayOrNone>()
+
+/**
+ * `ZRColor | ZRColor[]`: a single colour, or a palette cycled by the element index.
+ *
+ * Used where upstream widens a style type's colour parameter, for example
+ * `SplitLineOption.lineStyle: LineStyleOption<ZRColor | ZRColor[]>`.
+ */
+external interface ZRColorOrArray
+
+/** Wraps a single colour. */
+fun ZRColorOrArray(value: ZRColor): ZRColorOrArray = value.unsafeCast<ZRColorOrArray>()
+
+/** Wraps a palette of colours. */
+fun ZRColorOrArray(values: Array<ZRColor>): ZRColorOrArray = values.unsafeCast<ZRColorOrArray>()
 
 /**
  * `DecalObject[] | "none"`, used by the decal of a treemap level or node.

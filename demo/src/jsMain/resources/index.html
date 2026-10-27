@@ -1,14 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Demo page for ktjs-echarts, Kotlin/JS wrappers for echarts.">
-    <title>ktjs-echarts demo</title>
+    <meta name="description" content="ktjs-echarts example gallery: the official ECharts examples ported to Kotlin/JS. ECharts 官方示例的 Kotlin/JS 移植。">
+    <title>ktjs-echarts · Example gallery</title>
+    <!-- Inline icon: the page must not request a favicon the bundle site does not ship. -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f6fed'/%3E%3Cpath d='M8 22V15M14 22V9M20 22V18M26 22V12' stroke='white' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="demo.css">
     <script src="demo.js" defer></script>
+    <script>
+        // The gallery follows the browser language until the user picks one; mirror that on <html> as
+        // early as possible so assistive technology sees the right language before the bundle runs.
+        (() => {
+            try {
+                const stored = localStorage.getItem('ktjs-echarts-language');
+                const preferred = (navigator.languages && navigator.languages[0]) || navigator.language || '';
+                const code = stored || (preferred.toLowerCase().startsWith('zh') ? 'zh' : 'en');
+                document.documentElement.lang = code === 'zh' ? 'zh-CN' : 'en';
+            } catch (ignored) {
+                // Private mode with storage disabled: LanguageState detects the browser language.
+            }
+        })();
+        // Applied before first paint so a stored dark preference does not flash the light theme.
+        (() => {
+            try {
+                if (localStorage.getItem('ktjs-echarts-theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (ignored) {
+                // Private mode with storage disabled: stay with the light default.
+            }
+        })();
+    </script>
 </head>
 <body>
-<noscript>This demo is written in Kotlin/JS and needs JavaScript enabled.</noscript>
+<noscript>This gallery is built with Kotlin/JS and needs JavaScript. 这个示例站由 Kotlin/JS 构建，需要启用 JavaScript。</noscript>
 </body>
 </html>

@@ -211,6 +211,19 @@ object EmphasisFocuses {
     /** The whole series of the hovered element is emphasized. */
     inline val series: EmphasisFocus get() = EmphasisFocus("series")
 
+    /**
+     * The hovered element and its neighbours are emphasized.
+     *
+     * Only the series that declare it (`sankey`, `chord`, `graph`) accept this value.
+     */
+    inline val adjacency: EmphasisFocus get() = EmphasisFocus("adjacency")
+
+    /** The ancestors of the hovered node are emphasized; only hierarchical series accept it. */
+    inline val ancestor: EmphasisFocus get() = EmphasisFocus("ancestor")
+
+    /** The descendants of the hovered node are emphasized; only hierarchical series accept it. */
+    inline val descendant: EmphasisFocus get() = EmphasisFocus("descendant")
+
 }
 
 /**

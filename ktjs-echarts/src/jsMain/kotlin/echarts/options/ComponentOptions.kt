@@ -1098,7 +1098,7 @@ external interface SplitLineOption {
     var interval: AxisInterval?
 
     /** Style of the split lines. */
-    var lineStyle: LineStyleOption?
+    var lineStyle: SplitLineStyleOption?
 
     /** Whether the split line at the minimum value is shown. */
     var showMinLine: Boolean?
@@ -1118,5 +1118,5 @@ external interface SplitAreaOption {
     var interval: AxisInterval?
 
     /** Style of the split areas. */
-    var areaStyle: AreaStyleOption?
+    var areaStyle: SplitAreaStyleOption?
 }

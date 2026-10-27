@@ -14,8 +14,7 @@ import zrender.ZRFontWeights
  * The port shows the initial value of each gauge and drops the timer: the demo builds a page once,
  * and a timer would keep running after the chart is disposed. The option itself is identical.
  *
- * Dropped on purpose: `gauge-clock` and `gauge-speed` draw their pointers from `path://` icons of a
- * few kilobytes, `gauge-barometer` uses an icon as well.
+ * The dials that draw their needles from `path://` icons live in `GaugeLongTail.kt`.
  */
 
 private val gaugeExtra = Category(Groups.GAUGE, "examples/GaugeExtra.kt")

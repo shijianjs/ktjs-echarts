@@ -217,6 +217,7 @@ class SymbolAndKeywordOptionsTest {
     @Test
     fun gaugeDataItemCarriesThePerItemConfiguration() {
         val series = gaugeSeries {
+            clockwise = false
             title = unsafeJso<GaugeTitleOption> {
                 offsetCenter = arrayOf(StringOrDouble(0.0), StringOrDouble("-30%"))
             }
@@ -234,6 +235,7 @@ class SymbolAndKeywordOptionsTest {
         }
 
         assertEquals(2, series.title!!.offsetCenter?.size)
+        assertFalse(series.clockwise!!)
         assertEquals("40%", series.detail!!.offsetCenter!![1].unsafeCast<String>())
         val item = series.data!![0].unsafeCast<GaugeDataItemOption>()
         assertEquals("cpu", item.name!!.unsafeCast<String>())

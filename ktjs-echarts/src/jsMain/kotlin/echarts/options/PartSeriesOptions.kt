@@ -172,6 +172,9 @@ external interface GaugeSeriesOption : SeriesOption, ComponentOnCalendarOptionMi
     /** End angle in degrees. */
     var endAngle: Double?
 
+    /** Whether the values increase clockwise from [startAngle]; upstream `clockwise`. */
+    var clockwise: Boolean?
+
     /** Minimum value. */
     var min: Double?
 

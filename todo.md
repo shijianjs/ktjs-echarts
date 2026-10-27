@@ -233,14 +233,13 @@
 - 提交：`0a1f9ca`（第一批 69 个）、`6edff97`（第二批 tree / sunburst / dataset / calendar / matrix /
   custom，41 个）；`588381b`（第三批：文档示例 17 个 + `matrix-mini-bar-data-collection` + 主题按钮修复）、`4fd0dda`（三张显示修复）、
   已推送到 `origin/main`。
-- **`git push` 一直未成功**：本机到 `github.com:443` 连接被重置/超时，重试多次仍失败；下一次先
-  `git push`（含后面两批）。
+- 提交：每批一个 `feat(demo): …` 提交并推送到 `origin/main`；最近的是 `eded407`（第二十一批）。
 - 目录：`demo/src/jsMain/kotlin/demo/`（shell/router/主题/语言/ui/examples），
   e2e 在 `demo/src/jvmTest/kotlin/demo/e2e/DemoPageTest.kt`。
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（206 个示例 / 25 个家族 + 文档示例组 + 总览页）
+### 已落地（214 个示例 / 25 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -274,6 +273,18 @@
 - 第九批（2 个）：`geo-graph`（瑞士 GeoJSON 上的 graph 系列，节点用经纬度定位）、
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
+
+- 第二十二批（8 个，gauge 长尾 + line 变体 + 异步 option，gauge 家族至此 12/12 全）：新建
+  `examples/GaugeLongTail.kt` 的 `gauge-speed` / `gauge-clock` / `gauge-barometer` /
+  `gauge-multi-title` / `gauge-car`（面板图的 `path://` 字符串按上游原样内联，`Math.random()` 换成
+  `Lcg`，指针与数值刷新走 `ChartHolder` 的定时器；上游写在 `option.animationDurationUpdate` 上的 300ms
+  其实到不了 `setOption`，KDoc 记了这条差异），`LineExtra.kt` 的 `line-sections`（visualMap 分段配色 +
+  markArea 早晚高峰）与 `line-marker`（markPoint / markLine 的统计与定位写法），`DocInteractive.kt` 的
+  `doc-example/tutorial-async`（先画空 option，1 秒后按 `name` 合并 x 轴数据与系列数据）。同批给
+  `GaugeSeriesOption` 补上游的 `clockwise`（`gauge-car` 档位盘逆序刻度），在
+  `SymbolAndKeywordOptionsTest` 里断言回读；e2e 新增「仪表盘画出指针且定时器改变画面」用例，
+  doc-example 定时器用例补 `tutorial-async` 的像素增长断言，取样 helper 改成经 `Number` 读回
+  （Playwright 按最窄的装箱返回 JS 整数，直接 `as Double` 会 CCE）。
 
 - 第二十一批（9 个，极坐标长尾）：`examples/BarExtra.kt` 的 `bar-polar-label-radial` /
   `bar-polar-label-tangential` / `bar-polar-stack` / `bar-polar-stack-radial` /
@@ -333,27 +344,25 @@
 ### 下一批（按可做性排序）
 
 1. **无外部依赖、可直接做**：
-   - `doc-example` 剩余（22 个，见 `demo/AGENTS.md`）：象形柱图长尾 `pictorialBar-graphicType` /
-     `pictorialBar-patternSize` / `pictorialBar-repeatDirection` / `pictorialBar-repeatLayout`；
-     单字段小页 `title-block` / `bar-media-timeline`；其余是地图 / visualMap 组合、第二个渲染器与
-     异步设 option 的页面（清单见 `demo/AGENTS.md`）。
-   - `custom` 剩余：     `custom-calendar-icon`（`params.coordSys.cellWidth/cellHeight` 已补，可直接做）、
-     `custom-gantt-flight`（长动画）、`custom-gauge`
-     （`path://` 面板图，`params.coordSys.cx/cy` 已补）。
+   - `doc-example` 剩余 22 条（逐个核对过上游文件，排除原因见 `demo/AGENTS.md`）里只有 3 条可做：
+     `matrix-graph-box`（`graph` 用 matrix 坐标系的 `coordinateSystemUsage: 'box'`，50 行）、
+     `scatter-visualMap-categories`（内联 dataset + 两个 `visualMap`，232 行）、
+     `canvas-vs-svg`（含 `-en`，要有渲染器开关才说得通）。
+   - `custom` 剩余：`custom-calendar-icon`（`params.coordSys.cellWidth/cellHeight` 已补）、
+     `custom-gantt-flight`（长动画）、`custom-gauge`（`path://` 面板图的先例是
+     `examples/GaugeLongTail.kt`，原样内联即可）。
    - `matrix` 剩余：`matrix-mbti`、`matrix-periodic-table`、`matrix-stock`（数据表 8-17KB，
      需要先写一个把上游数组转成 Kotlin 的小脚本）、`matrix-mini-bar-geo`（需要 geo）。
-   - 已移植家族的长尾里可直接做的：`line-markarea`、`line-smooth` 之外的 line 变体、
-     `gauge-clock`/`gauge-speed`/`gauge-barometer`（`path://` 图标，需先决定是否搬运
-     几 KB 的 path 字符串）。
-   - 已移植家族的长尾：`bar-race`/`bar-race-country`/`bar-drilldown`/`bar-multi-drilldown`/
-     `bar-breaks-brush`、
-     `line-easing`/`line-fisheye-lens`/`line-graphic`/`line-pen`/`line-draggable`/`line-race`/`line-polar*`/
-     `area-pieces`/`area-time-axis`/`dynamic-data`/`dynamic-data2`/`bump-chart`/`confidence-band`/
-     `grid-multiple`/`multiple-x-axis`/`candlestick-sh`（26KB 内联表）/`candlestick-large`/
-     `candlestick-brush`/`intraday-breaks-1|2`、
-     `graph-force2` 之外的 graph 变体、`gauge-clock`/`gauge-speed`/`gauge-stage`/`gauge-temperature`/
-     `gauge-barometer`/`gauge-multi-title`、`radar` 家族已全、`treemap` 只剩需要外部数据的、
-     `pie-pattern`（图案需要贴图）等。
+   - 已移植家族的长尾里可直接做的：`line-markarea`、`area-pieces`、`area-time-axis`、`bump-chart`（127 行，
+     内联数据）、`confidence-band`（要先按 `line-aqi` 的先例把 `data/asset/data/confidence-band.json`
+     拷进 `resources/data/`）、`grid-multiple`、`multiple-x-axis`、`line-easing`（296 行，无外部依赖）、
+     `line-graphic`、`line-pen`、
+     `line-race`/`bar-race`/`bar-race-country`（竞速要先决定用哪个定时器与假数据）、
+     `bar-drilldown`/`bar-multi-drilldown`（下钻要 `dispatchAction` 替代表演）、`bar-breaks-brush`、
+     `dynamic-data`/`dynamic-data2`、`scatter-clustering`、`candlestick-sh`（26KB 内联表）/
+     `candlestick-large`/`candlestick-brush`/`intraday-breaks-1|2`、`graph-force2` 之外的 graph 变体。
+     gauge 家族已 12/12 全，`radar` 家族已全，`treemap` 只剩需要外部数据的，`pie-pattern` 要贴图，
+     `line-fisheye-lens` 靠 `getZr().on('mousemove')` 的真实指针序列，按排除策略不做。
 2. **需要先补 wrapper 建模**：
    - `calendar-lunar`：366 行农历表（数据而非 API）。
 3. **明确排除，不要重复尝试**（原因记在 `demo/AGENTS.md`）：
@@ -401,7 +410,8 @@
 ## 待办
 
 - 类型建模：暂无未完成项（见上面各轮）。
-- 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 `doc-example` 剩余 29 页（象形柱图长尾、
-  单字段小页、timeline 组件）、`custom` / `matrix` 剩余项与各家族长尾；`custom-calendar-icon` 因上游源码
-  只剩缩略图，不移植。
-- 提交：全部已推送到 `origin/main`（最新 本批：第十九批 8 个示例）。
+- 示例站（demo）：见「示例站（demo）移植进度」一节。第二十二批（8 个，gauge 长尾 + `line-sections` /
+  `line-marker` + `doc-example/tutorial-async`）之后，下一批按「下一批」清单的第一条做
+  `doc-example/matrix-graph-box`、`doc-example/scatter-visualMap-categories` 与 `custom` / `matrix`
+  剩余项、各家族长尾；`custom-calendar-icon` 因上游源码只剩缩略图，不移植。
+- 提交：全部已推送到 `origin/main`（最新 本批：第二十二批 8 个示例）。

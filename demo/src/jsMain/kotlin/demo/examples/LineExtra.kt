@@ -375,4 +375,229 @@ val lineExtraEntries: List<CatalogEntry> =
                     )
             }
         },
+        lineExtra.chart("line-sections", "一天用电量分布", "Distribution of Electricity") {
+            unsafeJso<EChartsOption> {
+                title =
+                    one(
+                        unsafeJso<TitleOption> {
+                            text = "Distribution of Electricity"
+                            subtext = "Fake Data"
+                        },
+                    )
+                tooltip =
+                    one(
+                        unsafeJso<TooltipOption> {
+                            trigger = TooltipTriggers.axis
+                            axisPointer = unsafeJso<AxisPointerOption> { type = AxisPointerTypes.cross }
+                        },
+                    )
+                toolbox = toolbox(saveAsImage = true)
+                xAxis =
+                    one(
+                        unsafeJso<XAxisOption> {
+                            type = AxisTypes.category
+                            boundaryGap = BooleanOrStringArray(false)
+                            data =
+                                strings(
+                                    "00:00", "01:15", "02:30", "03:45", "05:00", "06:15", "07:30", "08:45",
+                                    "10:00", "11:15", "12:30", "13:45", "15:00", "16:15", "17:30", "18:45",
+                                    "20:00", "21:15", "22:30", "23:45",
+                                )
+                        },
+                    )
+                yAxis =
+                    one(
+                        unsafeJso<YAxisOption> {
+                            type = AxisTypes.value
+                            axisLabel = unsafeJso<AxisLabelOption> { formatter = LabelFormatter("{value} W") }
+                            axisPointer = unsafeJso<AxisPointerOption> { snap = true }
+                        },
+                    )
+                visualMap =
+                    one(
+                        unsafeJso<VisualMapOption> {
+                            show = false
+                            dimension = 0.0
+                            pieces =
+                                arrayOf(
+                                    sectionPiece(null, 6.0, "green"),
+                                    sectionPiece(6.0, 8.0, "red"),
+                                    sectionPiece(8.0, 14.0, "green"),
+                                    sectionPiece(14.0, 17.0, "red"),
+                                    sectionPiece(17.0, null, "green"),
+                                )
+                        },
+                    )
+                series =
+                    arrayOf<SeriesOption>(
+                        lineSeries {
+                            name = "Electricity"
+                            smooth = BooleanOrDouble(true)
+                            typedData =
+                                numbers(
+                                    300.0, 280.0, 250.0, 260.0, 270.0, 300.0, 550.0, 500.0, 400.0, 390.0,
+                                    380.0, 390.0, 400.0, 500.0, 600.0, 750.0, 800.0, 700.0, 600.0, 400.0,
+                                )
+                            markArea =
+                                unsafeJso<MarkAreaOption> {
+                                    itemStyle =
+                                        unsafeJso<ItemStyleOption> { color = ZRColor("rgba(255, 173, 177, 0.4)") }
+                                    data =
+                                        arrayOf(
+                                            peakArea("Morning Peak", "07:30", "10:00"),
+                                            peakArea("Evening Peak", "17:30", "21:15"),
+                                        )
+                                }
+                        },
+                    )
+            }
+        },
+        lineExtra.chart("line-marker", "未来一周气温变化", "Temperature Change in the Coming Week") {
+            unsafeJso<EChartsOption> {
+                title = one(unsafeJso<TitleOption> { text = "Temperature Change in the Coming Week" })
+                tooltip = one(unsafeJso<TooltipOption> { trigger = TooltipTriggers.axis })
+                legend = one(unsafeJso<LegendOption> {})
+                toolbox =
+                    one(
+                        unsafeJso<ToolboxOption> {
+                            show = true
+                            feature =
+                                unsafeJso<ToolboxFeature> {
+                                    dataZoom =
+                                        unsafeJso<ToolboxDataZoomFeatureOption> {
+                                            // The upstream `yAxisIndex: 'none'` keeps the vertical scale intact.
+                                            yAxisIndex = ModelFinderIndexQuery(false)
+                                        }
+                                    dataView = unsafeJso<DataViewOption> { readOnly = false }
+                                    magicType = unsafeJso<MagicTypeOption> { type = arrayOf("line", "bar") }
+                                    restore = unsafeJso<ToolboxFeatureOption> {}
+                                    saveAsImage = unsafeJso<SaveAsImageOption> {}
+                                }
+                        },
+                    )
+                xAxis =
+                    one(
+                        unsafeJso<XAxisOption> {
+                            type = AxisTypes.category
+                            boundaryGap = BooleanOrStringArray(false)
+                            data = strings("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+                        },
+                    )
+                yAxis =
+                    one(
+                        unsafeJso<YAxisOption> {
+                            type = AxisTypes.value
+                            axisLabel = unsafeJso<AxisLabelOption> { formatter = LabelFormatter("{value} °C") }
+                        },
+                    )
+                series =
+                    arrayOf<SeriesOption>(
+                        lineSeries {
+                            name = "Highest"
+                            typedData = numbers(10.0, 11.0, 13.0, 11.0, 12.0, 12.0, 9.0)
+                            markPoint =
+                                unsafeJso<MarkPointOption> {
+                                    data =
+                                        arrayOf(
+                                            unsafeJso<MarkPointDataItemOption> {
+                                                type = MarkerStatisticTypes.max
+                                                name = "Max"
+                                            },
+                                            unsafeJso<MarkPointDataItemOption> {
+                                                type = MarkerStatisticTypes.min
+                                                name = "Min"
+                                            },
+                                        )
+                                }
+                            markLine =
+                                unsafeJso<MarkLineOption> {
+                                    data =
+                                        arrayOf(
+                                            MarkLineDataItem(
+                                                unsafeJso<MarkLine1DDataItemOption> {
+                                                    type = MarkerStatisticTypes.average
+                                                    name = "Avg"
+                                                },
+                                            ),
+                                        )
+                                }
+                        },
+                        lineSeries {
+                            name = "Lowest"
+                            typedData = numbers(1.0, -2.0, 2.0, 5.0, 3.0, 2.0, 0.0)
+                            markPoint =
+                                unsafeJso<MarkPointOption> {
+                                    data =
+                                        arrayOf(
+                                            unsafeJso<MarkPointDataItemOption> {
+                                                name = "周最低"
+                                                value = StringOrDouble(-2.0)
+                                                xAxis = ScaleDataValue(1.0)
+                                                yAxis = ScaleDataValue(-1.5)
+                                            },
+                                        )
+                                }
+                            markLine =
+                                unsafeJso<MarkLineOption> {
+                                    data =
+                                        arrayOf(
+                                            MarkLineDataItem(
+                                                unsafeJso<MarkLine1DDataItemOption> {
+                                                    type = MarkerStatisticTypes.average
+                                                    name = "Avg"
+                                                },
+                                            ),
+                                            MarkLineDataItem(
+                                                arrayOf(
+                                                    unsafeJso<MarkLine2DDataItemDimOption> {
+                                                        symbol = SymbolShape("none")
+                                                        x = StringOrDouble("90%")
+                                                        yAxis = ScaleDataValue("max")
+                                                    },
+                                                    unsafeJso<MarkLine2DDataItemDimOption> {
+                                                        symbol = SymbolShape("circle")
+                                                        label =
+                                                            unsafeJso<MarkLineLabelOption> {
+                                                                position = LabelPosition("start")
+                                                                formatter = LabelFormatter("Max")
+                                                            }
+                                                        type = MarkerStatisticTypes.max
+                                                        name = "最高点"
+                                                    },
+                                                ),
+                                            ),
+                                        )
+                                }
+                        },
+                    )
+            }
+        },
+    )
+
+/** One time-of-day band of `line-sections`; `gt`/`lte` are omitted at the open ends. */
+private fun sectionPiece(
+    gt: Double?,
+    lte: Double?,
+    color: String,
+): VisualPiece =
+    unsafeJso {
+        if (gt != null) this.gt = gt
+        if (lte != null) this.lte = lte
+        this.color = StringOrStringArray(color)
+    }
+
+/** A shaded `[from, to]` band of `line-sections`; the label sits on the first edge. */
+private fun peakArea(
+    name: String,
+    from: String,
+    to: String,
+): MarkAreaDataItem =
+    MarkAreaDataItem(
+        arrayOf(
+            unsafeJso<MarkArea2DDataItemDimOption> {
+                this.name = name
+                xAxis = ScaleDataValue(from)
+            },
+            unsafeJso<MarkArea2DDataItemDimOption> { xAxis = ScaleDataValue(to) },
+        ),
     )

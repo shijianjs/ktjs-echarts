@@ -233,6 +233,8 @@ class DemoPageTest {
      * exception in a timer callback is what the console assertion catches. `mix-timeline-all` is
      * checked one step further: its timeline autoplays, so a frame sampled after the play interval
      * must differ from the first one, which is what proves the per-year options reached the chart.
+     * `tutorial-async` starts with empty arrays, so its check counts content instead of comparing
+     * frames: the deferred option has to put noticeably more pixels on the canvas.
      */
     @Test
     fun `the interactive doc examples paint and run their timers`(page: Page) {
@@ -255,6 +257,7 @@ class DemoPageTest {
                 "doc-example/candlestick-axisPointer",
                 "doc-example/grid-outerBounds",
                 "doc-example/mix-timeline-all",
+                "doc-example/tutorial-async",
             )
         for (route in routes) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)
@@ -272,6 +275,45 @@ class DemoPageTest {
                 val after = paintedFrame(page)
                 assertTrue(before != after, "the timeline of $route did not switch to the next year")
             }
+            if (route == "doc-example/tutorial-async") {
+                // The page starts with empty arrays, so the axis labels and the bars only arrive with
+                // the asynchronous option; the canvas must therefore hold noticeably more content.
+                val before = paintedPixels(page)
+                page.waitForTimeout(1800.0)
+                val after = paintedPixels(page)
+                assertTrue(after > before * 1.2, "$route stayed empty: $before painted pixels before, $after after")
+            }
+        }
+        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
+    }
+
+    /**
+     * The dial pages of `GaugeLongTail.kt` draw their whole identity from `path://` needles, so a
+     * missing icon leaves a canvas that only holds the ring: the static pages are checked for painted
+     * pixels. The three animated ones replace their values from a timer, so a frame sampled after one
+     * tick of that timer must differ from the first one; an exception inside the callback is what the
+     * console assertion catches.
+     */
+    @RetryingTest(maxAttempts = 2)
+    fun `the gauge long tail pages draw and move their needles`(page: Page) {
+        val consoleErrors = mutableListOf<String>()
+        page.onConsoleMessage { message ->
+            if (message.type() == "error") consoleErrors += message.text()
+        }
+        openPage(page)
+        for (route in listOf("gauge-speed", "gauge-car")) {
+            page.evaluate("(value) => { location.hash = '#/' + value }", route)
+            assertChartRendered(page)
+            waitForPainted(page, route)
+        }
+        for (route in listOf("gauge-clock", "gauge-barometer", "gauge-multi-title")) {
+            page.evaluate("(value) => { location.hash = '#/' + value }", route)
+            assertChartRendered(page)
+            waitForPainted(page, route)
+            val before = paintedFrame(page)
+            page.waitForTimeout(2400.0)
+            val after = paintedFrame(page)
+            assertTrue(before != after, "$route did not repaint after its timer tick")
         }
         assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
     }
@@ -317,27 +359,57 @@ class DemoPageTest {
      *
      * Only the pixels that carry content contribute, so a page that repaints with different data
      * changes the value while an idle page does not.
+     *
+     * Playwright hands a JS integer back in the narrowest box that fits, so the sampling helpers read
+     * it through [Number] instead of casting to [Double].
      */
     private fun paintedFrame(page: Page): Double =
-        page.evaluate(
-            """
-            () => {
-                const canvas = document.querySelector('.chart canvas');
-                const context = canvas.getContext('2d');
-                const { width, height } = canvas;
-                const data = context.getImageData(0, 0, width, height).data;
-                let hash = 0;
-                let painted = 0;
-                for (let index = 3; index < data.length; index += 4 * 7) {
-                    if (data[index] !== 0) {
-                        painted++;
-                        hash = (hash * 31 + data[index - 3] + data[index - 2] * 7 + data[index - 1] * 13) % 1000000007;
+        (
+            page.evaluate(
+                """
+                () => {
+                    const canvas = document.querySelector('.chart canvas');
+                    const context = canvas.getContext('2d');
+                    const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
+                    let hash = 0;
+                    let painted = 0;
+                    for (let index = 3; index < data.length; index += 4 * 7) {
+                        if (data[index] !== 0) {
+                            painted++;
+                            hash = (hash * 31 + data[index - 3] + data[index - 2] * 7 + data[index - 1] * 13) % 1000000007;
+                        }
                     }
+                    return painted * 1000000007 + hash;
                 }
-                return painted * 1000000007 + hash;
-            }
-            """,
-        ) as Double
+                """,
+            ) as Number
+                ).toDouble()
+
+    /**
+     * How much of the chart canvas currently carries content.
+     *
+     * A page that starts from empty arrays can only grow, so the count tells whether a deferred option
+     * ever reached the chart, which a frame comparison cannot prove while other animation runs.
+     */
+    private fun paintedPixels(page: Page): Double =
+        (
+            page.evaluate(
+                """
+                () => {
+                    const canvas = document.querySelector('.chart canvas');
+                    const context = canvas.getContext('2d');
+                    const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
+                    let painted = 0;
+                    for (let index = 3; index < data.length; index += 4 * 7) {
+                        if (data[index] !== 0) {
+                            painted++;
+                        }
+                    }
+                    return painted;
+                }
+                """,
+            ) as Number
+                ).toDouble()
 
     /** Opens [route] through the sidebar, the way a visitor reaches it. */
     private fun openFromSidebar(page: Page, group: String, route: String) {

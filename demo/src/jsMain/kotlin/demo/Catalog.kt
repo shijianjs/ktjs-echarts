@@ -18,6 +18,7 @@ import demo.examples.funnelEntries
 import demo.examples.gaugeEntries
 import demo.examples.geoExtraEntries
 import demo.examples.gaugeExtraEntries
+import demo.examples.gaugeLongTailEntries
 import demo.examples.graphEntries
 import demo.examples.graphExtraEntries
 import demo.examples.heatmapEntries
@@ -134,6 +135,7 @@ val catalog: List<CatalogEntry> =
         gaugeEntries,
         geoExtraEntries,
         gaugeExtraEntries,
+        gaugeLongTailEntries,
         funnelEntries,
         radarEntries,
         treeEntries,

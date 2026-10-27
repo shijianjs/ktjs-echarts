@@ -5,6 +5,7 @@ import demo.Groups
 import echarts.AnimationEasings
 import echarts.AnimationTypes
 import echarts.Orients
+import echarts.Payload
 import echarts.RoseTypes
 import echarts.TooltipTriggers
 import echarts.options.AnimationDelay
@@ -469,9 +470,78 @@ val pieEntries: List<CatalogEntry> =
                     )
             }
         },
+        pie.interactive("pie-highlight", "饼图程序调用高亮示例", "Pie Highlight") { chart, holder ->
+            val names = arrayOf("直接访问", "邮件营销", "联盟广告", "视频广告", "搜索引擎")
+            val values = arrayOf(335.0, 310.0, 234.0, 135.0, 1548.0)
+            var currentIndex = -1
+            chart.setOption(
+                unsafeJso<EChartsOption> {
+                    title =
+                        one(
+                            unsafeJso<TitleOption> {
+                                text = "饼图程序调用高亮示例"
+                                left = StringOrDouble("center")
+                            },
+                        )
+                    tooltip =
+                        one(
+                            unsafeJso<TooltipOption> {
+                                trigger = TooltipTriggers.item
+                                formatter = TooltipFormatter("{a} <br/>{b} : {c} ({d}%)")
+                            },
+                        )
+                    legend =
+                        one(
+                            unsafeJso<LegendOption> {
+                                orient = Orients.vertical
+                                left = StringOrDouble("left")
+                                data = legendNames(*names)
+                            },
+                        )
+                    series =
+                        arrayOf<SeriesOption>(
+                            pieSeries {
+                                name = "访问来源"
+                                radius = StringOrDoubleOrArray("55%")
+                                center = arrayOf(StringOrDouble("50%"), StringOrDouble("60%"))
+                                typedData = dataItems(*Array(names.size) { index -> pieItem(names[index], values[index]) })
+                                emphasis =
+                                    unsafeJso<EmphasisOption> {
+                                        itemStyle =
+                                            unsafeJso<ItemStyleOption> {
+                                                shadowBlur = 10.0
+                                                shadowOffsetX = 0.0
+                                                shadowColor = ZRColor("rgba(0, 0, 0, 0.5)")
+                                            }
+                                    }
+                            },
+                        )
+                },
+            )
+            holder.setInterval({
+                val len = names.size
+                chart.dispatchAction(seriesAction("downplay", currentIndex))
+                currentIndex = (currentIndex + 1) % len
+                chart.dispatchAction(seriesAction("highlight", currentIndex))
+                chart.dispatchAction(seriesAction("showTip", currentIndex))
+            }, 1000)
+        },
     )
 
 /** The hover label of the doughnut family: a large percentage in the middle of the ring. */
+
+/** Action payload that targets one data item of the first series. */
+private external interface SeriesActionPayload {
+    var type: String?
+    var seriesIndex: Double
+    var dataIndex: Double
+}
+
+/** Builds a `dispatchAction` payload for the given series-0 data index. */
+private fun seriesAction(actionType: String, index: Int): Payload =
+    unsafeJso<SeriesActionPayload> { type = actionType; seriesIndex = 0.0; dataIndex = index.toDouble() }
+        .unsafeCast<Payload>()
+
 private fun centerLabelEmphasis(): EmphasisOption =
     unsafeJso {
         label =

@@ -240,7 +240,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（157 个示例 / 25 个家族 + 文档示例组 + 总览页）
+### 已落地（158 个示例 / 25 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -274,6 +274,8 @@
 - 第九批（2 个）：`geo-graph`（瑞士 GeoJSON 上的 graph 系列，节点用经纬度定位）、
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
+
+- 第十六批（1 个 + 基础设施）：`pie-highlight`（setInterval 每秒 dispatchAction 高亮/显示提示；chart-scoped timer 由 ChartHolder 在卸载时自动清理）。同时给 `ChartHolder` 加了 timer 生命周期（`setInterval`/`setTimeout` 注册后 `unmount()` 自动清理），`Category.interactive` 新增双参重载暴露 `ChartHolder`，解锁全部 setInterval 动画类（custom-spiral-race / custom-gantt-flight / graphic-wave-animation / value-animation-* 等）。
 
 - 第十五批（1 个）：`custom-profile`（自定义甘特/性能分析图，确定性数据，省略 clipRectByRect 裁剪）。
 
@@ -362,4 +364,4 @@
 - 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 `doc-example` 剩余约 45 页、`custom` /
   `matrix` 剩余项与各家族长尾；极坐标 `renderItem` 需要先补 `params.coordSys.cx/cy`，
   `custom-calendar-icon` 需要 `params.coordSys.cellWidth/cellHeight`。
-- 提交：全部已推送到 `origin/main`（最新 `edf2a62`）。
+- 提交：全部已推送到 `origin/main`（最新 本批：timer 基础设施 + pie-highlight）。

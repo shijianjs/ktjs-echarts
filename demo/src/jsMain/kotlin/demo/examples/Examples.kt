@@ -6,6 +6,7 @@ import demo.bi
 import demo.ui.DEFAULT_CHART_HEIGHT
 import demo.ui.PageMeta
 import demo.ui.PageView
+import demo.ui.ChartHolder
 import demo.ui.chart
 import demo.ui.example
 import demo.ui.interactiveChart
@@ -45,6 +46,23 @@ class Category(private val group: Group, private val sourcePath: String) {
         summaryEn: String = "",
         height: String = DEFAULT_CHART_HEIGHT,
         setup: (EChartsInstance) -> Unit,
+    ): CatalogEntry =
+        entry(id, titleZh, titleEn, summaryZh, summaryEn) { view ->
+            view.body.append(example(null, view.track(interactiveChart(height) { chart, _ -> setup(chart) }).root))
+        }
+
+    /**
+     * An example that needs a chart-scoped timer: the [setup] receives the [ChartHolder] so it can call
+     * [ChartHolder.setInterval]/[ChartHolder.setTimeout], cleared automatically on navigation.
+     */
+    fun interactive(
+        id: String,
+        titleZh: String,
+        titleEn: String,
+        summaryZh: String = "",
+        summaryEn: String = "",
+        height: String = DEFAULT_CHART_HEIGHT,
+        setup: (EChartsInstance, ChartHolder) -> Unit,
     ): CatalogEntry =
         entry(id, titleZh, titleEn, summaryZh, summaryEn) { view ->
             view.body.append(example(null, view.track(interactiveChart(height, setup)).root))

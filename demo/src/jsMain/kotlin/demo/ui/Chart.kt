@@ -22,23 +22,41 @@ const val DEFAULT_CHART_HEIGHT = "32rem"
  */
 class ChartHolder(
     private val height: String = DEFAULT_CHART_HEIGHT,
-    private val setup: (EChartsInstance) -> Unit,
+    private val setup: (EChartsInstance, ChartHolder) -> Unit,
 ) {
     /** Container of the chart; created once and never replaced. */
     val root: HTMLElement = element(HtmlTagName.div, "chart").apply { style.height = height }
 
     private var instance: EChartsInstance? = null
 
+    /** Timer ids created by [setInterval]/[setTimeout]; cleared on [unmount]. */
+    private val timers = mutableListOf<Int>()
+
     /** Creates the chart instance and applies the example option. Idempotent. */
     fun mount() {
         if (instance != null) return
         val chart = ECharts.init(root, if (Theme.isDark) DARK_THEME else null, null)
         instance = chart
-        setup(chart)
+        setup(chart, this)
     }
+
+    /**
+     * Registers an interval timer owned by this chart. The timer is cleared automatically when the
+     * chart is disposed, so animation examples built on `setInterval` never leak after navigation.
+     */
+    fun setInterval(handler: () -> Unit, delayMillis: Int): Int =
+        (kotlinx.browser.window.setInterval(handler, delayMillis) as Int).also { timers.add(it) }
+
+    /**
+     * Registers a one-shot timer owned by this chart; cleared on [unmount] if it has not fired yet.
+     */
+    fun setTimeout(handler: () -> Unit, delayMillis: Int): Int =
+        (kotlinx.browser.window.setTimeout(handler, delayMillis) as Int).also { timers.add(it) }
 
     /** Disposes the chart instance; the container stays in the DOM. */
     fun unmount() {
+        timers.forEach { kotlinx.browser.window.clearInterval(it); kotlinx.browser.window.clearTimeout(it) }
+        timers.clear()
         instance?.dispose()
         instance = null
     }
@@ -56,10 +74,10 @@ class ChartHolder(
  * be rebuilt (language or theme switch) without paying for it at build time.
  */
 fun chart(option: () -> echarts.options.EChartsOption, height: String = DEFAULT_CHART_HEIGHT): ChartHolder =
-    ChartHolder(height) { chart -> chart.setOption(option()) }
+    ChartHolder(height) { chart, _ -> chart.setOption(option()) }
 
 /** Creates a chart holder for an example that drives the chart directly (animation, timeline, ...). */
 fun interactiveChart(
     height: String = DEFAULT_CHART_HEIGHT,
-    setup: (EChartsInstance) -> Unit,
+    setup: (EChartsInstance, ChartHolder) -> Unit,
 ): ChartHolder = ChartHolder(height, setup)

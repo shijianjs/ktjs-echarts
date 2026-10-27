@@ -240,7 +240,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（148 个示例 / 25 个家族 + 文档示例组 + 总览页）
+### 已落地（149 个示例 / 25 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -271,7 +271,8 @@
 - 第八批（3 个）：`geo-choropleth-scatter`（冰岛 GeoJSON，geo 组件被 scatter 与 map 共享）、
   `geo-svg-scatter-simple`（SVG 地图 + effectScatter）、`geo-beef-cuts`（SVG 地图 + visualMap）；
   新增 `Groups.GEO`「地图」分组与 `demo.ui.loadText`（SVG 需要文本而不是 JSON）。
-- 第九批（1 个）：`geo-graph`（瑞士 GeoJSON 上的 graph 系列，节点用经纬度定位）。
+- 第九批（2 个）：`geo-graph`（瑞士 GeoJSON 上的 graph 系列，节点用经纬度定位）、
+  `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）。
 
 ### 下一批（按可做性排序）
 

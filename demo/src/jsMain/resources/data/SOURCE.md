@@ -20,9 +20,10 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `kawhi-leonard-16-17-regular.json` | `data/` | `custom-hexbin` |
 | `world.json` | `geo/` | `lines-airline` |
 | `iceland.geo.json` | `geo/` | `geo-choropleth-scatter` |
+| `ch.geo.json` | `geo/` | `geo-graph` |
 | `Map_of_Iceland.svg` | `geo/` | `geo-svg-scatter-simple` |
 | `Beef_cuts_France.svg` | `geo/` | `geo-beef-cuts` |
-| `obama_budget_proposal_2012.json` | `data/` | (not ported yet, `treemap-obama`) |
+| `obama_budget_proposal_2012.json` | `data/` | `treemap-obama` |
 | `wind-barb-hobart.json` | `data/` | (not ported yet, `custom-wind`) |
 | `aqi-beijing.json` | `data/` | (not ported yet, `line-aqi`) |
 

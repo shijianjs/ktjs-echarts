@@ -212,6 +212,7 @@ class DemoPageTest {
                 "pie-nest",
                 // Applied after a fetch, so it also proves the static datasets are served.
                 "treemap-disk",
+                "treemap-obama",
             )
         for (route in painted) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)

@@ -26,7 +26,7 @@ import zrender.ZRColor
 private val treemapExtra = Category(Groups.TREEMAP, "examples/TreemapExtra.kt")
 
 /** The `levels` of `treemap-disk`. */
-private fun diskLevels(): Array<TreemapSeriesLevelOption> =
+internal fun diskLevels(): Array<TreemapSeriesLevelOption> =
     arrayOf(
         unsafeJso {
             itemStyle =

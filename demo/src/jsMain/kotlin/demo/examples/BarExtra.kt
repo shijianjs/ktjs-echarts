@@ -59,21 +59,6 @@ private external interface DataZoomAction : Payload {
     var endValue: OptionDataValue?
 }
 
-/**
- * Deterministic replacement for `Math.random()` in `bar-large`.
- *
- * The original walks a random value up and down; the port uses a linear congruential generator so
- * every visit produces the same wave and the end-to-end assertions stay stable.
- */
-private class Lcg(seed: Int) {
-    private var state: Int = seed
-
-    fun next(): Double {
-        state = state * 1664525 + 1013904223
-        return (state ushr 1).toDouble() / 2147483648.0
-    }
-}
-
 /** The `[category, value]` table of `bar-large`. */
 private class LargeBarData(val categories: Array<OptionDataItem?>, val values: Array<BarDataItem?>) {
     val count: Int
@@ -138,7 +123,7 @@ val barExtraEntries: List<CatalogEntry> =
                     arrayOf<SeriesOption>(
                         barSeries {
                             name = "Forest"
-                            barGap = "0"
+                            barGap = StringOrDouble("0")
                             label = rotatedLabels()
                             emphasis = unsafeJso<EmphasisOption> { focus = EmphasisFocuses.series }
                             typedData = numbers(320.0, 332.0, 301.0, 334.0, 390.0)

@@ -240,7 +240,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（171 个示例 / 25 个家族 + 文档示例组 + 总览页）
+### 已落地（184 个示例 / 25 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -275,6 +275,16 @@
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
 
+- 第十八批（13 个，`examples/DocMore.kt`，文档示例的第二批）：
+  `pictorialBar-repeat` / `pictorialBar-position` / `pictorialBar-symbolSize` /
+  `pictorialBar-symbolBoundingDataArray`（`convertToPixel` 定位说明文字，`updated` 里用 silent
+  `setOption` 重排）、`scatter-tutorial-dataZoom-2` / `scatter-tutorial-dataZoom-3` /
+  `scatter-dataZoom-all`（确定性数据替代 `Math.random`）、`sunburst-simple`、
+  `text-fregment-align`、`label-position`、`custom-transition-simple`、`value-animation-simple`、
+  `treemap-borderColor`。同批把 `Lcg` 提到 `Items.kt` 共用，wrapper 的 `barGap` /
+  `barCategoryGap` 放宽为 `StringOrDouble?`。`custom-calendar-icon` 的源码在本地克隆里只剩缩略图，
+  无法移植。
+
 - 第十七批（13 个）：bar 长尾 `bar-gradient`（点击柱体 dispatchAction 平移 dataZoom）、`bar-large`
   （50 万条确定性数据 + `large` 模式）、`bar-breaks-simple`（轴断点 + 锯齿断口）；`pie-labelLine-adjust`；
   doc-example 的 `pie-label-margin` / `pie-label-distanceToLabelLine` / `pie-label-bleedMargin`
@@ -299,9 +309,13 @@
 ### 下一批（按可做性排序）
 
 1. **无外部依赖、可直接做**：
-   - `doc-example` 剩余（约 40 个）：`tutorial-styling` 之后的教程页、`text-*`、`title-block`、
-     `label-position`、`grid-outerBounds`、`sunburst-highlight-*`（需要
-     `dispatchAction`）、`pictorialBar-*`；`map-*`/`geo-*` 除外。
+   - `doc-example` 剩余（37 个）：象形柱图长尾 `pictorialBar-clip` / `pictorialBar-graphicType` /
+     `pictorialBar-patternSize` / `pictorialBar-repeatDirection` / `pictorialBar-repeatLayout`；
+     `barGrid-barGap`、`bar-dataZoom-filterMode`、`candlestick-axisPointer`、`grid-outerBounds`、
+     `title-block`、`pie-media`、`graphic-bounding`、`aria-decal`；`sunburst-highlight-*`
+     （需要 `dispatchAction`）；timeline 组件 `mix-timeline-all` / `timeline-dynamic-series` /
+     `bar-media-timeline`；其余是地图 / visualMap 组合、第二个渲染器与异步设 option 的页面
+     （清单见 `demo/AGENTS.md`）。
    - `custom` 剩余：     `custom-calendar-icon`（`params.coordSys.cellWidth/cellHeight` 已补，可直接做）、
      `custom-gantt-flight`（长动画）、`custom-gauge`
      （`path://` 面板图，`params.coordSys.cx/cy` 已补）。
@@ -366,6 +380,7 @@
 ## 待办
 
 - 类型建模：暂无未完成项（见上面各轮）。
-- 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 `doc-example` 剩余约 40 页、`custom` /
-  `matrix` 剩余项与各家族长尾；`custom-calendar-icon` 需要 `params.coordSys.cellWidth/cellHeight`。
-- 提交：全部已推送到 `origin/main`（最新 本批：第十七批 13 个示例）。
+- 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 `doc-example` 剩余 37 页（象形柱图长尾、
+  单字段小页、timeline 组件）、`custom` / `matrix` 剩余项与各家族长尾；`custom-calendar-icon` 因上游源码
+  只剩缩略图，不移植。
+- 提交：全部已推送到 `origin/main`（最新 本批：第十八批 13 个示例）。

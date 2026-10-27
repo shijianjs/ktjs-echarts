@@ -280,11 +280,11 @@ external interface BarSeriesOption : SeriesOption, SeriesOnCartesianOptionMixin,
     /** Minimum width of the bars. */
     var barMinWidth: StringOrDouble?
 
-    /** Gap between bars of different series. */
-    var barGap: String?
+    /** Gap between bars of different series; a percentage string or an absolute pixel value. */
+    var barGap: StringOrDouble?
 
-    /** Gap between bar categories. */
-    var barCategoryGap: String?
+    /** Gap between bar categories; a percentage string or an absolute pixel value. */
+    var barCategoryGap: StringOrDouble?
 
     /** Minimum height of a bar. */
     var barMinHeight: Double?

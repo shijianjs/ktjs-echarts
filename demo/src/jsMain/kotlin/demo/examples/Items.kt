@@ -78,6 +78,23 @@ internal fun every(millis: Int, action: () -> Unit) {
     js("(fn, ms) => { setInterval(fn, ms) }")(action, millis)
 }
 
+/**
+ * Deterministic replacement for `Math.random()`.
+ *
+ * The animated examples walk or rebuild their shapes on every tick; a fixed seed keeps the sequence
+ * reproducible, so a page draws the same frames on every visit and the end-to-end assertions stay
+ * stable.
+ */
+internal class Lcg(seed: Int) {
+    private var state: Int = seed
+
+    /** Next value in `0..1`. */
+    fun next(): Double {
+        state = state * 1664525 + 1013904223
+        return (state ushr 1).toDouble() / 2147483648.0
+    }
+}
+
 /** A pie item: `{ name, value }`. */
 internal fun pieItem(name: String, value: Double): PieDataItem =
     PieDataItem(

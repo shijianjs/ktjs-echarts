@@ -20,14 +20,14 @@ import zrender.ZRLineTypes
  * pages are intentionally short. Their ids keep the `doc-example/` prefix of the official site so
  * the "official example" link of a page points at the same page.
  *
- * Not ported yet:
+ * The second batch of the folder lives in `DocMore.kt`: the pictorial bar tutorials, the dataZoom
+ * scatter pages, the text / label pages, the animation pages and the sunburst / treemap
+ * introductions.
  *
- * - `pie-highlight` and `barGrid-barGap` drive the chart from a `setInterval`; the demo builds a
- *   page once and has no timer lifetime, so they need the interactive plumbing first;
- * - `canvas-vs-svg`, `tutorial-async`, `tutorial-loading` and the `value-animation` family create a
- *   second renderer or set the option after an asynchronous step;
- * - the `aria-decal*`, `map-*`, `geo-*`, `graphic-*` and `pictorialBar-*` entries of the list are the
- *   longer documentation pages, kept for a later batch.
+ * Still not ported: the pages that need a second renderer (`canvas-vs-svg`), an asynchronous
+ * `setOption` (`tutorial-async`, `tutorial-loading`, `tutorial-dynamic-data`), the timeline and
+ * media components, the map / `visualMap` combinations, and the pages built on official-site image
+ * assets.
  *
  * The stored tutorials (`tutorial-styling-step*`) still use the ECharts 4 shape with a `normal`
  * state inside `itemStyle` / `label` / `labelLine`; ECharts 6 dropped that state, so the ports set
@@ -75,7 +75,7 @@ private fun insideLabel(align: TextAlign): SunburstLabelOption = unsafeJso {
 }
 
 /** The hidden `-1..1` x axis the text examples sit on. */
-private fun hiddenXAxis(): Array<XAxisOption> =
+internal fun hiddenXAxis(): Array<XAxisOption> =
     one(
         unsafeJso<XAxisOption> {
             axisLabel = unsafeJso<AxisLabelOption> { show = false }
@@ -88,7 +88,7 @@ private fun hiddenXAxis(): Array<XAxisOption> =
     )
 
 /** The hidden `-1..1` y axis the text examples sit on. */
-private fun hiddenYAxis(): Array<YAxisOption> =
+internal fun hiddenYAxis(): Array<YAxisOption> =
     one(
         unsafeJso<YAxisOption> {
             axisLabel = unsafeJso<AxisLabelOption> { show = false }

@@ -123,7 +123,7 @@ val pictorialBarEntries: List<CatalogEntry> =
                         },
                         barSeries {
                             name = "line"
-                            barGap = "-100%"
+                            barGap = StringOrDouble("-100%")
                             barWidth = StringOrDouble(10.0)
                             itemStyle =
                                 unsafeJso<ItemStyleOption> {

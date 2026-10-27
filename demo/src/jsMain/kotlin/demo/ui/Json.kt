@@ -19,3 +19,8 @@ import kotlin.js.js
 fun loadJson(path: String): Promise<JsAny> =
     js("function (path) { return fetch(path).then(function (response) { return response.json(); }); }")(path)
         as Promise<JsAny>
+
+/** Loads a text document (an SVG map, for instance) from the static files. */
+fun loadText(path: String): Promise<String> =
+    js("function (path) { return fetch(path).then(function (response) { return response.text(); }); }")(path)
+        as Promise<String>

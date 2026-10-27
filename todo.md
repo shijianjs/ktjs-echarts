@@ -240,7 +240,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（144 个示例 / 24 个家族 + 文档示例组 + 总览页）
+### 已落地（147 个示例 / 25 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -267,6 +267,10 @@
   `dataset-encode1`（四宫格编码矩阵）。数据集不再抄进 Kotlin，改为
   `demo/src/jsMain/resources/data/` 下的静态 JSON（来源与许可见该目录 `SOURCE.md`），
   页面用 `demo.ui.loadJson` 异步加载；e2e 的像素断言改成轮询等待。
+
+- 第八批（3 个）：`geo-choropleth-scatter`（冰岛 GeoJSON，geo 组件被 scatter 与 map 共享）、
+  `geo-svg-scatter-simple`（SVG 地图 + effectScatter）、`geo-beef-cuts`（SVG 地图 + visualMap）；
+  新增 `Groups.GEO`「地图」分组与 `demo.ui.loadText`（SVG 需要文本而不是 JSON）。
 
 ### 下一批（按可做性排序）
 

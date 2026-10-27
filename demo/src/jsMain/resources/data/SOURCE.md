@@ -1,22 +1,30 @@
 # Third-party datasets
 
-The JSON files in this directory are copied verbatim from the Apache ECharts examples site
-(<https://github.com/apache/echarts-examples>, `public/data/asset/data/`), which is licensed under
-the Apache License 2.0 — see [LICENSE](LICENSE) in this directory.
+Every file here is copied verbatim from the Apache ECharts examples site
+(<https://github.com/apache/echarts-examples>), which is licensed under the Apache License 2.0 — see
+[LICENSE](LICENSE) in this directory for the full text. The GeoJSON / SVG maps come from
+`public/data/asset/geo/`, the rest from `public/data/asset/data/`.
 
 They are shipped as static files instead of being transcribed into Kotlin sources: several of them
 are hundreds of kilobytes, and keeping them as data makes the port of each example a diff of code
-rather than a diff of numbers.
+rather than a diff of numbers. They are served from `/data/<name>` and loaded with
+`demo.ui.loadJson` / `demo.ui.loadText`.
 
-| File | Used by |
-| --- | --- |
-| `disk.tree.json` | `treemap-disk`, `treemap-borderColor` |
-| `life-expectancy.json` | `graph-life-expectancy` |
-| `obama_budget_proposal_2012.json` | `treemap-obama` |
-| `nba-court.json` | `custom-hexbin` |
-| `kawhi-leonard-16-17-regular.json` | `custom-hexbin` |
-| `wind-barb-hobart.json` | `custom-wind` |
-| `aqi-beijing.json` | `line-aqi` |
+| File | Upstream folder | Used by |
+| --- | --- | --- |
+| `disk.tree.json` | `data/` | `treemap-disk` |
+| `life-expectancy.json` | `data/` | `graph-life-expectancy` |
+| `life-expectancy-table.json` | `data/` | `dataset-encode1` |
+| `flights.json` | `data/` | `lines-airline` |
+| `nba-court.json` | `data/` | `custom-hexbin` |
+| `kawhi-leonard-16-17-regular.json` | `data/` | `custom-hexbin` |
+| `world.json` | `geo/` | `lines-airline` |
+| `iceland.geo.json` | `geo/` | `geo-choropleth-scatter` |
+| `Map_of_Iceland.svg` | `geo/` | `geo-svg-scatter-simple` |
+| `Beef_cuts_France.svg` | `geo/` | `geo-beef-cuts` |
+| `obama_budget_proposal_2012.json` | `data/` | (not ported yet, `treemap-obama`) |
+| `wind-barb-hobart.json` | `data/` | (not ported yet, `custom-wind`) |
+| `aqi-beijing.json` | `data/` | (not ported yet, `line-aqi`) |
 
 Files added here must keep the upstream name so the example source stays traceable to
-`public/data/asset/data/<name>`.
+`public/data/asset/{data,geo}/<name>`.

@@ -16,6 +16,7 @@ import demo.examples.gaugeExtraEntries
 import demo.examples.graphEntries
 import demo.examples.heatmapEntries
 import demo.examples.lineEntries
+import demo.examples.linesExtraEntries
 import demo.examples.lineExtraEntries
 import demo.examples.matrixEntries
 import demo.examples.matrixExtraEntries
@@ -30,6 +31,7 @@ import demo.examples.sunburstEntries
 import demo.examples.themeRiverEntries
 import demo.examples.treeEntries
 import demo.examples.treemapEntries
+import demo.examples.treemapExtraEntries
 import demo.ui.PageMeta
 import demo.ui.PageView
 import demo.ui.officialExampleUrl
@@ -77,6 +79,9 @@ object Groups {
     val SANKEY = Group("sankey", "桑基图", "Sankey")
     val THEME_RIVER = Group("theme-river", "主题河流", "Theme river")
 
+    /** Path charts drawn on a map, the `lines` family of the manifest. */
+    val LINES = Group("lines", "路径图", "Lines")
+
     /** The short examples of the official documentation, `doc-example/` entries of the manifest. */
     val DOC = Group("doc-example", "文档示例", "Doc examples")
 }
@@ -108,6 +113,7 @@ val catalog: List<CatalogEntry> =
         barEntries,
         barExtraEntries,
         lineEntries,
+        linesExtraEntries,
         lineExtraEntries,
         pieEntries,
         scatterEntries,
@@ -122,6 +128,7 @@ val catalog: List<CatalogEntry> =
         radarEntries,
         treeEntries,
         treemapEntries,
+        treemapExtraEntries,
         sunburstEntries,
         datasetEntries,
         calendarEntries,

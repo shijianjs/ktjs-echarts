@@ -199,7 +199,7 @@ class DemoPageTest {
     fun `the matrix and custom series pages draw content`(page: Page) {
         openPage(page, "#/matrix-simple")
         assertChartRendered(page)
-        assertTrue(hasDrawnPixels(page), "matrix-simple should paint the matrix cells")
+        waitForPainted(page, "matrix-simple")
 
         val painted =
             listOf(
@@ -209,33 +209,51 @@ class DemoPageTest {
                 "matrix-confusion",
                 "matrix-sparkline",
                 "pie-nest",
+                // Applied after a fetch, so it also proves the static datasets are served.
+                "treemap-disk",
             )
         for (route in painted) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)
             assertChartRendered(page)
-            assertTrue(hasDrawnPixels(page), "$route should paint its series")
+            waitForPainted(page, route)
         }
     }
 
-    /** Samples the alpha channel of the chart canvas; `false` when nothing was painted. */
-    private fun hasDrawnPixels(page: Page): Boolean =
-        page.locator(".chart canvas").first().evaluate(
-            """
-            (canvas) => {
-                const context = canvas.getContext('2d');
-                if (!context) {
+    /**
+     * Waits until the chart canvas holds a painted pixel.
+     *
+     * The pages that fetch their data set the option later, so a single sample would race with the
+     * request; the loop samples the alpha channel until something shows up.
+     */
+    private fun waitForPainted(page: Page, route: String) {
+        try {
+            page.waitForFunction(
+                """
+                () => {
+                    const canvas = document.querySelector('.chart canvas');
+                    if (!canvas) {
+                        return false;
+                    }
+                    const context = canvas.getContext('2d');
+                    if (!context) {
+                        return false;
+                    }
+                    const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
+                    for (let index = 3; index < data.length; index += 4 * 97) {
+                        if (data[index] !== 0) {
+                            return true;
+                        }
+                    }
                     return false;
                 }
-                const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
-                for (let index = 3; index < data.length; index += 4 * 97) {
-                    if (data[index] !== 0) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            """,
-        ) as Boolean
+                """,
+                null,
+                Page.WaitForFunctionOptions().setTimeout(15000.0),
+            )
+        } catch (error: com.microsoft.playwright.TimeoutError) {
+            throw AssertionError("route $route did not paint any pixel", error)
+        }
+    }
 
     /** Opens [route] through the sidebar, the way a visitor reaches it. */
     private fun openFromSidebar(page: Page, group: String, route: String) {

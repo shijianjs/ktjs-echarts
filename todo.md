@@ -127,7 +127,7 @@
   映射、联合工厂、关键帧动画、真实图表渲染），`LiteralsTest` 新增 3 组字面量断言；
   浏览器用例 202 → 212，全过。
 
-### ⑧ 上游导出清单复核与类型收口（提交 `48f2135`）
+### ⑧ 上游导出清单复核与类型收口（提交 `ca37b82`）
 
 - 按 `types/dist/echarts.d.ts` 的导出清单逐个核对：`echarts/core`、`echarts/charts`、`echarts/components`、
   `echarts/features`、`echarts/renderers` 入口的安装函数已齐全；`innerDrawElementOnCanvas`、

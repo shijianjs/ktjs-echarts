@@ -15,6 +15,8 @@ import echarts.options.EChartsOption
 import echarts.options.EmphasisOption
 import echarts.options.ItemStyleOption
 import echarts.options.LabelFormatter
+import echarts.options.LabelLayout
+import echarts.options.LabelLayoutOption
 import echarts.options.LabelLineOption
 import echarts.options.LabelOption
 import echarts.options.LabelPosition
@@ -526,6 +528,109 @@ val pieEntries: List<CatalogEntry> =
                 chart.dispatchAction(seriesAction("showTip", currentIndex))
             }, 1000)
         },
+        pie.interactive("pie-labelLine-adjust", "饼图引导线调整", "Label Line Adjust") { chart ->
+            val shelves = bookShelves()
+            chart.setOption(
+                unsafeJso<EChartsOption> {
+                    title =
+                        one(
+                            unsafeJso<TitleOption> {
+                                text = "阅读书籍分布"
+                                left = StringOrDouble("center")
+                                textStyle =
+                                    unsafeJso<TextStyleOption> {
+                                        color = "#999"
+                                        fontWeight = ZRFontWeights.normal
+                                        fontSize = StringOrDouble(14.0)
+                                    }
+                            },
+                        )
+                    series =
+                        Array<SeriesOption>(shelves.size) { index ->
+                            pieSeries {
+                                radius = StringOrDoubleOrArray(arrayOf(StringOrDouble(20.0), StringOrDouble(60.0)))
+                                top = StringOrDouble(index * 33.3)
+                                height = StringOrDouble("33.33%")
+                                left = StringOrDouble("center")
+                                width = StringOrDouble(400.0)
+                                itemStyle =
+                                    unsafeJso<ItemStyleOption> {
+                                        borderColor = ZRColor("#fff")
+                                        borderWidth = 1.0
+                                    }
+                                typedLabel =
+                                    unsafeJso<PieLabelOption> {
+                                        alignTo = PieLabelAlignTos.edge
+                                        formatter = LabelFormatter("{name|{b}}\n{time|{c} 小时}")
+                                        minMargin = 5.0
+                                        edgeDistance = StringOrDouble(10.0)
+                                        lineHeight = 15.0
+                                        rich =
+                                            recordOf(
+                                                "time" to
+                                                    unsafeJso<TextStyleOption> {
+                                                        fontSize = StringOrDouble(10.0)
+                                                        color = "#999"
+                                                    },
+                                            ).unsafeCast<Record<String, TextStyleOption>>()
+                                    }
+                                labelLine =
+                                    unsafeJso<LabelLineOption> {
+                                        length = 15.0
+                                        length2 = 0.0
+                                        maxSurfaceAngle = 80.0
+                                    }
+                                // The original trims the last segment of the leader line to the edge of
+                                // the label, which needs the canvas width of the live chart.
+                                labelLayout =
+                                    LabelLayout { params ->
+                                        val rect = params.labelRect
+                                        val points = params.labelLinePoints
+                                        if (rect != null && points != null && points.size > 2) {
+                                            val isLeft = rect.x < chart.getWidth() / 2
+                                            points[2][0] = if (isLeft) rect.x else rect.x + rect.width
+                                        }
+                                        unsafeJso<LabelLayoutOption> { labelLinePoints = points }
+                                    }
+                                typedData = shelves[index]
+                            }
+                        }
+                },
+            )
+        },
+    )
+
+/** One shelf of `pie-labelLine-adjust`: a row of books with their reading hours. */
+private fun bookShelf(vararg entries: Pair<String, Double>): Array<PieDataItem?> =
+    dataItems(*Array(entries.size) { index -> pieItem(entries[index].first, entries[index].second) })
+
+/** The three shelves of `pie-labelLine-adjust`. */
+private fun bookShelves(): Array<Array<PieDataItem?>> =
+    arrayOf(
+        bookShelf(
+            "圣彼得堡来客" to 5.6,
+            "陀思妥耶夫斯基全集" to 1.0,
+            "史记精注全译（全6册）" to 0.8,
+            "加德纳艺术通史" to 0.5,
+            "表象与本质" to 0.5,
+            "其它" to 3.8,
+        ),
+        bookShelf(
+            "银河帝国5：迈向基地" to 3.8,
+            "俞军产品方法论" to 2.3,
+            "艺术的逃难" to 2.2,
+            "第一次世界大战回忆录（全五卷）" to 1.3,
+            "Scrum 精髓" to 1.2,
+            "其它" to 5.7,
+        ),
+        bookShelf(
+            "克莱因壶" to 3.5,
+            "投资最重要的事" to 2.8,
+            "简读中国史" to 1.7,
+            "你当像鸟飞往你的山" to 1.4,
+            "表象与本质" to 0.5,
+            "其它" to 3.8,
+        ),
     )
 
 /** The hover label of the doughnut family: a large percentage in the middle of the ring. */

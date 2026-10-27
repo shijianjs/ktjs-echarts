@@ -6,10 +6,13 @@ import demo.ui.loadText
 import demo.ui.loadJson
 import echarts.*
 import echarts.options.*
+import js.objects.Record
+import js.objects.recordOf
 import js.objects.unsafeJso
-import kotlin.js.JsAny
 import kotlin.js.unsafeCast
 import kotlin.math.sqrt
+import web.cssom.TextAlign
+import web.cssom.VerticalAlign
 import zrender.ZRColor
 import zrender.ZRLineTypes
 import zrender.ZRShapeProps
@@ -19,8 +22,11 @@ import zrender.ZRStyleProps
  * Custom series examples that do not fit the plain `renderItem` shape of `Custom.kt`: they read the
  * polar / calendar fields of `params.coordSys` or draw sectors instead of rectangles.
  *
- * Dropped on purpose: `custom-gauge` needs `ROOT_PATH` panel images, `custom-hexbin` fetches its
- * data with `$.getJSON`, `custom-spiral-race` and `custom-gantt-flight` animate with `setInterval`.
+ * Dropped on purpose: `custom-gauge` needs the `ROOT_PATH` panel images, and `custom-gantt-flight`
+ * animates over a hand-built Gantt table. `custom-hexbin` lives in `CustomHexbin.kt`.
+ *
+ * `custom-spiral-race` drives itself with `ChartHolder.setTimeout`, so the timers stop when the
+ * page is left.
  */
 
 /** Shape of `winds.json`: a grid of `[vx, vy]` vectors. */
@@ -548,4 +554,254 @@ val customExtraEntries: List<CatalogEntry> =
             )
             null
         },
+        customExtra.interactive("custom-spiral-race", "自定义螺旋线竞速", "Spiral Race") { chart, holder ->
+            // Upstream replays a pre-recorded table: every step widens the three spirals.
+            var currentDataIndex = 0
+            chart.setOption(
+                unsafeJso<EChartsOption> {
+                    animationDuration = AnimationDuration(spiralAnimationDuration)
+                    animationDurationUpdate = AnimationDuration(spiralAnimationDurationUpdate)
+                    animationEasingUpdate = AnimationEasings.linear
+                    dataset = one(spiralDataset(currentDataIndex))
+                    tooltip = one(unsafeJso<TooltipOption> {})
+                    angleAxis =
+                        one(
+                            unsafeJso<AngleAxisOption> {
+                                type = AxisTypes.value
+                                splitArea = unsafeJso<SplitAreaOption> { show = true }
+                                axisLabel =
+                                    unsafeJso<AxisLabelOption> {
+                                        formatter =
+                                            LabelFormatter(
+                                                js("(val) => ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpius','Sagittarius','Capricornus','Aquarius','Pisces'][val]")
+                                                    as LabelFormatterCallback,
+                                            )
+                                        color = "rgba(0,0,0,0.2)"
+                                    }
+                                axisLine = unsafeJso<AxisLineOption> { lineStyle = unsafeJso<LineStyleOption> { color = ZRColor("rgba(0,0,0,0.2)") } }
+                                min = AxisMinMax(0.0)
+                                max = AxisMinMax(valOnRoundRadian.toDouble())
+                            },
+                        )
+                    radiusAxis =
+                        one(
+                            unsafeJso<RadiusAxisOption> {
+                                type = AxisTypes.value
+                                interval = AxisInterval(1.0)
+                                splitLine = unsafeJso<SplitLineOption> { show = false }
+                                axisLabel =
+                                    unsafeJso<AxisLabelOption> {
+                                        color = "rgba(0,0,0,0.6)"
+                                        formatter =
+                                            LabelFormatter(
+                                                js("(val) => val === 1 ? 'A' : val === 2 ? 'B' : val === 3 ? 'C' : ''") as LabelFormatterCallback,
+                                            )
+                                    }
+                                axisTick = unsafeJso<AxisTickOption> { show = BooleanOrString(false) }
+                                axisLine = unsafeJso<AxisLineOption> { lineStyle = unsafeJso<LineStyleOption> { color = ZRColor("rgba(0,0,0,0.2)") } }
+                                min = AxisMinMax(0.0)
+                                max = AxisMinMax(getMaxRadius(currentDataIndex))
+                            },
+                        )
+                    polar = one(unsafeJso<PolarOption> {})
+                    series =
+                        arrayOf<SeriesOption>(
+                            customSeries {
+                                coordinateSystem = "polar"
+                                renderItem = { params, api ->
+                                    val dataIndex = params.dataIndex.toInt()
+                                    val children = mutableListOf<CustomElementOption>()
+                                    val valOnStartRadius = api.value(DimensionLoose(0.0)).unsafeCast<Double>()
+                                    val valOnEndRadian = api.value(DimensionLoose(1.0)).unsafeCast<Double>()
+                                    val coords =
+                                        api.coord(
+                                            CoordinateSystemDataCoord(
+                                                arrayOf(OptionDataValue(valOnStartRadius), OptionDataValue(valOnEndRadian)),
+                                            ),
+                                        )
+                                    val startRadius = coords[2]
+                                    val endRadian = coords[3]
+                                    val widthRadius =
+                                        api.coord(
+                                            CoordinateSystemDataCoord(
+                                                arrayOf(OptionDataValue(barWidthValue), OptionDataValue(0.0)),
+                                            ),
+                                        )[2]
+                                    val cx = params.coordSys.cx ?: 0.0
+                                    val cy = params.coordSys.cy ?: 0.0
+                                    val points = makeShapePoints(cx, cy, widthRadius, startRadius, endRadian)
+                                    children.add(
+                                        unsafeJso<CustomPathOption> {
+                                            type = "polygon"
+                                            shape = unsafeJso<ZRShapeProps> { this.points = points }
+                                            style = unsafeJso<ZRStyleProps> { fill = spiralColors[dataIndex].fill }
+                                        },
+                                    )
+                                    val point = makeLabelPosition(cx, cy, widthRadius, startRadius, endRadian)
+                                    children.add(
+                                        unsafeJso<CustomTextOption> {
+                                            type = "text"
+                                            x = point[0]
+                                            y = point[1]
+                                            z2 = 50.0
+                                            style =
+                                                unsafeJso<SpiralTextStyle> {
+                                                    text = makeText(endRadian)
+                                                    fill = spiralColors[dataIndex].text
+                                                    stroke = ZRColor("#fff")
+                                                    lineWidth = 3.0
+                                                    fontSize = StringOrDouble(16.0)
+                                                    align = TextAlign.center
+                                                    verticalAlign = VerticalAlign.middle
+                                                    rich =
+                                                        recordOf(
+                                                            "round" to unsafeJso<ZRStyleProps> { fontSize = StringOrDouble(24.0) },
+                                                            "percent" to unsafeJso<ZRStyleProps> { fontSize = StringOrDouble(18.0) },
+                                                        )
+                                                }
+                                        },
+                                    )
+                                    unsafeJso<CustomGroupOption> { type = "group"; this.children = children.toTypedArray() }
+                                }
+                            },
+                        )
+                },
+            )
+            fun next() {
+                currentDataIndex++
+                if (currentDataIndex >= datasourceList.size) return
+                chart.setOption(
+                    unsafeJso<EChartsOption> {
+                        dataset = one(spiralDataset(currentDataIndex))
+                        radiusAxis = one(unsafeJso<RadiusAxisOption> { max = AxisMinMax(getMaxRadius(currentDataIndex)) })
+                    },
+                )
+                if (currentDataIndex < datasourceList.size - 1) {
+                    holder.setTimeout(::next, spiralAnimationDurationUpdate.toInt())
+                }
+            }
+            holder.setTimeout(::next, 1000)
+            null
+        },
     )
+
+/** Text style of the spiral labels; [ZRStyleProps] does not declare `rich` yet. */
+private external interface SpiralTextStyle : ZRStyleProps {
+    var rich: Record<String, ZRStyleProps>?
+}
+
+/** Content of the `dataset` of step [index]: `[radius value, radian value]` pairs. */
+private fun spiralDataset(index: Int): DatasetOption =
+    unsafeJso {
+        source =
+            datasetArrayRows(
+                Array(datasourceList[index].size) { row ->
+                    Array(datasourceList[index][row].size) { column -> OptionDataValue(datasourceList[index][row][column]) }
+                },
+            )
+    }
+private external interface SpiralColor {
+    var fill: ZRColor
+    var text: ZRColor
+}
+
+private val spiralColors =
+    arrayOf(
+        unsafeJso<SpiralColor> { fill = ZRColor("#5470c6"); text = ZRColor("#2747a5") },
+        unsafeJso<SpiralColor> { fill = ZRColor("#91cc75"); text = ZRColor("#447f27") },
+        unsafeJso<SpiralColor> { fill = ZRColor("#fac858"); text = ZRColor("#a0761c") },
+    )
+
+private val radianLabels =
+    arrayOf(
+        "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpius",
+        "Sagittarius", "Capricornus", "Aquarius", "Pisces",
+    )
+private val valOnRoundRadian = radianLabels.size
+private val radianStep = kotlin.math.PI / 45
+private val barWidthValue = 0.4
+private val valOnRadiusStep = 4.0
+private val startRadian = kotlin.math.PI / 2
+private const val spiralAnimationDuration = 5000.0
+private const val spiralAnimationDurationUpdate = 7000.0
+
+private val datasourceList: Array<Array<Array<Double>>> =
+    arrayOf(
+        arrayOf(arrayOf(1.0, 3.0), arrayOf(2.0, 6.0), arrayOf(3.0, 9.0)),
+        arrayOf(arrayOf(1.0, 12.0), arrayOf(2.0, 16.0), arrayOf(3.0, 14.0)),
+        arrayOf(arrayOf(1.0, 17.0), arrayOf(2.0, 22.0), arrayOf(3.0, 19.0)),
+        arrayOf(arrayOf(1.0, 19.0), arrayOf(2.0, 33.0), arrayOf(3.0, 24.0)),
+        arrayOf(arrayOf(1.0, 24.0), arrayOf(2.0, 42.0), arrayOf(3.0, 29.0)),
+        arrayOf(arrayOf(1.0, 27.0), arrayOf(2.0, 47.0), arrayOf(3.0, 41.0)),
+        arrayOf(arrayOf(1.0, 36.0), arrayOf(2.0, 52.0), arrayOf(3.0, 52.0)),
+        arrayOf(arrayOf(1.0, 46.0), arrayOf(2.0, 59.0), arrayOf(3.0, 63.0)),
+        arrayOf(arrayOf(1.0, 60.0), arrayOf(2.0, 63.0), arrayOf(3.0, 69.0)),
+    )
+
+private fun getSpiralValueOnRadius(valOnStartRadius: Double, valOnEndAngle: Double): Double =
+    valOnStartRadius + valOnRadiusStep * (valOnEndAngle / valOnRoundRadian)
+
+private fun getSpiralRadius(startRadius: Double, endRadian: Double, radiusStep: Double): Double =
+    startRadius + radiusStep * ((startRadian - endRadian) / (kotlin.math.PI * 2))
+
+private fun getRadiusStepByWidth(widthRadius: Double): Double = (widthRadius / barWidthValue) * valOnRadiusStep
+
+private fun convertToPolarPoint(radius: Double, radian: Double, cx: Double, cy: Double): Array<Double> =
+    arrayOf(kotlin.math.cos(radian) * radius + cx, -kotlin.math.sin(radian) * radius + cy)
+
+private fun makeShapePoints(
+    cx: Double,
+    cy: Double,
+    widthRadius: Double,
+    startRadius: Double,
+    endRadian: Double,
+): Array<Array<Double>> {
+    val points = mutableListOf<Array<Double>>()
+    val radiusStep = getRadiusStepByWidth(widthRadius)
+    var iRadian = startRadian
+    val end1 = endRadian - radianStep
+    while (iRadian > end1) {
+        if (iRadian < endRadian) iRadian = endRadian
+        val iRadius = getSpiralRadius(startRadius - widthRadius, iRadian, radiusStep)
+        points.add(convertToPolarPoint(iRadius, iRadian, cx, cy))
+        iRadian -= radianStep
+    }
+    iRadian = endRadian
+    val end2 = startRadian + radianStep
+    while (iRadian < end2) {
+        if (iRadian > startRadian) iRadian = startRadian
+        val iRadius = getSpiralRadius(startRadius + widthRadius, iRadian, radiusStep)
+        points.add(convertToPolarPoint(iRadius, iRadian, cx, cy))
+        iRadian += radianStep
+    }
+    return points.toTypedArray()
+}
+
+private fun makeLabelPosition(
+    cx: Double,
+    cy: Double,
+    widthRadius: Double,
+    startRadius: Double,
+    endRadian: Double,
+): Array<Double> {
+    val radiusStep = getRadiusStepByWidth(widthRadius)
+    val iRadius = getSpiralRadius(startRadius, endRadian, radiusStep)
+    return convertToPolarPoint(iRadius, endRadian - 10 / iRadius, cx, cy)
+}
+
+private fun getMaxRadius(idx: Int): Double {
+    var radius = 0.0
+    for (item in datasourceList[idx]) {
+        radius = kotlin.math.max(radius, getSpiralValueOnRadius(item[0], item[1]))
+    }
+    return kotlin.math.ceil(radius * 1.2)
+}
+
+private fun makeText(endRadian: Double): String {
+    val radian = startRadian - endRadian
+    val pi2 = kotlin.math.PI * 2
+    val round = kotlin.math.floor(radian / pi2)
+    val p = ((radian / pi2) % 1) * 100
+    val percent = (kotlin.math.round(p * 10) / 10.0).toString() + "%"
+    return "Round {round|" + round.toInt() + "}\n{percent|" + percent + "}"
+}

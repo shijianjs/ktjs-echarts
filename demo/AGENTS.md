@@ -83,10 +83,12 @@ demo/src/jvmTest/kotlin/demo/e2e/
 - 需要百度地图的（清单里 `tags: ["bmap"]`），
 - 需要 `echarts-gl` 的（`public/examples/ts/gl`，wrapper 没有覆盖），
 - 依赖官方站点图片素材的（`image://` 图标、纹理贴图、`data:image/...` 大块 base64），
-- 依赖真实键鼠序列的（拖拽、触摸、`sendInput`），
-- 依赖 `setInterval` 驱动的动画（demo 一页只构建一次，没有定时器生命周期）。
+- 依赖真实键鼠序列的（拖拽、触摸、`sendInput`）。
 
-筛选后仍有 250+ 个候选，目前已落地 **158 个**（覆盖 25 个家族 + 一个「文档示例」组），其余按批推进。
+`setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
+`Category.interactive` 的双参重载把 holder 交给例子。
+
+筛选后仍有 250+ 个候选，目前已落地 **171 个**（覆盖 25 个家族 + 一个「文档示例」组），其余按批推进。
 
 「文档示例」组（`Groups.DOC`，`examples/DocExamples.kt`）对应官方清单里的 `doc-example/*` 条目：它们
 不属于任何家族，一个例子只讲一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。
@@ -104,13 +106,13 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `public/data/asset/geo/` 下的 GeoJSON 或 SVG，就能继续补这两个家族。
 
 个别被移植家族内的长尾示例（动画竞速、下钻、真实指针交互）留待下一批，例如 `bar-race`、
-`bar-drilldown`、`line-easing`、`scatter-clustering`、`custom-spiral-race`、`custom-gantt-flight`、
+`bar-drilldown`、`line-easing`、`scatter-clustering`、`custom-gantt-flight`、
 `custom-gauge`（需要 `path://` 面板图）、`custom-calendar-icon`（图标是 `path://` 素材）。
 
-`doc-example/*` 里还没有移植的：`pie-highlight` 与 `barGrid-barGap`（`setInterval` 驱动，
-需要定时器生命周期）、`canvas-vs-svg`（第二个渲染器）、`tutorial-async` / `tutorial-loading`
-（异步设 option）、`value-animation-*`、`sunburst-highlight-*`（需要 `dispatchAction`）、
-以及 `text-fregment-align`、`title-block`、`grid-outerBounds`、`pictorialBar-*` 这些较长的文档页。
+`doc-example/*` 里还没有移植的：`barGrid-barGap`（`setInterval` 驱动）、`canvas-vs-svg`（第二个渲染器）、
+`tutorial-async` / `tutorial-loading`（异步设 option）、`value-animation-*`、
+`sunburst-highlight-*`（需要 `dispatchAction`）、以及 `text-fregment-align`、`title-block`、
+`grid-outerBounds`、`pictorialBar-*` 这些较长的文档页。
 
 ## 移植过程中修掉的 wrapper 缺口
 

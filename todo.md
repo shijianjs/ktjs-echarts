@@ -240,7 +240,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（158 个示例 / 25 个家族 + 文档示例组 + 总览页）
+### 已落地（171 个示例 / 25 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -275,6 +275,13 @@
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
 
+- 第十七批（13 个）：bar 长尾 `bar-gradient`（点击柱体 dispatchAction 平移 dataZoom）、`bar-large`
+  （50 万条确定性数据 + `large` 模式）、`bar-breaks-simple`（轴断点 + 锯齿断口）；`pie-labelLine-adjust`；
+  doc-example 的 `pie-label-margin` / `pie-label-distanceToLabelLine` / `pie-label-bleedMargin`
+  （三页共用 `pieLabelPair` 双饼布局）、`radar`、`scatter-jitter-avoidOverlap`（抖动像素随画布宽度计算）、
+  `parallel-all`（北京 / 上海 / 广州各 31 天的 AQI 表）、`data-transform-multiple-sort-bar`
+  （`sort` 转换配置用数组 cast 成 `Record`）；`custom-spiral-race`（ChartHolder.setTimeout 驱动的螺旋竞速）。
+
 - 第十六批（1 个 + 基础设施）：`pie-highlight`（setInterval 每秒 dispatchAction 高亮/显示提示；chart-scoped timer 由 ChartHolder 在卸载时自动清理）。同时给 `ChartHolder` 加了 timer 生命周期（`setInterval`/`setTimeout` 注册后 `unmount()` 自动清理），`Category.interactive` 新增双参重载暴露 `ChartHolder`，解锁全部 setInterval 动画类（custom-spiral-race / custom-gantt-flight / graphic-wave-animation / value-animation-* 等）。
 
 - 第十五批（1 个）：`custom-profile`（自定义甘特/性能分析图，确定性数据，省略 clipRectByRect 裁剪）。
@@ -292,30 +299,28 @@
 ### 下一批（按可做性排序）
 
 1. **无外部依赖、可直接做**：
-   - `doc-example` 剩余（约 42 个）：`tutorial-styling` 之后的教程页、`text-*`、`title-block`、
-     `label-position`、`grid-outerBounds`、`parallel-all`、`radar`、`sunburst-highlight-*`（需要
+   - `doc-example` 剩余（约 40 个）：`tutorial-styling` 之后的教程页、`text-*`、`title-block`、
+     `label-position`、`grid-outerBounds`、`sunburst-highlight-*`（需要
      `dispatchAction`）、`pictorialBar-*`；`map-*`/`geo-*` 除外。
    - `custom` 剩余：     `custom-calendar-icon`（`params.coordSys.cellWidth/cellHeight` 已补，可直接做）、
-     `custom-spiral-race`/`custom-gantt-flight`（长动画）、`custom-gauge`
-     （`path://` 面板图）。
+     `custom-gantt-flight`（长动画）、`custom-gauge`
+     （`path://` 面板图，`params.coordSys.cx/cy` 已补）。
    - `matrix` 剩余：`matrix-mbti`、`matrix-periodic-table`、`matrix-stock`（数据表 8-17KB，
      需要先写一个把上游数组转成 Kotlin 的小脚本）、`matrix-mini-bar-geo`（需要 geo）。
    - 已移植家族的长尾里可直接做的：`line-markline`、`line-markarea`、`line-smooth` 之外的 line 变体、
      `pie-legend`、`gauge-clock`/`gauge-speed`/`gauge-barometer`（`path://` 图标，需先决定是否搬运
      几 KB 的 path 字符串）、`bar-polar-*`、`polar-*`。
-   - 已移植家族的长尾：`bar-race`/`bar-race-country`/`bar-drilldown`/`bar-multi-drilldown`/`bar-gradient`/
-     `bar-large`/`bar-breaks-simple`/`bar-breaks-brush`/`bar-label-rotation`/`bar-polar-*`/`polar-*`、
+   - 已移植家族的长尾：`bar-race`/`bar-race-country`/`bar-drilldown`/`bar-multi-drilldown`/
+     `bar-breaks-brush`/`bar-polar-*`/`polar-*`、
      `line-easing`/`line-fisheye-lens`/`line-graphic`/`line-pen`/`line-draggable`/`line-race`/`line-polar*`/
      `area-pieces`/`area-time-axis`/`dynamic-data`/`dynamic-data2`/`bump-chart`/`confidence-band`/
      `grid-multiple`/`multiple-x-axis`/`candlestick-sh`（26KB 内联表）/`candlestick-large`/
      `candlestick-brush`/`intraday-breaks-1|2`、
      `graph-force2` 之外的 graph 变体、`gauge-clock`/`gauge-speed`/`gauge-stage`/`gauge-temperature`/
      `gauge-barometer`/`gauge-multi-title`、`radar` 家族已全、`treemap` 只剩需要外部数据的、
-     `pie-labelLine-adjust`/`pie-legend`/`pie-pattern`（图案需要贴图）等。
+     `pie-legend`/`pie-pattern`（图案需要贴图）等。
 2. **需要先补 wrapper 建模**：
    - `calendar-lunar`：366 行农历表（数据而非 API）。
-   - 极坐标的 `renderItem`：`params.coordSys` 的 `cx` / `cy` 还没有 Kotlin 声明（`.d.ts` 只写了
-     `type`），要补才能做 `custom-gauge`。
 3. **明确排除，不要重复尝试**（原因记在 `demo/AGENTS.md`）：
    - 地图 / `geo` / GeoJSON、百度地图（`tags: ["bmap"]`）、`echarts-gl`（`public/examples/ts/gl`）。
    - 运行时取数：`$.get` / `XMLHttpRequest` / `fetch` + `ROOT_PATH`、`*.json`、`*.bin`。
@@ -361,7 +366,6 @@
 ## 待办
 
 - 类型建模：暂无未完成项（见上面各轮）。
-- 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 `doc-example` 剩余约 45 页、`custom` /
-  `matrix` 剩余项与各家族长尾；极坐标 `renderItem` 需要先补 `params.coordSys.cx/cy`，
-  `custom-calendar-icon` 需要 `params.coordSys.cellWidth/cellHeight`。
-- 提交：全部已推送到 `origin/main`（最新 本批：timer 基础设施 + pie-highlight）。
+- 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 `doc-example` 剩余约 40 页、`custom` /
+  `matrix` 剩余项与各家族长尾；`custom-calendar-icon` 需要 `params.coordSys.cellWidth/cellHeight`。
+- 提交：全部已推送到 `origin/main`（最新 本批：第十七批 13 个示例）。

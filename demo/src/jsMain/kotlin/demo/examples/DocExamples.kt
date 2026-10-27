@@ -8,6 +8,7 @@ import js.objects.Record
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import web.cssom.TextAlign
+import web.cssom.VerticalAlign
 import zrender.ZRColor
 import zrender.ZRLineTypes
 
@@ -97,6 +98,226 @@ private fun hiddenYAxis(): Array<YAxisOption> =
             min = AxisMinMax(-1.0)
             max = AxisMinMax(1.0)
         },
+    )
+
+/** The seven slices of the `pie-label-*` pages; the `distanceToLabelLine` / `bleedMargin` pages use longer names. */
+private fun pieLabelSlices(longNames: Boolean): Array<PieDataItem?> {
+    val names =
+        if (longNames) {
+            arrayOf("Apple Numbers", "Strawberry Numbers", "Banana Numbers", "Orange Numbers", "Pear Numbers", "Pineapple Numbers", "Grape Numbers")
+        } else {
+            arrayOf("Apples", "Strawberries", "Bananas", "Oranges", "Pears", "Pineapples", "Grapes")
+        }
+    val values = doubleArrayOf(70.0, 68.0, 48.0, 40.0, 32.0, 27.0, 18.0)
+    return Array<PieDataItem?>(names.size) { index -> pieItem(names[index], values[index]) }
+}
+
+/** The title block above the two pies of a `pie-label-*` page. */
+private fun pieLabelTitles(leftCaption: String, rightCaption: String): Array<TitleOption> =
+    arrayOf(
+        unsafeJso<TitleOption> { text = "Pie label margin" },
+        unsafeJso<TitleOption> {
+            subtext = leftCaption
+            left = StringOrDouble("25%")
+            top = StringOrDouble("75%")
+            textAlign = "center"
+        },
+        unsafeJso<TitleOption> {
+            subtext = rightCaption
+            left = StringOrDouble("75%")
+            top = StringOrDouble("75%")
+            textAlign = "center"
+        },
+    )
+
+/** The two half-width pies of a `pie-label-*` page, each with its own label options. */
+private fun pieLabelPair(
+    slices: Array<PieDataItem?>,
+    leftLabel: PieLabelOption,
+    rightLabel: PieLabelOption,
+): Array<SeriesOption> =
+    arrayOf(
+        pieSeries {
+            radius = StringOrDoubleOrArray("25%")
+            center = arrayOf(StringOrDouble("50%"), StringOrDouble("50%"))
+            animation = false
+            typedLabel = leftLabel
+            left = StringOrDouble(0.0)
+            right = StringOrDouble("50%")
+            top = StringOrDouble(0.0)
+            bottom = StringOrDouble(0.0)
+            typedData = slices
+        },
+        pieSeries {
+            radius = StringOrDoubleOrArray("25%")
+            center = arrayOf(StringOrDouble("50%"), StringOrDouble("50%"))
+            animation = false
+            typedLabel = rightLabel
+            left = StringOrDouble("50%")
+            right = StringOrDouble(0.0)
+            top = StringOrDouble(0.0)
+            bottom = StringOrDouble(0.0)
+            typedData = slices
+        },
+    )
+
+/** One descriptor of the `sort` transform of `doc-example/data-transform-multiple-sort-bar`. */
+private external interface SortDescriptor {
+    var dimension: String
+    var order: String
+}
+
+/**
+ * Config of the `sort` transform: an array of descriptors.
+ *
+ * Upstream types `transform.config` as `unknown`; the wrapper types it as a record, so the array is
+ * cast to the record type. ECharts only looks at the resulting JavaScript value.
+ */
+private fun sortDescriptors(vararg pairs: Pair<String, String>): Record<String, JsAny> =
+    Array(pairs.size) { index ->
+        unsafeJso<SortDescriptor> {
+            dimension = pairs[index].first
+            order = pairs[index].second
+        }
+    }.unsafeCast<Record<String, JsAny>>()
+
+/**
+ * Source rows of `doc-example/data-transform-multiple-sort-bar`.
+ *
+ * One score is `null`, which [datasetArrayRows] cannot express, so the rows are cast to
+ * [DatasetSource]; ECharts reads the plain JavaScript arrays the same way.
+ */
+private fun sortBarSource(): DatasetSource =
+    arrayOf(
+        arrayOf<Any?>(" Hannah Krause ", 41.0, "Engineer", 314.0, "2011-02-12"),
+        arrayOf<Any?>("Zhao Qian ", 20.0, "Teacher", 351.0, "2011-03-01"),
+        arrayOf<Any?>(" Jasmin Krause ", 52.0, "Musician", 287.0, "2011-02-14"),
+        arrayOf<Any?>("Li Lei", 37.0, "Teacher", 219.0, "2011-02-18"),
+        arrayOf<Any?>(" Karle Neumann ", 25.0, "Engineer", 253.0, "2011-04-02"),
+        arrayOf<Any?>(" Adrian Groß", 19.0, "Teacher", null, "2011-01-16"),
+        arrayOf<Any?>("Mia Neumann", 71.0, "Engineer", 165.0, "2011-03-19"),
+        arrayOf<Any?>(" Böhm Fuchs", 36.0, "Musician", 318.0, "2011-02-24"),
+        arrayOf<Any?>("Han Meimei ", 67.0, "Engineer", 366.0, "2011-03-12"),
+    ).unsafeCast<DatasetSource>()
+
+/** One row of the `doc-example/parallel-all` tables: `[date, AQI, PM2.5, PM10, CO, NO2, SO2, grade]`. */
+private fun aqiRow(
+    day: Double,
+    aqi: Double,
+    pm25: Double,
+    pm10: Double,
+    co: Double,
+    no2: Double,
+    so2: Double,
+    grade: String,
+): ParallelSeriesDataItem = ParallelSeriesDataItem(row(day, aqi, pm25, pm10, co, no2, so2, grade))
+
+/** The daily AQI table of 北京 in `doc-example/parallel-all`. */
+private val parallelBeijing: List<ParallelSeriesDataItem> =
+    listOf<ParallelSeriesDataItem>(
+        aqiRow(1.0, 55.0, 9.0, 56.0, 0.46, 18.0, 6.0, "良"),
+        aqiRow(2.0, 25.0, 11.0, 21.0, 0.65, 34.0, 9.0, "优"),
+        aqiRow(3.0, 56.0, 7.0, 63.0, 0.3, 14.0, 5.0, "良"),
+        aqiRow(4.0, 33.0, 7.0, 29.0, 0.33, 16.0, 6.0, "优"),
+        aqiRow(5.0, 42.0, 24.0, 44.0, 0.76, 40.0, 16.0, "优"),
+        aqiRow(6.0, 82.0, 58.0, 90.0, 1.77, 68.0, 33.0, "良"),
+        aqiRow(7.0, 74.0, 49.0, 77.0, 1.46, 48.0, 27.0, "良"),
+        aqiRow(8.0, 78.0, 55.0, 80.0, 1.29, 59.0, 29.0, "良"),
+        aqiRow(9.0, 267.0, 216.0, 280.0, 4.8, 108.0, 64.0, "重度污染"),
+        aqiRow(10.0, 185.0, 127.0, 216.0, 2.52, 61.0, 27.0, "中度污染"),
+        aqiRow(11.0, 39.0, 19.0, 38.0, 0.57, 31.0, 15.0, "优"),
+        aqiRow(12.0, 41.0, 11.0, 40.0, 0.43, 21.0, 7.0, "优"),
+        aqiRow(13.0, 64.0, 38.0, 74.0, 1.04, 46.0, 22.0, "良"),
+        aqiRow(14.0, 108.0, 79.0, 120.0, 1.7, 75.0, 41.0, "轻度污染"),
+        aqiRow(15.0, 108.0, 63.0, 116.0, 1.48, 44.0, 26.0, "轻度污染"),
+        aqiRow(16.0, 33.0, 6.0, 29.0, 0.34, 13.0, 5.0, "优"),
+        aqiRow(17.0, 94.0, 66.0, 110.0, 1.54, 62.0, 31.0, "良"),
+        aqiRow(18.0, 186.0, 142.0, 192.0, 3.88, 93.0, 79.0, "中度污染"),
+        aqiRow(19.0, 57.0, 31.0, 54.0, 0.96, 32.0, 14.0, "良"),
+        aqiRow(20.0, 22.0, 8.0, 17.0, 0.48, 23.0, 10.0, "优"),
+        aqiRow(21.0, 39.0, 15.0, 36.0, 0.61, 29.0, 13.0, "优"),
+        aqiRow(22.0, 94.0, 69.0, 114.0, 2.08, 73.0, 39.0, "良"),
+        aqiRow(23.0, 99.0, 73.0, 110.0, 2.43, 76.0, 48.0, "良"),
+        aqiRow(24.0, 31.0, 12.0, 30.0, 0.5, 32.0, 16.0, "优"),
+        aqiRow(25.0, 42.0, 27.0, 43.0, 1.0, 53.0, 22.0, "优"),
+        aqiRow(26.0, 154.0, 117.0, 157.0, 3.05, 92.0, 58.0, "中度污染"),
+        aqiRow(27.0, 234.0, 185.0, 230.0, 4.09, 123.0, 69.0, "重度污染"),
+        aqiRow(28.0, 160.0, 120.0, 186.0, 2.77, 91.0, 50.0, "中度污染"),
+        aqiRow(29.0, 134.0, 96.0, 165.0, 2.76, 83.0, 41.0, "轻度污染"),
+        aqiRow(30.0, 52.0, 24.0, 60.0, 1.03, 50.0, 21.0, "良"),
+        aqiRow(31.0, 46.0, 5.0, 49.0, 0.28, 10.0, 6.0, "优"),
+    )
+
+/** The daily AQI table of 广州 in `doc-example/parallel-all`. */
+private val parallelGuangzhou: List<ParallelSeriesDataItem> =
+    listOf<ParallelSeriesDataItem>(
+        aqiRow(1.0, 26.0, 37.0, 27.0, 1.163, 27.0, 13.0, "优"),
+        aqiRow(2.0, 85.0, 62.0, 71.0, 1.195, 60.0, 8.0, "良"),
+        aqiRow(3.0, 78.0, 38.0, 74.0, 1.363, 37.0, 7.0, "良"),
+        aqiRow(4.0, 21.0, 21.0, 36.0, 0.634, 40.0, 9.0, "优"),
+        aqiRow(5.0, 41.0, 42.0, 46.0, 0.915, 81.0, 13.0, "优"),
+        aqiRow(6.0, 56.0, 52.0, 69.0, 1.067, 92.0, 16.0, "良"),
+        aqiRow(7.0, 64.0, 30.0, 28.0, 0.924, 51.0, 2.0, "良"),
+        aqiRow(8.0, 55.0, 48.0, 74.0, 1.236, 75.0, 26.0, "良"),
+        aqiRow(9.0, 76.0, 85.0, 113.0, 1.237, 114.0, 27.0, "良"),
+        aqiRow(10.0, 91.0, 81.0, 104.0, 1.041, 56.0, 40.0, "良"),
+        aqiRow(11.0, 84.0, 39.0, 60.0, 0.964, 25.0, 11.0, "良"),
+        aqiRow(12.0, 64.0, 51.0, 101.0, 0.862, 58.0, 23.0, "良"),
+        aqiRow(13.0, 70.0, 69.0, 120.0, 1.198, 65.0, 36.0, "良"),
+        aqiRow(14.0, 77.0, 105.0, 178.0, 2.549, 64.0, 16.0, "良"),
+        aqiRow(15.0, 109.0, 68.0, 87.0, 0.996, 74.0, 29.0, "轻度污染"),
+        aqiRow(16.0, 73.0, 68.0, 97.0, 0.905, 51.0, 34.0, "良"),
+        aqiRow(17.0, 54.0, 27.0, 47.0, 0.592, 53.0, 12.0, "良"),
+        aqiRow(18.0, 51.0, 61.0, 97.0, 0.811, 65.0, 19.0, "良"),
+        aqiRow(19.0, 91.0, 71.0, 121.0, 1.374, 43.0, 18.0, "良"),
+        aqiRow(20.0, 73.0, 102.0, 182.0, 2.787, 44.0, 19.0, "良"),
+        aqiRow(21.0, 73.0, 50.0, 76.0, 0.717, 31.0, 20.0, "良"),
+        aqiRow(22.0, 84.0, 94.0, 140.0, 2.238, 68.0, 18.0, "良"),
+        aqiRow(23.0, 93.0, 77.0, 104.0, 1.165, 53.0, 7.0, "良"),
+        aqiRow(24.0, 99.0, 130.0, 227.0, 3.97, 55.0, 15.0, "良"),
+        aqiRow(25.0, 146.0, 84.0, 139.0, 1.094, 40.0, 17.0, "轻度污染"),
+        aqiRow(26.0, 113.0, 108.0, 137.0, 1.481, 48.0, 15.0, "轻度污染"),
+        aqiRow(27.0, 81.0, 48.0, 62.0, 1.619, 26.0, 3.0, "良"),
+        aqiRow(28.0, 56.0, 48.0, 68.0, 1.336, 37.0, 9.0, "良"),
+        aqiRow(29.0, 82.0, 92.0, 174.0, 3.29, 0.0, 13.0, "良"),
+        aqiRow(30.0, 106.0, 116.0, 188.0, 3.628, 101.0, 16.0, "轻度污染"),
+        aqiRow(31.0, 118.0, 50.0, 0.0, 1.383, 76.0, 11.0, "轻度污染"),
+    )
+
+/** The daily AQI table of 上海 in `doc-example/parallel-all`. */
+private val parallelShanghai: List<ParallelSeriesDataItem> =
+    listOf<ParallelSeriesDataItem>(
+        aqiRow(1.0, 91.0, 45.0, 125.0, 0.82, 34.0, 23.0, "良"),
+        aqiRow(2.0, 65.0, 27.0, 78.0, 0.86, 45.0, 29.0, "良"),
+        aqiRow(3.0, 83.0, 60.0, 84.0, 1.09, 73.0, 27.0, "良"),
+        aqiRow(4.0, 109.0, 81.0, 121.0, 1.28, 68.0, 51.0, "轻度污染"),
+        aqiRow(5.0, 106.0, 77.0, 114.0, 1.07, 55.0, 51.0, "轻度污染"),
+        aqiRow(6.0, 109.0, 81.0, 121.0, 1.28, 68.0, 51.0, "轻度污染"),
+        aqiRow(7.0, 106.0, 77.0, 114.0, 1.07, 55.0, 51.0, "轻度污染"),
+        aqiRow(8.0, 89.0, 65.0, 78.0, 0.86, 51.0, 26.0, "良"),
+        aqiRow(9.0, 53.0, 33.0, 47.0, 0.64, 50.0, 17.0, "良"),
+        aqiRow(10.0, 80.0, 55.0, 80.0, 1.01, 75.0, 24.0, "良"),
+        aqiRow(11.0, 117.0, 81.0, 124.0, 1.03, 45.0, 24.0, "轻度污染"),
+        aqiRow(12.0, 99.0, 71.0, 142.0, 1.1, 62.0, 42.0, "良"),
+        aqiRow(13.0, 95.0, 69.0, 130.0, 1.28, 74.0, 50.0, "良"),
+        aqiRow(14.0, 116.0, 87.0, 131.0, 1.47, 84.0, 40.0, "轻度污染"),
+        aqiRow(15.0, 108.0, 80.0, 121.0, 1.3, 85.0, 37.0, "轻度污染"),
+        aqiRow(16.0, 134.0, 83.0, 167.0, 1.16, 57.0, 43.0, "轻度污染"),
+        aqiRow(17.0, 79.0, 43.0, 107.0, 1.05, 59.0, 37.0, "良"),
+        aqiRow(18.0, 71.0, 46.0, 89.0, 0.86, 64.0, 25.0, "良"),
+        aqiRow(19.0, 97.0, 71.0, 113.0, 1.17, 88.0, 31.0, "良"),
+        aqiRow(20.0, 84.0, 57.0, 91.0, 0.85, 55.0, 31.0, "良"),
+        aqiRow(21.0, 87.0, 63.0, 101.0, 0.9, 56.0, 41.0, "良"),
+        aqiRow(22.0, 104.0, 77.0, 119.0, 1.09, 73.0, 48.0, "轻度污染"),
+        aqiRow(23.0, 87.0, 62.0, 100.0, 1.0, 72.0, 28.0, "良"),
+        aqiRow(24.0, 168.0, 128.0, 172.0, 1.49, 97.0, 56.0, "中度污染"),
+        aqiRow(25.0, 65.0, 45.0, 51.0, 0.74, 39.0, 17.0, "良"),
+        aqiRow(26.0, 39.0, 24.0, 38.0, 0.61, 47.0, 17.0, "优"),
+        aqiRow(27.0, 39.0, 24.0, 39.0, 0.59, 50.0, 19.0, "优"),
+        aqiRow(28.0, 93.0, 68.0, 96.0, 1.05, 79.0, 29.0, "良"),
+        aqiRow(29.0, 188.0, 143.0, 197.0, 1.66, 99.0, 51.0, "中度污染"),
+        aqiRow(30.0, 174.0, 131.0, 174.0, 1.55, 108.0, 50.0, "中度污染"),
+        aqiRow(31.0, 187.0, 143.0, 201.0, 1.39, 89.0, 53.0, "中度污染"),
     )
 
 val docExampleEntries: List<CatalogEntry> =
@@ -814,6 +1035,304 @@ val docExampleEntries: List<CatalogEntry> =
                             itemStyle = unsafeJso<ItemStyleOption> { opacity = 0.8 }
                             symbolSize = SymbolSize { value, _ -> DoubleOrDoubleArray(numberAt(value, 2) * 40) }
                             typedData = points(*values)
+                        },
+                    )
+            }
+        },
+        docExample.chart("doc-example/pie-label-margin", "饼图标签外边距", "Pie label margin") {
+            unsafeJso<EChartsOption> {
+                title = pieLabelTitles("margin: \"25%\"", "margin: 10")
+                series =
+                    pieLabelPair(
+                        pieLabelSlices(false),
+                        unsafeJso<PieLabelOption> {
+                            position = LabelPosition("outer")
+                            alignTo = PieLabelAlignTos.edge
+                            margin = StringOrDouble("25%")
+                        },
+                        unsafeJso<PieLabelOption> {
+                            position = LabelPosition("outer")
+                            alignTo = PieLabelAlignTos.edge
+                            margin = StringOrDouble(10.0)
+                        },
+                    )
+            }
+        },
+        docExample.chart("doc-example/pie-label-distanceToLabelLine", "饼图标签与引导线距离", "Pie label distance to label line") {
+            unsafeJso<EChartsOption> {
+                title = pieLabelTitles("distanceToLabelLine: 5", "distanceToLabelLine: 20")
+                series =
+                    pieLabelPair(
+                        pieLabelSlices(true),
+                        unsafeJso<PieLabelOption> {
+                            position = LabelPosition("outer")
+                            alignTo = PieLabelAlignTos.labelLine
+                            distanceToLabelLine = 5.0
+                        },
+                        unsafeJso<PieLabelOption> {
+                            position = LabelPosition("outer")
+                            alignTo = PieLabelAlignTos.labelLine
+                            distanceToLabelLine = 20.0
+                        },
+                    )
+            }
+        },
+        docExample.chart("doc-example/pie-label-bleedMargin", "饼图标签出血边距", "Pie label bleed margin") {
+            unsafeJso<EChartsOption> {
+                title = pieLabelTitles("bleedMargin: 50", "bleedMargin: 10")
+                series =
+                    pieLabelPair(
+                        pieLabelSlices(true),
+                        unsafeJso<PieLabelOption> {
+                            position = LabelPosition("outer")
+                            alignTo = PieLabelAlignTos.labelLine
+                            bleedMargin = 50.0
+                        },
+                        unsafeJso<PieLabelOption> {
+                            position = LabelPosition("outer")
+                            alignTo = PieLabelAlignTos.labelLine
+                            bleedMargin = 10.0
+                        },
+                    )
+            }
+        },
+        docExample.chart("doc-example/radar", "雷达图的坐标轴样式", "Radar") {
+            unsafeJso<EChartsOption> {
+                radar =
+                    one(
+                        unsafeJso<RadarOption> {
+                            indicator =
+                                arrayOf(
+                                    unsafeJso<RadarIndicator> { name = "指标一" },
+                                    unsafeJso<RadarIndicator> { name = "指标二" },
+                                    unsafeJso<RadarIndicator> { name = "指标三" },
+                                    unsafeJso<RadarIndicator> { name = "指标四" },
+                                    unsafeJso<RadarIndicator> { name = "指标五" },
+                                )
+                            center = arrayOf(StringOrDouble("50%"), StringOrDouble("50%"))
+                            radius = StringOrDouble("80%")
+                            startAngle = 90.0
+                            splitNumber = 4.0
+                            shape = RadarShapes.circle
+                            axisName =
+                                unsafeJso<LabelOption> {
+                                    formatter = LabelFormatter("【{value}】")
+                                    color = "#72ACD1"
+                                }
+                            splitArea =
+                                unsafeJso<SplitAreaOption> {
+                                    areaStyle =
+                                        unsafeJso<SplitAreaStyleOption> {
+                                            typedColor =
+                                                arrayOf(
+                                                    ZRColor("#B8D3E4"),
+                                                    ZRColor("#96C5E3"),
+                                                    ZRColor("#7DB5DA"),
+                                                    ZRColor("#72ACD1"),
+                                                )
+                                        }
+                                }
+                            axisTick =
+                                unsafeJso<AxisTickOption> {
+                                    show = BooleanOrString(true)
+                                    lineStyle = unsafeJso<LineStyleOption> { color = ZRColor("rgba(255, 255, 255, 0.8)") }
+                                }
+                            axisLabel =
+                                unsafeJso<AxisLabelOption> {
+                                    show = true
+                                    color = "white"
+                                }
+                            axisLine = unsafeJso<AxisLineOption> { lineStyle = unsafeJso<LineStyleOption> { color = ZRColor("rgba(255, 255, 255, 0.4)") } }
+                            splitLine = unsafeJso<SplitLineOption> { lineStyle = unsafeJso<SplitLineStyleOption> { color = ZRColor("rgba(255, 255, 255, 0.4)") } }
+                        },
+                    )
+            }
+        },
+        docExample.interactive("doc-example/scatter-jitter-avoidOverlap", "散点抖动（避免重叠）", "Scatter with Jittering") { chart ->
+            // The jitter is expressed in pixels, so it depends on the width of the plot area.
+            val plotWidth = chart.getWidth() - 80.0 - 50.0
+            // The original randomizes the third value; a fixed sequence keeps the page reproducible.
+            val values =
+                Array(7 * 30) { index ->
+                    val day = index / 30
+                    val position = index % 30
+                    doubleArrayOf(day.toDouble(), kotlin.math.tan(position.toDouble()) / 2 + 7, (index % 100).toDouble() / 100.0)
+                }
+            chart.setOption(
+                unsafeJso<EChartsOption> {
+                    title = one(unsafeJso<TitleOption> { text = "Scatter with Jittering" })
+                    grid =
+                        one(
+                            unsafeJso<GridOption> {
+                                left = StringOrDouble(80.0)
+                                right = StringOrDouble(50.0)
+                            },
+                        )
+                    xAxis =
+                        one(
+                            unsafeJso<XAxisOption> {
+                                type = AxisTypes.category
+                                jitter = plotWidth / 7 * 0.8
+                                jitterOverlap = false
+                                data = strings("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+                            },
+                        )
+                    yAxis =
+                        one(
+                            unsafeJso<YAxisOption> {
+                                type = AxisTypes.value
+                                max = AxisMinMax(10.0)
+                                min = AxisMinMax(0.0)
+                            },
+                        )
+                    series =
+                        one(
+                            scatterSeries {
+                                name = "Sleeping Hours"
+                                colorBy = "data"
+                                typedData = points(*values)
+                            },
+                        )
+                },
+            )
+        },
+        docExample.chart("doc-example/parallel-all", "平行坐标（多指标）", "Parallel (all)") {
+            unsafeJso<EChartsOption> {
+                color = arrayOf(ZRColor("#c23531"), ZRColor("#91c7ae"), ZRColor("#dd8668"))
+                legend =
+                    one(
+                        unsafeJso<LegendOption> {
+                            top = StringOrDouble(10.0)
+                            data = legendNames("北京", "上海", "广州")
+                            itemGap = 20.0
+                        },
+                    )
+                parallelAxis =
+                    arrayOf(
+                        unsafeJso<ParallelAxisOption> {
+                            dim = IndexOrIndexArray(0.0)
+                            name = "日期"
+                            inverse = true
+                            max = AxisMinMax(31.0)
+                            nameLocation = AxisNameLocations.start
+                        },
+                        unsafeJso<ParallelAxisOption> { dim = IndexOrIndexArray(1.0); name = "AQI" },
+                        unsafeJso<ParallelAxisOption> { dim = IndexOrIndexArray(2.0); name = "PM2.5" },
+                        unsafeJso<ParallelAxisOption> { dim = IndexOrIndexArray(3.0); name = "PM10" },
+                        unsafeJso<ParallelAxisOption> { dim = IndexOrIndexArray(4.0); name = " CO" },
+                        unsafeJso<ParallelAxisOption> { dim = IndexOrIndexArray(5.0); name = "NO2" },
+                        unsafeJso<ParallelAxisOption> { dim = IndexOrIndexArray(6.0); name = "SO2" },
+                        unsafeJso<ParallelAxisOption> {
+                            dim = IndexOrIndexArray(7.0)
+                            name = "等级"
+                            type = AxisTypes.category
+                            data = strings("优", "良", "轻度污染", "中度污染", "重度污染", "严重污染")
+                        },
+                    )
+                parallel =
+                    one(
+                        unsafeJso<ParallelOption> {
+                            left = StringOrDouble("5%")
+                            right = StringOrDouble("13%")
+                            bottom = StringOrDouble("10%")
+                            top = StringOrDouble("20%")
+                            parallelAxisDefault =
+                                unsafeJso<ParallelAxisOption> {
+                                    type = AxisTypes.value
+                                    name = "AQI指数"
+                                    nameLocation = AxisNameLocations.end
+                                    nameGap = 20.0
+                                    nameTextStyle = unsafeJso<LabelOption> { fontSize = StringOrDouble(12.0) }
+                                }
+                        },
+                    )
+                series =
+                    arrayOf<SeriesOption>(
+                        parallelSeries {
+                            name = "北京"
+                            lineStyle = unsafeJso<LineStyleOption> { width = 1.0; opacity = 0.5 }
+                            typedData = dataItems(*parallelBeijing.toTypedArray())
+                        },
+                        parallelSeries {
+                            name = "上海"
+                            lineStyle = unsafeJso<LineStyleOption> { width = 1.0; opacity = 0.5 }
+                            typedData = dataItems(*parallelShanghai.toTypedArray())
+                        },
+                        parallelSeries {
+                            name = "广州"
+                            lineStyle = unsafeJso<LineStyleOption> { width = 1.0; opacity = 0.5 }
+                            typedData = dataItems(*parallelGuangzhou.toTypedArray())
+                        },
+                    )
+            }
+        },
+        docExample.chart("doc-example/data-transform-multiple-sort-bar", "数据转换：多重排序", "Data transform: multiple sort") {
+            unsafeJso<EChartsOption> {
+                dataset =
+                    arrayOf(
+                        unsafeJso<DatasetOption> {
+                            dimensions =
+                                arrayOf(
+                                    DimensionDefinitionLoose("name"),
+                                    DimensionDefinitionLoose("age"),
+                                    DimensionDefinitionLoose("profession"),
+                                    DimensionDefinitionLoose("score"),
+                                    DimensionDefinitionLoose("date"),
+                                )
+                            source = sortBarSource()
+                        },
+                        unsafeJso<DatasetOption> {
+                            transform =
+                                arrayOf(
+                                    unsafeJso<DataTransformOption> {
+                                        type = "sort"
+                                        config = sortDescriptors("profession" to "desc", "score" to "desc")
+                                    },
+                                )
+                        },
+                    )
+                xAxis =
+                    one(
+                        unsafeJso<XAxisOption> {
+                            type = AxisTypes.category
+                            axisLabel =
+                                unsafeJso<AxisLabelOption> {
+                                    interval = AxisInterval(0.0)
+                                    rotate = 30.0
+                                }
+                        },
+                    )
+                yAxis = one(unsafeJso<YAxisOption> {})
+                series =
+                    one(
+                        barSeries {
+                            label =
+                                unsafeJso<LabelOption> {
+                                    show = true
+                                    rotate = 90.0
+                                    position = LabelPosition("insideBottom")
+                                    align = TextAlign.left
+                                    verticalAlign = VerticalAlign.middle
+                                }
+                            itemStyle =
+                                unsafeJso<ItemStyleOption> {
+                                    // The original colours the bars by the profession column.
+                                    color =
+                                        js(
+                                            "(params) => {" +
+                                                " const colors = { Engineer: '#5470c6', Teacher: '#91cc75', Musician: '#fac858' };" +
+                                                " return colors[params.data[2]];" +
+                                                " }",
+                                        )
+                                            .unsafeCast<ZRColor>()
+                                }
+                            encode =
+                                unsafeJso<OptionEncode> {
+                                    x = OptionEncodeValue(DimensionLoose("name"))
+                                    y = OptionEncodeValue(DimensionLoose("score"))
+                                    label = OptionEncodeValue(arrayOf(DimensionLoose("profession")))
+                                }
+                            datasetIndex = 1.0
                         },
                     )
             }

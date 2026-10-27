@@ -18,7 +18,8 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `flights.json` | `data/` | `lines-airline` |
 | `nba-court.json` | `data/` | `custom-hexbin` |
 | `kawhi-leonard-16-17-regular.json` | `data/` | `custom-hexbin` |
-| `world.json` | `geo/` | `lines-airline` |
+| `world.json` | `geo/` | `lines-airline`, `custom-wind` |
+| `winds.json` | `data-gl/asset/data/` | `custom-wind` |
 | `iceland.geo.json` | `geo/` | `geo-choropleth-scatter` |
 | `ch.geo.json` | `geo/` | `geo-graph` |
 | `Map_of_Iceland.svg` | `geo/` | `geo-svg-scatter-simple` |

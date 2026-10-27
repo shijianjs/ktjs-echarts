@@ -204,6 +204,7 @@ class DemoPageTest {
         val painted =
             listOf(
                 "custom-bar-trend",
+                "custom-wind",
                 "custom-hexbin",
                 "custom-polar-heatmap",
                 "matrix-covariance",

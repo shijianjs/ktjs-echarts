@@ -14,6 +14,7 @@ import demo.examples.datasetExtraEntries
 import demo.examples.docExampleEntries
 import demo.examples.funnelEntries
 import demo.examples.gaugeEntries
+import demo.examples.geoExtraEntries
 import demo.examples.gaugeExtraEntries
 import demo.examples.graphEntries
 import demo.examples.graphExtraEntries
@@ -85,6 +86,9 @@ object Groups {
     /** Path charts drawn on a map, the `lines` family of the manifest. */
     val LINES = Group("lines", "路径图", "Lines")
 
+    /** Charts drawn on a registered map, the `map` / `geo` family of the manifest. */
+    val GEO = Group("geo", "地图", "Geo")
+
     /** The short examples of the official documentation, `doc-example/` entries of the manifest. */
     val DOC = Group("doc-example", "文档示例", "Doc examples")
 }
@@ -126,6 +130,7 @@ val catalog: List<CatalogEntry> =
         parallelEntries,
         heatmapEntries,
         gaugeEntries,
+        geoExtraEntries,
         gaugeExtraEntries,
         funnelEntries,
         radarEntries,

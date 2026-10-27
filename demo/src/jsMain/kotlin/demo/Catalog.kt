@@ -7,6 +7,7 @@ import demo.examples.calendarEntries
 import demo.examples.candlestickEntries
 import demo.examples.chordEntries
 import demo.examples.customEntries
+import demo.examples.customHexbinEntries
 import demo.examples.customExtraEntries
 import demo.examples.datasetEntries
 import demo.examples.docExampleEntries
@@ -136,6 +137,7 @@ val catalog: List<CatalogEntry> =
         matrixEntries,
         matrixExtraEntries,
         customEntries,
+        customHexbinEntries,
         customExtraEntries,
         graphEntries,
         graphExtraEntries,

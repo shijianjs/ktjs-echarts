@@ -5,6 +5,9 @@ import echarts.NodeAlign
 import echarts.GraphLayout
 import echarts.GraphInitLayout
 import echarts.FocusNodeAdjacency
+import echarts.ChordCoordinateSystem
+import echarts.SankeyCoordinateSystem
+import kotlin.js.JsName
 import zrender.ZRColor
 
 /*
@@ -286,6 +289,13 @@ external interface ChordSeriesOption :
     SeriesOnGeoOptionMixin,
     SeriesOnSingleOptionMixin
 {
+    /** Coordinate system, always `"none"`. */
+    override var coordinateSystem: String?
+
+    /** Typed view of [coordinateSystem]; see [LineSeriesOption.typedCoordinateSystem]. */
+    @JsName("coordinateSystem")
+    var typedCoordinateSystem: ChordCoordinateSystem?
+
     /** Width of the nodes. */
     var nodeWidth: Double?
 
@@ -415,6 +425,13 @@ external interface SankeyLevelOption : SankeyNodeStateOption, SankeyEdgeStateOpt
  * Sankey diagram.
  */
 external interface SankeySeriesOption : SeriesOption, ComponentOnCalendarOptionMixin, ComponentOnMatrixOptionMixin {
+    /** Coordinate system, always `"view"`. */
+    override var coordinateSystem: String?
+
+    /** Typed view of [coordinateSystem]; see [LineSeriesOption.typedCoordinateSystem]. */
+    @JsName("coordinateSystem")
+    var typedCoordinateSystem: SankeyCoordinateSystem?
+
     /** Width of the nodes. */
     var nodeWidth: Double?
 

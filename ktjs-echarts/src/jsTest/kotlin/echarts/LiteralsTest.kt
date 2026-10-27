@@ -2,23 +2,32 @@ package echarts
 
 import echarts.options.AreaStyleOption
 import echarts.options.AxisPointerOption
+import echarts.options.BarSeriesOption
 import echarts.options.BooleanOrString
+import echarts.options.BoxplotSeriesOption
 import echarts.options.BrushOption
+import echarts.options.CandlestickSeriesOption
+import echarts.options.ChordSeriesOption
 import echarts.options.DataZoomOption
 import echarts.options.EChartsOption
 import echarts.options.GaugeSeriesOption
 import echarts.options.GraphicElement
 import echarts.options.GridOption
+import echarts.options.HeatmapSeriesOption
 import echarts.options.LabelOption
 import echarts.options.LegendOption
 import echarts.options.LineSeriesOption
 import echarts.options.MatrixDimensionOption
 import echarts.options.ParallelOption
+import echarts.options.PictorialBarSeriesOption
 import echarts.options.PieSeriesOption
+import echarts.options.RadarSeriesOption
+import echarts.options.SankeySeriesOption
 import echarts.options.SelectionModes
 import echarts.options.StringOrDouble
 import echarts.options.StringOrDoubleOrArray
 import echarts.options.SymbolOffset
+import echarts.options.ThemeRiverSeriesOption
 import echarts.options.TimelineControlStyle
 import echarts.options.TimelineOption
 import echarts.options.TitleOption
@@ -52,6 +61,27 @@ import zrender.ZRLineTypes
 private external interface ActionProbe {
     @JsName("\$action")
     var action: String?
+}
+
+/**
+ * Reads the `coordinateSystem` property through the string accessor and the typed accessor.
+ */
+private external interface CoordinateSystemProbe {
+    var coordinateSystem: String?
+
+    @JsName("coordinateSystem")
+    var typedCoordinateSystem: String?
+}
+
+/**
+ * Sets the string accessor of [option] and checks that the typed accessor sees the same value, so
+ * that both Kotlin properties really map to the single JavaScript `coordinateSystem` property.
+ */
+private fun assertCoordinateSystemRoundTrip(option: Any, expected: String) {
+    val probe = option.unsafeCast<CoordinateSystemProbe>()
+    assertEquals(expected, probe.coordinateSystem)
+    probe.coordinateSystem = "cartesian2d"
+    assertEquals("cartesian2d", probe.typedCoordinateSystem)
 }
 
 /**
@@ -428,6 +458,108 @@ class LiteralsTest {
         assertEquals("start", AreaOrigins.start.unsafeCast<String>())
         assertEquals("end", AreaOrigins.end.unsafeCast<String>())
         assertEquals(30.0, AreaOrigin(30.0).unsafeCast<Double>())
+    }
+
+    @Test
+    fun seriesCoordinateSystemLiteralsMatchTheUpstreamNames() {
+        assertEquals("cartesian2d", CartesianPolarCoordinateSystems.cartesian2d.unsafeCast<String>())
+        assertEquals("polar", CartesianPolarCoordinateSystems.polar.unsafeCast<String>())
+        assertEquals("cartesian2d", CartesianCoordinateSystems.cartesian2d.unsafeCast<String>())
+        assertEquals("cartesian2d", HeatmapCoordinateSystems.cartesian2d.unsafeCast<String>())
+        assertEquals("geo", HeatmapCoordinateSystems.geo.unsafeCast<String>())
+        assertEquals("calendar", HeatmapCoordinateSystems.calendar.unsafeCast<String>())
+        assertEquals("matrix", HeatmapCoordinateSystems.matrix.unsafeCast<String>())
+        assertEquals("radar", RadarCoordinateSystems.radar.unsafeCast<String>())
+        assertEquals("none", ChordCoordinateSystems.none.unsafeCast<String>())
+        assertEquals("view", SankeyCoordinateSystems.view.unsafeCast<String>())
+        assertEquals("singleAxis", SingleAxisCoordinateSystems.singleAxis.unsafeCast<String>())
+    }
+
+    /**
+     * Every narrowed series exposes the typed accessor next to the inherited string one; the
+     * assignments check the narrowed types at compile time, the round trips check that both
+     * properties are the same JavaScript property.
+     */
+    @Test
+    fun typedCoordinateSystemSharesTheStringProperty() {
+        val line = unsafeJso<LineSeriesOption> {
+            typedCoordinateSystem = CartesianPolarCoordinateSystems.polar
+        }
+        assertCoordinateSystemRoundTrip(line, "polar")
+
+        val bar = unsafeJso<BarSeriesOption> {
+            typedCoordinateSystem = CartesianPolarCoordinateSystems.cartesian2d
+        }
+        assertCoordinateSystemRoundTrip(bar, "cartesian2d")
+
+        val candlestick = unsafeJso<CandlestickSeriesOption> {
+            typedCoordinateSystem = CartesianCoordinateSystems.cartesian2d
+        }
+        assertCoordinateSystemRoundTrip(candlestick, "cartesian2d")
+
+        val boxplot = unsafeJso<BoxplotSeriesOption> {
+            typedCoordinateSystem = CartesianCoordinateSystems.cartesian2d
+        }
+        assertCoordinateSystemRoundTrip(boxplot, "cartesian2d")
+
+        val heatmap = unsafeJso<HeatmapSeriesOption> {
+            typedCoordinateSystem = HeatmapCoordinateSystems.calendar
+        }
+        assertCoordinateSystemRoundTrip(heatmap, "calendar")
+
+        val pictorialBar = unsafeJso<PictorialBarSeriesOption> {
+            typedCoordinateSystem = CartesianCoordinateSystems.cartesian2d
+        }
+        assertCoordinateSystemRoundTrip(pictorialBar, "cartesian2d")
+
+        val radar = unsafeJso<RadarSeriesOption> {
+            typedCoordinateSystem = RadarCoordinateSystems.radar
+        }
+        assertCoordinateSystemRoundTrip(radar, "radar")
+
+        val themeRiver = unsafeJso<ThemeRiverSeriesOption> {
+            typedCoordinateSystem = SingleAxisCoordinateSystems.singleAxis
+        }
+        assertCoordinateSystemRoundTrip(themeRiver, "singleAxis")
+
+        val chord = unsafeJso<ChordSeriesOption> {
+            typedCoordinateSystem = ChordCoordinateSystems.none
+        }
+        assertCoordinateSystemRoundTrip(chord, "none")
+
+        val sankey = unsafeJso<SankeySeriesOption> {
+            typedCoordinateSystem = SankeyCoordinateSystems.view
+        }
+        assertCoordinateSystemRoundTrip(sankey, "view")
+    }
+
+    /**
+     * The narrowed accessor also survives a real chart: the value written through it is the value
+     * that ECharts keeps on the merged series option.
+     */
+    @Test
+    fun typedCoordinateSystemReachesTheMergedOption() {
+        val option = cartesianLineOption(1.0, 2.0) {
+            series = one(
+                lineSeries {
+                    data = numbers(1.0, 2.0)
+                    typedCoordinateSystem = CartesianPolarCoordinateSystems.cartesian2d
+                },
+            )
+        }
+
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(option)
+            val stored = chart.getOption().series!![0].unsafeCast<LineSeriesOption>()
+            assertEquals("cartesian2d", stored.coordinateSystem)
+            assertEquals(
+                "cartesian2d",
+                stored.typedCoordinateSystem!!.unsafeCast<String>(),
+            )
+        } finally {
+            destroyChart(chart, container)
+        }
     }
 
     /**

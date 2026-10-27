@@ -82,8 +82,25 @@
 - 补齐 scrollable 的 `pageButtonItemGap` / `pageButtonGap` / `pageIcons`，`pageTextStyle` / `textStyle`
   改成上游的 `LabelOption`。
 - `ScrollableLegendOption` 仍不单独拆出：`EChartsOption.legend` 是 `Array<LegendOption>`，拆开后调用方
-  拿不到分页字段；字段保留在 `LegendOption` 上属于有意的更宽建模（与上游的联合等价，见第 8 条）。
+  拿不到分页字段；字段保留在 `LegendOption` 上属于有意的更宽建模（与上游的联合等价，见第 6 条）。
 - 测试：新增 `options/LegendOptionTest`（4 例，含真实图表 round trip）；浏览器用例 195 → 199，全过。
+
+### ⑥ 系列 `coordinateSystem` 收窄
+
+- 新增字面量 `CartesianPolarCoordinateSystem`（line/bar：`"cartesian2d"` / `"polar"`）、
+  `CartesianCoordinateSystem`（candlestick/boxplot/pictorialBar：只有 `"cartesian2d"`）、
+  `HeatmapCoordinateSystem`（`"cartesian2d"` / `"geo"` / `"calendar"` / `"matrix"`）、
+  `RadarCoordinateSystem`、`ChordCoordinateSystem`、`SankeyCoordinateSystem`、
+  `SingleAxisCoordinateSystem` 及各自的常量对象。
+- 上游把这 10 个系列的 `coordinateSystem` 收窄成字面量联合，而基接口 `SeriesOption` 是 `string`。
+  Kotlin 不能收窄 `var`，因此沿用基接口的 `String?` 字段，并在各子接口里加
+  `@JsName("coordinateSystem") var typedCoordinateSystem: …?`，两个属性在 JS 侧是同一个属性
+  （写法记进 `TYPE-MAPPING.md` §12）。`RadarSeriesOption` / `PictorialBarSeriesOption` /
+  `ChordSeriesOption` / `SankeySeriesOption` 原本没重声明 `coordinateSystem`，一并补上。
+- `HeatmapSeriesOption.coordinateSystem` 的 KDoc 按上游改成 `"cartesian2d"` / `"geo"` / `"calendar"` /
+  `"matrix"`。
+- 测试：`LiteralsTest` 新增 11 条字面量断言、1 个覆盖全部 10 个系列的「两个属性指向同一 JS 属性」用例、
+  1 个真实图表 round trip；浏览器用例 199 → 202，全过。
 
 ### 遗留提醒
 
@@ -92,28 +109,17 @@
 
 ## 待办
 
-### 1. 系列自身的 `coordinateSystem` 收窄
-
-上游基接口 `SeriesOption.coordinateSystem` 是 `string`，子类型收窄成 `'cartesian2d' | 'polar'`、
-`'none'`、`'view'` 等（line/bar/scatter/effectScatter、chord、sankey、heatmap、parallel、custom、graphic 系列）。
-Kotlin 的 `var` 覆盖要求类型完全一致，只能：
-
-- 把基接口改成联合（子类型仍不能收窄，只是调用方拿到联合），或
-- 按 `AGENTS.md` 的同名字段约定用 `@JsName("coordinateSystem")` + `Property` 后缀另起一个 Kotlin 名，
-  先验证 `external interface` 继承里两个成员映射到同一 JS 属性名是否被编译器接受。
-
-### 2. `Omit<...> & { ... }`、var 收窄带来的限制（需要新写法才解）
-
+### 1. `Omit<...> & { ... }`、var 收窄带来的限制（需要新写法才解）
 
 - series 级 `itemStyle` / `label` 上游会收窄成子类型（`TreemapSeriesItemStyleOption`、`SunburstLabelOption`、
   `ChordItemStyleOption` …），Kotlin 的 `var` 覆盖要求类型完全相同，这些字段只能保留基接口类型；
   精确类型在 `levels` / `data` 的 item 上可用，因此不算功能缺失。
 - gauge `axisLabel` 的 `rotate` 是同类问题（`LabelOption.rotate: Double?` 无法收窄成
   `'tangential' | 'radial' | number`）。
-- 可选方案：对同名字段用 `@JsName` + `Property` 后缀另起一个 Kotlin 名（见 `AGENTS.md` 的 DOM 同名字段约定），
-  但要先验证 `external interface` 继承里两个成员映射到同一个 JS 属性名是否被编译器接受。
+- 关键字收窄（如 `coordinateSystem`）已用 `@JsName` 同名字段解决，写法见 `TYPE-MAPPING.md` §12；
+  上面两类收窄成的是**另一套对象 / 字符串+数字混合联合**，套用同名字段只能得到近似类型，暂不做。
 
-### 3. 自定义系列的元素选项树
+### 2. 自定义系列的元素选项树
 
 - `CustomSeriesRenderItemReturn` 目前是 `echarts.options.GraphicElement?` 的近似实现。
 - 上游是 `CustomRootElementOption | undefined | null`，需要新建除选项树：
@@ -127,15 +133,15 @@ Kotlin 的 `var` 覆盖要求类型完全一致，只能：
 - 顺带：`CustomSeriesRenderItemAPI.visual(type)` 的入参目前是 `String`，上游是
   `NonStyleVisualProps | StyleVisualProps`（`'color' | 'borderColor' | 'symbol' | ...`），可补字面量类型。
 
-### 4. 其余数据项类型
+### 3. 其余数据项类型
 
 - 除 gauge / theme river / 层级与关系图外，各系列的 `*DataItemOption` 都还没有单独声明，`data` 走通用联合：
   line / bar / scatter / effectScatter / radar（`*DataItemOption`）、boxplot、candlestick、heatmap、lines、
   parallel、pictorialBar、funnel、pie、map。
 - `OptionDataValueDate`（`Date | string | number`）已备好，用于这类数据项。
-- 前置问题见第 5 条。
+- 前置问题见第 4 条。
 
-### 5. 基接口 `data` 的处理（设计问题）
+### 4. 基接口 `data` 的处理（设计问题）
 
 - 上游 `SeriesOption.data?: unknown`，各具体类型收窄；Kotlin 基接口现在是 `Array<OptionDataItem?>?`，
   节点类 item 靠继承 `OptionDataItemObject` + `items(...)` 塞进去。
@@ -143,14 +149,14 @@ Kotlin 的 `var` 覆盖要求类型完全一致，只能：
   代价是 `option.series[i].data` 这种基类访问会消失（`OptionModelTest` / `LiteralsTest` 里有用例依赖它）。
 - 决定前先评估：下放后是否需要给 `EChartsOption.series` 之外再提供一个「只读 data」的视图。
 
-### 6. 上游导出清单的全量复核
+### 5. 上游导出清单的全量复核
 
 - 目前只补「已知空缺」，没有重新逐个核对 `echarts` 的公开导出（`EChartsType` / `ChartView` / `SeriesModel` /
   `ComponentModel` / `Payload` / 各 `*Payload` / `*Event` …）与各入口
   （`echarts/core`、`echarts/charts`、`echarts/components`、`echarts/features`、`echarts/renderers`）的差异。
 - 建议单独开一轮：从 `types/dist/*.d.ts` 生成导出清单再逐项比对（参考 `custom-elements.json` 式清单的做法）。
 
-### 7. 已确认「保持现状」的项（不要重复修）
+### 6. 已确认「保持现状」的项（不要重复修）
 
 - `LegendOption` 保留 `ScrollableLegendOption` 的分页字段：`EChartsOption.legend` 是 `Array<LegendOption>`，
   拆成子类型后调用方无法直接访问分页字段；与上游的联合建模等价，属于有意的更宽类型。

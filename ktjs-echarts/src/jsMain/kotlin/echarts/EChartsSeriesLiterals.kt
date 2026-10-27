@@ -524,3 +524,134 @@ object AreaOrigins {
     /** Fill from the end of the axis. */
     inline val end: AreaOrigin get() = AreaOrigin("end")
 }
+
+/**
+ * Coordinate system of a line-like series: `"cartesian2d"` or `"polar"`.
+ */
+sealed external interface CartesianPolarCoordinateSystem
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [CartesianPolarCoordinateSystems]. */
+inline fun CartesianPolarCoordinateSystem(value: String): CartesianPolarCoordinateSystem =
+    value.unsafeCast<CartesianPolarCoordinateSystem>()
+
+/**
+ * The documented values of [CartesianPolarCoordinateSystem].
+ */
+object CartesianPolarCoordinateSystems {
+    /** A cartesian grid. */
+    inline val cartesian2d: CartesianPolarCoordinateSystem get() = CartesianPolarCoordinateSystem("cartesian2d")
+
+    /** A polar coordinate system. */
+    inline val polar: CartesianPolarCoordinateSystem get() = CartesianPolarCoordinateSystem("polar")
+}
+
+/**
+ * Coordinate system of a series that only supports a cartesian grid: `"cartesian2d"`.
+ */
+sealed external interface CartesianCoordinateSystem
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [CartesianCoordinateSystems]. */
+inline fun CartesianCoordinateSystem(value: String): CartesianCoordinateSystem =
+    value.unsafeCast<CartesianCoordinateSystem>()
+
+/**
+ * The documented values of [CartesianCoordinateSystem].
+ */
+object CartesianCoordinateSystems {
+    /** A cartesian grid. */
+    inline val cartesian2d: CartesianCoordinateSystem get() = CartesianCoordinateSystem("cartesian2d")
+}
+
+/**
+ * Coordinate system of the heatmap series: `"cartesian2d"`, `"geo"`, `"calendar"` or `"matrix"`.
+ */
+sealed external interface HeatmapCoordinateSystem
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [HeatmapCoordinateSystems]. */
+inline fun HeatmapCoordinateSystem(value: String): HeatmapCoordinateSystem =
+    value.unsafeCast<HeatmapCoordinateSystem>()
+
+/**
+ * The documented values of [HeatmapCoordinateSystem].
+ */
+object HeatmapCoordinateSystems {
+    /** A cartesian grid. */
+    inline val cartesian2d: HeatmapCoordinateSystem get() = HeatmapCoordinateSystem("cartesian2d")
+
+    /** A geo (map) coordinate system. */
+    inline val geo: HeatmapCoordinateSystem get() = HeatmapCoordinateSystem("geo")
+
+    /** A calendar coordinate system. */
+    inline val calendar: HeatmapCoordinateSystem get() = HeatmapCoordinateSystem("calendar")
+
+    /** A matrix coordinate system. */
+    inline val matrix: HeatmapCoordinateSystem get() = HeatmapCoordinateSystem("matrix")
+}
+
+/**
+ * Coordinate system of the radar series, always `"radar"`.
+ */
+sealed external interface RadarCoordinateSystem
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [RadarCoordinateSystems]. */
+inline fun RadarCoordinateSystem(value: String): RadarCoordinateSystem =
+    value.unsafeCast<RadarCoordinateSystem>()
+
+/**
+ * The documented values of [RadarCoordinateSystem].
+ */
+object RadarCoordinateSystems {
+    /** A radar coordinate system. */
+    inline val radar: RadarCoordinateSystem get() = RadarCoordinateSystem("radar")
+}
+
+/**
+ * Coordinate system of the chord series, always `"none"`.
+ */
+sealed external interface ChordCoordinateSystem
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [ChordCoordinateSystems]. */
+inline fun ChordCoordinateSystem(value: String): ChordCoordinateSystem =
+    value.unsafeCast<ChordCoordinateSystem>()
+
+/**
+ * The documented values of [ChordCoordinateSystem].
+ */
+object ChordCoordinateSystems {
+    /** No coordinate system. */
+    inline val none: ChordCoordinateSystem get() = ChordCoordinateSystem("none")
+}
+
+/**
+ * Coordinate system of the sankey series, always `"view"`.
+ */
+sealed external interface SankeyCoordinateSystem
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [SankeyCoordinateSystems]. */
+inline fun SankeyCoordinateSystem(value: String): SankeyCoordinateSystem =
+    value.unsafeCast<SankeyCoordinateSystem>()
+
+/**
+ * The documented values of [SankeyCoordinateSystem].
+ */
+object SankeyCoordinateSystems {
+    /** The whole view. */
+    inline val view: SankeyCoordinateSystem get() = SankeyCoordinateSystem("view")
+}
+
+/**
+ * Coordinate system of the theme river series, always `"singleAxis"`.
+ */
+sealed external interface SingleAxisCoordinateSystem
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [SingleAxisCoordinateSystems]. */
+inline fun SingleAxisCoordinateSystem(value: String): SingleAxisCoordinateSystem =
+    value.unsafeCast<SingleAxisCoordinateSystem>()
+
+/**
+ * The documented values of [SingleAxisCoordinateSystem].
+ */
+object SingleAxisCoordinateSystems {
+    /** A single axis. */
+    inline val singleAxis: SingleAxisCoordinateSystem get() = SingleAxisCoordinateSystem("singleAxis")
+}

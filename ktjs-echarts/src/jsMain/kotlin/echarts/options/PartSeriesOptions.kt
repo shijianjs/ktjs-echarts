@@ -6,7 +6,11 @@ import echarts.PictorialBarSymbolRepeatDirection
 import echarts.PictorialBarSymbolPosition
 import echarts.FunnelSort
 import echarts.FunnelAlign
+import echarts.CartesianCoordinateSystem
+import echarts.RadarCoordinateSystem
+import echarts.SingleAxisCoordinateSystem
 import js.objects.Record
+import kotlin.js.JsName
 import kotlin.js.unsafeCast
 import web.canvas.CanvasLineCap
 import web.canvas.CanvasLineJoin
@@ -403,6 +407,13 @@ external interface GaugeSplitLineOption {
  * Radar series.
  */
 external interface RadarSeriesOption : SeriesOption, SymbolOptionMixin, SeriesOnRadarOptionMixin {
+    /** Coordinate system, always `"radar"`. */
+    override var coordinateSystem: String?
+
+    /** Typed view of [coordinateSystem]; see [LineSeriesOption.typedCoordinateSystem]. */
+    @JsName("coordinateSystem")
+    var typedCoordinateSystem: RadarCoordinateSystem?
+
     /** How the data maps to the radar axes. */
     var seriesLayoutBy: SeriesLayoutBy?
 }
@@ -494,6 +505,10 @@ external interface ThemeRiverSeriesOption : SeriesOption, SeriesOnSingleOptionMi
     /** Coordinate system: `"singleAxis"`. */
     override var coordinateSystem: String?
 
+    /** Typed view of [coordinateSystem]; see [LineSeriesOption.typedCoordinateSystem]. */
+    @JsName("coordinateSystem")
+    var typedCoordinateSystem: SingleAxisCoordinateSystem?
+
     /** Whether the axis has gaps at both ends. */
     var boundaryGap: Array<StringOrDouble>?
 
@@ -505,6 +520,13 @@ external interface ThemeRiverSeriesOption : SeriesOption, SeriesOnSingleOptionMi
  * Pictorial bar series.
  */
 external interface PictorialBarSeriesOption : SeriesOption, SeriesOnCartesianOptionMixin, SeriesOnPolarOptionMixin {
+    /** Coordinate system: `"cartesian2d"`. */
+    override var coordinateSystem: String?
+
+    /** Typed view of [coordinateSystem]; see [LineSeriesOption.typedCoordinateSystem]. */
+    @JsName("coordinateSystem")
+    var typedCoordinateSystem: CartesianCoordinateSystem?
+
     /** Symbol shape of the bars. */
     var symbol: String?
 

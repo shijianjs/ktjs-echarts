@@ -4,7 +4,11 @@ import echarts.SeriesType
 import echarts.SeriesLayoutBy
 import echarts.ProgressiveChunkMode
 import echarts.CustomSeriesRenderItem
+import echarts.CartesianPolarCoordinateSystem
+import echarts.CartesianCoordinateSystem
+import echarts.HeatmapCoordinateSystem
 import echarts.AnimationEasing
+import kotlin.js.JsName
 import zrender.ZRColor
 import zrender.ZRFontWeight
 
@@ -127,7 +131,11 @@ external interface SeriesOption {
     /** Chunking mode of the progressive rendering; `"mod"` splits the rest into equal chunks. */
     var progressiveChunkMode: ProgressiveChunkMode?
 
-    /** Coordinate system used by the series. */
+    /**
+     * Coordinate system used by the series. Series that only accept a fixed set of coordinate
+     * systems also expose a typed `typedCoordinateSystem` property that maps to this same
+     * JavaScript property; see [LineSeriesOption.typedCoordinateSystem].
+     */
     var coordinateSystem: String?
 
     /** Whether the series participates in the legend. */
@@ -166,6 +174,13 @@ external interface LineSeriesOption :
 {
     /** Coordinate system: `"cartesian2d"` or `"polar"`. */
     override var coordinateSystem: String?
+
+    /**
+     * Typed view of [coordinateSystem]; the base interface keeps it as a string because Kotlin
+     * cannot narrow an overridden `var`.
+     */
+    @JsName("coordinateSystem")
+    var typedCoordinateSystem: CartesianPolarCoordinateSystem?
 
     /** Whether to clip the line to the coordinate system. */
     var clip: Boolean?
@@ -225,6 +240,10 @@ external interface LineSeriesOption :
 external interface BarSeriesOption : SeriesOption, SeriesOnCartesianOptionMixin, SeriesOnPolarOptionMixin {
     /** Coordinate system: `"cartesian2d"` or `"polar"`. */
     override var coordinateSystem: String?
+
+    /** Typed view of [coordinateSystem]; see [LineSeriesOption.typedCoordinateSystem]. */
+    @JsName("coordinateSystem")
+    var typedCoordinateSystem: CartesianPolarCoordinateSystem?
 
     /** Stack group name. */
     var stack: String?
@@ -351,6 +370,10 @@ external interface CandlestickSeriesOption : SeriesOption, SeriesOnCartesianOpti
     /** Coordinate system: `"cartesian2d"`. */
     override var coordinateSystem: String?
 
+    /** Typed view of [coordinateSystem]; see [LineSeriesOption.typedCoordinateSystem]. */
+    @JsName("coordinateSystem")
+    var typedCoordinateSystem: CartesianCoordinateSystem?
+
     /** Layout of the candles: `"horizontal"` or `"vertical"`. */
     var layout: String?
 
@@ -386,6 +409,10 @@ external interface BoxplotSeriesOption : SeriesOption, SeriesOnCartesianOptionMi
     /** Coordinate system: `"cartesian2d"`. */
     override var coordinateSystem: String?
 
+    /** Typed view of [coordinateSystem]; see [LineSeriesOption.typedCoordinateSystem]. */
+    @JsName("coordinateSystem")
+    var typedCoordinateSystem: CartesianCoordinateSystem?
+
     /** Layout of the boxes: `"horizontal"` or `"vertical"`. */
     var layout: String?
 
@@ -406,8 +433,12 @@ external interface HeatmapSeriesOption :
     ComponentOnCalendarOptionMixin,
     ComponentOnMatrixOptionMixin
 {
-    /** Coordinate system: `"cartesian2d"`, `"calendar"`, `"geo"` or `"none"`. */
+    /** Coordinate system: `"cartesian2d"`, `"geo"`, `"calendar"` or `"matrix"`. */
     override var coordinateSystem: String?
+
+    /** Typed view of [coordinateSystem]; see [LineSeriesOption.typedCoordinateSystem]. */
+    @JsName("coordinateSystem")
+    var typedCoordinateSystem: HeatmapCoordinateSystem?
 
     /** Size of a heatmap point in pixels. */
     var pointSize: Double?

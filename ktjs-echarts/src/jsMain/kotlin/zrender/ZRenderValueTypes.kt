@@ -116,6 +116,17 @@ fun ImageLike(value: HTMLCanvasElement): ImageLike = value.unsafeCast<ImageLike>
 fun ImageLike(value: HTMLVideoElement): ImageLike = value.unsafeCast<ImageLike>()
 
 /**
+ * `string | ImageLike`, accepted wherever zrender takes an image source.
+ */
+external interface StringOrImageLike
+
+/** Wraps an image URL. */
+fun StringOrImageLike(value: String): StringOrImageLike = value.unsafeCast<StringOrImageLike>()
+
+/** Wraps an image source. */
+fun StringOrImageLike(value: ImageLike): StringOrImageLike = value.unsafeCast<StringOrImageLike>()
+
+/**
  * Font weight: a CSS font-weight keyword or a number in `100..900`.
  *
  * Upstream `ZRFontWeight = FontWeight | number`. Use the constants for the keywords and

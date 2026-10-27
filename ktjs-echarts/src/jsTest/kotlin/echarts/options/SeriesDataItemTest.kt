@@ -401,7 +401,7 @@ class SeriesDataItemTest {
         val series = customSeries {
             renderItem = { _, api ->
                 val value = api.value(DimensionLoose(0.0))!!
-                unsafeJso<GraphicElement> {
+                unsafeJso<CustomPathOption> {
                     type = "rect"
                     shape = unsafeJso<ZRShapeProps> {
                         width = api.getWidth()

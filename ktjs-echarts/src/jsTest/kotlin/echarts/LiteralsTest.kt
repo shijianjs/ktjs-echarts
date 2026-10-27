@@ -50,6 +50,8 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import zrender.RendererTypes
 import zrender.TextOverflows
+import zrender.BuiltinTextPositions
+import zrender.TransformProps
 import zrender.ZRFontWeight
 import zrender.ZRFontWeights
 import zrender.ZRLineType
@@ -217,6 +219,51 @@ class LiteralsTest {
         assertEquals("bold", ZRFontWeights.bold.unsafeCast<String>())
         assertEquals("bolder", ZRFontWeights.bolder.unsafeCast<String>())
         assertEquals("lighter", ZRFontWeights.lighter.unsafeCast<String>())
+    }
+
+    @Test
+    fun zrenderTransformPropsMatchTheUpstreamNames() {
+        assertEquals("x", TransformProps.x.unsafeCast<String>())
+        assertEquals("y", TransformProps.y.unsafeCast<String>())
+        assertEquals("originX", TransformProps.originX.unsafeCast<String>())
+        assertEquals("originY", TransformProps.originY.unsafeCast<String>())
+        assertEquals("anchorX", TransformProps.anchorX.unsafeCast<String>())
+        assertEquals("anchorY", TransformProps.anchorY.unsafeCast<String>())
+        assertEquals("rotation", TransformProps.rotation.unsafeCast<String>())
+        assertEquals("scaleX", TransformProps.scaleX.unsafeCast<String>())
+        assertEquals("scaleY", TransformProps.scaleY.unsafeCast<String>())
+        assertEquals("skewX", TransformProps.skewX.unsafeCast<String>())
+        assertEquals("skewY", TransformProps.skewY.unsafeCast<String>())
+    }
+
+    @Test
+    fun builtinTextPositionsMatchTheUpstreamNames() {
+        assertEquals("left", BuiltinTextPositions.left.unsafeCast<String>())
+        assertEquals("right", BuiltinTextPositions.right.unsafeCast<String>())
+        assertEquals("top", BuiltinTextPositions.top.unsafeCast<String>())
+        assertEquals("bottom", BuiltinTextPositions.bottom.unsafeCast<String>())
+        assertEquals("inside", BuiltinTextPositions.inside.unsafeCast<String>())
+        assertEquals("insideLeft", BuiltinTextPositions.insideLeft.unsafeCast<String>())
+        assertEquals("insideRight", BuiltinTextPositions.insideRight.unsafeCast<String>())
+        assertEquals("insideTop", BuiltinTextPositions.insideTop.unsafeCast<String>())
+        assertEquals("insideBottom", BuiltinTextPositions.insideBottom.unsafeCast<String>())
+        assertEquals("insideTopLeft", BuiltinTextPositions.insideTopLeft.unsafeCast<String>())
+        assertEquals("insideTopRight", BuiltinTextPositions.insideTopRight.unsafeCast<String>())
+        assertEquals("insideBottomLeft", BuiltinTextPositions.insideBottomLeft.unsafeCast<String>())
+        assertEquals("insideBottomRight", BuiltinTextPositions.insideBottomRight.unsafeCast<String>())
+    }
+
+    @Test
+    fun visualPropsMatchTheUpstreamNames() {
+        assertEquals("color", VisualProps.color.unsafeCast<String>())
+        assertEquals("borderColor", VisualProps.borderColor.unsafeCast<String>())
+        assertEquals("symbol", VisualProps.symbol.unsafeCast<String>())
+        assertEquals("symbolSize", VisualProps.symbolSize.unsafeCast<String>())
+        assertEquals("symbolKeepAspect", VisualProps.symbolKeepAspect.unsafeCast<String>())
+        assertEquals("legendIcon", VisualProps.legendIcon.unsafeCast<String>())
+        assertEquals("visualMeta", VisualProps.visualMeta.unsafeCast<String>())
+        assertEquals("liftZ", VisualProps.liftZ.unsafeCast<String>())
+        assertEquals("decal", VisualProps.decal.unsafeCast<String>())
     }
 
     @Test

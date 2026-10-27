@@ -82,7 +82,7 @@
 - 补齐 scrollable 的 `pageButtonItemGap` / `pageButtonGap` / `pageIcons`，`pageTextStyle` / `textStyle`
   改成上游的 `LabelOption`。
 - `ScrollableLegendOption` 仍不单独拆出：`EChartsOption.legend` 是 `Array<LegendOption>`，拆开后调用方
-  拿不到分页字段；字段保留在 `LegendOption` 上属于有意的更宽建模（与上游的联合等价，见第 6 条）。
+  拿不到分页字段；字段保留在 `LegendOption` 上属于有意的更宽建模（与上游的联合等价，见第 5 条）。
 - 测试：新增 `options/LegendOptionTest`（4 例，含真实图表 round trip）；浏览器用例 195 → 199，全过。
 
 ### ⑥ 系列 `coordinateSystem` 收窄
@@ -102,6 +102,31 @@
 - 测试：`LiteralsTest` 新增 11 条字面量断言、1 个覆盖全部 10 个系列的「两个属性指向同一 JS 属性」用例、
   1 个真实图表 round trip；浏览器用例 199 → 202，全过。
 
+### ⑦ 自定义系列的元素选项树
+
+- 新增 `CustomElementOptions.kt`，按上游 `shared.d.ts` 建模 `renderItem` 返回的元素树：
+  `CustomBaseElementOption`（`type` / `id` / `name` / `info` / `textContent` / `clipPath` /
+  `tooltipDisabled` / `extra` / `during` / 三种动画 / 变换属性 / `silent` / `ignore` / `textConfig`）、
+  `CustomDisplayableOption`（`zlevel` / `z` / `z2` / `invisible` / `style` / `emphasis` / `blur` /
+  `select` / `styleEmphasis`）、`CustomGroupOption`（含 `$mergeChildren`，用 `@JsName` 映射）、
+  `CustomPathOption`、`CustomImageOption`、`CustomTextOption`、`CustomCompoundPathOption`、
+  `CustomRootElementOption`，以及 `TransitionOptionMixin`、`TransitionBaseDuringAPI` /
+  `TransitionDuringAPI`、`ElementAnimationOption`、`ElementKeyframeAnimationOption`、
+  `AnimationKeyframe`、`CustomElementProps`。
+- 联合类型按 §3 建不透明接口 + 工厂：`ElementKeyframeAnimationOptionOrArray`、
+  `CustomTextContentOption`（`CustomTextOption | false`）、`CustomClipPathOption`、
+  `CustomStyleOption`（`ZRStyleProps | false`）、`CustomMergeChildrenOption`（`false | "byName" |
+  "byIndex"`）、`CustomElementFocus`（`"none" | "self" | "series" | number[]`）。
+- zrender 侧补充这些类型需要的成员：`TransformProp` / `TransformProps`、`BuiltinTextPosition` /
+  `BuiltinTextPositions`、`ElementTextConfig`、`ZRElement.textConfig`、`StringOrImageLike`，
+  并在 `ZRStyleProps` 上补 `image` / `sx` / `sy` / `sWidth` / `sHeight`（图片元素专用）。
+- `CustomSeriesRenderItemReturn` 由 `GraphicElement?` 改为上游的 `CustomRootElementOption?`；
+  `CustomSeriesRenderItemAPI.visual` 的入参由 `String` 改为新增的 `VisualProp` 字面量
+  （`StyleVisualProps | NonStyleVisualProps` 的合并）。
+- 测试：新增 `options/CustomElementOptionsTest`（7 例，含 `$mergeChildren` / `during` 的 `@JsName`
+  映射、联合工厂、关键帧动画、真实图表渲染），`LiteralsTest` 新增 3 组字面量断言；
+  浏览器用例 202 → 212，全过。
+
 ### 遗留提醒
 
 `GraphSeriesOption` 里原 `directed` / `edgeShape` / `edgeForkPosition` / `selectedMode` 在 6.1.0 的
@@ -119,29 +144,15 @@
 - 关键字收窄（如 `coordinateSystem`）已用 `@JsName` 同名字段解决，写法见 `TYPE-MAPPING.md` §12；
   上面两类收窄成的是**另一套对象 / 字符串+数字混合联合**，套用同名字段只能得到近似类型，暂不做。
 
-### 2. 自定义系列的元素选项树
-
-- `CustomSeriesRenderItemReturn` 目前是 `echarts.options.GraphicElement?` 的近似实现。
-- 上游是 `CustomRootElementOption | undefined | null`，需要新建除选项树：
-  `CustomBaseElementOption`（`type` / `info` / `textContent` / `clipPath` / `tooltipDisabled` / `extra` /
-  `during` / `enter|update|leaveAnimation`）、`CustomDisplayableOption`（`style` / `emphasis` / `blur` / `select` /
-  `z` / `zlevel` / `z2` / `invisible`）、`CustomPathOption`（含 `type` 字面量联合与 `BuiltinShapes` 的 `shape`）、
-  `CustomImageOption`、`CustomTextOption`、`CustomGroupOption`、`CustomCompoundPathOption`、
-  `ElementKeyframeAnimationOption` 与 `TransitionOptionMixin`。
-- 难点：这些类型引用 zrender 的 `PathProps` / `TextProps` / `GroupProps` / `Displayable` / `TransformProp`
-  等内部类型，需要先决定用 `ZRShapeProps` / `ZRStyleProps` 这类现成封装顶替哪些成员。
-- 顺带：`CustomSeriesRenderItemAPI.visual(type)` 的入参目前是 `String`，上游是
-  `NonStyleVisualProps | StyleVisualProps`（`'color' | 'borderColor' | 'symbol' | ...`），可补字面量类型。
-
-### 3. 其余数据项类型
+### 2. 其余数据项类型
 
 - 除 gauge / theme river / 层级与关系图外，各系列的 `*DataItemOption` 都还没有单独声明，`data` 走通用联合：
   line / bar / scatter / effectScatter / radar（`*DataItemOption`）、boxplot、candlestick、heatmap、lines、
   parallel、pictorialBar、funnel、pie、map。
 - `OptionDataValueDate`（`Date | string | number`）已备好，用于这类数据项。
-- 前置问题见第 4 条。
+- 前置问题见第 3 条。
 
-### 4. 基接口 `data` 的处理（设计问题）
+### 3. 基接口 `data` 的处理（设计问题）
 
 - 上游 `SeriesOption.data?: unknown`，各具体类型收窄；Kotlin 基接口现在是 `Array<OptionDataItem?>?`，
   节点类 item 靠继承 `OptionDataItemObject` + `items(...)` 塞进去。
@@ -149,14 +160,14 @@
   代价是 `option.series[i].data` 这种基类访问会消失（`OptionModelTest` / `LiteralsTest` 里有用例依赖它）。
 - 决定前先评估：下放后是否需要给 `EChartsOption.series` 之外再提供一个「只读 data」的视图。
 
-### 5. 上游导出清单的全量复核
+### 4. 上游导出清单的全量复核
 
 - 目前只补「已知空缺」，没有重新逐个核对 `echarts` 的公开导出（`EChartsType` / `ChartView` / `SeriesModel` /
   `ComponentModel` / `Payload` / 各 `*Payload` / `*Event` …）与各入口
   （`echarts/core`、`echarts/charts`、`echarts/components`、`echarts/features`、`echarts/renderers`）的差异。
 - 建议单独开一轮：从 `types/dist/*.d.ts` 生成导出清单再逐项比对（参考 `custom-elements.json` 式清单的做法）。
 
-### 6. 已确认「保持现状」的项（不要重复修）
+### 5. 已确认「保持现状」的项（不要重复修）
 
 - `LegendOption` 保留 `ScrollableLegendOption` 的分页字段：`EChartsOption.legend` 是 `Array<LegendOption>`，
   拆成子类型后调用方无法直接访问分页字段；与上游的联合建模等价，属于有意的更宽类型。

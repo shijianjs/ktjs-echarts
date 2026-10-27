@@ -185,6 +185,55 @@ external interface ZRShapeProps {
 }
 
 /**
+ * Placement of the text attached to an element.
+ *
+ * Upstream `ElementTextConfig` in zrender.
+ */
+external interface ElementTextConfig {
+    /**
+     * Position of the text relative to the element: a keyword such as `"inside"` or
+     * `"insideTop"`, or a pair of offsets.
+     */
+    var position: StringOrDoubleOrArray?
+
+    /** Rotation of the text, in radians. */
+    var rotation: Double?
+
+    /** Rectangle the text is laid out in. */
+    var layoutRect: RectLike?
+
+    /** Offset added to [position], `[x, y]`. */
+    var offset: Array<Double>?
+
+    /** Origin of the rotation: `"center"` or `[x, y]`. */
+    var origin: StringOrDoubleOrArray?
+
+    /** Distance between the text and the element. */
+    var distance: Double?
+
+    /** Whether the position is computed in the local coordinate system. */
+    var local: Boolean?
+
+    /** Fill used when the text is inside the element. */
+    var insideFill: String?
+
+    /** Stroke used when the text is inside the element. */
+    var insideStroke: String?
+
+    /** Fill used when the text is outside the element. */
+    var outsideFill: String?
+
+    /** Stroke used when the text is outside the element. */
+    var outsideStroke: String?
+
+    /** Whether the text is placed inside the element. */
+    var inside: Boolean?
+
+    /** Whether the overflow area is computed automatically. */
+    var autoOverflowArea: Boolean?
+}
+
+/**
  * Style of a graphic element.
  *
  * Upstream declares this as `PathStyleProps` for paths and `TextStyleProps` for text; the two have
@@ -193,6 +242,21 @@ external interface ZRShapeProps {
 external interface ZRStyleProps {
     /** Text content of a `"text"` element. */
     var text: String?
+
+    /** Image source of an `"image"` element. */
+    var image: StringOrImageLike?
+
+    /** Left edge of the image source rectangle, for cropping. */
+    var sx: Double?
+
+    /** Top edge of the image source rectangle, for cropping. */
+    var sy: Double?
+
+    /** Width of the image source rectangle, for cropping. */
+    var sWidth: Double?
+
+    /** Height of the image source rectangle, for cropping. */
+    var sHeight: Double?
 
     /** Fill color. */
     var fill: ZRColor?
@@ -425,6 +489,9 @@ external interface ZRElement {
 
     /** Whether the element is ignored by the layout. */
     var ignore: Boolean
+
+    /** Placement of the text attached to the element. */
+    var textConfig: ElementTextConfig?
 
     /** Cursor shown on hover. */
     var cursor: String

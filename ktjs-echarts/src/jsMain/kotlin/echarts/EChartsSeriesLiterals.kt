@@ -655,3 +655,46 @@ object SingleAxisCoordinateSystems {
     /** A single axis. */
     inline val singleAxis: SingleAxisCoordinateSystem get() = SingleAxisCoordinateSystem("singleAxis")
 }
+
+/**
+ * Visual property read with `CustomSeriesRenderItemAPI.visual`.
+ *
+ * Upstream is `StyleVisualProps | NonStyleVisualProps`: the style visuals (`"color"`,
+ * `"borderColor"`) are resolved to `fill` / `stroke`, the others come from the data visual.
+ */
+sealed external interface VisualProp
+
+/** Wraps a visual property name. Prefer the constants in [VisualProps]. */
+inline fun VisualProp(value: String): VisualProp = value.unsafeCast<VisualProp>()
+
+/**
+ * The documented values of [VisualProp].
+ */
+object VisualProps {
+    /** The fill color of the item. */
+    inline val color: VisualProp get() = VisualProp("color")
+
+    /** The stroke color of the item. */
+    inline val borderColor: VisualProp get() = VisualProp("borderColor")
+
+    /** The symbol of the item. */
+    inline val symbol: VisualProp get() = VisualProp("symbol")
+
+    /** The symbol size of the item. */
+    inline val symbolSize: VisualProp get() = VisualProp("symbolSize")
+
+    /** Whether the symbol keeps its aspect ratio. */
+    inline val symbolKeepAspect: VisualProp get() = VisualProp("symbolKeepAspect")
+
+    /** The legend icon of the series. */
+    inline val legendIcon: VisualProp get() = VisualProp("legendIcon")
+
+    /** The visual metadata of the data item. */
+    inline val visualMeta: VisualProp get() = VisualProp("visualMeta")
+
+    /** The lift z-level of the item. */
+    inline val liftZ: VisualProp get() = VisualProp("liftZ")
+
+    /** The decal pattern of the item. */
+    inline val decal: VisualProp get() = VisualProp("decal")
+}

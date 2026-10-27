@@ -45,3 +45,102 @@ object TextOverflows {
     /** Let the text overflow the box. */
     inline val none: TextOverflow get() = TextOverflow("none")
 }
+
+/**
+ * Transform property of an element, used by `during` callbacks to read or write one value.
+ */
+sealed external interface TransformProp
+
+/** Wraps a transform property name. Prefer the constants in [TransformProps]. */
+inline fun TransformProp(value: String): TransformProp = value.unsafeCast<TransformProp>()
+
+/**
+ * The documented values of [TransformProp].
+ */
+object TransformProps {
+    /** Horizontal position. */
+    inline val x: TransformProp get() = TransformProp("x")
+
+    /** Vertical position. */
+    inline val y: TransformProp get() = TransformProp("y")
+
+    /** Horizontal origin of the transform. */
+    inline val originX: TransformProp get() = TransformProp("originX")
+
+    /** Vertical origin of the transform. */
+    inline val originY: TransformProp get() = TransformProp("originY")
+
+    /** Horizontal anchor of the transform. */
+    inline val anchorX: TransformProp get() = TransformProp("anchorX")
+
+    /** Vertical anchor of the transform. */
+    inline val anchorY: TransformProp get() = TransformProp("anchorY")
+
+    /** Rotation in radians. */
+    inline val rotation: TransformProp get() = TransformProp("rotation")
+
+    /** Horizontal scale. */
+    inline val scaleX: TransformProp get() = TransformProp("scaleX")
+
+    /** Vertical scale. */
+    inline val scaleY: TransformProp get() = TransformProp("scaleY")
+
+    /** Horizontal skew. */
+    inline val skewX: TransformProp get() = TransformProp("skewX")
+
+    /** Vertical skew. */
+    inline val skewY: TransformProp get() = TransformProp("skewY")
+}
+
+/**
+ * Built-in position of the text attached to an element.
+ */
+sealed external interface BuiltinTextPosition
+
+/** Wraps a text position name. Prefer the constants in [BuiltinTextPositions]. */
+inline fun BuiltinTextPosition(value: String): BuiltinTextPosition =
+    value.unsafeCast<BuiltinTextPosition>()
+
+/**
+ * The documented values of [BuiltinTextPosition].
+ */
+object BuiltinTextPositions {
+    /** Left of the element. */
+    inline val left: BuiltinTextPosition get() = BuiltinTextPosition("left")
+
+    /** Right of the element. */
+    inline val right: BuiltinTextPosition get() = BuiltinTextPosition("right")
+
+    /** Above the element. */
+    inline val top: BuiltinTextPosition get() = BuiltinTextPosition("top")
+
+    /** Below the element. */
+    inline val bottom: BuiltinTextPosition get() = BuiltinTextPosition("bottom")
+
+    /** Centered inside the element. */
+    inline val inside: BuiltinTextPosition get() = BuiltinTextPosition("inside")
+
+    /** Inside the element, aligned left. */
+    inline val insideLeft: BuiltinTextPosition get() = BuiltinTextPosition("insideLeft")
+
+    /** Inside the element, aligned right. */
+    inline val insideRight: BuiltinTextPosition get() = BuiltinTextPosition("insideRight")
+
+    /** Inside the element, aligned top. */
+    inline val insideTop: BuiltinTextPosition get() = BuiltinTextPosition("insideTop")
+
+    /** Inside the element, aligned bottom. */
+    inline val insideBottom: BuiltinTextPosition get() = BuiltinTextPosition("insideBottom")
+
+    /** Inside the top-left corner. */
+    inline val insideTopLeft: BuiltinTextPosition get() = BuiltinTextPosition("insideTopLeft")
+
+    /** Inside the top-right corner. */
+    inline val insideTopRight: BuiltinTextPosition get() = BuiltinTextPosition("insideTopRight")
+
+    /** Inside the bottom-left corner. */
+    inline val insideBottomLeft: BuiltinTextPosition get() = BuiltinTextPosition("insideBottomLeft")
+
+    /** Inside the bottom-right corner. */
+    inline val insideBottomRight: BuiltinTextPosition get() = BuiltinTextPosition("insideBottomRight")
+}

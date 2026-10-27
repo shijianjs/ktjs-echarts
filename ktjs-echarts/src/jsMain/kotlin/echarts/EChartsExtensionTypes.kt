@@ -2,10 +2,10 @@ package echarts
 
 import echarts.options.BarGridLayoutOptionForCustomSeries
 import echarts.options.BarGridLayoutResultForCustomSeries
+import echarts.options.CustomRootElementOption
 import echarts.options.CustomSeriesFontOption
 import echarts.options.DimensionDefinitionLoose
 import echarts.options.DimensionLoose
-import echarts.options.GraphicElement
 import echarts.options.OptionDataValue
 import echarts.options.StringOrDouble
 import js.objects.Record
@@ -302,7 +302,7 @@ external interface CustomSeriesRenderItemAPI {
     fun styleEmphasis(userProps: ZRStyleProps? = definedExternally, dataIndexInside: Double? = definedExternally): ZRStyleProps
 
     /** Returns a visual value of the data item. */
-    fun visual(visualType: String, dataIndexInside: Double? = definedExternally): JsAny?
+    fun visual(visualType: VisualProp, dataIndexInside: Double? = definedExternally): JsAny?
 
     /** Computes the bar layout of the data item. */
     fun barLayout(opt: BarGridLayoutOptionForCustomSeries): BarGridLayoutResultForCustomSeries?
@@ -315,9 +315,9 @@ external interface CustomSeriesRenderItemAPI {
 }
 
 /**
- * Return value of a custom series `renderItem` callback.
+ * Return value of a custom series `renderItem` callback: a custom element tree, `null` or `undefined`.
  */
-typealias CustomSeriesRenderItemReturn = echarts.options.GraphicElement?
+typealias CustomSeriesRenderItemReturn = CustomRootElementOption?
 
 /**
  * Callback that renders one data item of a custom series.

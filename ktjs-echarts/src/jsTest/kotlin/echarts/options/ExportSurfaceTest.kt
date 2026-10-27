@@ -80,7 +80,7 @@ class ExportSurfaceTest {
                     }
                     xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = strings("a", "b", "c") })
                     yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
-                    series = one(lineSeries { data = numbers(1.0, 2.0, 3.0) })
+                    series = one(lineSeries { typedData = numbers(1.0, 2.0, 3.0) })
                 },
             )
 
@@ -101,7 +101,7 @@ class ExportSurfaceTest {
                     yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
                     series = one(
                         lineSeries {
-                            data = numbers(1.0, 2.0, 3.0)
+                            typedData = numbers(1.0, 2.0, 3.0)
                             // A series-level callback wins over the root option.
                             animationDuration = AnimationDuration {
                                 seriesDurationCalls++
@@ -143,7 +143,7 @@ class ExportSurfaceTest {
                 cartesianLineOption(1.0, 2.0) {
                     series = one(
                         lineSeries {
-                            data = numbers(1.0, 2.0)
+                            typedData = numbers(1.0, 2.0)
                             label = unsafeJso<LabelOption> {
                                 show = true
                                 this.formatter = LabelFormatter(formatter)
@@ -183,7 +183,7 @@ class ExportSurfaceTest {
                     )
                     xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = strings("a", "b", "c") })
                     yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
-                    series = one(lineSeries { data = numbers(1.0, 2.0, 3.0) })
+                    series = one(lineSeries { typedData = numbers(1.0, 2.0, 3.0) })
                 },
             )
 
@@ -215,7 +215,7 @@ class ExportSurfaceTest {
                     )
                     xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = strings("a", "b", "c") })
                     yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
-                    series = one(lineSeries { data = numbers(1.0, 2.0, 3.0) })
+                    series = one(lineSeries { typedData = numbers(1.0, 2.0, 3.0) })
                 },
             )
 
@@ -263,7 +263,7 @@ class ExportSurfaceTest {
                     )
                     xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = strings("a", "b") })
                     yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
-                    series = one(lineSeries { data = numbers(1.0, 2.0) })
+                    series = one(lineSeries { typedData = numbers(1.0, 2.0) })
                 },
             )
 
@@ -484,7 +484,7 @@ class ExportSurfaceTest {
                     )
                     series = one(
                         lineSeries {
-                            data = numbers(1.0, 2.0, 3.0)
+                            typedData = numbers(1.0, 2.0, 3.0)
                             coordinateSystem = "cartesian2d"
                         },
                     )
@@ -556,10 +556,10 @@ class ExportSurfaceTest {
                     series = one(
                         graphSeries {
                             layout = GraphLayouts.circular
-                            data = arrayOf(
-                                unsafeJso<GraphNodeItemOption> { name = "a" }.asThumbnailDataItem(),
-                                unsafeJso<GraphNodeItemOption> { name = "b" }.asThumbnailDataItem(),
-                                unsafeJso<GraphNodeItemOption> { name = "c" }.asThumbnailDataItem(),
+                            typedData = arrayOf(
+                                unsafeJso<GraphNodeItemOption> { name = "a" }.asGraphDataItem(),
+                                unsafeJso<GraphNodeItemOption> { name = "b" }.asGraphDataItem(),
+                                unsafeJso<GraphNodeItemOption> { name = "c" }.asGraphDataItem(),
                             )
                             links = arrayOf(
                                 unsafeJso<GraphEdgeItemOption> { source = StringOrDouble("a"); target = StringOrDouble("b") },
@@ -599,7 +599,7 @@ class ExportSurfaceTest {
             )
             xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = strings("a", "b") })
             yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
-            series = one(lineSeries { data = numbers(1.0, 2.0) })
+            series = one(lineSeries { typedData = numbers(1.0, 2.0) })
         }
         val asTypedOption: EChartsOption = option
         assertEquals(2, asTypedOption.colorLayer?.size)
@@ -622,7 +622,7 @@ class ExportSurfaceTest {
 }
 
 /**
- * `GraphNodeItemOption` is not an `OptionDataItemObject`, so graph data needs an explicit cast,
- * exactly like upstream's `GraphNodeItemOption` union.
+ * `GraphNodeItemOption` keeps its own `value` instead of extending `OptionDataItemObject`, so graph
+ * data is wrapped in the `GraphDataItem` union, exactly like upstream's node union.
  */
-private fun JsAny.asThumbnailDataItem(): OptionDataItem? = unsafeCast<OptionDataItem?>()
+private fun JsAny.asGraphDataItem(): GraphDataItem? = unsafeCast<GraphDataItem?>()

@@ -157,11 +157,11 @@ private fun seriesOptions(revenue: List<Double>, orders: List<Double>): Array<Se
     lineSeries {
         name = "Revenue"
         smooth = BooleanOrDouble(true)
-        data = numbers(*revenue.toDoubleArray())
+        typedData = numbers(*revenue.toDoubleArray())
     },
     barSeries {
         name = "Orders"
-        data = numbers(*orders.toDoubleArray())
+        typedData = numbers(*orders.toDoubleArray())
     },
 )
 

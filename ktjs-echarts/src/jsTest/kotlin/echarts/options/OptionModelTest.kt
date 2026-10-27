@@ -52,7 +52,7 @@ class OptionModelTest {
             grid = one(unsafeJso<GridOption> { left = StringOrDouble("5%"); containLabel = true })
             xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = numbers(1.0, 2.0, 3.0) })
             yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
-            series = one(lineSeries { name = "orders"; data = numbers(3.0, 5.0, 8.0) })
+            series = one(lineSeries { name = "orders"; typedData = numbers(3.0, 5.0, 8.0) })
         }
 
         assertEquals("Sales", option.title!![0].text)
@@ -77,7 +77,7 @@ class OptionModelTest {
 
     @Test
     fun numbersCreatesARealJavaScriptArray() {
-        val data = numbers(1.0, 2.5, -3.0)
+        val data: Array<OptionDataItem?> = numbers(1.0, 2.5, -3.0)
         assertEquals(3, data.size)
         assertEquals(1.0, data[0].unsafeCast<Double>())
         assertEquals(2.5, data[1].unsafeCast<Double>())
@@ -87,7 +87,8 @@ class OptionModelTest {
 
     @Test
     fun pointsCreatesNestedJavaScriptArrays() {
-        val data = points(doubleArrayOf(1.0, 2.0), doubleArrayOf(3.0, 4.0))
+        val data: Array<OptionDataItem?> =
+            points(doubleArrayOf(1.0, 2.0), doubleArrayOf(3.0, 4.0))
         assertEquals(2, data.size)
         val first = data[0].unsafeCast<Array<Double>>()
         assertEquals(2, first.size)
@@ -97,7 +98,7 @@ class OptionModelTest {
 
     @Test
     fun itemsWrapsExistingObjects() {
-        val data = items(
+        val data: Array<OptionDataItem?> = items(
             unsafeJso<OptionDataItemObject> { name = OptionId("first") },
             unsafeJso<OptionDataItemObject> { name = OptionId("second") },
         )

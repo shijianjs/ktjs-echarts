@@ -86,8 +86,20 @@ external interface PieSeriesOption :
     /** Style of the labels. */
     override var label: LabelOption?
 
+    /** Typed view of [label] with the pie-specific members; see `TYPE-MAPPING.md` §12. */
+    @JsName("label")
+    var typedLabel: PieLabelOption?
+
     /** Style of the label lines. */
     override var labelLine: LabelLineOption?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a pie series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<PieDataItem?>?
 }
 
 /**
@@ -120,6 +132,14 @@ external interface FunnelSeriesOption : SeriesOption, ComponentOnCalendarOptionM
 
     /** Style of the label lines. */
     override var labelLine: LabelLineOption?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a funnel series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<FunnelDataItem?>?
 }
 
 /**
@@ -165,8 +185,13 @@ external interface GaugeSeriesOption : SeriesOption, ComponentOnCalendarOptionMi
     /** Configuration of the split lines. */
     var splitLine: GaugeSplitLineOption?
 
-    /** Configuration of the axis labels. */
-    var axisLabel: LabelOption?
+    /**
+     * Configuration of the axis labels.
+     *
+     * Upstream declares the gauge axis label as `Omit<LabelOption, 'rotate'> & { rotate?: … }`, so
+     * the rotation accepts the `"tangential"` / `"radial"` keywords on top of a number of degrees.
+     */
+    var axisLabel: GaugeAxisLabelOption?
 
     /** Configuration of the title. */
     var title: GaugeTitleOption?
@@ -179,6 +204,14 @@ external interface GaugeSeriesOption : SeriesOption, ComponentOnCalendarOptionMi
 
     /** Whether the gauge is silent. */
     override var silent: Boolean?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a gauge series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<GaugeDataItem?>?
 }
 
 /**
@@ -204,13 +237,25 @@ external interface GaugeDetailOption : LabelOption {
 }
 
 /**
- * One data item of a gauge series.
+ * Axis label of a gauge.
  *
- * Upstream `GaugeDataItemOption`; [value] is inherited from [OptionDataItemObject], i.e. it is the
- * generic data value rather than the upstream `OptionDataValueNumeric`. Put the items into
- * `SeriesOption.data` with [items].
+ * Upstream declares the type inline as `Omit<LabelOption, 'rotate'> & { rotate?: … }`; [LabelOption]
+ * keeps the whole member set and [typedRotate] carries the narrowed rotation, which accepts the
+ * `"tangential"` / `"radial"` keywords as well as a number of degrees.
  */
-external interface GaugeDataItemOption : OptionDataItemObject {
+external interface GaugeAxisLabelOption : LabelOption {
+    /** Typed view of [LabelOption.rotate]. */
+    @JsName("rotate")
+    var typedRotate: LabelRotate?
+}
+
+/**
+ * One data item of a gauge series.
+ */
+external interface GaugeDataItemOption : OptionDataItemObject, DataItemStateOption {
+    /** Style of the item. */
+    var itemStyle: ItemStyleOption?
+
     /** Configuration of the pointer of this item. */
     var pointer: GaugePointerOption?
 
@@ -416,6 +461,14 @@ external interface RadarSeriesOption : SeriesOption, SymbolOptionMixin, SeriesOn
 
     /** How the data maps to the radar axes. */
     var seriesLayoutBy: SeriesLayoutBy?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a radar series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<RadarSeriesDataItem?>?
 }
 
 /**
@@ -472,6 +525,14 @@ external interface MapSeriesOption :
 
     /** Whether to show the legend symbol. */
     var showLegendSymbol: Boolean?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a map series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<MapDataItem?>?
 }
 
 /**
@@ -514,19 +575,22 @@ external interface ThemeRiverSeriesOption : SeriesOption, SeriesOnSingleOptionMi
 
     /** Whether to show the tooltip. */
     override var tooltip: TooltipOption?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a theme river series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<ThemeRiverDataItem?>?
 }
 
 /**
- * Pictorial bar series.
+ * Symbol members of a pictorial bar series, shared by the series and its data items.
+ *
+ * Upstream `PictorialBarSeriesSymbolOption`.
  */
-external interface PictorialBarSeriesOption : SeriesOption, SeriesOnCartesianOptionMixin, SeriesOnPolarOptionMixin {
-    /** Coordinate system: `"cartesian2d"`. */
-    override var coordinateSystem: String?
-
-    /** Typed view of [coordinateSystem]; see [LineSeriesOption.typedCoordinateSystem]. */
-    @JsName("coordinateSystem")
-    var typedCoordinateSystem: CartesianCoordinateSystem?
-
+external interface PictorialBarSeriesSymbolOption {
     /** Symbol shape of the bars. */
     var symbol: String?
 
@@ -559,6 +623,23 @@ external interface PictorialBarSeriesOption : SeriesOption, SeriesOnCartesianOpt
 
     /** Size of the symbol pattern. */
     var symbolPatternSize: Double?
+}
+
+/**
+ * Pictorial bar series.
+ */
+external interface PictorialBarSeriesOption :
+    SeriesOption,
+    PictorialBarSeriesSymbolOption,
+    SeriesOnCartesianOptionMixin,
+    SeriesOnPolarOptionMixin
+{
+    /** Coordinate system: `"cartesian2d"`. */
+    override var coordinateSystem: String?
+
+    /** Typed view of [coordinateSystem]; see [LineSeriesOption.typedCoordinateSystem]. */
+    @JsName("coordinateSystem")
+    var typedCoordinateSystem: CartesianCoordinateSystem?
 
     /** Gap between bars of different series. */
     var barGap: String?
@@ -577,4 +658,12 @@ external interface PictorialBarSeriesOption : SeriesOption, SeriesOnCartesianOpt
 
     /** Whether to clip the bars to the coordinate system. */
     var clip: Boolean?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a pictorial bar series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<PictorialBarDataItem?>?
 }

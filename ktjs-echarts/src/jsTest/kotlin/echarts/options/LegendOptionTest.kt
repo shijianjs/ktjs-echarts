@@ -90,7 +90,7 @@ class LegendOptionTest {
             series = one(
                 unsafeJso<LineSeriesOption> {
                     name = "series"
-                    data = numbers(1.0, 2.0)
+                    typedData = numbers(1.0, 2.0)
                 },
             )
         }
@@ -122,7 +122,7 @@ class LegendOptionTest {
                     }
                 },
             )
-            series = one(unsafeJso<LineSeriesOption> { data = numbers(1.0, 2.0) })
+            series = one(unsafeJso<LineSeriesOption> { typedData = numbers(1.0, 2.0) })
         }
 
         val (chart, container) = createChart()

@@ -161,6 +161,30 @@
 - `TYPE-MAPPING.md` 补「同一个联合有两个上游名字」「`number | callback`」两节，并把 `T | T[]`
   一条改成统一用 `Array<T>`（模板仓库同步）。
 
+### ⑨ 各系列数据项类型与 `data` 的只读视图
+
+- `SeriesOption.data` 改为**只读** `val data: Array<OptionDataItem?>?`；23 个系列接口各自新增
+  `@JsName("data") var typedData`，类型是该系列上游收窄后的 item 联合。两个属性读写同一个 JS 属性，
+  由 `SeriesTypedDataTest.typedDataAndTheReadOnlyViewShareOneJavaScriptProperty` 验证。
+- 新增各系列的 data item 类型与联合：`CartesianDataItemOptions.kt`（line / bar / scatter / effectScatter /
+  candlestick / boxplot / heatmap / lines / parallel）、`PartDataItemOptions.kt`（pie / funnel / gauge /
+  radar / map / pictorialBar），关系系列补 `GraphDataItem` / `ChordDataItem`；层级系列与主题河流沿用已有
+  item 类型。共同的三态成员抽成 `DataItemStateOption`；`PictorialBarSeriesSymbolOption` 从系列里抽成独立
+  接口，由系列与 data item 共用。`EffectScatterSeriesOption` 不再继承 `ScatterSeriesOption`（上游也没有
+  这个继承关系，两者的 data item 不同）。
+- `value` 被收窄成数组或联合的 item 用 `@JsName("value") var typedValue`（candlestick / boxplot / heatmap /
+  radar / parallel / line / scatter / effectScatter / lines），保住「写数组 value」的能力。
+- label 的 `rotate` 收窄用 `@JsName("rotate") var typedRotate` + 新联合 `LabelRotate`，覆盖
+  `PieLabelOption`、`GaugeAxisLabelOption`（新增，配 `GaugeSeriesOption.typedAxisLabel`）与
+  `SunburstLabelOption`。
+- `numbers` / `strings` / `points` / `items` 改成泛型（元素类型从目标属性推断），新增 `dataItems` 用于
+  联合分支；`one` 不变。
+- 测试：新增 `options/SeriesTypedDataTest`（6 例）；测试与 demo 里系列 block 内的 `data =` 全部改为
+  `typedData =`（脚本一次性改写 117 处 + demo 2 处）。浏览器用例 224 → 230，全过；`./gradlew build`
+  （含 detekt）通过。
+- `TYPE-MAPPING.md` §12 的 `data?: unknown` 一节按新写法重写，「继承来的 `var` 需要收窄」补了三种收窄
+  形态，反模式速查同步（模板仓库提交 `b863493`，推送待网络恢复）。
+
 ### 遗留提醒
 
 `GraphSeriesOption` 里原 `directed` / `edgeShape` / `edgeForkPosition` / `selectedMode` 在 6.1.0 的
@@ -168,33 +192,17 @@
 
 ## 待办
 
-### 1. `Omit<...> & { ... }`、var 收窄带来的限制（需要新写法才解）
+### 1. `Omit<...> & { ... }` 与 var 收窄的残留
 
-- series 级 `itemStyle` / `label` 上游会收窄成子类型（`TreemapSeriesItemStyleOption`、`SunburstLabelOption`、
-  `ChordItemStyleOption` …），Kotlin 的 `var` 覆盖要求类型完全相同，这些字段只能保留基接口类型；
-  精确类型在 `levels` / `data` 的 item 上可用，因此不算功能缺失。
-- gauge `axisLabel` 的 `rotate` 是同类问题（`LabelOption.rotate: Double?` 无法收窄成
-  `'tangential' | 'radial' | number`）。
-- 关键字收窄（如 `coordinateSystem`）已用 `@JsName` 同名字段解决，写法见 `TYPE-MAPPING.md` §12；
-  上面两类收窄成的是**另一套对象 / 字符串+数字混合联合**，套用同名字段只能得到近似类型，暂不做。
+- series 级 `itemStyle` / `label` 上游收窄成**另一套对象**（`TreemapSeriesItemStyleOption`、
+  `SunburstLabelOption`、`CandlestickItemStyleOption`…）：精确类型本身就是基类型的子接口，调用方直接
+  `unsafeJso<精确类型> { }` 赋给基接口字段即可写，读回来按需 `unsafeCast`，不算能力缺失。**不额外加
+  `typedItemStyle` / `typedLabel` 视图**：上游的 `Omit<X, 'k'> & { … }` 与基接口并非逐字段相同的集合，
+  套同名字段只能得到近似类型。
+- `rotate` 的收窄已在 ⑨ 用 `typedRotate` 补齐（gauge axis label / pie / sunburst）。
+- 关键字收窄（`coordinateSystem` 等）沿用 `@JsName` 同名字段，见 `TYPE-MAPPING.md` §12。
 
-### 2. 其余数据项类型
-
-- 除 gauge / theme river / 层级与关系图外，各系列的 `*DataItemOption` 都还没有单独声明，`data` 走通用联合：
-  line / bar / scatter / effectScatter / radar（`*DataItemOption`）、boxplot、candlestick、heatmap、lines、
-  parallel、pictorialBar、funnel、pie、map。
-- `OptionDataValueDate`（`Date | string | number`）已备好，用于这类数据项。
-- 前置问题见第 3 条。
-
-### 3. 基接口 `data` 的处理（设计问题）
-
-- 上游 `SeriesOption.data?: unknown`，各具体类型收窄；Kotlin 基接口现在是 `Array<OptionDataItem?>?`，
-  节点类 item 靠继承 `OptionDataItemObject` + `items(...)` 塞进去。
-- 若要完全精确，需要按 TYPE-MAPPING §12 把 `data` 从基接口下放到每个具体系列；
-  代价是 `option.series[i].data` 这种基类访问会消失（`OptionModelTest` / `LiteralsTest` 里有用例依赖它）。
-- 决定前先评估：下放后是否需要给 `EChartsOption.series` 之外再提供一个「只读 data」的视图。
-
-### 4. 已确认「保持现状」的项（不要重复修）
+### 2. 已确认「保持现状」的项（不要重复修）
 
 - `LegendOption` 保留 `ScrollableLegendOption` 的分页字段：`EChartsOption.legend` 是 `Array<LegendOption>`，
   拆成子类型后调用方无法直接访问分页字段；与上游的联合建模等价，属于有意的更宽类型。

@@ -166,6 +166,24 @@ external interface OptionDataItemObject {
 }
 
 /**
+ * State members that most data items override: the emphasis, blur and select variants of the item.
+ *
+ * Upstream declares them per series through `StatesOptionMixin`; the wrapper uses the same
+ * [EmphasisOption] / [BlurOption] / [SelectOption] types as the series level does, which is wider
+ * than the per-series narrowing but keeps one declaration for every data item.
+ */
+external interface DataItemStateOption {
+    /** Emphasis (hover) state of the item. */
+    var emphasis: EmphasisOption?
+
+    /** Blur (non-focused) state of the item. */
+    var blur: BlurOption?
+
+    /** Select state of the item. */
+    var select: SelectOption?
+}
+
+/**
  * `string | number`, used by component and data item ids.
  */
 external interface OptionId

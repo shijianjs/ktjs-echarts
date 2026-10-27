@@ -70,7 +70,7 @@ internal fun cartesianLineOption(
 ): EChartsOption = unsafeJso<EChartsOption> {
     xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category })
     yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
-    series = one(lineSeries { data = numbers(*values) })
+    series = one(lineSeries { typedData = numbers(*values) })
     block()
 }
 

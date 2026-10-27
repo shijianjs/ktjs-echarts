@@ -11,7 +11,7 @@ import echarts.options.EChartsOption
 import echarts.options.GeoOption
 import echarts.options.GraphNodeItemOption
 import echarts.options.GridOption
-import echarts.options.OptionDataItem
+import echarts.options.GraphDataItem
 import echarts.options.SeriesOption
 import echarts.options.StringOrDouble
 import echarts.options.XAxisOption
@@ -217,20 +217,20 @@ class ContainPixelTest {
                     series = arrayOf<SeriesOption>(
                         scatterSeries {
                             id = "k1"
-                            data = points(doubleArrayOf(1000.0, 700.0))
+                            typedData = points(doubleArrayOf(1000.0, 700.0))
                         },
                         scatterSeries {
                             id = "k2"
-                            data = points(doubleArrayOf(100.0, 800.0))
+                            typedData = points(doubleArrayOf(100.0, 800.0))
                         },
                         scatterSeries {
                             id = "j1"
-                            data = points(doubleArrayOf(100.0, 800.0))
+                            typedData = points(doubleArrayOf(100.0, 800.0))
                             xAxisIndex = 1.0
                         },
                         scatterSeries {
                             id = "i1"
-                            data = arrayOf()
+                            typedData = arrayOf()
                             xAxisId = "x2"
                             yAxisId = "y1"
                         },
@@ -268,7 +268,7 @@ class ContainPixelTest {
                             right = StringOrDouble("50%")
                             top = StringOrDouble(30.0)
                             bottom = StringOrDouble(40.0)
-                            data = arrayOf(
+                            typedData = arrayOf(
                                 node(1000.0, 2000.0),
                                 node(1000.0, 5000.0),
                                 node(3000.0, 5000.0),
@@ -291,12 +291,12 @@ class ContainPixelTest {
 /**
  * Builds a graph node with fixed coordinates.
  *
- * `GraphNodeItemOption` is not an `OptionDataItemObject` (its `value` is wider), so the series
+ * `GraphNodeItemOption` keeps its own `value` instead of extending `OptionDataItemObject`, so the
  * `data` slot needs an explicit cast �?the same thing upstream does with its `GraphNodeItemOption`
  * union.
  */
-private fun node(x: Double, y: Double): OptionDataItem? =
+private fun node(x: Double, y: Double): GraphDataItem? =
     unsafeJso<GraphNodeItemOption> {
         this.x = x
         this.y = y
-    }.unsafeCast<OptionDataItem?>()
+    }.unsafeCast<GraphDataItem?>()

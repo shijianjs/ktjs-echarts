@@ -42,7 +42,7 @@ class SetOptionTest {
                 unsafeJso<EChartsOption> {
                     xAxis = arrayOf(unsafeJso<XAxisOption> { })
                     yAxis = arrayOf(unsafeJso<YAxisOption> { })
-                    series = arrayOf<SeriesOption>(scatterSeries { data = points(doubleArrayOf(12.0, 223.0)) })
+                    series = arrayOf<SeriesOption>(scatterSeries { typedData = points(doubleArrayOf(12.0, 223.0)) })
                     visualMap = arrayOf(
                         unsafeJso<VisualMapOption> {
                             inRange = unsafeJso<VisualOptionUnit> {
@@ -71,7 +71,7 @@ class SetOptionTest {
                 unsafeJso<EChartsOption> {
                     xAxis = arrayOf(unsafeJso<XAxisOption> { })
                     yAxis = arrayOf(unsafeJso<YAxisOption> { })
-                    series = arrayOf<SeriesOption>(scatterSeries { data = points(doubleArrayOf(12.0, 223.0)) })
+                    series = arrayOf<SeriesOption>(scatterSeries { typedData = points(doubleArrayOf(12.0, 223.0)) })
                     visualMap = arrayOf(
                         unsafeJso<VisualMapOption> {
                             color = arrayOf("yellow", "blue", "red")
@@ -99,7 +99,7 @@ class SetOptionTest {
                 unsafeJso<EChartsOption> {
                     xAxis = arrayOf(unsafeJso<XAxisOption> { })
                     yAxis = arrayOf(unsafeJso<YAxisOption> { })
-                    series = arrayOf<SeriesOption>(scatterSeries { data = points(doubleArrayOf(12.0, 223.0)) })
+                    series = arrayOf<SeriesOption>(scatterSeries { typedData = points(doubleArrayOf(12.0, 223.0)) })
                     visualMap = arrayOf(
                         unsafeJso<VisualMapOption> {
                             inRange = unsafeJso<VisualOptionUnit> {
@@ -116,7 +116,7 @@ class SetOptionTest {
             // visualMap depends on the series, so updating the data must not drop the visuals.
             chart.setOption(
                 unsafeJso<EChartsOption> {
-                    series = arrayOf<SeriesOption>(scatterSeries { data = points(doubleArrayOf(44.0, 55.0)) })
+                    series = arrayOf<SeriesOption>(scatterSeries { typedData = points(doubleArrayOf(44.0, 55.0)) })
                 },
             )
             expectTheSame(chart)
@@ -133,7 +133,7 @@ class SetOptionTest {
                 unsafeJso<EChartsOption> {
                     xAxis = arrayOf(unsafeJso<XAxisOption> { })
                     yAxis = arrayOf(unsafeJso<YAxisOption> { })
-                    series = arrayOf<SeriesOption>(scatterSeries { data = points(doubleArrayOf(12.0, 223.0)) })
+                    series = arrayOf<SeriesOption>(scatterSeries { typedData = points(doubleArrayOf(12.0, 223.0)) })
                     visualMap = arrayOf(
                         unsafeJso<VisualMapOption> {
                             inRange = unsafeJso<VisualOptionUnit> {
@@ -179,7 +179,7 @@ class SetOptionTest {
                 unsafeJso<EChartsOption> {
                     xAxis = arrayOf(unsafeJso<XAxisOption> { })
                     yAxis = arrayOf(unsafeJso<YAxisOption> { })
-                    series = arrayOf<SeriesOption>(scatterSeries { data = points(doubleArrayOf(12.0, 223.0)) })
+                    series = arrayOf<SeriesOption>(scatterSeries { typedData = points(doubleArrayOf(12.0, 223.0)) })
                     visualMap = arrayOf(
                         unsafeJso<VisualMapOption> {
                             inRange = unsafeJso<VisualOptionUnit> {
@@ -230,7 +230,7 @@ class SetOptionTest {
                 unsafeJso<EChartsOption> {
                     xAxis = arrayOf(unsafeJso<XAxisOption> { })
                     yAxis = arrayOf(unsafeJso<YAxisOption> { })
-                    series = arrayOf<SeriesOption>(scatterSeries { data = points(doubleArrayOf(12.0, 223.0)) })
+                    series = arrayOf<SeriesOption>(scatterSeries { typedData = points(doubleArrayOf(12.0, 223.0)) })
                     visualMap = arrayOf(
                         unsafeJso<VisualMapOption> {
                             inRange = unsafeJso<VisualOptionUnit> {

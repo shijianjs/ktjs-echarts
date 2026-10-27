@@ -286,9 +286,30 @@ external interface LabelOption : TextStyleOption {
 }
 
 /**
- * Label formatter: a template string or a callback.
+ * Rotation of a label that upstream narrows to keywords: `'radial' | 'tangential' | number`.
  *
- * Create one with `LabelFormatter("{b}: {c}")` or `LabelFormatter { params -> ... }`.
+ * Used by the labels whose series (gauge axis label, sunburst) accept the keywords instead of the
+ * plain number of [LabelOption.rotate]; prefer the constants in [LabelRotates].
+ */
+external interface LabelRotate
+
+/** Wraps a rotation in degrees. */
+fun LabelRotate(value: Double): LabelRotate = value.unsafeCast<LabelRotate>()
+
+/** Wraps a keyword such as `"radial"`; prefer the constants in [LabelRotates]. */
+fun LabelRotate(value: String): LabelRotate = value.unsafeCast<LabelRotate>()
+
+/** The keywords accepted by [LabelRotate]. */
+object LabelRotates {
+    /** The label is laid out along the radius. */
+    inline val radial: LabelRotate get() = LabelRotate("radial")
+
+    /** The label is laid out along the tangent of the sector. */
+    inline val tangential: LabelRotate get() = LabelRotate("tangential")
+}
+
+/**
+ * Label formatter: a template string or a callback.
  */
 external interface LabelFormatter
 

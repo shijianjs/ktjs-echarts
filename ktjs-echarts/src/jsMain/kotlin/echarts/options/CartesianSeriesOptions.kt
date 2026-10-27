@@ -101,8 +101,15 @@ external interface SeriesOption {
     /** Cursor shown when hovering the series. */
     var cursor: String?
 
-    /** Series data: values, `[x, y]` tuples or data item objects. */
-    var data: Array<OptionDataItem?>?
+    /**
+     * Read-only view of the series data.
+     *
+     * The elements keep the generic [OptionDataItem] type, which is enough to read values and
+     * `[x, y]` tuples but not to write the data back. Writing uses the `typedData` view that every
+     * concrete series declares over the same JavaScript property, with the exact item type of that
+     * series.
+     */
+    val data: Array<OptionDataItem?>?
 
     /** Index of the dataset used as the data source. */
     var datasetIndex: Double?
@@ -232,6 +239,14 @@ external interface LineSeriesOption :
 
     /** Whether to show the line as a polar bar when on a polar coordinate system. */
     var showBackground: Boolean?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a line series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<LineDataItem?>?
 }
 
 /**
@@ -298,6 +313,14 @@ external interface BarSeriesOption : SeriesOption, SeriesOnCartesianOptionMixin,
 
     /** Data size above which large-data mode is used. */
     var largeThreshold: Double?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a bar series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<BarDataItem?>?
 }
 
 /**
@@ -330,17 +353,55 @@ external interface ScatterSeriesOption :
 
     /** Whether to clip the symbols to the coordinate system. */
     var clip: Boolean?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a scatter series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<ScatterDataItem?>?
 }
 
 /**
  * Effect scatter series: a scatter series with a ripple animation.
+ *
+ * Upstream `EffectScatterSeriesOption` shares the coordinate-system mixins with
+ * [ScatterSeriesOption] but is not a subtype of it, and the two series accept different data items,
+ * so this interface does not extend [ScatterSeriesOption] either.
  */
-external interface EffectScatterSeriesOption : ScatterSeriesOption {
+external interface EffectScatterSeriesOption :
+    SeriesOption,
+    SymbolOptionMixin,
+    SeriesOnCartesianOptionMixin,
+    SeriesOnPolarOptionMixin,
+    ComponentOnCalendarOptionMixin,
+    ComponentOnMatrixOptionMixin,
+    SeriesOnGeoOptionMixin,
+    SeriesOnSingleOptionMixin
+{
+    /** Coordinate system: `"cartesian2d"`, `"polar"`, `"geo"`, `"singleAxis"` or `"calendar"`. */
+    override var coordinateSystem: String?
+
+    /** Type of the effect, always `"ripple"`. */
+    var effectType: String?
+
     /** When the ripple effect is shown: `"render"` or `"emphasis"`. */
     var showEffectOn: String?
 
+    /** Whether to clip the symbols to the coordinate system. */
+    var clip: Boolean?
+
     /** Ripple effect configuration. */
     var rippleEffect: RippleEffectOption?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of an effect scatter series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<EffectScatterDataItem?>?
 }
 
 /**
@@ -400,6 +461,14 @@ external interface CandlestickSeriesOption : SeriesOption, SeriesOnCartesianOpti
 
     /** Whether to clip the candles to the coordinate system. */
     var clip: Boolean?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a candlestick series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<CandlestickDataItem?>?
 }
 
 /**
@@ -421,6 +490,14 @@ external interface BoxplotSeriesOption : SeriesOption, SeriesOnCartesianOptionMi
 
     /** Whether to clip the boxes to the coordinate system. */
     var clip: Boolean?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a boxplot series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<BoxplotDataItem?>?
 }
 
 /**
@@ -454,6 +531,14 @@ external interface HeatmapSeriesOption :
 
     /** Whether to clip the heatmap to the coordinate system. */
     var clip: Boolean?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a heatmap series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<HeatmapDataItem?>?
 }
 
 /**
@@ -487,6 +572,14 @@ external interface LinesSeriesOption :
 
     /** Symbol size of the line ends. */
     var symbolSize: DoubleOrDoubleArray?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a lines series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<LinesDataItemOption?>?
 }
 
 /**
@@ -545,6 +638,14 @@ external interface ParallelSeriesOption : SeriesOption, ComponentOnCalendarOptio
 
     /** Index of the y axis. */
     var yAxisIndex: Double?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a parallel series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<ParallelSeriesDataItem?>?
 }
 
 /**
@@ -567,6 +668,16 @@ external interface CustomSeriesOption :
 
     /** Whether to clip the elements to the coordinate system. */
     var clip: Boolean?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a custom series.
+     *
+     * Upstream leaves the `data` of a custom series as `unknown[]` because the render item function
+     * consumes it; the wrapper keeps the generic data item shape, so both this and
+     * [SeriesOption.data] have the same type.
+     */
+    @JsName("data")
+    var typedData: Array<OptionDataItem?>?
 }
 
 /**

@@ -207,7 +207,7 @@ class SeriesDataItemTest {
                     moveOverlap = MoveOverlaps.shiftY
                 },
             )
-            data = items(
+            typedData = items(
                 unsafeJso<TreeSeriesNodeItemOption> {
                     name = OptionId("root")
                     value = OptionDataValue(1.0)
@@ -264,7 +264,7 @@ class SeriesDataItemTest {
                     }
                 },
             )
-            data = items(
+            typedData = items(
                 unsafeJso<TreemapSeriesNodeItemOption> {
                     name = OptionId("root")
                     value = OptionDataValue(100.0)
@@ -306,7 +306,7 @@ class SeriesDataItemTest {
                     }
                 },
             )
-            data = items(
+            typedData = items(
                 unsafeJso<SunburstSeriesNodeItemOption> {
                     name = OptionId("root")
                     value = OptionDataValue(1.0)
@@ -480,7 +480,7 @@ class SeriesDataItemChartTest {
                                 },
                             )
                             breadcrumb = unsafeJso<TreemapBreadcrumbOption> { show = false }
-                            data = items(
+                            typedData = items(
                                 unsafeJso<TreemapSeriesNodeItemOption> {
                                     name = OptionId("root")
                                     value = OptionDataValue(10.0)
@@ -496,7 +496,7 @@ class SeriesDataItemChartTest {
                         sunburstSeries {
                             sort = SunburstSort(SortOrders.asc)
                             animationType = AnimationTypes.scale
-                            data = items(
+                            typedData = items(
                                 unsafeJso<SunburstSeriesNodeItemOption> {
                                     name = OptionId("root")
                                     value = OptionDataValue(10.0)
@@ -513,7 +513,7 @@ class SeriesDataItemChartTest {
                             leaves = unsafeJso<TreeSeriesLeavesOption> {
                                 label = unsafeJso<LabelOption> { show = true }
                             }
-                            data = items(
+                            typedData = items(
                                 unsafeJso<TreeSeriesNodeItemOption> {
                                     name = OptionId("root")
                                     value = OptionDataValue(1.0)

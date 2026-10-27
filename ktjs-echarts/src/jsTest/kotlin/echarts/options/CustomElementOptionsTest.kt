@@ -204,7 +204,7 @@ class CustomElementOptionsTest {
                     yAxis = one(unsafeJso<YAxisOption> { type = echarts.AxisTypes.value })
                     series = one(
                         customSeries {
-                            data = points(doubleArrayOf(0.0, 1.0))
+                            typedData = points(doubleArrayOf(0.0, 1.0))
                             renderItem = { _, api ->
                                 unsafeJso<CustomGroupOption> {
                                     type = "group"

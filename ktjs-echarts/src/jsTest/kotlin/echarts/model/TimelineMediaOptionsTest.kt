@@ -70,7 +70,7 @@ class TimelineMediaOptionsTest {
                     xAxis = one(unsafeJso<XAxisOption> { data = numbers(1.0) })
                     yAxis = one(unsafeJso<YAxisOption> { })
                     legend = one(unsafeJso<LegendOption> { left = StringOrDouble(10.0) })
-                    series = one(lineSeries { name = "a"; data = numbers(11.0) })
+                    series = one(lineSeries { name = "a"; typedData = numbers(11.0) })
                     media = arrayOf(
                         unsafeJso<MediaUnit> {
                             query = unsafeJso { maxWidth = 670.0; minWidth = 550.0 }
@@ -101,7 +101,7 @@ class TimelineMediaOptionsTest {
                     xAxis = one(unsafeJso<XAxisOption> { data = numbers(1.0) })
                     yAxis = one(unsafeJso<YAxisOption> { })
                     legend = one(unsafeJso<LegendOption> { left = StringOrDouble(10.0) })
-                    series = one(lineSeries { name = "a"; data = numbers(11.0) })
+                    series = one(lineSeries { name = "a"; typedData = numbers(11.0) })
                     media = arrayOf(
                         unsafeJso<MediaUnit> {
                             query = unsafeJso { maxWidth = 670.0; minWidth = 550.0 }
@@ -131,7 +131,7 @@ class TimelineMediaOptionsTest {
                         xAxis = one(unsafeJso<XAxisOption> { data = numbers(1.0) })
                         yAxis = one(unsafeJso<YAxisOption> { })
                         legend = one(unsafeJso<LegendOption> { left = StringOrDouble(10.0) })
-                        series = one(lineSeries { name = "a"; data = numbers(11.0) })
+                        series = one(lineSeries { name = "a"; typedData = numbers(11.0) })
                     }
                     // Illegal, should be ignored.
                     legend = one(unsafeJso<LegendOption> { left = StringOrDouble(999.0); right = StringOrDouble(123.0) })
@@ -145,8 +145,8 @@ class TimelineMediaOptionsTest {
                         },
                     )
                     options = arrayOf(
-                        unsafeJso { series = one(lineSeries { data = numbers(88.0) }) },
-                        unsafeJso { series = one(lineSeries { data = numbers(99.0) }) },
+                        unsafeJso { series = one(lineSeries { typedData = numbers(88.0) }) },
+                        unsafeJso { series = one(lineSeries { typedData = numbers(99.0) }) },
                     )
                 },
             )
@@ -178,7 +178,7 @@ class TimelineMediaOptionsTest {
                     xAxis = one(unsafeJso<XAxisOption> { data = numbers(1.0) })
                     yAxis = one(unsafeJso<YAxisOption> { })
                     legend = one(unsafeJso<LegendOption> { left = StringOrDouble(10.0) })
-                    series = one(lineSeries { name = "a"; data = numbers(11.0) })
+                    series = one(lineSeries { name = "a"; typedData = numbers(11.0) })
                     media = arrayOf(
                         unsafeJso<MediaUnit> {
                             query = unsafeJso { maxWidth = 670.0; minWidth = 550.0 }
@@ -189,8 +189,8 @@ class TimelineMediaOptionsTest {
                         },
                     )
                     options = arrayOf(
-                        unsafeJso { series = one(lineSeries { data = numbers(88.0) }) },
-                        unsafeJso { series = one(lineSeries { data = numbers(99.0) }) },
+                        unsafeJso { series = one(lineSeries { typedData = numbers(88.0) }) },
+                        unsafeJso { series = one(lineSeries { typedData = numbers(99.0) }) },
                     )
                 },
             )
@@ -222,13 +222,13 @@ class TimelineMediaOptionsTest {
                         xAxis = one(unsafeJso<XAxisOption> { data = numbers(1.0) })
                         yAxis = one(unsafeJso<YAxisOption> { })
                         legend = one(unsafeJso<LegendOption> { })
-                        series = one(lineSeries { name = "a"; data = numbers(11.0) })
+                        series = one(lineSeries { name = "a"; typedData = numbers(11.0) })
                     }
                     // Illegal, should be ignored.
                     legend = one(unsafeJso<LegendOption> { right = StringOrDouble(123.0) })
                     options = arrayOf(
-                        unsafeJso { series = one(lineSeries { data = numbers(88.0) }) },
-                        unsafeJso { series = one(lineSeries { data = numbers(99.0) }) },
+                        unsafeJso { series = one(lineSeries { typedData = numbers(88.0) }) },
+                        unsafeJso { series = one(lineSeries { typedData = numbers(99.0) }) },
                     )
                 },
             )
@@ -256,13 +256,13 @@ class TimelineMediaOptionsTest {
                         xAxis = one(unsafeJso<XAxisOption> { data = numbers(1.0) })
                         yAxis = one(unsafeJso<YAxisOption> { })
                         legend = one(unsafeJso<LegendOption> { })
-                        series = one(lineSeries { name = "a"; data = numbers(11.0) })
+                        series = one(lineSeries { name = "a"; typedData = numbers(11.0) })
                     }
                     // Illegal, should be ignored.
                     legend = one(unsafeJso<LegendOption> { right = StringOrDouble(123.0) })
                     options = arrayOf(
-                        unsafeJso { series = one(lineSeries { data = numbers(88.0) }) },
-                        unsafeJso { series = one(lineSeries { data = numbers(99.0) }) },
+                        unsafeJso { series = one(lineSeries { typedData = numbers(88.0) }) },
+                        unsafeJso { series = one(lineSeries { typedData = numbers(99.0) }) },
                     )
                 },
             )
@@ -288,10 +288,10 @@ class TimelineMediaOptionsTest {
                     xAxis = one(unsafeJso<XAxisOption> { data = numbers(1.0) })
                     yAxis = one(unsafeJso<YAxisOption> { })
                     legend = one(unsafeJso<LegendOption> { })
-                    series = one(lineSeries { name = "a"; data = numbers(11.0) })
+                    series = one(lineSeries { name = "a"; typedData = numbers(11.0) })
                     options = arrayOf(
-                        unsafeJso { series = one(lineSeries { data = numbers(88.0) }) },
-                        unsafeJso { series = one(lineSeries { data = numbers(99.0) }) },
+                        unsafeJso { series = one(lineSeries { typedData = numbers(88.0) }) },
+                        unsafeJso { series = one(lineSeries { typedData = numbers(99.0) }) },
                     )
                 },
             )
@@ -325,14 +325,14 @@ class TimelineMediaOptionsTest {
                     options = arrayOf(
                         unsafeJso {
                             series = arrayOf<SeriesOption>(
-                                lineSeries { data = numbers(11.0) },
-                                lineSeries { data = numbers(22.0) },
+                                lineSeries { typedData = numbers(11.0) },
+                                lineSeries { typedData = numbers(22.0) },
                             )
                         },
                         unsafeJso {
                             series = arrayOf<SeriesOption>(
-                                lineSeries { data = numbers(111.0) },
-                                lineSeries { data = numbers(222.0) },
+                                lineSeries { typedData = numbers(111.0) },
+                                lineSeries { typedData = numbers(222.0) },
                             )
                         },
                     )
@@ -380,20 +380,20 @@ class TimelineMediaOptionsTest {
                     options = arrayOf(
                         unsafeJso {
                             series = arrayOf<SeriesOption>(
-                                lineSeries { data = numbers(11.0) },
-                                lineSeries { data = numbers(22.0) },
+                                lineSeries { typedData = numbers(11.0) },
+                                lineSeries { typedData = numbers(22.0) },
                             )
                         },
                         unsafeJso {
                             series = arrayOf<SeriesOption>(
-                                lineSeries { data = numbers(111.0) },
-                                lineSeries { data = numbers(222.0) },
+                                lineSeries { typedData = numbers(111.0) },
+                                lineSeries { typedData = numbers(222.0) },
                             )
                         },
                         unsafeJso {
                             series = arrayOf<SeriesOption>(
-                                lineSeries { data = numbers(1111.0) },
-                                lineSeries { data = numbers(2222.0) },
+                                lineSeries { typedData = numbers(1111.0) },
+                                lineSeries { typedData = numbers(2222.0) },
                             )
                         },
                     )
@@ -412,14 +412,14 @@ class TimelineMediaOptionsTest {
                     options = arrayOf(
                         unsafeJso {
                             series = arrayOf<SeriesOption>(
-                                lineSeries { data = numbers(55.0) },
-                                lineSeries { data = numbers(66.0) },
+                                lineSeries { typedData = numbers(55.0) },
+                                lineSeries { typedData = numbers(66.0) },
                             )
                         },
                         unsafeJso {
                             series = arrayOf<SeriesOption>(
-                                lineSeries { data = numbers(555.0) },
-                                lineSeries { data = numbers(666.0) },
+                                lineSeries { typedData = numbers(555.0) },
+                                lineSeries { typedData = numbers(666.0) },
                             )
                         },
                     )
@@ -452,7 +452,7 @@ private fun mediaBaseOption(): EChartsOption =
         xAxis = one(unsafeJso<XAxisOption> { data = numbers(1.0) })
         yAxis = one(unsafeJso<YAxisOption> { })
         legend = one(unsafeJso<LegendOption> { left = StringOrDouble(10.0) })
-        series = one(lineSeries { name = "a"; data = numbers(11.0) })
+        series = one(lineSeries { name = "a"; typedData = numbers(11.0) })
     }
 
 private fun legendLeft(chart: echarts.EChartsInstance): Double =

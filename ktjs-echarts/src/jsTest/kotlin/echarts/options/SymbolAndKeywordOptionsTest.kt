@@ -204,7 +204,7 @@ class SymbolAndKeywordOptionsTest {
             detail = unsafeJso<GaugeDetailOption> {
                 offsetCenter = arrayOf(StringOrDouble(0.0), StringOrDouble("40%"))
             }
-            data = items(
+            typedData = items(
                 unsafeJso<GaugeDataItemOption> {
                     name = OptionId("cpu")
                     value = OptionDataValue(72.0)
@@ -238,7 +238,7 @@ class SymbolAndKeywordOptionsTest {
 
         val series = themeRiverSeries {
             boundaryGap = arrayOf(StringOrDouble(0.0), StringOrDouble(0.0))
-            data = arrayOf(OptionDataItem(item))
+            typedData = arrayOf(item)
         }
         assertEquals(1, series.data?.size)
         assertEquals(2, series.boundaryGap?.size)
@@ -266,13 +266,13 @@ class SymbolAndKeywordChartTest {
                     yAxis = one(unsafeJso<YAxisOption> { type = echarts.AxisTypes.value })
                     series = arrayOf<SeriesOption>(
                         lineSeries {
-                            data = numbers(1.0, 2.0)
+                            typedData = numbers(1.0, 2.0)
                             symbol = SymbolShape("rect")
                             symbolSize = SymbolSize(20.0)
                             symbolRotate = SymbolRotate(30.0)
                         },
                         pictorialBarSeries {
-                            data = numbers(1.0, 2.0)
+                            typedData = numbers(1.0, 2.0)
                             symbolPosition = PictorialBarSymbolPositions.end
                         },
                     )

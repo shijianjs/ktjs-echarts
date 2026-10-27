@@ -34,13 +34,13 @@ class SeriesCoverageTest {
                     xAxis = one(unsafeJso<XAxisOption> { type = echarts.AxisTypes.category; data = numbers(1.0, 2.0, 3.0) })
                     yAxis = one(unsafeJso<YAxisOption> { type = echarts.AxisTypes.value })
                     series = arrayOf<SeriesOption>(
-                        lineSeries { data = numbers(1.0, 2.0, 3.0) },
-                        barSeries { data = numbers(1.0, 2.0, 3.0) },
-                        scatterSeries { data = points(doubleArrayOf(1.0, 1.0)) },
-                        effectScatterSeries { data = points(doubleArrayOf(2.0, 2.0)) },
-                        candlestickSeries { data = points(doubleArrayOf(1.0, 2.0, 0.5, 3.0)) },
-                        boxplotSeries { data = points(doubleArrayOf(1.0, 2.0, 3.0, 4.0, 5.0)) },
-                        pictorialBarSeries { data = numbers(1.0, 2.0, 3.0) },
+                        lineSeries { typedData = numbers(1.0, 2.0, 3.0) },
+                        barSeries { typedData = numbers(1.0, 2.0, 3.0) },
+                        scatterSeries { typedData = points(doubleArrayOf(1.0, 1.0)) },
+                        effectScatterSeries { typedData = points(doubleArrayOf(2.0, 2.0)) },
+                        candlestickSeries { typedData = points(doubleArrayOf(1.0, 2.0, 0.5, 3.0)) },
+                        boxplotSeries { typedData = points(doubleArrayOf(1.0, 2.0, 3.0, 4.0, 5.0)) },
+                        pictorialBarSeries { typedData = numbers(1.0, 2.0, 3.0) },
                     )
                 },
             )
@@ -70,7 +70,7 @@ class SeriesCoverageTest {
                     xAxis = one(unsafeJso<XAxisOption> { type = echarts.AxisTypes.category; data = numbers(1.0, 2.0) })
                     yAxis = one(unsafeJso<YAxisOption> { type = echarts.AxisTypes.category; data = numbers(1.0, 2.0) })
                     visualMap = one(unsafeJso<VisualMapOption> { show = false; min = 0.0; max = 10.0 })
-                    series = one(heatmapSeries { data = points(doubleArrayOf(0.0, 0.0, 5.0)) })
+                    series = one(heatmapSeries { typedData = points(doubleArrayOf(0.0, 0.0, 5.0)) })
                 },
             )
 
@@ -87,9 +87,9 @@ class SeriesCoverageTest {
             chart.setOption(
                 unsafeJso<EChartsOption> {
                     series = arrayOf<SeriesOption>(
-                        pieSeries { data = items(unsafeJso<OptionDataItemObject> { name = OptionId("a"); value = OptionDataValue(1.0) }) },
-                        funnelSeries { data = numbers(1.0, 2.0) },
-                        gaugeSeries { data = numbers(1.0) },
+                        pieSeries { typedData = items(unsafeJso<OptionDataItemObject> { name = OptionId("a"); value = OptionDataValue(1.0) }) },
+                        funnelSeries { typedData = numbers(1.0, 2.0) },
+                        gaugeSeries { typedData = numbers(1.0) },
                     )
                 },
             )
@@ -114,7 +114,7 @@ class SeriesCoverageTest {
                             )
                         },
                     )
-                    series = one(radarSeries { data = items(unsafeJso<OptionDataItemObject> { value = OptionDataValue(1.0) }) })
+                    series = one(radarSeries { typedData = items(unsafeJso<OptionDataItemObject> { value = OptionDataValue(1.0) }) })
                 },
             )
 
@@ -132,7 +132,7 @@ class SeriesCoverageTest {
         try {
             chart.setOption(
                 unsafeJso<EChartsOption> {
-                    series = one(mapSeries { map = "coverage-map"; data = numbers(1.0) })
+                    series = one(mapSeries { map = "coverage-map"; typedData = numbers(1.0) })
                 },
             )
 
@@ -150,7 +150,7 @@ class SeriesCoverageTest {
                 unsafeJso<EChartsOption> {
                     series = arrayOf<SeriesOption>(
                         treeSeries {
-                            data = items(
+                            typedData = items(
                                 unsafeJso<TreeSeriesNodeItemOption> {
                                     name = OptionId("root")
                                     children = arrayOf(unsafeJso { name = OptionId("leaf") })
@@ -158,7 +158,7 @@ class SeriesCoverageTest {
                             )
                         },
                         treemapSeries {
-                            data = items(
+                            typedData = items(
                                 unsafeJso<TreemapSeriesNodeItemOption> {
                                     name = OptionId("root")
                                     value = OptionDataValue(1.0)
@@ -167,7 +167,7 @@ class SeriesCoverageTest {
                             )
                         },
                         sunburstSeries {
-                            data = items(
+                            typedData = items(
                                 unsafeJso<SunburstSeriesNodeItemOption> {
                                     name = OptionId("root")
                                     children = arrayOf(unsafeJso { name = OptionId("leaf"); value = OptionDataValue(1.0) })
@@ -192,23 +192,23 @@ class SeriesCoverageTest {
                 unsafeJso<EChartsOption> {
                     series = arrayOf<SeriesOption>(
                         graphSeries {
-                            data = arrayOf(
-                                unsafeJso<GraphNodeItemOption> { name = "a"; x = 0.0; y = 0.0 }.asDataItem(),
-                                unsafeJso<GraphNodeItemOption> { name = "b"; x = 1.0; y = 1.0 }.asDataItem(),
+                            typedData = arrayOf(
+                                unsafeJso<GraphNodeItemOption> { name = "a"; x = 0.0; y = 0.0 }.asGraphDataItem(),
+                                unsafeJso<GraphNodeItemOption> { name = "b"; x = 1.0; y = 1.0 }.asGraphDataItem(),
                             )
                             links = arrayOf(unsafeJso<GraphEdgeItemOption> { source = StringOrDouble("a"); target = StringOrDouble("b") })
                         },
                         sankeySeries {
-                            data = items(
+                            typedData = items(
                                 unsafeJso<SankeyNodeItemOption> { name = OptionId("a") },
                                 unsafeJso<SankeyNodeItemOption> { name = OptionId("b") },
                             )
                             links = arrayOf(unsafeJso<SankeyEdgeItemOption> { source = StringOrDouble("a"); target = StringOrDouble("b"); value = OptionDataValue(1.0) })
                         },
                         chordSeries {
-                            data = arrayOf(
-                                unsafeJso<ChordNodeItemOption> { name = "a" }.asDataItem(),
-                                unsafeJso<ChordNodeItemOption> { name = "b" }.asDataItem(),
+                            typedData = arrayOf(
+                                unsafeJso<ChordNodeItemOption> { name = "a" }.asChordDataItem(),
+                                unsafeJso<ChordNodeItemOption> { name = "b" }.asChordDataItem(),
                             )
                             links = arrayOf(unsafeJso<ChordEdgeItemOption> { source = StringOrDouble("a"); target = StringOrDouble("b"); value = OptionDataValue(1.0) })
                         },
@@ -231,9 +231,9 @@ class SeriesCoverageTest {
                     singleAxis = one(unsafeJso<SingleAxisOption> { type = echarts.AxisTypes.time })
                     series = one(
                         themeRiverSeries {
-                            data = arrayOf(
-                                OptionDataItem(themeRiverDataItem(OptionDataValue("2026-01-01"), OptionDataValue(1.0), OptionDataValue("a"))),
-                                OptionDataItem(themeRiverDataItem(OptionDataValue("2026-01-02"), OptionDataValue(2.0), OptionDataValue("a"))),
+                            typedData = arrayOf(
+                                themeRiverDataItem(OptionDataValue("2026-01-01"), OptionDataValue(1.0), OptionDataValue("a")),
+                                themeRiverDataItem(OptionDataValue("2026-01-02"), OptionDataValue(2.0), OptionDataValue("a")),
                             )
                         },
                     )
@@ -257,8 +257,10 @@ class SeriesCoverageTest {
                     series = one(
                         linesSeries {
                             coordinateSystem = "cartesian2d"
-                            data = arrayOf(
-                                arrayOf(arrayOf(0.0, 0.0), arrayOf(10.0, 10.0)).unsafeCast<OptionDataItem?>(),
+                            typedData = arrayOf(
+                                unsafeJso<LinesDataItemOption> {
+                                    coords = arrayOf(arrayOf(0.0, 0.0), arrayOf(10.0, 10.0))
+                                },
                             )
                         },
                     )
@@ -281,7 +283,7 @@ class SeriesCoverageTest {
                     yAxis = one(unsafeJso<YAxisOption> { type = echarts.AxisTypes.value })
                     series = one(
                         customSeries {
-                            data = points(doubleArrayOf(0.0, 1.0), doubleArrayOf(1.0, 2.0))
+                            typedData = points(doubleArrayOf(0.0, 1.0), doubleArrayOf(1.0, 2.0))
                             // A render item that draws nothing still has to be accepted.
                             renderItem = { _, _ -> null }
                         },
@@ -303,7 +305,7 @@ class SeriesCoverageTest {
                 unsafeJso<EChartsOption> {
                     parallel = one(unsafeJso<ParallelOption> { })
                     parallelAxis = arrayOf(unsafeJso<ParallelAxisOption> { })
-                    series = one(parallelSeries { data = arrayOf(arrayOf(1.0, 2.0).unsafeCast<OptionDataItem?>()) })
+                    series = one(parallelSeries { typedData = points(doubleArrayOf(1.0, 2.0)) })
                 },
             )
 
@@ -383,7 +385,7 @@ class SeriesCoverageTest {
                     yAxis = one(unsafeJso<YAxisOption> { id = "y0"; type = echarts.AxisTypes.value; gridId = "grid0" })
                     geo = one(unsafeJso<GeoOption> { id = "geo0"; map = "coverage-ids" })
                     series = arrayOf<SeriesOption>(
-                        scatterSeries { xAxisId = "x0"; yAxisId = "y0"; data = points(doubleArrayOf(1.0, 2.0)) },
+                        scatterSeries { xAxisId = "x0"; yAxisId = "y0"; typedData = points(doubleArrayOf(1.0, 2.0)) },
                         scatterSeries { coordinateSystem = "geo"; geoId = "geo0" },
                     )
                 },
@@ -415,14 +417,14 @@ class SeriesCoverageTest {
                             stack = "total"
                             smooth = BooleanOrDouble(true)
                             showSymbol = false
-                            data = numbers(1.0, 2.0)
+                            typedData = numbers(1.0, 2.0)
                         },
                         barSeries {
                             id = "bar"
                             name = "bar-name"
                             barWidth = StringOrDouble("40%")
                             seriesLayoutBy = SeriesLayoutBys.column
-                            data = numbers(2.0, 1.0)
+                            typedData = numbers(2.0, 1.0)
                         },
                     )
                 },
@@ -455,7 +457,9 @@ private fun assertSeriesTypes(chart: EChartsInstance, vararg expected: SeriesTyp
 }
 
 /**
- * `GraphNodeItemOption` is not an `OptionDataItemObject` (its `value` is wider), so graph data
+ * `GraphNodeItemOption` keeps its own `value` instead of extending `OptionDataItemObject`, so graph
  * needs an explicit cast — the same thing upstream does with its `GraphNodeItemOption` union.
  */
-private fun JsAny.asDataItem(): OptionDataItem? = unsafeCast<OptionDataItem?>()
+private fun JsAny.asGraphDataItem(): GraphDataItem? = unsafeCast<GraphDataItem?>()
+
+private fun JsAny.asChordDataItem(): ChordDataItem? = unsafeCast<ChordDataItem?>()

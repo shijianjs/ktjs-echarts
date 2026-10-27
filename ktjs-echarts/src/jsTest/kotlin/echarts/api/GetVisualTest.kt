@@ -10,7 +10,8 @@ import echarts.options.EChartsOption
 import echarts.options.DataZoomValue
 import echarts.options.IndexOrIndexArray
 import echarts.options.ItemStyleOption
-import echarts.options.OptionDataItem
+import echarts.options.ScatterDataItem
+import echarts.options.ScatterDataItemOption
 import echarts.options.OptionDataValue
 import echarts.options.OptionDataValueOrArray
 import echarts.options.SeriesOption
@@ -58,16 +59,16 @@ class GetVisualTest {
                     series = arrayOf<SeriesOption>(
                         scatterSeries {
                             id = "k0"
-                            data = points(doubleArrayOf(1000.0, 700.0), doubleArrayOf(333.0, 222.0))
+                            typedData = points(doubleArrayOf(1000.0, 700.0), doubleArrayOf(333.0, 222.0))
                         },
                         scatterSeries {
                             id = "k1"
-                            data = points(doubleArrayOf(10.0, 7.0))
+                            typedData = points(doubleArrayOf(10.0, 7.0))
                             itemStyle = unsafeJso<ItemStyleOption> { color = ZRColor("#fff") }
                         },
                         scatterSeries {
                             id = "k2"
-                            data = arrayOf(
+                            typedData = arrayOf(
                                 plainPoint(10.0, 7.0),
                                 coloredPoint(333.0, 222.0, "#ff0"),
                             )
@@ -75,7 +76,7 @@ class GetVisualTest {
                         },
                         scatterSeries {
                             id = "k3"
-                            data = arrayOf(
+                            typedData = arrayOf(
                                 plainPoint(10.0, 7.0),
                                 coloredPoint(333.0, 9999.0, "red"),
                             )
@@ -118,7 +119,7 @@ class GetVisualTest {
                     series = arrayOf<SeriesOption>(
                         scatterSeries {
                             id = "k2"
-                            data = arrayOf(
+                            typedData = arrayOf(
                                 plainPoint(10.0, 7.0),
                                 plainPoint(20.0, 7.0),
                                 plainPoint(30.0, 7.0),
@@ -154,7 +155,7 @@ class GetVisualTest {
                     yAxis = arrayOf(unsafeJso<YAxisOption> { })
                     series = arrayOf<SeriesOption>(
                         scatterSeries {
-                            data = points(doubleArrayOf(1.0, 2.0))
+                            typedData = points(doubleArrayOf(1.0, 2.0))
                             symbol = SymbolShape("diamond")
                             symbolSize = SymbolSize(12.0)
                         },
@@ -173,19 +174,13 @@ class GetVisualTest {
 /**
  * The data item shape used by the upstream `getVisual` cases: a value tuple plus its own style.
  *
- * Upstream declares this as `ScatterDataItemOption`; the wrapper does not model per-series data
- * item objects yet (see `todo.md`).
+ * Upstream declares this as `ScatterDataItemOption`, which the wrapper now models.
  */
-private external interface StyledPoint {
-    var value: OptionDataValueOrArray?
-    var itemStyle: ItemStyleOption?
-}
+private fun plainPoint(x: Double, y: Double): ScatterDataItem? =
+    ScatterDataItem(arrayOf<OptionDataValue?>(OptionDataValue(x), OptionDataValue(y)))
 
-private fun plainPoint(x: Double, y: Double): OptionDataItem? =
-    OptionDataItem(arrayOf<OptionDataValue?>(OptionDataValue(x), OptionDataValue(y)))
-
-private fun coloredPoint(x: Double, y: Double, color: String): OptionDataItem? =
-    unsafeJso<StyledPoint> {
-        value = OptionDataValueOrArray(arrayOf<OptionDataValue?>(OptionDataValue(x), OptionDataValue(y)))
+private fun coloredPoint(x: Double, y: Double, color: String): ScatterDataItem? =
+    unsafeJso<ScatterDataItemOption> {
+        typedValue = OptionDataValueOrArray(arrayOf<OptionDataValue?>(OptionDataValue(x), OptionDataValue(y)))
         itemStyle = unsafeJso<ItemStyleOption> { this.color = ZRColor(color) }
-    }.unsafeCast<OptionDataItem?>()
+    }.unsafeCast<ScatterDataItem?>()

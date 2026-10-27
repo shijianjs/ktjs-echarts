@@ -8,6 +8,7 @@ import echarts.FocusNodeAdjacency
 import echarts.ChordCoordinateSystem
 import echarts.SankeyCoordinateSystem
 import kotlin.js.JsName
+import kotlin.js.unsafeCast
 import zrender.ZRColor
 
 /*
@@ -206,7 +207,31 @@ external interface GraphSeriesOption :
 
     /** Whether the edges are curved automatically; `[0, 1]` per edge when an array. */
     var autoCurveness: BooleanOrDouble?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a graph series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<GraphDataItem?>?
 }
+
+/**
+ * One entry of `GraphSeriesOption.typedData`.
+ *
+ * Upstream `GraphNodeItemOption | GraphDataValue`.
+ */
+external interface GraphDataItem
+
+/** Wraps a single value. */
+fun GraphDataItem(value: OptionDataValue): GraphDataItem = value.unsafeCast<GraphDataItem>()
+
+/** Wraps a row of values. */
+fun GraphDataItem(values: Array<OptionDataValue?>): GraphDataItem = values.unsafeCast<GraphDataItem>()
+
+/** Wraps a node object. */
+fun GraphDataItem(value: GraphNodeItemOption): GraphDataItem = value.unsafeCast<GraphDataItem>()
 
 /**
  * Line style of a chord edge; the upstream interface only adds the curvature, which
@@ -349,7 +374,31 @@ external interface ChordSeriesOption :
 
     /** Whether panning and zooming are enabled. */
     var roam: BooleanOrString?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a chord diagram.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<ChordDataItem?>?
 }
+
+/**
+ * One entry of `ChordSeriesOption.typedData`.
+ *
+ * Upstream `ChordNodeItemOption | ChordDataValue`.
+ */
+external interface ChordDataItem
+
+/** Wraps a single value. */
+fun ChordDataItem(value: OptionDataValue): ChordDataItem = value.unsafeCast<ChordDataItem>()
+
+/** Wraps a row of values. */
+fun ChordDataItem(values: Array<OptionDataValue?>): ChordDataItem = values.unsafeCast<ChordDataItem>()
+
+/** Wraps a node object. */
+fun ChordDataItem(value: ChordNodeItemOption): ChordDataItem = value.unsafeCast<ChordDataItem>()
 
 /**
  * Line style of a sankey edge; the upstream interface only adds the curvature, which
@@ -473,4 +522,12 @@ external interface SankeySeriesOption : SeriesOption, ComponentOnCalendarOptionM
 
     /** Whether panning and zooming are enabled. */
     var roam: BooleanOrString?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a sankey diagram.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<SankeyNodeItemOption?>?
 }

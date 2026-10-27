@@ -11,6 +11,7 @@ import echarts.ClipWindow
 import echarts.BlurScope
 import echarts.AnimationType
 import echarts.AnimationEasing
+import kotlin.js.JsName
 import kotlin.js.unsafeCast
 
 /*
@@ -121,6 +122,14 @@ external interface TreeSeriesOption :
 
     /** Position of the fork in a `"polyline"` edge. */
     var edgeForkPosition: StringOrDouble?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a tree series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<TreeSeriesNodeItemOption?>?
 }
 
 /**
@@ -331,6 +340,14 @@ external interface TreemapSeriesOption :
 
     /** Per-level configuration; the last entry applies to the deeper levels. */
     var levels: Array<TreemapSeriesLevelOption>?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a treemap series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<TreemapSeriesNodeItemOption?>?
 }
 
 /**
@@ -345,6 +362,13 @@ typealias SunburstItemStyleOption = ItemStyleOption
 external interface SunburstLabelOption : LabelOption {
     /** Minimum angle of a sector for its label to be shown, in degrees. */
     var minAngle: Double?
+
+    /**
+     * Typed view of [LabelOption.rotate]; upstream allows the `"radial"` / `"tangential"` keywords
+     * as well as a number of degrees.
+     */
+    @JsName("rotate")
+    var typedRotate: LabelRotate?
 }
 
 /**
@@ -492,4 +516,16 @@ external interface SunburstSeriesOption : SeriesOption, ComponentOnCalendarOptio
 
     /** Kind of animation used when the root of the sunburst changes. */
     var animationType: AnimationType?
+
+    /** Typed view of [SeriesOption.label] with the sunburst-specific members. */
+    @JsName("label")
+    var typedLabel: SunburstLabelOption?
+
+    /**
+     * Typed view of [SeriesOption.data] with the item type of a sunburst series.
+     *
+     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("data")
+    var typedData: Array<SunburstSeriesNodeItemOption?>?
 }

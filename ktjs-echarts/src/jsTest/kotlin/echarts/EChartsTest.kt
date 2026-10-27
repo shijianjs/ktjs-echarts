@@ -108,7 +108,7 @@ class EChartsTest {
                 unsafeJso<EChartsOption> {
                     xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = numbers(1.0, 2.0) })
                     yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
-                    series = one(lineSeries { name = "s"; data = numbers(3.0, 4.0) })
+                    series = one(lineSeries { name = "s"; typedData = numbers(3.0, 4.0) })
                 },
             )
             val stored = chart.getOption().unsafeCast<EChartsOption>()
@@ -151,7 +151,7 @@ class EChartsTest {
                 unsafeJso<EChartsOption> {
                     xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = numbers(1.0, 2.0) })
                     yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
-                    series = one(lineSeries { name = "a"; data = numbers(1.0, 2.0) })
+                    series = one(lineSeries { name = "a"; typedData = numbers(1.0, 2.0) })
                 },
             )
             chart.setOption(unsafeJso<EChartsOption> { series = one(pieSeries { name = "b" }) }, true)
@@ -260,7 +260,7 @@ class EChartsTest {
         val (chart, container) = createChart()
         var eventType: String? = null
         try {
-            chart.setOption(unsafeJso<EChartsOption> { series = one(pieSeries { data = numbers(1.0, 2.0) }) })
+            chart.setOption(unsafeJso<EChartsOption> { series = one(pieSeries { typedData = numbers(1.0, 2.0) }) })
             chart.on("wrapperTestActionEvent") { event -> eventType = event.type }
             chart.dispatchAction(unsafeJso { type = "wrapperTestAction"; seriesIndex = 0.0 })
             assertNotNull(actionPayload)
@@ -277,7 +277,7 @@ class EChartsTest {
         val (chart, container) = createChart()
         var calls = 0
         try {
-            chart.setOption(unsafeJso<EChartsOption> { series = one(pieSeries { data = numbers(1.0, 2.0) }) })
+            chart.setOption(unsafeJso<EChartsOption> { series = one(pieSeries { typedData = numbers(1.0, 2.0) }) })
             val handler: (ECElementEvent) -> Unit = { calls += 1 }
             chart.on("wrapperRemovableEvent", handler)
             chart.dispatchAction(unsafeJso { type = "wrapperRemovableAction" })
@@ -300,7 +300,7 @@ class EChartsTest {
             chart.setOption(
                 unsafeJso<EChartsOption> {
                     animation = false
-                    series = one(pieSeries { data = numbers(1.0, 2.0) })
+                    series = one(pieSeries { typedData = numbers(1.0, 2.0) })
                 },
             )
             assertEquals(1, rendered)
@@ -320,7 +320,7 @@ class EChartsTest {
                     series = one(
                         pieSeries {
                             selectedMode = SelectionModes.multiple
-                            data = numbers(1.0, 2.0)
+                            typedData = numbers(1.0, 2.0)
                         },
                     )
                 },
@@ -412,7 +412,7 @@ class EChartsTest {
                     xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.value; min = AxisMinMax(0.0); max = AxisMinMax(100.0) })
                     yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value; min = AxisMinMax(0.0); max = AxisMinMax(100.0) })
                     calendar = one(unsafeJso<CalendarOption> { range = CalendarRange(DataZoomValue("2026-10")) })
-                    series = one(lineSeries { data = numbers(0.0, 100.0) })
+                    series = one(lineSeries { typedData = numbers(0.0, 100.0) })
                 },
             )
             val finder = ModelFinder(unsafeJso<ModelFinderObject> { xAxisIndex = 0.0 })
@@ -537,7 +537,7 @@ class EChartsTest {
                 unsafeJso<EChartsOption> {
                     xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = numbers(1.0, 2.0) })
                     yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
-                    series = one(lineSeries { data = numbers(1.0, 2.0) })
+                    series = one(lineSeries { typedData = numbers(1.0, 2.0) })
                 },
             )
             assertTrue(chart.renderToCanvas().width > 0)

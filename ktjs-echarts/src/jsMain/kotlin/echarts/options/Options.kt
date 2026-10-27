@@ -12,36 +12,75 @@ import kotlin.js.unsafeCast
 fun <T : JsAny> one(value: T): Array<T> = arrayOf(value)
 
 /**
- * Wraps numeric series data in the `Array<OptionDataItem?>` shape used by the typed options.
+ * Wraps numeric series data in the array shape expected by the `data` fields.
+ *
+ * The element type is inferred from the target property, so the same helper fills the read-only
+ * [SeriesOption.data] view, the `data` fields of components and the per-series `typedData` fields:
+ *
+ * ```kotlin
+ * lineSeries { typedData = numbers(1.0, 2.0) }
+ * ```
  *
  * The Kotlin vararg produces a primitive `DoubleArray` (a JavaScript typed array), which ECharts
  * rejects as series data, so this copies the values into a real JavaScript array.
  */
-fun numbers(vararg values: Double): Array<OptionDataItem?> =
-    Array(values.size) { index -> OptionDataItem(OptionDataValue(values[index])) }
+@Suppress("UNCHECKED_CAST")
+fun <T : JsAny> numbers(vararg values: Double): Array<T?> {
+    val data: Array<OptionDataItem?> =
+        Array(values.size) { index -> OptionDataItem(OptionDataValue(values[index])) }
+    return data as Array<T?>
+}
 
 /**
- * Wraps string values, such as category names, in the `Array<OptionDataItem?>` shape used by the
- * typed options.
+ * Wraps string values, such as category names, in the array shape expected by the `data` fields.
+ *
+ * The element type is inferred from the target property; see [numbers].
  */
-fun strings(vararg values: String): Array<OptionDataItem?> =
-    Array(values.size) { index -> OptionDataItem(OptionDataValue(values[index])) }
+@Suppress("UNCHECKED_CAST")
+fun <T : JsAny> strings(vararg values: String): Array<T?> {
+    val data: Array<OptionDataItem?> =
+        Array(values.size) { index -> OptionDataItem(OptionDataValue(values[index])) }
+    return data as Array<T?>
+}
 
 /**
  * Wraps `[x, y]` pairs (or similar tuples) as series data.
  *
- * Each pair is copied into a real JavaScript array for the same reason as [numbers].
+ * The element type is inferred from the target property; see [numbers]. Each pair is copied into a
+ * real JavaScript array for the same reason as [numbers].
  */
-fun points(vararg pairs: DoubleArray): Array<OptionDataItem?> =
-    Array(pairs.size) { index ->
+@Suppress("UNCHECKED_CAST")
+fun <T : JsAny> points(vararg pairs: DoubleArray): Array<T?> {
+    val data: Array<OptionDataItem?> = Array(pairs.size) { index ->
         OptionDataItem(Array(pairs[index].size) { position -> OptionDataValue(pairs[index][position]) })
     }
+    return data as Array<T?>
+}
 
 /**
  * Wraps already built data item objects as series data.
+ *
+ * The element type is inferred from the target property; see [numbers].
  */
-fun items(vararg values: OptionDataItemObject): Array<OptionDataItem?> =
-    Array(values.size) { index -> OptionDataItem(values[index]) }
+@Suppress("UNCHECKED_CAST")
+fun <T : JsAny> items(vararg values: OptionDataItemObject): Array<T?> {
+    val data: Array<OptionDataItem?> = Array(values.size) { index -> OptionDataItem(values[index]) }
+    return data as Array<T?>
+}
+
+/**
+ * Wraps already built data items of any type, for example the branches of a `*DataItem` union.
+ *
+ * Unlike [items], the element type follows the argument, so this is the helper for the unions
+ * (`LineDataItem(…)`, `BarDataItem(…)`, …) and for the item interfaces that do not extend
+ * [OptionDataItemObject]:
+ *
+ * ```kotlin
+ * lineSeries { typedData = dataItems(LineDataItem(OptionDataValue(1.0))) }
+ * ```
+ */
+@Suppress("UNCHECKED_CAST")
+fun <T : JsAny> dataItems(vararg values: T): Array<T?> = values as Array<T?>
 
 /**
  * `string | number`, used by positions and sizes that accept either a percentage-like string or an

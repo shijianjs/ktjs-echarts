@@ -351,7 +351,7 @@ class LiteralsTest {
                 },
             )
             yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
-            series = one(lineSeries { data = numbers(1.0, 2.0) })
+            series = one(lineSeries { typedData = numbers(1.0, 2.0) })
         }
 
         val (chart, container) = createChart()
@@ -619,7 +619,7 @@ class LiteralsTest {
         val option = cartesianLineOption(1.0, 2.0) {
             series = one(
                 lineSeries {
-                    data = numbers(1.0, 2.0)
+                    typedData = numbers(1.0, 2.0)
                     typedCoordinateSystem = CartesianPolarCoordinateSystems.cartesian2d
                 },
             )
@@ -705,7 +705,7 @@ class LiteralsTest {
             )
             series = one(
                 lineSeries {
-                    data = numbers(1.0, 2.0)
+                    typedData = numbers(1.0, 2.0)
                     progressiveChunkMode = ProgressiveChunkModes.mod
                     areaStyle = unsafeJso<AreaStyleOption> { origin = AreaOrigins.start }
                     label = unsafeJso<LabelOption> {

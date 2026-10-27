@@ -17,6 +17,8 @@ import echarts.options.LegendDataItemOption
 import echarts.options.MagicTypeOption
 import echarts.options.SaveAsImageOption
 import echarts.options.StringOrDouble
+import echarts.options.ToolboxBrushFeatureOption
+import echarts.options.ToolboxDataZoomFeatureOption
 import echarts.options.ToolboxFeature
 import echarts.options.ToolboxFeatureOption
 import echarts.options.ToolboxOption
@@ -215,9 +217,9 @@ internal fun toolbox(
                     if (dataView) this.dataView = unsafeJso<DataViewOption> { readOnly = false }
                     if (restore) this.restore = unsafeJso<ToolboxFeatureOption> {}
                     if (saveAsImage) this.saveAsImage = unsafeJso<SaveAsImageOption> {}
-                    if (brush) this.brush = unsafeJso<ToolboxFeatureOption> {}
+                    if (brush) this.brush = unsafeJso<ToolboxBrushFeatureOption> {}
                     if (magicType) this.magicType = unsafeJso<MagicTypeOption> {}
-                    if (dataZoom) this.dataZoom = unsafeJso<ToolboxFeatureOption> {}
+                    if (dataZoom) this.dataZoom = unsafeJso<ToolboxDataZoomFeatureOption> {}
                 }
         },
     )

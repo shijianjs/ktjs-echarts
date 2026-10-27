@@ -65,6 +65,73 @@ private fun functionPlot(): Array<LineDataItem?> {
     return points(*data.toTypedArray())
 }
 
+/** The twelve mark-line label positions of `line-markline`, in the upstream order. */
+private val MARK_LINE_LABEL_POSITIONS =
+    arrayOf(
+        "start",
+        "middle",
+        "end",
+        "insideStart",
+        "insideStartTop",
+        "insideStartBottom",
+        "insideMiddle",
+        "insideMiddleTop",
+        "insideMiddleBottom",
+        "insideEnd",
+        "insideEndTop",
+        "insideEndBottom",
+    )
+
+/** `[x, y]` in the coordinate system of the series, as a mark line end accepts it. */
+private fun markerCoord(
+    x: Double,
+    y: Double,
+): Array<ScaleDataValueOrMarkerStatisticType> =
+    arrayOf(x, y).map { ScaleDataValueOrMarkerStatisticType(ScaleDataValue(it)) }.toTypedArray()
+
+/** The 23 mark lines of `line-markline`: a horizontal line and a diagonal one per label position. */
+private fun markLinePositions(): Array<MarkLineDataItem?> {
+    val data = mutableListOf<MarkLineDataItem>()
+    MARK_LINE_LABEL_POSITIONS.forEachIndexed { index, position ->
+        // Every third line drops one step, so the twelve lines form four rows of three.
+        data +=
+            MarkLineDataItem(
+                unsafeJso<MarkLine1DDataItemOption> {
+                    name = position
+                    yAxis = StringOrDouble(1.8 - 0.2 * kotlin.math.floor(index / 3.0))
+                    label =
+                        unsafeJso<MarkLineLabelOption> {
+                            formatter = LabelFormatter("{b}")
+                            this.position = LabelPosition(position)
+                        }
+                },
+            )
+        if (position != "middle") {
+            // `insideMiddle` and `middle` land on the same place, so the diagonal shares one label.
+            val label = if (position == "insideMiddle") "insideMiddle / middle" else position
+            data +=
+                MarkLineDataItem(
+                    arrayOf(
+                        unsafeJso<MarkLine2DDataItemDimOption> {
+                            name = "start: $position"
+                            coord = markerCoord(0.0, 0.3)
+                            this.label =
+                                unsafeJso<MarkLineLabelOption> {
+                                    formatter = LabelFormatter(label)
+                                    this.position = LabelPosition(position)
+                                }
+                        },
+                        unsafeJso<MarkLine2DDataItemDimOption> {
+                            name = "end: $position"
+                            coord = markerCoord(3.0, 1.0)
+                        },
+                    ),
+                )
+        }
+    }
+    return data.toTypedArray()
+}
+
 val lineExtraEntries: List<CatalogEntry> =
     listOf(
         lineExtra.chart("line-polar", "极坐标双数值轴", "Two Value-Axes in Polar") {
@@ -264,6 +331,48 @@ val lineExtraEntries: List<CatalogEntry> =
                     },
                 )
                 null
+            }
+        },
+        lineExtra.chart("line-markline", "折线图的标记线", "Line with Marklines") {
+            unsafeJso<EChartsOption> {
+                animation = false
+                textStyle = unsafeJso<TextStyleOption> { fontSize = StringOrDouble(14.0) }
+                grid =
+                    one(
+                        unsafeJso<GridOption> {
+                            top = StringOrDouble(30.0)
+                            left = StringOrDouble(60.0)
+                            right = StringOrDouble(60.0)
+                            bottom = StringOrDouble(40.0)
+                        },
+                    )
+                xAxis =
+                    one(
+                        unsafeJso<XAxisOption> {
+                            data = strings("A", "B", "C", "D", "E")
+                            boundaryGap = BooleanOrStringArray(true)
+                            splitArea = unsafeJso<SplitAreaOption> { show = true }
+                        },
+                    )
+                yAxis = one(unsafeJso<YAxisOption> { max = AxisMinMax(2.0) })
+                series =
+                    arrayOf<SeriesOption>(
+                        lineSeries {
+                            name = "line"
+                            stack = "all"
+                            symbolSize = SymbolSize(6.0)
+                            typedData = points(doubleArrayOf(0.3, 1.4, 1.2, 1.0, 0.6))
+                            markLine =
+                                unsafeJso<MarkLineOption> {
+                                    data = markLinePositions()
+                                    label =
+                                        unsafeJso<MarkLineLabelOption> {
+                                            // `[20, 8]`: the horizontal and the vertical gap to the line.
+                                            typedDistance = DoubleOrDoubleArray(arrayOf(20.0, 8.0))
+                                        }
+                                }
+                        },
+                    )
             }
         },
     )

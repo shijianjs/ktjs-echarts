@@ -2,11 +2,16 @@ package demo.examples
 
 import demo.CatalogEntry
 import demo.Groups
+import demo.ui.loadJson
 import echarts.*
 import echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.Date
+import kotlin.js.JsAny
+import kotlin.js.unsafeCast
 import kotlin.math.PI
+import kotlin.math.round
+import zrender.ElementTextConfig
 import zrender.ZRColor
 import zrender.ZRShapeProps
 import zrender.ZRStyleProps
@@ -37,6 +42,15 @@ import zrender.ZRStyleProps
  *   `sunburstHighlight` / `targetNodeId` is deprecated and, as of ECharts 6.1.0, applies no state at
  *   all — the official page stays all yellow — so the ports resolve the target's flattened data
  *   index themselves instead.
+ * - `bar-dataZoom-filterMode` and `candlestick-axisPointer` ask for their dataset with `$.get` on the
+ *   official site; both files are mirrored under `resources/data/` and loaded with `fetch`, so the
+ *   `showLoading` / `hideLoading` pair of the originals is kept. `candlestick-axisPointer` also calls
+ *   `splitData`, which mutates the rows (`splice`), so the columns are read by index here.
+ * - the tooltip of `candlestick-axisPointer` is an HTML block upstream, with an `<hr>` between the
+ *   date and the prices; the rows are kept and the `<hr>` dropped.
+ * - `grid-outerBounds` is driven by a floating control panel upstream. This site has no panel, so the
+ *   port runs with the defaults of that panel, and the two tutorial rectangles are repainted from the
+ *   container size through the holder's `onResize` instead of the panel's `onChange` callback.
  */
 
 private val docInteractive = Category(Groups.DOC, "examples/DocInteractive.kt")
@@ -544,7 +558,7 @@ val docInteractiveEntries: List<CatalogEntry> =
                                     top = StringOrDouble(30.0)
                                     feature =
                                         unsafeJso<ToolboxFeature> {
-                                            dataZoom = unsafeJso<ToolboxFeatureOption> {}
+                                            dataZoom = unsafeJso<ToolboxDataZoomFeatureOption> {}
                                         }
                                 },
                             )
@@ -591,4 +605,608 @@ val docInteractiveEntries: List<CatalogEntry> =
                     )
             }
         },
+        docInteractive.interactive(
+            "doc-example/bar-dataZoom-filterMode",
+            "数据缩放过滤模式（filterMode）",
+            "Bar with a vertical data zoom and filterMode",
+        ) { chart, _ ->
+            chart.showLoading(null)
+            loadJson("data/obama_budget_proposal_2012.list.json").then { json ->
+                chart.hideLoading()
+                chart.setOption(budgetOption(json.unsafeCast<ObamaBudgetJson>()))
+            }
+        },
+        docInteractive.interactive(
+            "doc-example/candlestick-axisPointer",
+            "K 线与联动的 axisPointer",
+            "Candlestick with a linked axis pointer",
+        ) { chart, _ ->
+            chart.showLoading(null)
+            loadJson("data/stock-DJI.json").then { json ->
+                chart.hideLoading()
+                chart.setOption(stockOption(json.unsafeCast<Array<Array<JsAny>>>()), true)
+            }
+        },
+        docInteractive.interactive(
+            "doc-example/grid-outerBounds",
+            "网格外边界（grid.outerBounds）",
+            "Grid outerBounds and its indicator rectangles",
+        ) { chart, holder ->
+            // The two tutorial rectangles are pixel-sized, so they follow the container.
+            fun repaint() {
+                chart.setOption(outerBoundsOption(chart.getWidth(), chart.getHeight()))
+            }
+            repaint()
+            holder.onResize(::repaint)
+        },
     )
+
+/** Shape of `data/obama_budget_proposal_2012.list.json`. */
+private external interface ObamaBudgetJson {
+    val names: Array<String>
+    val budget2011List: Array<Double>
+    val budget2012List: Array<Double>
+}
+
+/**
+ * Option of `doc-example/bar-dataZoom-filterMode`.
+ *
+ * The vertical slider is the point of the page: with `filterMode: 'empty'` a bar that stays inside
+ * the horizontal window but falls outside the vertical one is drawn empty instead of being dropped,
+ * which keeps the category axis intact.
+ */
+private fun budgetOption(budget: ObamaBudgetJson): EChartsOption =
+    unsafeJso {
+        tooltip = one(unsafeJso<TooltipOption> { trigger = TooltipTriggers.item })
+        legend =
+            one(
+                unsafeJso<LegendOption> {
+                    top = StringOrDouble(5.0)
+                    data = legendNames("Growth", "Budget 2011", "Budget 2012")
+                    itemGap = 5.0
+                },
+            )
+        grid =
+            one(
+                unsafeJso<GridOption> {
+                    top = StringOrDouble("12%")
+                    left = StringOrDouble("1%")
+                    right = StringOrDouble("10%")
+                    containLabel = true
+                },
+            )
+        xAxis =
+            one(
+                unsafeJso<XAxisOption> {
+                    type = AxisTypes.category
+                    data = strings(*budget.names)
+                },
+            )
+        yAxis =
+            one(
+                unsafeJso<YAxisOption> {
+                    type = AxisTypes.value
+                    name = "Budget (million USD)"
+                    axisLabel = budgetAxisLabel()
+                },
+            )
+        dataZoom = budgetDataZoom()
+        series =
+            arrayOf<SeriesOption>(
+                barSeries { name = "Budget 2011"; typedData = numbers(*budget.budget2011List.toDoubleArray()) },
+                barSeries { name = "Budget 2012"; typedData = numbers(*budget.budget2012List.toDoubleArray()) },
+            )
+    }
+
+/** Labels of the budget axis, printed in thousands with the upstream thousands separator. */
+private fun budgetAxisLabel(): AxisLabelOption =
+    unsafeJso {
+        // A value axis hands the formatter the raw scale value, not the item parameters of a series.
+        formatter =
+            LabelFormatter(
+                { params ->
+                    val value = numeric(params.unsafeCast<JsAny?>())
+                    if (value.isFinite()) {
+                        ECharts.format.addCommas(StringOrDouble(value / 1000.0))
+                    } else {
+                        ""
+                    }
+                },
+            )
+    }
+
+/** The horizontal slider and wheel plus the vertical slider that shows `filterMode: 'empty'`. */
+private fun budgetDataZoom(): Array<DataZoomOption> =
+    arrayOf(
+        unsafeJso<DataZoomOption> {
+            type = DataZoomTypes.slider
+            show = true
+            start = 94.0
+            end = 100.0
+            handleSize = StringOrDouble(8.0)
+        },
+        unsafeJso {
+            type = DataZoomTypes.inside
+            start = 94.0
+            end = 100.0
+        },
+        unsafeJso {
+            type = DataZoomTypes.slider
+            show = true
+            yAxisIndex = IndexOrIndexArray(0.0)
+            filterMode = FilterModes.empty
+            width = StringOrDouble(12.0)
+            height = StringOrDouble("70%")
+            handleSize = StringOrDouble(8.0)
+            showDataShadow = BooleanOrString(false)
+            left = StringOrDouble("93%")
+        },
+    )
+
+/**
+ * Params of an axis-pointer label formatter.
+ *
+ * Upstream `AxisPointerLabelFormatterParams`; the wrapper types every label formatter with
+ * [CallbackDataParams] because that is the shape shared by series labels, so the axis-pointer
+ * specific fields are narrowed here.
+ */
+private external interface AxisPointerLabelParams {
+    val value: JsAny?
+    val seriesData: Array<AxisPointerSeriesData>?
+}
+
+/** One series under the axis pointer, as read by [AxisPointerLabelParams.seriesData]. */
+private external interface AxisPointerSeriesData {
+    val value: JsAny?
+}
+
+/** Columns of a candle after the date of a `data/stock-DJI.json` row. */
+private const val STOCK_CANDLE_COLUMNS = 5
+
+/** Column of the volume in a row of `data/stock-DJI.json`. */
+private const val STOCK_VOLUME_COLUMN = 5
+
+/** Column of the closing price, the input of the moving averages. */
+private const val STOCK_CLOSE_COLUMN = 2
+
+/** Option of `doc-example/candlestick-axisPointer`, built once the quotes have loaded. */
+private fun stockOption(rows: Array<Array<JsAny>>): EChartsOption =
+    unsafeJso {
+        animation = false
+        legend =
+            one(
+                unsafeJso<LegendOption> {
+                    bottom = StringOrDouble(10.0)
+                    left = StringOrDouble("center")
+                    data = legendNames("Dow-Jones index", "MA5", "MA10", "MA20", "MA30")
+                },
+            )
+        tooltip = one(stockTooltip())
+        axisPointer = one(stockAxisPointer())
+        toolbox = one(stockToolbox())
+        brush = one(stockBrush())
+        grid =
+            arrayOf(
+                unsafeJso<GridOption> {
+                    left = StringOrDouble("10%")
+                    right = StringOrDouble("8%")
+                    height = StringOrDouble("50%")
+                },
+                unsafeJso {
+                    left = StringOrDouble("10%")
+                    right = StringOrDouble("8%")
+                    bottom = StringOrDouble("20%")
+                    height = StringOrDouble("15%")
+                },
+            )
+        xAxis = stockAxes(stockDates(rows))
+        yAxis = stockValueAxes()
+        dataZoom = stockDataZoom()
+        series = stockSeries(rows)
+    }
+
+/** Axis tooltip with a cross pointer, pinned to the far side of the pointer. */
+private fun stockTooltip(): TooltipOption =
+    unsafeJso {
+        trigger = TooltipTriggers.axis
+        axisPointer = unsafeJso<AxisPointerOption> { type = AxisPointerTypes.cross }
+        backgroundColor = ZRColor("rgba(255, 255, 255, 0.8)")
+        position =
+            TooltipPosition(
+                { point, _, _, _, size ->
+                    val box =
+                        unsafeJso<TooltipBoxLayoutOption> {
+                            top = StringOrDouble(10.0)
+                            if (point[0] < size.viewSize[0] / 2.0) {
+                                right = StringOrDouble(30.0)
+                            } else {
+                                left = StringOrDouble(30.0)
+                            }
+                        }
+                    TooltipPosition(box)
+                },
+            )
+        extraCssText = "width: 170px"
+    }
+
+/** Links the pointers of the price and the volume grid. */
+private fun stockAxisPointer(): AxisPointerOption =
+    unsafeJso {
+        link = one(unsafeJso<AxisPointerLink> { xAxisIndex = ModelFinderIndexQuery("all") })
+        label = unsafeJso<AxisPointerLabelOption> { backgroundColor = ZRColor("#777") }
+    }
+
+/** Zoom and brush buttons; the brush offers only the horizontal line and clearing. */
+private fun stockToolbox(): ToolboxOption =
+    unsafeJso {
+        feature =
+            unsafeJso<ToolboxFeature> {
+                dataZoom = unsafeJso<ToolboxDataZoomFeatureOption> { yAxisIndex = ModelFinderIndexQuery(false) }
+                brush =
+                    unsafeJso<ToolboxBrushFeatureOption> {
+                        type = arrayOf(BrushToolboxIconTypes.lineX, BrushToolboxIconTypes.clear)
+                    }
+            }
+    }
+
+/** Brushing one grid applies to both, and what falls outside keeps only a tenth of its color. */
+private fun stockBrush(): BrushOption =
+    unsafeJso {
+        xAxisIndex = ModelFinderIndexQuery("all")
+        brushLink = ModelFinderIndexQuery("all")
+        outOfBrush = unsafeJso<VisualOptionUnit> { colorAlpha = DoubleOrDoubleArray(0.1) }
+    }
+
+/** The two category axes: the price grid and, below it, the volume grid. */
+private fun stockAxes(dates: Array<OptionDataItem?>): Array<XAxisOption> =
+    arrayOf(
+        unsafeJso<XAxisOption> {
+            type = AxisTypes.category
+            data = dates
+            scale = true
+            boundaryGap = BooleanOrStringArray(false)
+            axisLine = unsafeJso<AxisLineOption> { onZero = BooleanOrString(false) }
+            splitLine = unsafeJso<SplitLineOption> { show = false }
+            splitNumber = 20.0
+            min = AxisMinMax("dataMin")
+            max = AxisMinMax("dataMax")
+            axisPointer = unsafeJso<AxisPointerOption> { z = 100.0 }
+        },
+        unsafeJso {
+            type = AxisTypes.category
+            gridIndex = 1.0
+            data = dates
+            scale = true
+            boundaryGap = BooleanOrStringArray(false)
+            axisLine = unsafeJso<AxisLineOption> { onZero = BooleanOrString(false) }
+            axisTick = unsafeJso<AxisTickOption> { show = BooleanOrString(false) }
+            splitLine = unsafeJso<SplitLineOption> { show = false }
+            axisLabel = unsafeJso<AxisLabelOption> { show = false }
+            splitNumber = 20.0
+            min = AxisMinMax("dataMin")
+            max = AxisMinMax("dataMax")
+            axisPointer =
+                unsafeJso {
+                    label = unsafeJso<AxisPointerLabelOption> { formatter = stockPointerLabel() }
+                }
+        },
+    )
+
+/**
+ * Label of the volume axis pointer: the date and, under it, the price the pointer sits on.
+ *
+ * Upstream returns `params.value` plus `echarts.format.addCommas(seriesData[0].value)` when a series
+ * value exists; `seriesData` is empty on the y pointer, so no value is appended there.
+ */
+private fun stockPointerLabel(): LabelFormatter =
+    LabelFormatter(
+        { params ->
+            val pointer = params.unsafeCast<AxisPointerLabelParams>()
+            val date = textOf(pointer.value)
+            val price = pointer.seriesData?.firstOrNull()?.value
+            if (price == null) {
+                date
+            } else {
+                date + "\n" + ECharts.format.addCommas(StringOrDouble(numeric(price)))
+            }
+        },
+    )
+
+/** The price axis, with the alternating split areas of the original. */
+private fun stockValueAxes(): Array<YAxisOption> =
+    arrayOf(
+        unsafeJso<YAxisOption> {
+            scale = true
+            splitArea = unsafeJso<SplitAreaOption> { show = true }
+        },
+        unsafeJso {
+            scale = true
+            gridIndex = 1.0
+            splitNumber = 2.0
+            axisLabel = unsafeJso<AxisLabelOption> { show = false }
+            axisLine = unsafeJso<AxisLineOption> { show = BooleanOrString(false) }
+            axisTick = unsafeJso<AxisTickOption> { show = BooleanOrString(false) }
+            splitLine = unsafeJso<SplitLineOption> { show = false }
+        },
+    )
+
+/** The two zoom windows, both bound to the two category axes. */
+private fun stockDataZoom(): Array<DataZoomOption> =
+    arrayOf(
+        unsafeJso<DataZoomOption> {
+            type = DataZoomTypes.inside
+            xAxisIndex = IndexOrIndexArray(arrayOf(0.0, 1.0))
+            start = 98.0
+            end = 100.0
+        },
+        unsafeJso {
+            show = true
+            xAxisIndex = IndexOrIndexArray(arrayOf(0.0, 1.0))
+            type = DataZoomTypes.slider
+            top = StringOrDouble("85%")
+            start = 98.0
+            end = 100.0
+        },
+    )
+
+/** Candles, the four moving averages and the volume bars of the second grid. */
+private fun stockSeries(rows: Array<Array<JsAny>>): Array<SeriesOption> {
+    val closes = DoubleArray(rows.size) { numeric(rows[it][STOCK_CLOSE_COLUMN]) }
+    return arrayOf(
+        candlestickSeries {
+            name = "Dow-Jones index"
+            typedData = stockCandles(rows)
+            itemStyle =
+                unsafeJso<CandlestickItemStyleOption> {
+                    color = ZRColor("#06B800")
+                    color0 = ZRColor("#FA0000")
+                }
+            tooltip = unsafeJso<TooltipOption> { formatter = stockCandleTooltip() }
+        },
+        *stockAverageLines(closes),
+        barSeries {
+            name = "Volumn"
+            xAxisIndex = 1.0
+            yAxisIndex = 1.0
+            typedData = numbers(*DoubleArray(rows.size) { numeric(rows[it][STOCK_VOLUME_COLUMN]) })
+        },
+    )
+}
+
+/**
+ * Series tooltip of the candles.
+ *
+ * The original returns an HTML block with an `<hr>`; this site keeps tooltip content plain, so the
+ * rows are separated by `<br/>` only.
+ */
+private fun stockCandleTooltip(): TooltipFormatter =
+    TooltipFormatter(
+        { params ->
+            val item = params.unsafeCast<Array<CallbackDataParams>>()[0]
+            val candle = item.data.unsafeCast<JsAny?>()
+            TooltipContent(
+                listOf(
+                    "Date: " + item.name,
+                    "Open: " + textAt(candle, 0),
+                    "Close: " + textAt(candle, 1),
+                    "Lowest: " + textAt(candle, 2),
+                    "Highest: " + textAt(candle, 3),
+                ).joinToString("<br/>"),
+            )
+        },
+    )
+
+/** Dates of the axis, the first column of every row. */
+private fun stockDates(rows: Array<Array<JsAny>>): Array<OptionDataItem?> =
+    strings(*Array(rows.size) { textOf(rows[it][0]) })
+
+/** The five columns that follow the date, in the order ECharts expects a candle. */
+private fun stockCandles(rows: Array<Array<JsAny>>): Array<CandlestickDataItem?> =
+    Array(rows.size) { row ->
+        CandlestickDataItem(
+            Array(STOCK_CANDLE_COLUMNS) { column -> OptionDataValue(numeric(rows[row][column + 1])) },
+        )
+    }
+
+/** Moving averages of the closing prices, in the order of the legend. */
+private fun stockAverageLines(closes: DoubleArray): Array<SeriesOption> =
+    arrayOf<SeriesOption>(
+        stockAverageLine("MA5", movingAverage(5, closes)),
+        stockAverageLine("MA10", movingAverage(10, closes)),
+        stockAverageLine("MA20", movingAverage(20, closes)),
+        stockAverageLine("MA30", movingAverage(30, closes)),
+    )
+
+private fun stockAverageLine(seriesName: String, data: Array<LineDataItem?>): SeriesOption =
+    lineSeries {
+        name = seriesName
+        smooth = BooleanOrDouble(true)
+        lineStyle = unsafeJso<LineStyleOption> { opacity = 0.5 }
+        typedData = data
+    }
+
+/**
+ * Mean of the last [dayCount] closes, rounded to three decimals as the original does.
+ *
+ * The first [dayCount] points have no window yet; the original writes the string `"-"`, which
+ * ECharts reads as a missing value.
+ */
+private fun movingAverage(dayCount: Int, closes: DoubleArray): Array<LineDataItem?> =
+    Array(closes.size) { index ->
+        if (index < dayCount) {
+            LineDataItem(OptionDataValue("-"))
+        } else {
+            val sum = (0 until dayCount).sumOf { offset -> closes[index - offset] }
+            LineDataItem(OptionDataValue(round(sum / dayCount * 1000.0) / 1000.0))
+        }
+    }
+
+/** `grid.left` of the control panel of `doc-example/grid-outerBounds`, kept by this port. */
+private const val OUTER_BOUNDS_GRID_LEFT = 70.0
+
+/** `grid.top` of that panel. */
+private const val OUTER_BOUNDS_GRID_TOP = 50.0
+
+/** `grid.right` of that panel. */
+private const val OUTER_BOUNDS_GRID_RIGHT = 260.0
+
+/** `grid.bottom` of that panel. */
+private const val OUTER_BOUNDS_GRID_BOTTOM = 45.0
+
+/** The jitter of the `medium_data` set: five points, `y += random * 1000`. */
+private val OUTER_BOUNDS_JITTER = doubleArrayOf(0.79, 0.03, 0.25, 0.68, 0.33)
+
+/** Name of an axis, spelled the way the original builds it (`xAxis_0name`). */
+private fun outerBoundsAxisName(
+    axis: String,
+    index: Int,
+): String = "${axis}Axis_${index}name"
+
+/** `[x, y]` points of the medium data set: `100000 + i * 10000`, with the jitter added to `y`. */
+private fun outerBoundsData(): Array<LineDataItem?> =
+    points<LineDataItem>(
+        *Array(OUTER_BOUNDS_JITTER.size) { index ->
+            val x = 100000.0 + index * 10000.0
+            doubleArrayOf(x, x + OUTER_BOUNDS_JITTER[index] * 1000.0)
+        },
+    )
+
+/**
+ * Option of `doc-example/grid-outerBounds`.
+ *
+ * The original drives every box of the grid from a floating control panel; this port keeps the
+ * defaults of that panel and only the two tutorial rectangles, which are rebuilt from the current
+ * [width] and [height] so that they still hug the grid after a resize.
+ */
+private fun outerBoundsOption(
+    width: Double,
+    height: Double,
+): EChartsOption =
+    unsafeJso {
+        title =
+            one(
+                unsafeJso<TitleOption> {
+                    text = "Grid outerBounds example"
+                    left = StringOrDouble(5.0)
+                    top = StringOrDouble(5.0)
+                },
+            )
+        legend = one(unsafeJso<LegendOption> { top = StringOrDouble(3.0) })
+        tooltip = one(unsafeJso<TooltipOption> {})
+        graphic = one(GraphicComponentLooseOption(outerBoundsIndicators(width, height)))
+        xAxis =
+            one(
+                unsafeJso<XAxisOption> {
+                    type = AxisTypes.value
+                    name = outerBoundsAxisName("x", 0)
+                    nameLocation = AxisNameLocations.center
+                    splitLine = unsafeJso<SplitLineOption> { show = false }
+                },
+            )
+        yAxis =
+            one(
+                unsafeJso<YAxisOption> {
+                    type = AxisTypes.value
+                    name = outerBoundsAxisName("y", 0)
+                    nameLocation = AxisNameLocations.center
+                    alignTicks = true
+                    axisLine = unsafeJso<AxisLineOption> { show = BooleanOrString(true) }
+                },
+            )
+        grid = one(outerBoundsGrid())
+        series =
+            arrayOf<SeriesOption>(
+                lineSeries {
+                    name = "series_0"
+                    symbolSize = SymbolSize(10.0)
+                    typedData = outerBoundsData()
+                },
+            )
+    }
+
+/** The grid of the page: the panel's box, an explicit `outerBounds` of `0` and `mode: 'auto'`. */
+private fun outerBoundsGrid(): GridOption =
+    unsafeJso {
+        left = StringOrDouble(OUTER_BOUNDS_GRID_LEFT)
+        top = StringOrDouble(OUTER_BOUNDS_GRID_TOP)
+        right = StringOrDouble(OUTER_BOUNDS_GRID_RIGHT)
+        bottom = StringOrDouble(OUTER_BOUNDS_GRID_BOTTOM)
+        outerBounds =
+            unsafeJso<BoxLayoutOption> {
+                left = StringOrDouble(0.0)
+                top = StringOrDouble(0.0)
+                right = StringOrDouble(0.0)
+                bottom = StringOrDouble(0.0)
+            }
+        outerBoundsMode = OuterBoundsModes.auto
+        containLabel = false
+    }
+
+/**
+ * The two tutorial rectangles.
+ *
+ * With `outerBoundsMode: 'auto'` and `containLabel: false` the outer bounds are exactly the box set
+ * in `grid.outerBounds`, which the panel keeps at `0` on every side; that is the second rectangle.
+ */
+private fun outerBoundsIndicators(
+    width: Double,
+    height: Double,
+): GraphicComponentOption =
+    unsafeJso {
+        elements =
+            arrayOf(
+                indicatorRectangle(
+                    id = "grid_axis_aligned_rect_indicator",
+                    left = OUTER_BOUNDS_GRID_LEFT,
+                    top = OUTER_BOUNDS_GRID_TOP,
+                    width = width - OUTER_BOUNDS_GRID_LEFT - OUTER_BOUNDS_GRID_RIGHT,
+                    height = height - OUTER_BOUNDS_GRID_TOP - OUTER_BOUNDS_GRID_BOTTOM,
+                    fillColor = "rgba(0,0,100,0.1)",
+                    caption = "grid.t/r/b/l/w/h rect",
+                ),
+                indicatorRectangle(
+                    id = "grid_outerBounds_indicator",
+                    left = 0.0,
+                    top = 0.0,
+                    width = width,
+                    height = height,
+                    fillColor = "rgba(0,80,0,0.1)",
+                    caption = "grid.outerBounds.t/r/b/l/w/h rect",
+                ),
+            )
+    }
+
+/** One indicator rectangle with its caption, drawn behind the chart and ignoring the pointer. */
+private fun indicatorRectangle(
+    id: String,
+    left: Double,
+    top: Double,
+    width: Double,
+    height: Double,
+    fillColor: String,
+    caption: String,
+): GraphicElement =
+    unsafeJso {
+        this.id = id
+        type = "rect"
+        shape = unsafeJso<ZRShapeProps> { x = left; y = top; this.width = width; this.height = height }
+        style = unsafeJso<ZRStyleProps> { fill = ZRColor(fillColor) }
+        silent = true
+        textContent =
+            unsafeJso<GraphicElement> {
+                type = "text"
+                style =
+                    unsafeJso<ZRStyleProps> {
+                        text = caption
+                        stroke = ZRColor("#fff")
+                        lineWidth = 2.0
+                        fill = ZRColor("#555")
+                        fontSize = StringOrDouble(10.0)
+                    }
+            }
+        textConfig =
+            unsafeJso<ElementTextConfig> {
+                position = StringOrDoubleOrArray("insideTopRight")
+                distance = 0.0
+            }
+    }

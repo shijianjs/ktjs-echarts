@@ -29,8 +29,10 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `ksia-ext-plan-min.svg` | `geo/` | `geo-svg-traffic` |
 | `Beef_cuts_France.svg` | `geo/` | `geo-beef-cuts` |
 | `obama_budget_proposal_2012.json` | `data/` | `treemap-obama` |
+| `obama_budget_proposal_2012.list.json` | `data/` | `doc-example/bar-dataZoom-filterMode` |
+| `stock-DJI.json` | `data/` | `doc-example/candlestick-axisPointer` |
 | `wind-barb-hobart.json` | `data/` | (not ported yet, `custom-wind`) |
-| `aqi-beijing.json` | `data/` | (not ported yet, `line-aqi`) |
+| `aqi-beijing.json` | `data/` | `line-aqi` |
 
 Files added here must keep the upstream name so the example source stays traceable to
 `public/data/asset/{data,geo}/<name>`.

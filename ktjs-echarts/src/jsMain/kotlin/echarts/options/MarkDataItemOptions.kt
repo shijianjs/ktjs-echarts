@@ -2,6 +2,7 @@ package echarts.options
 
 import echarts.MarkerRelativeTo
 import echarts.MarkerStatisticType
+import kotlin.js.JsName
 import kotlin.js.unsafeCast
 
 /**
@@ -103,10 +104,25 @@ external interface MarkLineStateOption {
     var itemStyle: ItemStyleOption?
 
     /** Style of the two end labels. */
-    var label: LabelOption?
+    var label: MarkLineLabelOption?
 
     /** z-index of the mark line inside its z-level. */
     var z2: Double?
+}
+
+/**
+ * Label of a mark line: upstream `SeriesLineLabelOption`, which extends `LineLabelOption`.
+ *
+ * Upstream widens `distance` to `number | number[]`, where the pair gives the horizontal and the
+ * vertical distance to the line, and narrows `position` to the start / middle / end keywords
+ * (`"start"`, `"insideMiddleTop"`, ...), which [LabelPosition] already wraps. Kotlin cannot override
+ * the inherited `var distance`, so the array form is written through [typedDistance]; both
+ * properties address the same `distance` field of the option object.
+ */
+external interface MarkLineLabelOption : LabelOption {
+    /** [distance] as the upstream `number | number[]`; the same JavaScript property. */
+    @JsName("distance")
+    var typedDistance: DoubleOrDoubleArray?
 }
 
 /**

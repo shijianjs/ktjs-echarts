@@ -12,6 +12,7 @@ import kotlin.math.round
 import web.cssom.TextAlign
 import web.cssom.VerticalAlign
 import zrender.ElementTextConfig
+import zrender.PatternObject
 import zrender.ZRColor
 import zrender.ZRShapeProps
 import zrender.ZRStyleProps
@@ -41,7 +42,11 @@ import zrender.ZRStyleProps
  * - `label-position` is driven by a configuration panel on the official site; the demo has no panel,
  *   so the page shows the panel's defaults (`top` / `center` / `middle` / `5`);
  * - the tooltip of `treemap-borderColor` is plain text (`{b}: {c} KB`) instead of the HTML one of the
- *   original, per the UI rules of this repository.
+ *   original, per the UI rules of this repository;
+ * - `pie-media` drops the `draggable.js` helper of the original page (real pointer dragging) and the
+ *   legacy `calculable` flag; its `media` units still switch layout by container size;
+ * - `aria-decal` ends with the `path://` swirl of the original; the `base64` image decal the folder
+ *   ships is commented out upstream as well and this site does not carry image assets.
  */
 
 private val docMore = Category(Groups.DOC, "examples/DocMore.kt")
@@ -1132,4 +1137,325 @@ val docMoreEntries: List<CatalogEntry> =
                 null
             }
         },
+        docMore.chart(
+            "doc-example/pie-media",
+            "按容器尺寸切换布局的玫瑰图",
+            "Nightingale chart with media queries",
+        ) {
+            unsafeJso<EChartsOption> {
+                baseOption =
+                    unsafeJso {
+                        title =
+                            one(
+                                unsafeJso<TitleOption> {
+                                    text = "南丁格尔玫瑰图"
+                                    subtext = "纯属虚构"
+                                    left = StringOrDouble("center")
+                                },
+                            )
+                        tooltip =
+                            one(
+                                unsafeJso<TooltipOption> {
+                                    trigger = TooltipTriggers.item
+                                    formatter = TooltipFormatter("{a} <br/>{b} : {c} ({d}%)")
+                                },
+                            )
+                        legend = one(unsafeJso<LegendOption> { data = legendNames(*roseLegendNames) })
+                        toolbox =
+                            one(
+                                unsafeJso<ToolboxOption> {
+                                    feature =
+                                        unsafeJso<ToolboxFeature> {
+                                            dataView = unsafeJso<DataViewOption> { readOnly = false }
+                                            magicType = unsafeJso<MagicTypeOption> { type = arrayOf("pie", "funnel") }
+                                            restore = unsafeJso<ToolboxFeatureOption> {}
+                                            saveAsImage = unsafeJso<SaveAsImageOption> {}
+                                        }
+                                },
+                            )
+                        series =
+                            arrayOf<SeriesOption>(
+                                roseSeries("半径模式", RoseTypes.radius),
+                                roseSeries("面积模式", RoseTypes.area),
+                            )
+                    }
+                media =
+                    arrayOf(
+                        // The unit without a query is the fallback; the container of this site is
+                        // wide, so it is also what the first paint shows.
+                        roseMedia(
+                            null,
+                            StringOrDouble("center"),
+                            null,
+                            StringOrDouble(0.0),
+                            Orients.horizontal,
+                            "25%/50%",
+                            "75%/50%",
+                        ),
+                        roseMedia(
+                            unsafeJso { minAspectRatio = 1.0 },
+                            StringOrDouble("center"),
+                            null,
+                            StringOrDouble(0.0),
+                            Orients.horizontal,
+                            "25%/50%",
+                            "75%/50%",
+                        ),
+                        roseMedia(
+                            unsafeJso { maxAspectRatio = 1.0 },
+                            StringOrDouble("center"),
+                            null,
+                            StringOrDouble(0.0),
+                            Orients.horizontal,
+                            "50%/30%",
+                            "50%/70%",
+                        ),
+                        roseMedia(
+                            unsafeJso { maxWidth = 500.0 },
+                            StringOrDouble(10.0),
+                            StringOrDouble("15%"),
+                            null,
+                            Orients.vertical,
+                            "50%/30%",
+                            "50%/75%",
+                        ),
+                    )
+            }
+        },
+        docMore.chart(
+            "doc-example/aria-decal",
+            "无障碍图案（decal）一览",
+            "Accessibility decal patterns",
+        ) {
+            val decalGallery = ariaDecals()
+            unsafeJso<EChartsOption> {
+                xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.value; max = AxisMinMax(1.0); show = false })
+                yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value; show = false })
+                color = arrayOf(ZRColor("#ddd"))
+                aria =
+                    unsafeJso<AriaOption> {
+                        enabled = true
+                        decal =
+                            unsafeJso<AriaDecalOption> {
+                                show = true
+                                decals = DecalList(decalGallery)
+                            }
+                    }
+                series = Array<SeriesOption>(decalGallery.size) { index -> decalSwatch(index) }
+            }
+        },
     )
+
+/** The eight rose slices of `pie-media`, named after the legend. */
+private val roseLegendNames = Array(8) { index -> "rose${index + 1}" }
+
+/** The values of the two roses of `pie-media`; both series use the same table. */
+private val roseValues = doubleArrayOf(10.0, 5.0, 15.0, 25.0, 20.0, 35.0, 30.0, 40.0)
+
+/**
+ * One rose series of `pie-media`; the base option only sets the name and the rose mode, the radius
+ * and the centre come from the matched `media` unit.
+ *
+ * The original also sets the ECharts 4 `label.normal` / `lableLine.normal` blocks (the second one is
+ * a typo ECharts never read) and the legacy `calculable` flag; ECharts 6 has none of them.
+ */
+private fun roseSeries(name: String, roseType: RoseType): SeriesOption =
+    pieSeries {
+        this.name = name
+        this.roseType = roseType
+        typedData = dataItems(*Array(roseValues.size) { index -> pieItem("rose${index + 1}", roseValues[index]) })
+    }
+
+/**
+ * One `media` unit of `pie-media`: the legend box and the two rose centres.
+ *
+ * [centers] holds one `"x/y"` pair per series, which is expanded into the two percentages upstream
+ * writes as an array.
+ */
+private fun roseMedia(
+    query: MediaQueryOption?,
+    legendRight: StringOrDouble,
+    legendTop: StringOrDouble?,
+    legendBottom: StringOrDouble?,
+    orient: Orient,
+    vararg centers: String,
+): MediaUnit =
+    unsafeJso {
+        this.query = query
+        option =
+            unsafeJso {
+                legend =
+                    one(
+                        unsafeJso<LegendOption> {
+                            right = legendRight
+                            if (legendTop != null) this.top = legendTop
+                            if (legendBottom != null) this.bottom = legendBottom
+                            this.orient = orient
+                        },
+                    )
+                series =
+                    Array<SeriesOption>(centers.size) { index ->
+                        val parts = centers[index].split('/')
+                        pieSeries {
+                            radius =
+                                StringOrDoubleOrArray(
+                                    arrayOf(
+                                        StringOrDouble(20.0 + 10.0 * index),
+                                        StringOrDouble("50%"),
+                                    ),
+                                )
+                            center =
+                                arrayOf(
+                                    StringOrDouble(parts[0]),
+                                    StringOrDouble(parts[1]),
+                                )
+                        }
+                    }
+            }
+    }
+
+/** The fill colour of the `aria-decal` patterns. */
+private const val DECAL_COLOR = "rgba(0, 0, 0, 0.8)"
+
+/** Number of swatches in one row of `aria-decal`. */
+private const val ARIA_DECAL_COLUMNS = 6
+
+/** The swirl of the last decal of `aria-decal`, copied verbatim. */
+private const val DECAL_SWIRL_PATH =
+    "path://M136.71078,90.7149424 C135.038663,90.084817 133.319214,89.8204828 131.637995,89.8987366 " +
+        "C131.93792,88.5693311 132.022117,87.2371959 131.901965,85.9319035 C131.475516,81.1970909 128.414369,76.8944942 123.681104,75.0882862 " +
+        "C118.812669,73.2488659 113.532803,74.556888 110.072058,78.0014222 C111.44425,78.0132512 112.836467,78.2716709 114.184082,78.7876003 " +
+        "C120.385569,81.1311211 123.498145,88.0593162 121.156545,94.2582038 C120.289538,96.5421242 118.80038,98.4052027 116.960324,99.7405227 " +
+        "C113.796773,102.011704 109.591905,102.714169 105.683776,101.228711 C99.4827445,98.8915594 96.3669821,91.9606345 98.7113134,85.7581072 " +
+        "C99.0176102,84.9537305 99.4044636,84.2007647 99.8609505,83.4869258 L99.8545788,83.4869258 " +
+        "C99.8545788,83.4869258 99.8545788,83.4869258 99.8545788,83.4932953 C101.850742,80.3754255 103.561544,76.9968612 104.927364,73.3990041 " +
+        "C115.528966,45.4164295 101.427934,14.127175 73.4261234,3.52605368 C45.4215819,-7.07142797 14.1333382,7.02472855 3.52900521,35.0104878 " +
+        "C0.629425582,42.6470623 -0.42099504,50.523403 0.149272308,58.1686218 C0.16110547,58.4206719 0.185226914,58.6786366 0.209348358,58.9366014 " +
+        "C2.47266801,84.9182432 19.2184117,108.595036 45.2413538,118.442737 C71.7121355,128.45559 100.448968,121.413198 119.352898,102.762395 " +
+        "C122.585626,99.6263266 127.465895,98.4657129 131.950208,100.160455 C137.34704,102.203699 140.39954,107.712861 139.559386,113.191995 " +
+        "C141.579216,111.769777 143.215378,109.750646 144.163851,107.256987 C146.676122,100.628613 143.33553,93.2204304 136.71078,90.7149424 ZZ"
+
+/** Horizontal dash spacing of a decal from a flat list of numbers. */
+private fun dashX(vararg values: Double): DecalDashArrayX =
+    DecalDashArrayX(Array(values.size) { index -> DoubleOrDoubleArray(values[index]) })
+
+/** Horizontal dash spacing of a decal from the tiles of a repeated pattern. */
+private fun dashXTiles(vararg tiles: DoubleArray): DecalDashArrayX =
+    DecalDashArrayX(Array(tiles.size) { index -> DoubleOrDoubleArray(tiles[index].toTypedArray()) })
+
+/** Vertical dash spacing of a decal; one value keeps the number form upstream uses. */
+private fun dashY(vararg values: Double): DoubleOrDoubleArray =
+    if (values.size == 1) DoubleOrDoubleArray(values[0]) else DoubleOrDoubleArray(values.toTypedArray())
+
+/** One decal of the `aria-decal` gallery; unset members stay out of the option object. */
+private fun decal(
+    color: String? = DECAL_COLOR,
+    symbol: String? = null,
+    symbolSize: Double? = null,
+    dashArrayX: DecalDashArrayX? = null,
+    dashArrayY: DoubleOrDoubleArray? = null,
+    rotation: Double? = null,
+): DecalObject =
+    unsafeJso {
+        if (color != null) this.color = color
+        if (symbol != null) this.symbol = StringOrStringArray(symbol)
+        if (symbolSize != null) this.symbolSize = symbolSize
+        if (dashArrayX != null) this.dashArrayX = dashArrayX
+        if (dashArrayY != null) this.dashArrayY = dashArrayY
+        if (rotation != null) this.rotation = rotation
+    }
+
+/**
+ * The twelve decal patterns of `doc-example/aria-decal`.
+ *
+ * The rotations are multiples of `PI`, which is what zrender reads; the original ends with a
+ * `base64` image decal that this site does not ship, so the swirl `path://` is the last entry.
+ */
+private fun ariaDecals(): Array<DecalObject> =
+    arrayOf(
+        decal(
+            dashArrayX = dashX(1.0, 0.0),
+            dashArrayY = dashY(2.0, 5.0),
+            symbolSize = 1.0,
+            rotation = kotlin.math.PI / 6,
+        ),
+        decal(
+            symbol = "circle",
+            dashArrayX = dashXTiles(doubleArrayOf(8.0, 8.0), doubleArrayOf(0.0, 8.0, 8.0, 0.0)),
+            dashArrayY = dashY(6.0, 0.0),
+            symbolSize = 0.8,
+        ),
+        decal(dashArrayX = dashX(1.0, 0.0), dashArrayY = dashY(4.0, 3.0), rotation = -kotlin.math.PI / 4),
+        decal(dashArrayX = dashXTiles(doubleArrayOf(6.0, 6.0), doubleArrayOf(0.0, 6.0, 6.0, 0.0)), dashArrayY = dashY(6.0, 0.0)),
+        decal(
+            dashArrayX = dashXTiles(doubleArrayOf(1.0, 0.0), doubleArrayOf(1.0, 6.0)),
+            dashArrayY = dashY(1.0, 0.0, 6.0, 0.0),
+            rotation = kotlin.math.PI / 4,
+        ),
+        decal(
+            symbol = "triangle",
+            dashArrayX = dashXTiles(doubleArrayOf(9.0, 9.0), doubleArrayOf(0.0, 9.0, 9.0, 0.0)),
+            dashArrayY = dashY(7.0, 2.0),
+            symbolSize = 0.75,
+        ),
+        decal(dashArrayX = dashX(1.0, 0.0), dashArrayY = dashY(10.0), rotation = 0.0),
+        decal(dashArrayX = dashX(10.0, 10.0), dashArrayY = dashY(1.0, 0.0), rotation = 0.0),
+        decal(dashArrayX = dashX(10.0, 5.0, 20.0, 5.0), dashArrayY = dashY(10.0), rotation = 0.0),
+        decal(
+            dashArrayX =
+                dashXTiles(
+                    doubleArrayOf(10.0, 5.0, 20.0, 5.0),
+                    doubleArrayOf(20.0, 5.0),
+                ),
+            dashArrayY = dashY(10.0, 5.0),
+            rotation = 0.0,
+        ),
+        decal(
+            color = "black",
+            symbol = "rect",
+            dashArrayX = dashXTiles(doubleArrayOf(8.0, 8.0), doubleArrayOf(0.0, 8.0, 8.0, 0.0)),
+            dashArrayY = dashY(8.0, 0.0),
+            symbolSize = 0.8,
+            rotation = kotlin.math.PI / 4,
+        ),
+        decal(
+            symbol = DECAL_SWIRL_PATH,
+            dashArrayX = dashXTiles(doubleArrayOf(30.0, 30.0), doubleArrayOf(0.0, 30.0, 30.0, 0.0)),
+            dashArrayY = dashY(15.0, 0.0),
+        ),
+    )
+
+/**
+ * One swatch series of `aria-decal`: a filled rectangle painted with the color and the decal that
+ * the accessibility module assigned to the item, laid out on a [ARIA_DECAL_COLUMNS]-wide grid.
+ */
+private fun decalSwatch(index: Int): SeriesOption =
+    customSeries {
+        typedData = arrayOf(OptionDataItem(doubleRow(index.toDouble())))
+        renderItem = { _, api ->
+            val value = api.value(DimensionLoose(0.0)).unsafeCast<Double>()
+            unsafeJso<CustomGroupOption> {
+                type = "group"
+                x = (value % ARIA_DECAL_COLUMNS) * 120 + 50
+                y = kotlin.math.floor(value / ARIA_DECAL_COLUMNS) * 120 + 50
+                children =
+                    arrayOf(
+                        unsafeJso<CustomPathOption> {
+                            type = "rect"
+                            shape =
+                                unsafeJso<ZRShapeProps> {
+                                    x = 0.0
+                                    y = 0.0
+                                    width = 100.0
+                                    height = 100.0
+                                }
+                            style =
+                                unsafeJso<ZRStyleProps> {
+                                    fill = api.visual(VisualProps.color).unsafeCast<ZRColor>()
+                                    decal = api.visual(VisualProps.decal).unsafeCast<PatternObject>()
+                                }
+                        },
+                    )
+            }
+        }
+    }

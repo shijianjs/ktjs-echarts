@@ -32,6 +32,9 @@ class ChartHolder(
     /** Timer ids created by [setInterval]/[setTimeout]; cleared on [unmount]. */
     private val timers = mutableListOf<Int>()
 
+    /** Handlers created by [onResize] for the current instance; dropped on [unmount]. */
+    private val resizeHandlers = mutableListOf<() -> Unit>()
+
     /** Creates the chart instance and applies the example option. Idempotent. */
     fun mount() {
         if (instance != null) return
@@ -53,17 +56,30 @@ class ChartHolder(
     fun setTimeout(handler: () -> Unit, delayMillis: Int): Int =
         (kotlinx.browser.window.setTimeout(handler, delayMillis) as Int).also { timers.add(it) }
 
+    /**
+     * Registers a handler that runs after the chart has been resized.
+     *
+     * Examples that place pixel-sized overlays need the new container size; the handlers belong to the
+     * instance they were registered for, so [unmount] drops them and [mount] feeds the new one.
+     */
+    fun onResize(handler: () -> Unit) {
+        resizeHandlers.add(handler)
+    }
+
     /** Disposes the chart instance; the container stays in the DOM. */
     fun unmount() {
         timers.forEach { kotlinx.browser.window.clearInterval(it); kotlinx.browser.window.clearTimeout(it) }
         timers.clear()
+        resizeHandlers.clear()
         instance?.dispose()
         instance = null
     }
 
-    /** Forwards a container resize to the chart. */
+    /** Forwards a container resize to the chart and to the handlers registered through [onResize]. */
     fun resize() {
-        instance?.resize()
+        val chart = instance ?: return
+        chart.resize()
+        resizeHandlers.forEach { it() }
     }
 }
 

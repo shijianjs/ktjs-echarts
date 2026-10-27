@@ -520,6 +520,20 @@ typealias TooltipPositionCallback = (
 fun TooltipPosition(callback: TooltipPositionCallback): TooltipPosition = callback.unsafeCast<TooltipPosition>()
 
 /**
+ * `boolean | TooltipOption`, used by [TimelineDataItemOption.tooltip].
+ *
+ * Upstream declares the member as `boolean`, but the timeline view resolves the item's option model,
+ * so a tooltip object works and the official examples pass one.
+ */
+external interface BooleanOrTooltipOption
+
+/** Wraps the flag form; `false` hides the tooltip of that point. */
+fun BooleanOrTooltipOption(value: Boolean): BooleanOrTooltipOption = value.unsafeCast<BooleanOrTooltipOption>()
+
+/** Wraps a tooltip option object for one component or data item. */
+fun BooleanOrTooltipOption(value: TooltipOption): BooleanOrTooltipOption = value.unsafeCast<BooleanOrTooltipOption>()
+
+/**
  * Tooltip position expressed as distances to the container edges.
  */
 external interface TooltipBoxLayoutOption {
@@ -776,6 +790,19 @@ fun ModelFinderIndexQuery(value: Boolean): ModelFinderIndexQuery =
     value.unsafeCast<ModelFinderIndexQuery>()
 
 /**
+ * Query for the id of one or more components: an [OptionId], an array of ids, or nothing.
+ *
+ * Upstream `ModelFinderIdQuery`.
+ */
+external interface ModelFinderIdQuery
+
+/** Wraps a single id. */
+fun ModelFinderIdQuery(value: OptionId): ModelFinderIdQuery = value.unsafeCast<ModelFinderIdQuery>()
+
+/** Wraps several ids. */
+fun ModelFinderIdQuery(values: Array<OptionId>): ModelFinderIdQuery = values.unsafeCast<ModelFinderIdQuery>()
+
+/**
  * A data zoom bound: a percentage number, a value name, a number or a date.
  */
 external interface DataZoomValue
@@ -944,7 +971,12 @@ external interface DecalObject {
     /** Vertical dash spacing. */
     var dashArrayY: DoubleOrDoubleArray?
 
-    /** Rotation of the pattern in degrees. */
+    /**
+     * Rotation of the pattern, in radians.
+     *
+     * Upstream hands the value to `zrender`'s `Pattern.rotation`, which the SVG renderer divides by
+     * `PI` to get degrees; the official decal examples therefore pass multiples of `Math.PI`.
+     */
     var rotation: Double?
 
     /** Maximum tile width. */

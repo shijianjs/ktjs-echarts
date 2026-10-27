@@ -226,10 +226,11 @@ class DemoPageTest {
 
     /**
      * The `doc-example` pages of `DocInteractive.kt` paint on their own: a timer replaces the data,
-     * `showLoading` covers the canvas for three seconds, and the sunburst pages dispatch an action
-     * after the first frame. Sampling once right after the route switch would miss all of that, so
-     * each page is left running long enough for at least one tick of its timer; an exception in a
-     * timer callback is what the console assertion catches.
+     * `showLoading` covers the canvas for three seconds, the sunburst pages dispatch an action after
+     * the first frame, and `bar-dataZoom-filterMode` / `candlestick-axisPointer` set the option only
+     * once their data file has been fetched. Sampling once right after the route switch would miss all
+     * of that, so each page is left running long enough for at least one tick of its timer; an
+     * exception in a timer callback is what the console assertion catches.
      */
     @Test
     fun `the interactive doc examples paint and run their timers`(page: Page) {
@@ -248,6 +249,9 @@ class DemoPageTest {
                 "doc-example/graphic-bounding",
                 "doc-example/timeline-dynamic-series",
                 "doc-example/pictorialBar-clip",
+                "doc-example/bar-dataZoom-filterMode",
+                "doc-example/candlestick-axisPointer",
+                "doc-example/grid-outerBounds",
             )
         for (route in routes) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)

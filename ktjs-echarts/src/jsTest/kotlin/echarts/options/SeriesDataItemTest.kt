@@ -70,7 +70,7 @@ class SeriesDataItemTest {
                     unsafeJso<MarkLine1DDataItemOption> {
                         yAxis = StringOrDouble("average")
                         type = MarkerStatisticTypes.average
-                        label = unsafeJso<LabelOption> { formatter = LabelFormatter("avg") }
+                        label = unsafeJso<MarkLineLabelOption> { formatter = LabelFormatter("avg") }
                     },
                 ),
                 MarkLineDataItem(

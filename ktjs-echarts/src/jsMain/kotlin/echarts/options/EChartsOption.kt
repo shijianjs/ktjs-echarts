@@ -26,6 +26,7 @@ import js.objects.Record
 import kotlin.js.JsAny
 import kotlin.js.JsName
 import web.html.HTMLDivElement
+import zrender.ElementTextConfig
 import zrender.ZRColor
 import zrender.ZRElementEvent
 import zrender.ZRFontWeight
@@ -518,13 +519,13 @@ external interface ToolboxFeature {
     var dataView: DataViewOption?
 
     /** Data zoom buttons. */
-    var dataZoom: ToolboxFeatureOption?
+    var dataZoom: ToolboxDataZoomFeatureOption?
 
     /** Switch between chart types, e.g. line and bar. */
     var magicType: MagicTypeOption?
 
     /** Brush selection. */
-    var brush: ToolboxFeatureOption?
+    var brush: ToolboxBrushFeatureOption?
 }
 
 /**
@@ -551,6 +552,45 @@ external interface ToolboxFeatureOption {
 
     /** Callback invoked when the feature is clicked. */
     var onclick: (() -> Unit)?
+}
+
+/**
+ * `toolbox.feature.dataZoom`: the common feature option plus the axes its buttons zoom.
+ *
+ * Upstream `ToolboxDataZoomFeatureOption`.
+ */
+external interface ToolboxDataZoomFeatureOption : ToolboxFeatureOption {
+    /** Icons shown by the feature: `"zoom"` and `"back"`. */
+    var type: Array<String>?
+
+    /** How the data outside the zoom window is handled. */
+    var filterMode: FilterMode?
+
+    /** X axes the buttons zoom; `false` is the upstream alias for `"none"`. */
+    var xAxisIndex: ModelFinderIndexQuery?
+
+    /** Y axes the buttons zoom; `false` is the upstream alias for `"none"`. */
+    var yAxisIndex: ModelFinderIndexQuery?
+
+    /** Ids of the x axes the buttons zoom. */
+    var xAxisId: ModelFinderIdQuery?
+
+    /** Ids of the y axes the buttons zoom. */
+    var yAxisId: ModelFinderIdQuery?
+
+    /** Style of the rubber band the feature draws while zooming. */
+    var brushStyle: ItemStyleOption?
+}
+
+/**
+ * `toolbox.feature.brush`: the common feature option plus the brush icons it shows.
+ *
+ * Upstream `ToolboxBrushFeatureOption`; `icon` and `title` of the base interface hold one entry per
+ * brush icon instead of a single value.
+ */
+external interface ToolboxBrushFeatureOption : ToolboxFeatureOption {
+    /** Brush icons shown by the feature. */
+    var type: Array<BrushToolboxIconType>?
 }
 
 /**
@@ -1238,7 +1278,12 @@ external interface TimelineOption {
     /** Style of the progress bar. */
     var progress: TimelineProgressOption?
 
-    /** Data of the timeline points. */
+    /**
+     * Data of the timeline points.
+     *
+     * A point is a plain value (`"2002-01-01"`) or a [TimelineDataItemOption]; the latter is a data
+     * item object, so both forms are handed to [OptionDataItem].
+     */
     var data: Array<OptionDataItem?>?
 
     /** Background color of the component. */
@@ -1262,6 +1307,49 @@ external interface TimelineOption {
      * When omitted, the option of the new point is merged into the current one (`normalMerge`).
      */
     var replaceMerge: StringOrStringArray?
+}
+
+/**
+ * One point of [TimelineOption.data] that carries its own style instead of a bare value.
+ *
+ * Upstream `TimelineDataItemOption`, which mixes in `SymbolOptionMixin`; wrap it with
+ * `OptionDataItem(item)` to put it into [TimelineOption.data].
+ */
+external interface TimelineDataItemOption : OptionDataItemObject, SymbolOptionMixin {
+    /** Tooltip of the point. Upstream types it as `boolean`, but the timeline view reads a full
+     * tooltip option object, which is what the official examples pass. */
+    var tooltip: BooleanOrTooltipOption?
+
+    /** Style of the point. */
+    var itemStyle: ItemStyleOption?
+
+    /** Label of the point. */
+    var label: TimelineLabelOption?
+
+    /** Style of the checkpoint when it rests on this point. */
+    var checkpointStyle: TimelineCheckpointStyle?
+
+    /** Hover state of the point. */
+    var emphasis: TimelineDataItemEmphasisOption?
+
+    /** Style of the progress bar up to this point. */
+    var progress: TimelineProgressOption?
+}
+
+/**
+ * Hover state of one [TimelineDataItemOption].
+ *
+ * Upstream has no `labelLine` here, so the state is not the shared [EmphasisOption].
+ */
+external interface TimelineDataItemEmphasisOption {
+    /** Style of the hovered point. */
+    var itemStyle: ItemStyleOption?
+
+    /** Label of the hovered point. */
+    var label: TimelineLabelOption?
+
+    /** Style of the checkpoint over the hovered point. */
+    var checkpointStyle: TimelineCheckpointStyle?
 }
 
 /**
@@ -1437,6 +1525,17 @@ external interface GraphicElement {
 
     /** Style of the element. */
     var style: ZRStyleProps?
+
+    /**
+     * Text attached to the element, shown with [textConfig].
+     *
+     * Upstream `Omit<GraphicComponentTextOption, 'clipPath'>`; every element type of [GraphicElement]
+     * can carry it, so the same interface is reused.
+     */
+    var textContent: GraphicElement?
+
+    /** Placement of the text attached to the element. */
+    var textConfig: ElementTextConfig?
 
     /** Position offset, `[x, y]`. */
     var position: Array<Double>?

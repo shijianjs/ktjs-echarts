@@ -12,6 +12,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
+import zrender.ElementTextConfig
 import zrender.RectLike
 import zrender.ZRColor
 import zrender.ZRShapeProps
@@ -164,6 +165,49 @@ class MatrixAndGraphicOptionTest {
         assertEquals("45%", component.elements!![0].x!!.unsafeCast<String>())
         assertEquals(false, component.animation)
         assertEquals("merge", component.unsafeCast<GraphicActionProbe>().action)
+    }
+
+    /**
+     * Every graphic element type can carry an attached text element and the placement it is drawn
+     * with; upstream declares both on `GraphicElement` itself, so a rect gets its caption without a
+     * second element in the group.
+     */
+    @Test
+    fun graphicElementAttachesTextAndPlacement() {
+        val rect = unsafeJso<GraphicElement> {
+            type = "rect"
+            shape = unsafeJso<ZRShapeProps> { x = 10.0; y = 10.0; width = 40.0; height = 20.0 }
+            style = unsafeJso<ZRStyleProps> { fill = ZRColor("#111") }
+            textContent = unsafeJso<GraphicElement> {
+                type = "text"
+                style = unsafeJso<ZRStyleProps> { this.text = "caption"; fill = ZRColor("#fff") }
+            }
+            textConfig = unsafeJso<ElementTextConfig> {
+                position = StringOrDoubleOrArray("insideTopRight")
+                distance = 2.0
+                inside = true
+            }
+        }
+
+        assertEquals("caption", assertNotNull(rect.textContent).style!!.text)
+        assertEquals(2.0, assertNotNull(rect.textConfig).distance)
+        assertTrue(rect.textConfig!!.inside!!)
+        assertEquals("insideTopRight", rect.textConfig!!.position!!.unsafeCast<String>())
+
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(
+                unsafeJso<EChartsOption> {
+                    graphic = one(GraphicComponentLooseOption(unsafeJso<GraphicComponentOption> {
+                        id = "captioned"
+                        elements = arrayOf(rect)
+                    }))
+                },
+            )
+            assertTrue(chart.renderToCanvas().width > 0, "the element with attached text should render")
+        } finally {
+            destroyChart(chart, container)
+        }
     }
 
     @Test

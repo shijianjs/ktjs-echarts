@@ -3,7 +3,9 @@ package echarts.options
 import echarts.AxisBreakActions
 import echarts.AxisBreakChangedEvent
 import echarts.AxisTypes
+import echarts.BrushToolboxIconTypes
 import echarts.ExpandAxisBreakPayload
+import echarts.FilterModes
 import echarts.GraphLayouts
 import echarts.HorizontalAligns
 import echarts.Payload
@@ -615,6 +617,151 @@ class ExportSurfaceTest {
             // `colorLayer` is a palette input; ECharts normalises it while building the model, so
             // only the rendered result is asserted here.
             assertTrue(chart.renderToCanvas().width > 0, "the option with layered colors should render")
+        } finally {
+            destroyChart(chart, container)
+        }
+    }
+
+    /**
+     * `toolbox.feature.dataZoom` and `toolbox.feature.brush` are the common feature option plus
+     * their own members, so both the added fields and the inherited ones must stay reachable and
+     * both subtypes must stay assignable to [ToolboxFeature].
+     *
+     * Upstream `ToolboxDataZoomFeatureOption` / `ToolboxBrushFeatureOption`.
+     */
+    @Test
+    fun toolboxFeaturesCarryTheirOwnMembers() {
+        val dataZoom = unsafeJso<ToolboxDataZoomFeatureOption> {
+            show = true
+            type = arrayOf("zoom", "back")
+            filterMode = FilterModes.filter
+            xAxisIndex = ModelFinderIndexQuery(0.0)
+            yAxisIndex = ModelFinderIndexQuery(arrayOf(0.0, 1.0))
+            xAxisId = ModelFinderIdQuery(OptionId("xa"))
+            yAxisId = ModelFinderIdQuery(arrayOf(OptionId("ya"), OptionId("yb")))
+            brushStyle = unsafeJso<ItemStyleOption> { color = ZRColor("rgba(0, 0, 0, 0.2)") }
+        }
+        assertEquals(2, dataZoom.type!!.size)
+        assertEquals("filter", dataZoom.filterMode!!.unsafeCast<String>())
+        assertEquals(0.0, dataZoom.xAxisIndex!!.unsafeCast<Double>())
+        assertEquals(2, dataZoom.yAxisIndex!!.unsafeCast<Array<Double>>().size)
+        assertEquals("xa", dataZoom.xAxisId!!.unsafeCast<String>())
+        assertEquals("yb", dataZoom.yAxisId!!.unsafeCast<Array<String>>()[1])
+        assertEquals("rgba(0, 0, 0, 0.2)", dataZoom.brushStyle!!.color!!.unsafeCast<String>())
+
+        // The base members come from ToolboxFeatureOption.
+        val base: ToolboxFeatureOption = dataZoom
+        assertEquals(true, base.show)
+
+        val brush = unsafeJso<ToolboxBrushFeatureOption> {
+            type = arrayOf(BrushToolboxIconTypes.rect, BrushToolboxIconTypes.clear)
+        }
+        assertEquals(2, brush.type!!.size)
+        assertEquals("rect", brush.type!![0].unsafeCast<String>())
+
+        val feature = unsafeJso<ToolboxFeature> {
+            this.dataZoom = dataZoom
+            this.brush = brush
+        }
+        assertEquals(2, feature.dataZoom!!.type!!.size)
+        assertEquals("clear", feature.brush!!.type!![1].unsafeCast<String>())
+    }
+
+    /**
+     * `ModelFinderIdQuery` is upstream `OptionId | OptionId[] | NullUndefined`; the single id keeps
+     * its primitive form so ECharts can tell it apart from the array.
+     */
+    @Test
+    fun modelFinderIdQueryWrapsSingleAndMultipleIds() {
+        val single = ModelFinderIdQuery(OptionId("only"))
+        assertEquals("string", jsTypeOf(single))
+        assertEquals("only", single.unsafeCast<String>())
+
+        val many = ModelFinderIdQuery(arrayOf(OptionId("a"), OptionId(1.0)))
+        assertEquals("object", jsTypeOf(many))
+        assertEquals(2, many.unsafeCast<Array<JsAny>>().size)
+        assertEquals(1.0, many.unsafeCast<Array<JsAny>>()[1].unsafeCast<Double>())
+    }
+
+    /**
+     * Upstream types the timeline item `tooltip` as `boolean`, but the timeline view reads the item
+     * option model, so a full tooltip object works as well; the union has to carry both.
+     */
+    @Test
+    fun booleanOrTooltipOptionWrapsBothBranches() {
+        val flag = BooleanOrTooltipOption(false)
+        assertEquals("boolean", jsTypeOf(flag))
+        assertFalse(flag.unsafeCast<Boolean>())
+
+        val option = BooleanOrTooltipOption(
+            unsafeJso<TooltipOption> {
+                trigger = TooltipTriggers.item
+                formatter = TooltipFormatter("{b}")
+            },
+        )
+        assertEquals("object", jsTypeOf(option))
+        assertEquals("item", option.unsafeCast<TooltipOption>().trigger!!.unsafeCast<String>())
+    }
+
+    /**
+     * A timeline point is either a bare value or a `TimelineDataItemOption`, and both go through
+     * [OptionDataItem]; the styled form must survive `setOption` / `getOption` with every one of its
+     * own members.
+     */
+    @Test
+    fun timelineDataItemsSurviveTheOptionRoundTrip() {
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(
+                unsafeJso<EChartsOption> {
+                    timeline = unsafeJso<TimelineOption> {
+                        axisType = "category"
+                        autoPlay = false
+                        data =
+                            arrayOf(
+                                OptionDataItem(OptionDataValue("first")),
+                                OptionDataItem(
+                                    unsafeJso<TimelineDataItemOption> {
+                                        value = OptionDataValue("second")
+                                        symbol = SymbolShape("rect")
+                                        tooltip = BooleanOrTooltipOption(true)
+                                        itemStyle = unsafeJso<ItemStyleOption> { color = ZRColor("#111111") }
+                                        label = unsafeJso<TimelineLabelOption> { show = true }
+                                        checkpointStyle =
+                                            unsafeJso<TimelineCheckpointStyle> {
+                                                color = ZRColor("#222222")
+                                                symbol = SymbolShape("circle")
+                                            }
+                                        emphasis =
+                                            unsafeJso<TimelineDataItemEmphasisOption> {
+                                                itemStyle = unsafeJso<ItemStyleOption> { color = ZRColor("#333333") }
+                                            }
+                                        progress =
+                                            unsafeJso<TimelineProgressOption> {
+                                                lineStyle =
+                                                    unsafeJso<TimelineLineStyleOption> { color = ZRColor("#444444") }
+                                            }
+                                    },
+                                ),
+                            )
+                    }
+                    xAxis = one(unsafeJso<XAxisOption> { data = strings("first", "second") })
+                    yAxis = one(unsafeJso<YAxisOption> { })
+                    series = one(lineSeries { typedData = numbers(1.0, 2.0) })
+                },
+            )
+
+            // `ECUnitOption` declares the timeline as a single object but `getOption` normalises
+            // every component into an array, so the stored option is the first entry.
+            val stored = assertNotNull(chart.getOption().timeline.unsafeCast<Array<TimelineOption>?>())[0]
+            val data = assertNotNull(stored.data)
+            assertEquals(2, data.size)
+            val item = data[1].unsafeCast<TimelineDataItemOption>()
+            assertEquals("rect", item.symbol!!.unsafeCast<String>())
+            assertEquals(true, item.tooltip!!.unsafeCast<Boolean>())
+            assertEquals("#111111", item.itemStyle!!.color!!.unsafeCast<String>())
+            assertEquals("#444444", item.progress!!.lineStyle!!.color!!.unsafeCast<String>())
+            assertEquals("#333333", item.emphasis!!.itemStyle!!.color!!.unsafeCast<String>())
         } finally {
             destroyChart(chart, container)
         }

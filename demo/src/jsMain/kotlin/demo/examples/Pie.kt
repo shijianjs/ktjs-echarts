@@ -4,6 +4,7 @@ import demo.CatalogEntry
 import demo.Groups
 import echarts.AnimationEasings
 import echarts.AnimationTypes
+import echarts.LegendTypes
 import echarts.Orients
 import echarts.Payload
 import echarts.RoseTypes
@@ -41,6 +42,8 @@ import echarts.options.pieSeries
 import js.objects.Record
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
+import kotlin.math.ceil
+import kotlin.math.round
 import web.cssom.TextAlign
 import zrender.ZRColor
 import zrender.ZRFontWeights
@@ -48,11 +51,14 @@ import zrender.ZRFontWeights
 /*
  * Pie examples ported from `public/examples/ts/pie-*.ts` of apache/echarts-examples.
  *
- * Two deliberate deviations, both about assets rather than options:
+ * Two deliberate deviations from the originals, both about assets rather than options:
  *  - `toolbox.feature.mark` is not reproduced: ECharts 6 registers only brush, dataView, dataZoom,
  *    magicType, restore and saveAsImage, so the key never rendered a button.
  *  - `pie-pattern` (300 KB of embedded textures) and `pie-rich-text` (weather icons served by the
  *    example site) need image assets this page does not ship.
+ *
+ * `pie-legend` draws its 50 names with `Math.random()` upstream; the port uses [Lcg] so the same
+ * names appear on every visit.
  */
 
 private val pie = Category(Groups.PIE, "examples/Pie.kt")
@@ -598,7 +604,101 @@ val pieEntries: List<CatalogEntry> =
                 },
             )
         },
+        pie.chart("pie-legend", "可滚动的图例", "Pie with Scrollable Legend") {
+            val surnames = surnames(50)
+            val items =
+                dataItems(*Array(surnames.size) { index -> pieItem(surnames[index].first, surnames[index].second) })
+            unsafeJso<EChartsOption> {
+                title =
+                    one(
+                        unsafeJso<TitleOption> {
+                            text = "同名数量统计"
+                            subtext = "纯属虚构"
+                            left = StringOrDouble("center")
+                        },
+                    )
+                tooltip =
+                    one(
+                        unsafeJso<TooltipOption> {
+                            trigger = TooltipTriggers.item
+                            formatter = TooltipFormatter("{a} <br/>{b} : {c} ({d}%)")
+                        },
+                    )
+                legend =
+                    one(
+                        unsafeJso<LegendOption> {
+                            type = LegendTypes.scroll
+                            orient = Orients.vertical
+                            right = StringOrDouble(10.0)
+                            top = StringOrDouble(20.0)
+                            bottom = StringOrDouble(20.0)
+                            data = legendNames(*Array(surnames.size) { surnames[it].first })
+                        },
+                    )
+                series =
+                    arrayOf<SeriesOption>(
+                        pieSeries {
+                            name = "姓名"
+                            radius = StringOrDoubleOrArray("55%")
+                            center = arrayOf(StringOrDouble("40%"), StringOrDouble("50%"))
+                            typedData = items
+                            emphasis =
+                                unsafeJso<EmphasisOption> {
+                                    itemStyle =
+                                        unsafeJso<ItemStyleOption> {
+                                            shadowBlur = 10.0
+                                            shadowOffsetX = 0.0
+                                            shadowColor = ZRColor("rgba(0, 0, 0, 0.5)")
+                                        }
+                                }
+                        },
+                    )
+            }
+        },
     )
+
+/** The surname pool of `pie-legend`, copied from the upstream `nameList`. */
+private val SURNAME_POOL =
+    arrayOf(
+        "赵", "钱", "孙", "李", "周", "吴", "郑", "王", "冯", "陈", "褚", "卫", "蒋", "沈", "韩", "杨",
+        "朱", "秦", "尤", "许", "何", "吕", "施", "张", "孔", "曹", "严", "华", "金", "魏", "陶", "姜",
+        "戚", "谢", "邹", "喻", "柏", "水", "窦", "章", "云", "苏", "潘", "葛", "奚", "范", "彭", "郎",
+        "鲁", "韦", "昌", "马", "苗", "凤", "花", "方", "俞", "任", "袁", "柳", "酆", "鲍", "史", "唐",
+        "费", "廉", "岑", "薛", "雷", "贺", "倪", "汤", "滕", "殷", "罗", "毕", "郝", "邬", "安", "常",
+        "乐", "于", "时", "傅", "皮", "卞", "齐", "康", "伍", "余", "元", "卜", "顾", "孟", "平", "黄",
+        "和", "穆", "萧", "尹", "姚", "邵", "湛", "汪", "祁", "毛", "禹", "狄", "米", "贝", "明", "臧",
+        "计", "伏", "成", "戴", "谈", "宋", "茅", "庞", "熊", "纪", "舒", "屈", "项", "祝", "董", "梁",
+        "杜", "阮", "蓝", "闵", "席", "季", "麻", "强", "贾", "路", "娄", "危",
+    )
+
+/**
+ * The generated surnames of `pie-legend`.
+ *
+ * Upstream builds each name and value with `Math.random()`; one [Lcg] run produces both, so a visit
+ * always shows the same 50 names. Each round draws the name first and then its value, like the
+ * upstream loop.
+ */
+private fun surnames(count: Int): List<Pair<String, Double>> {
+    val random = Lcg(20261028)
+    return List(count) {
+        val word = surnameWord(random, 2, 1)
+        val name = if (random.next() > 0.65) "$word·${surnameWord(random, 3, 0)}" else word
+        name to round(random.next() * 100000.0)
+    }
+}
+
+/** `makeWord(max, min)`: between `min + 1` and `min + max` surnames joined together. */
+private fun surnameWord(
+    random: Lcg,
+    max: Int,
+    min: Int,
+): String =
+    buildString {
+        repeat(ceil(random.next() * max + min).toInt()) {
+            // Upstream rounds `random() * length - 1`, which can index -1; the floor form stays in range.
+            append(SURNAME_POOL[(random.next() * SURNAME_POOL.size).toInt()])
+        }
+    }
 
 /** One shelf of `pie-labelLine-adjust`: a row of books with their reading hours. */
 private fun bookShelf(vararg entries: Pair<String, Double>): Array<PieDataItem?> =

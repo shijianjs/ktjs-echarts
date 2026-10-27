@@ -88,13 +88,14 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **192 个**（覆盖 25 个家族 + 一个「文档示例」组），其余按批推进。
+筛选后仍有 250+ 个候选，目前已落地 **199 个**（覆盖 25 个家族 + 一个「文档示例」组），其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
 一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。这批页面按依赖分三个文件：
 `examples/DocExamples.kt`（静态页，28 个）、`examples/DocMore.kt`（象形柱图教程、dataZoom 散点、
-文本 / 标签、动画与旭日图 / 矩形树图入门，14 个）与 `examples/DocInteractive.kt`（首次绘制后还要
-`setOption` / `dispatchAction` / 起定时器，或使用 timeline 组件的 7 个）。
+文本 / 标签、动画、旭日图 / 矩形树图入门与 `baseOption` + `media` 教程，16 个）与
+`examples/DocInteractive.kt`（首次绘制后还要 `setOption` / `dispatchAction` / 起定时器，或使用 timeline
+组件的 10 个）。
 
 ### 尚未移植的家族与原因
 
@@ -112,12 +113,11 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `bar-drilldown`、`line-easing`、`scatter-clustering`、`custom-gantt-flight`、
 `custom-gauge`（需要 `path://` 面板图）、`custom-calendar-icon`（图标是 `path://` 素材）。
 
-`doc-example/` 里还没有移植的（31 条，其中 `bar-large` / `pie-highlight` 已按家族 id 落地）：
+`doc-example/` 里还没有移植的（24 条，其中 `bar-large` / `pie-highlight` 已按家族 id 落地）：
 
 - 象形柱图长尾：`pictorialBar-graphicType`、`pictorialBar-patternSize`、
   `pictorialBar-repeatDirection`、`pictorialBar-repeatLayout`；
-- 单字段小页：`bar-dataZoom-filterMode`、`candlestick-axisPointer`、`grid-outerBounds`、
-  `title-block`、`pie-media`、`bar-media-timeline`、`aria-decal`；
+- 单字段小页：`title-block`、`bar-media-timeline`；
 - 第二个渲染器 / 异步设 option：`canvas-vs-svg`（含 `-en`）、`tutorial-async`；
 - 地图与 visualMap 组合：`map-example`、`map-visualMap-continuous`、`map-visualMap-continuous-text`、
   `map-visualMap-pieces`、`map-visualMap-piecewise-text`、`scatter-visualMap-categories`、
@@ -169,6 +169,22 @@ demo/src/jvmTest/kotlin/demo/e2e/
   （`pictorialBar-clip` 背景系列的 `animationDuration: 0` 需要）。
 - `GraphicElement.rotation`：KDoc 原先写「角度」，实际 zrender 元素读的是弧度
   （`graphic-bounding` 按弧度做匀速旋转），已改正。
+- `ToolboxFeatureOption`：`dataZoom` / `brush` 上游是带自己字段的子接口，wrapper 之前统一用基接口，
+  现在分别改为 `ToolboxDataZoomFeatureOption`（`type` / `filterMode` / `xAxisIndex` / `yAxisIndex` /
+  `xAxisId` / `yAxisId` / `brushStyle`）与 `ToolboxBrushFeatureOption`（`type: BrushToolboxIconType[]`），
+  子接口仍是基接口的子类型，原有写法不受影响；配套新增 `ModelFinderIdQuery` 联合。
+- `MarkLineStateOption.label`：上游是 `SeriesLineLabelOption`（`LineLabelOption` 的派生），`distance`
+  被放宽成 `number | number[]`、`position` 收窄成 start / middle / end 关键字。Kotlin 不能覆盖继承来的
+  `var distance`，所以新增 `MarkLineLabelOption`，数组形式经 `typedDistance` + `@JsName("distance")`
+  写入同一个 JS 字段。
+- `TimelineOption.data` 的数据项：补上游 `TimelineDataItemOption`（`tooltip` / `itemStyle` / `label` /
+  `checkpointStyle` / `emphasis` / `progress`）与 `TimelineDataItemEmphasisOption`，配套新增
+  `BooleanOrTooltipOption`（上游写 `boolean`，但 timeline 视图会解析成 option 对象，官方示例即这么传）。
+- `GraphicElement`：补上游声明在元素基接口上的 `textContent` / `textConfig`，让矩形一类元素能直接挂
+  文本与位置配置，不必再往 group 里塞第二个 text 元素。
+- `DecalObject.rotation`：KDoc 原先写「角度」，zrender 的 `Pattern.rotation` 读的是弧度（官方 decal
+  示例一律传 `Math.PI` 的倍数），已改正；`aria.decal` / `itemStyle.decal` 一族的联合
+  （`DecalSetting` / `DecalList` / `DecalDashArrayX`）已补用例覆盖。
 
 ## 兜底说明：图表与主题
 

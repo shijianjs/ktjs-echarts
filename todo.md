@@ -319,10 +319,9 @@
 ### 下一批（按可做性排序）
 
 1. **无外部依赖、可直接做**：
-   - `doc-example` 剩余（29 个）：象形柱图长尾 `pictorialBar-graphicType` /
+   - `doc-example` 剩余（24 个）：象形柱图长尾 `pictorialBar-graphicType` /
      `pictorialBar-patternSize` / `pictorialBar-repeatDirection` / `pictorialBar-repeatLayout`；
-     `bar-dataZoom-filterMode`、`candlestick-axisPointer`、`grid-outerBounds`、
-     `title-block`、`pie-media`、`aria-decal`；timeline 组件 `mix-timeline-all` /
+     `title-block`；timeline 组件 `mix-timeline-all` /
      `bar-media-timeline`；其余是地图 / visualMap 组合、第二个渲染器与异步设 option 的页面
      （清单见 `demo/AGENTS.md`）。
    - `custom` 剩余：     `custom-calendar-icon`（`params.coordSys.cellWidth/cellHeight` 已补，可直接做）、
@@ -330,8 +329,8 @@
      （`path://` 面板图，`params.coordSys.cx/cy` 已补）。
    - `matrix` 剩余：`matrix-mbti`、`matrix-periodic-table`、`matrix-stock`（数据表 8-17KB，
      需要先写一个把上游数组转成 Kotlin 的小脚本）、`matrix-mini-bar-geo`（需要 geo）。
-   - 已移植家族的长尾里可直接做的：`line-markline`、`line-markarea`、`line-smooth` 之外的 line 变体、
-     `pie-legend`、`gauge-clock`/`gauge-speed`/`gauge-barometer`（`path://` 图标，需先决定是否搬运
+   - 已移植家族的长尾里可直接做的：`line-markarea`、`line-smooth` 之外的 line 变体、
+     `gauge-clock`/`gauge-speed`/`gauge-barometer`（`path://` 图标，需先决定是否搬运
      几 KB 的 path 字符串）、`bar-polar-*`、`polar-*`。
    - 已移植家族的长尾：`bar-race`/`bar-race-country`/`bar-drilldown`/`bar-multi-drilldown`/
      `bar-breaks-brush`/`bar-polar-*`/`polar-*`、
@@ -341,7 +340,7 @@
      `candlestick-brush`/`intraday-breaks-1|2`、
      `graph-force2` 之外的 graph 变体、`gauge-clock`/`gauge-speed`/`gauge-stage`/`gauge-temperature`/
      `gauge-barometer`/`gauge-multi-title`、`radar` 家族已全、`treemap` 只剩需要外部数据的、
-     `pie-legend`/`pie-pattern`（图案需要贴图）等。
+     `pie-pattern`（图案需要贴图）等。
 2. **需要先补 wrapper 建模**：
    - `calendar-lunar`：366 行农历表（数据而非 API）。
 3. **明确排除，不要重复尝试**（原因记在 `demo/AGENTS.md`）：

@@ -26,6 +26,14 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
+ * Reads the raw `distance` property so both `MarkLineLabelOption` members can be checked against the
+ * same JavaScript field.
+ */
+private external interface DistanceProbe {
+    var distance: JsAny?
+}
+
+/**
  * Tests for the series options that were remodelled after the upstream `.d.ts`: the symbol members
  * (which now use the `SymbolShape` / `SymbolSize` / `SymbolRotate` / `SymbolOffset` unions through
  * `SymbolOptionMixin`) and the keyword fields that became string-literal unions.
@@ -93,12 +101,23 @@ class SymbolAndKeywordOptionsTest {
         val markLine = unsafeJso<MarkLineOption> {
             symbol = StringOrStringArray(arrayOf("circle", "rect"))
             symbolSize = DoubleOrDoubleArray(arrayOf(6.0, 6.0))
-            label = unsafeJso<LabelOption> { show = false }
+            label = unsafeJso<MarkLineLabelOption> {
+                show = false
+                typedDistance = DoubleOrDoubleArray(arrayOf(4.0, 8.0))
+            }
             data = arrayOf()
         }
         assertEquals(2, markLine.symbol!!.unsafeCast<Array<String>>().size)
         assertEquals(2, markLine.symbolSize!!.unsafeCast<Array<Double>>().size)
         assertFalse(markLine.label!!.show!!)
+        // Upstream widens `distance` to `number | number[]`; the pair must reach the same property.
+        val pair = markLine.label!!.unsafeCast<DistanceProbe>().distance.unsafeCast<Array<Double>>()
+        assertEquals(2, pair.size)
+        assertEquals(8.0, pair[1])
+        assertEquals(2, markLine.label!!.typedDistance!!.unsafeCast<Array<Double>>().size)
+
+        val scalarDistance = unsafeJso<MarkLineLabelOption> { distance = 6.0 }
+        assertEquals(6.0, scalarDistance.unsafeCast<DistanceProbe>().distance!!.unsafeCast<Double>())
 
         // A mark area has no symbol members upstream.
         val markArea = unsafeJso<MarkAreaOption> { silent = true }

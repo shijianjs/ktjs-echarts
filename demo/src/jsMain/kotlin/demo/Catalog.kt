@@ -12,6 +12,7 @@ import demo.examples.datasetEntries
 import demo.examples.docExampleEntries
 import demo.examples.funnelEntries
 import demo.examples.gaugeEntries
+import demo.examples.gaugeExtraEntries
 import demo.examples.graphEntries
 import demo.examples.heatmapEntries
 import demo.examples.lineEntries
@@ -116,6 +117,7 @@ val catalog: List<CatalogEntry> =
         parallelEntries,
         heatmapEntries,
         gaugeEntries,
+        gaugeExtraEntries,
         funnelEntries,
         radarEntries,
         treeEntries,

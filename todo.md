@@ -73,6 +73,18 @@
 - 测试：`LiteralsTest` 新增 5 组字面量断言与 2 组字段读写用例（含 `graphic.$action` 的 `@JsName` 映射），
   浏览器用例 189 → 195，全过。
 
+### ⑤ legend 细分类型
+
+- 新增 `LegendStyleOption`（legend 与 data item 共用的成员）、`LegendItemStyleOption`、
+  `LegendLineStyleOption`、`LegendPageIconsOption`；`LegendOption` / `LegendDataItemOption` 改为继承
+  `LegendStyleOption`，`itemStyle` / `lineStyle` 换成细分类型，`borderWidth` / `width` 支持 `"auto"` /
+  `"inherit"`。
+- 补齐 scrollable 的 `pageButtonItemGap` / `pageButtonGap` / `pageIcons`，`pageTextStyle` / `textStyle`
+  改成上游的 `LabelOption`。
+- `ScrollableLegendOption` 仍不单独拆出：`EChartsOption.legend` 是 `Array<LegendOption>`，拆开后调用方
+  拿不到分页字段；字段保留在 `LegendOption` 上属于有意的更宽建模（与上游的联合等价，见第 8 条）。
+- 测试：新增 `options/LegendOptionTest`（4 例，含真实图表 round trip）；浏览器用例 195 → 199，全过。
+
 ### 遗留提醒
 
 `GraphSeriesOption` 里原 `directed` / `edgeShape` / `edgeForkPosition` / `selectedMode` 在 6.1.0 的
@@ -131,23 +143,17 @@ Kotlin 的 `var` 覆盖要求类型完全一致，只能：
   代价是 `option.series[i].data` 这种基类访问会消失（`OptionModelTest` / `LiteralsTest` 里有用例依赖它）。
 - 决定前先评估：下放后是否需要给 `EChartsOption.series` 之外再提供一个「只读 data」的视图。
 
-### 6. 图例（legend）的细分类型
-
-- 上游 `LegendOption` 由 `LegendStyleOption + BoxLayoutOptionMixin + BorderOptionMixin + ...` 组成，另有
-  `ScrollableLegendOption`（分页字段）、`LegendLineStyleOption`（`inactiveColor` / `inactiveWidth`、
-  `width: 'auto' | 'inherit'`）、`LegendItemStyleOption`（`borderWidth: 'auto' | 'inherit'`）。
-- 现状把分页字段摊在 `LegendOption` 上、`lineStyle` 用通用 `LineStyleOption`（都更宽）；
-  想把它们收窄会撞上 `var` 覆盖限制（同第 2 条），因此需要先定方案再动手。
-
-### 7. 上游导出清单的全量复核
+### 6. 上游导出清单的全量复核
 
 - 目前只补「已知空缺」，没有重新逐个核对 `echarts` 的公开导出（`EChartsType` / `ChartView` / `SeriesModel` /
   `ComponentModel` / `Payload` / 各 `*Payload` / `*Event` …）与各入口
   （`echarts/core`、`echarts/charts`、`echarts/components`、`echarts/features`、`echarts/renderers`）的差异。
 - 建议单独开一轮：从 `types/dist/*.d.ts` 生成导出清单再逐项比对（参考 `custom-elements.json` 式清单的做法）。
 
-### 8. 已确认「保持现状」的项（不要重复修）
+### 7. 已确认「保持现状」的项（不要重复修）
 
+- `LegendOption` 保留 `ScrollableLegendOption` 的分页字段：`EChartsOption.legend` 是 `Array<LegendOption>`，
+  拆成子类型后调用方无法直接访问分页字段；与上游的联合建模等价，属于有意的更宽类型。
 - `LegendDataItemOption.tooltip` 保持 `JsAny`：上游就是 `DataItem.tooltip?: unknown`，是正确映射。
 - `MapSeriesOption.markPoint` / `markLine` / `markArea`：上游声明为 `any`，Kotlin 侧继承基接口的具名类型
   （比上游更严格）属于有意选择。

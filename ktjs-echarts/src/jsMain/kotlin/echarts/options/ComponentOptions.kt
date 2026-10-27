@@ -17,8 +17,11 @@ import echarts.AnimationEasing
 import js.objects.Record
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
+import web.canvas.CanvasLineCap
+import web.canvas.CanvasLineJoin
 import zrender.TextOverflow
 import zrender.ZRColor
+import zrender.ZRLineType
 
 /**
  * Title component.
@@ -113,9 +116,134 @@ external interface TitleOption {
 }
 
 /**
+ * Style shared by a legend and by one entry of its data.
+ *
+ * Upstream splits this into `LegendStyleOption`; the members are the ones a legend item can
+ * override for itself.
+ */
+external interface LegendStyleOption {
+    /** Icon of the item, e.g. `"circle"`, `"rect"` or `"path://..."`. */
+    var icon: String?
+
+    /** Color of the item when it is not selected. */
+    var inactiveColor: String?
+
+    /** Border color of the item when it is not selected. */
+    var inactiveBorderColor: String?
+
+    /** Border width of the item when it is not selected, `"auto"` or `"inherit"`. */
+    var inactiveBorderWidth: StringOrDouble?
+
+    /** Formatter of the item name. */
+    var formatter: LabelFormatter?
+
+    /** Style of the item symbol. */
+    var itemStyle: LegendItemStyleOption?
+
+    /** Style of the item line. */
+    var lineStyle: LegendLineStyleOption?
+
+    /** Style of the item text. */
+    var textStyle: LabelOption?
+
+    /** Rotation of the item symbol in degrees, or `"inherit"`. */
+    var symbolRotate: StringOrDouble?
+
+    /** Whether the symbol keeps its aspect ratio. Deprecated upstream. */
+    var symbolKeepAspect: Boolean?
+}
+
+/**
+ * Item style of a legend item.
+ *
+ * Upstream widens every [ItemStyleOption] member with `"inherit"` and [borderWidth] also with
+ * `"auto"`. Kotlin cannot widen `var` members of an inherited interface, so the members are
+ * repeated here. Only [borderWidth] changes to a type that can hold the string forms; the other
+ * numeric members still accept `"inherit"` upstream but are typed as numbers here.
+ */
+external interface LegendItemStyleOption : ShadowOption {
+    /** Fill color. */
+    var color: ZRColor?
+
+    /** Border color. */
+    var borderColor: ZRColor?
+
+    /** Border width in pixels, `"auto"` or `"inherit"`. */
+    var borderWidth: StringOrDouble?
+
+    /** Border type: `"solid"`, `"dashed"`, `"dotted"` or a dash pattern. */
+    var borderType: ZRLineType?
+
+    /** Line cap of the border. */
+    var borderCap: CanvasLineCap?
+
+    /** Line join of the border. */
+    var borderJoin: CanvasLineJoin?
+
+    /** Dash offset of a dashed border. */
+    var borderDashOffset: Double?
+
+    /** Miter limit of the border. */
+    var borderMiterLimit: Double?
+
+    /** Border radius, or an array of radii. */
+    var borderRadius: StringOrDoubleOrArray?
+
+    /** Opacity, `0..1`. */
+    var opacity: Double?
+
+    /** Decal pattern applied to the item, or `"none"`. */
+    var decal: DecalSetting?
+
+    /** Area fill color, used by map and geo items. */
+    var areaColor: ZRColor?
+}
+
+/**
+ * Line style of a legend item.
+ *
+ * Upstream widens every [LineStyleOption] member with `"inherit"` and [width] also with `"auto"`;
+ * see [LegendItemStyleOption] for why the members are repeated.
+ */
+external interface LegendLineStyleOption : ShadowOption {
+    /** Line color. */
+    var color: ZRColor?
+
+    /** Line width in pixels, `"auto"` or `"inherit"`. */
+    var width: StringOrDouble?
+
+    /** Line type: `"solid"`, `"dashed"`, `"dotted"`, a number or a `[dash, gap]` array. */
+    var type: ZRLineType?
+
+    /** Dash offset. */
+    var dashOffset: Double?
+
+    /** Line cap of the line. */
+    var cap: CanvasLineCap?
+
+    /** Line join of the line. */
+    var join: CanvasLineJoin?
+
+    /** Miter limit for `join = "miter"`. */
+    var miterLimit: Double?
+
+    /** Opacity, `0..1`. */
+    var opacity: Double?
+
+    /** Curvature of the line. */
+    var curveness: Double?
+
+    /** Color of the line when the item is not selected. */
+    var inactiveColor: ZRColor?
+
+    /** Width of the line when the item is not selected. */
+    var inactiveWidth: Double?
+}
+
+/**
  * Legend component.
  */
-external interface LegendOption {
+external interface LegendOption : LegendStyleOption {
     /** Component id. */
     var id: String?
 
@@ -158,6 +286,15 @@ external interface LegendOption {
     /** Position of the page buttons of a scrollable legend: `"start"` or `"end"`. */
     var pageButtonPosition: LegendPageButtonPosition?
 
+    /** Gap between two page buttons, in pixels. */
+    var pageButtonItemGap: Double?
+
+    /** Gap between the page buttons and the legend items, in pixels. */
+    var pageButtonGap: Double?
+
+    /** Images of the page buttons, keyed by orientation. */
+    var pageIcons: LegendPageIconsOption?
+
     /** Padding of the component. */
     var padding: DoubleOrDoubleArray?
 
@@ -170,38 +307,11 @@ external interface LegendOption {
     /** Height of a legend item. */
     var itemHeight: Double?
 
-    /** Style of the legend symbol. */
-    var itemStyle: ItemStyleOption?
-
-    /** Style of the legend line. */
-    var lineStyle: LineStyleOption?
-
-    /** Rotation of the legend symbols in degrees, or `"inherit"`. */
-    var symbolRotate: StringOrDouble?
-
-    /** Formatter of the legend labels. */
-    var formatter: LabelFormatter?
-
     /** Selection mode of the legend items. */
     var selectedMode: SelectionMode?
 
-    /** Color of unselected items. */
-    var inactiveColor: String?
-
-    /** Border color of unselected items. */
-    var inactiveBorderColor: String?
-
-    /** Border width of unselected items, or `"auto"`. */
-    var inactiveBorderWidth: StringOrDouble?
-
     /** Which legend items are selected, keyed by name. */
     var selected: Record<String, Boolean>?
-
-    /** Style of the legend text. */
-    var textStyle: TextStyleOption?
-
-    /** Icon of the legend items, e.g. `"circle"`, `"rect"` or `"path://..."`. */
-    var icon: String?
 
     /** Data of the legend items; defaults to the series names. */
     var data: Array<LegendDataItemOption>?
@@ -240,7 +350,7 @@ external interface LegendOption {
     var pageIconSize: Double?
 
     /** Style of the scroll button text. */
-    var pageTextStyle: TextStyleOption?
+    var pageTextStyle: LabelOption?
 
     /** Formatter of the page text. */
     var pageFormatter: LabelFormatter?
@@ -265,35 +375,22 @@ external interface LegendOption {
 }
 
 /**
+ * Images of the page buttons of a scrollable legend, keyed by orientation.
+ */
+external interface LegendPageIconsOption {
+    /** Images used when the legend scrolls horizontally. */
+    var horizontal: Array<String>?
+
+    /** Images used when the legend scrolls vertically. */
+    var vertical: Array<String>?
+}
+
+/**
  * One entry of [LegendOption.data].
  */
-external interface LegendDataItemOption {
+external interface LegendDataItemOption : LegendStyleOption {
     /** Name of the series this item controls. */
     var name: String?
-
-    /** Icon of the item. */
-    var icon: String?
-
-    /** Style of the item symbol. */
-    var itemStyle: ItemStyleOption?
-
-    /** Style of the item line. */
-    var lineStyle: LineStyleOption?
-
-    /** Rotation of the item symbol in degrees, or `"inherit"`. */
-    var symbolRotate: StringOrDouble?
-
-    /** Style of the item text. */
-    var textStyle: TextStyleOption?
-
-    /** Color of the item when it is not selected. */
-    var inactiveColor: String?
-
-    /** Border color of the item when it is not selected. */
-    var inactiveBorderColor: String?
-
-    /** Border width of the item when it is not selected, or `"auto"`. */
-    var inactiveBorderWidth: StringOrDouble?
 
     /** Tooltip specific to this item. Upstream types it as `unknown`. */
     var tooltip: JsAny?

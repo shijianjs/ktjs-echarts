@@ -319,6 +319,36 @@ class DemoPageTest {
     }
 
     /**
+     * The generated-data pages of `LineLongTail.kt`. `area-time-axis` plots twenty thousand points and
+     * `line-easing` thirty grids of their own: a page that fails to build its arrays leaves an empty
+     * canvas, so those are checked for painted pixels. `dynamic-data2` shifts its window once a
+     * second, so a frame sampled after one tick must differ from the first one; an exception inside
+     * the timer callback is what the console assertion catches.
+     */
+    @RetryingTest(maxAttempts = 2)
+    fun `the line long tail pages draw and move their window`(page: Page) {
+        val consoleErrors = mutableListOf<String>()
+        page.onConsoleMessage { message ->
+            if (message.type() == "error") consoleErrors += message.text()
+        }
+        openPage(page)
+        for (route in listOf("area-time-axis", "line-easing", "area-pieces", "doc-example/matrix-graph-box")) {
+            page.evaluate("(value) => { location.hash = '#/' + value }", route)
+            assertChartRendered(page)
+            waitForPainted(page, route)
+        }
+        val route = "dynamic-data2"
+        page.evaluate("(value) => { location.hash = '#/' + value }", route)
+        assertChartRendered(page)
+        waitForPainted(page, route)
+        val before = paintedFrame(page)
+        page.waitForTimeout(2400.0)
+        val after = paintedFrame(page)
+        assertTrue(before != after, "$route did not repaint after its timer tick")
+        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
+    }
+
+    /**
      * Waits until the chart canvas holds a painted pixel.
      *
      * The pages that fetch their data set the option later, so a single sample would race with the

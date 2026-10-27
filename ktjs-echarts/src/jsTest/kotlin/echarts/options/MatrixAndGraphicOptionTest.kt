@@ -1,5 +1,6 @@
 package echarts.options
 
+import echarts.CoordinateSystemUsages
 import echarts.ECharts
 import echarts.GraphicActions
 import echarts.createChart
@@ -279,6 +280,111 @@ class MatrixAndGraphicOptionTest {
             assertEquals(2, option.series!![0].unsafeCast<HeatmapSeriesOption>().typedData!!.size)
             assertTrue(chart.getWidth() > 0)
             assertTrue(chart.getHeight() > 0)
+        } finally {
+            destroyChart(chart, container)
+        }
+    }
+
+    /**
+     * The `doc-example/matrix-graph-box` shape: a graph series placed on one cell of a matrix, where
+     * only the bounding box comes from the coordinate system.
+     *
+     * Upstream `core/CoordinateSystem.ts` reads `coordinateSystemUsage` off the component option, so it
+     * has to survive both `setOption` and `getOption`.
+     */
+    @Test
+    fun graphSeriesCanUseTheMatrixAsABox() {
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(
+                unsafeJso<EChartsOption> {
+                    matrix =
+                        one(
+                            unsafeJso<MatrixOption> {
+                                x =
+                                    unsafeJso<MatrixDimensionOption> {
+                                        levelSize = StringOrDouble(50.0)
+                                        data =
+                                            arrayOf(
+                                                MatrixDimensionCellLooseOption("a"),
+                                                MatrixDimensionCellLooseOption("b"),
+                                                MatrixDimensionCellLooseOption("c"),
+                                                MatrixDimensionCellLooseOption("d"),
+                                            )
+                                    }
+                                y =
+                                    unsafeJso<MatrixDimensionOption> {
+                                        levelSize = StringOrDouble(50.0)
+                                        data =
+                                            arrayOf(
+                                                MatrixDimensionCellLooseOption("x"),
+                                                MatrixDimensionCellLooseOption("y"),
+                                                MatrixDimensionCellLooseOption("z"),
+                                            )
+                                    }
+                            },
+                        )
+                    series =
+                        one(
+                            graphSeries {
+                                coordinateSystem = "matrix"
+                                coordinateSystemUsage = CoordinateSystemUsages.box
+                                coord =
+                                    CoordinateSystemDataCoord(
+                                        arrayOf(
+                                            OptionDataValue(2.0),
+                                            OptionDataValue(1.0),
+                                        ),
+                                    )
+                                edgeSymbol = StringOrStringArray(arrayOf("none", "arrow"))
+                                symbolSize = SymbolSize(15.0)
+                                lineStyle =
+                                    unsafeJso<LineStyleOption> {
+                                        color = ZRColor("#9af")
+                                        width = 2.0
+                                    }
+                                links =
+                                    arrayOf(
+                                        unsafeJso<GraphEdgeItemOption> {
+                                            source = StringOrDouble(1.0)
+                                            target = StringOrDouble(0.0)
+                                        },
+                                        unsafeJso<GraphEdgeItemOption> {
+                                            source = StringOrDouble(4.0)
+                                            target = StringOrDouble(3.0)
+                                        },
+                                    )
+                                typedData =
+                                    dataItems(
+                                        GraphDataItem(
+                                            unsafeJso<GraphNodeItemOption> {
+                                                name = "a"
+                                                x = 110.0
+                                                y = 100.0
+                                                value = OptionDataValueOrArray(arrayOf(OptionDataValue(134.0)))
+                                            },
+                                        ),
+                                        GraphDataItem(
+                                            unsafeJso<GraphNodeItemOption> {
+                                                name = "b"
+                                                x = 270.0
+                                                y = 10.0
+                                                value = OptionDataValueOrArray(arrayOf(OptionDataValue(421.0)))
+                                            },
+                                        ),
+                                    )
+                            },
+                        )
+                },
+            )
+
+            val series = chart.getOption().series!![0].unsafeCast<GraphSeriesOption>()
+            assertEquals("matrix", series.coordinateSystem)
+            assertEquals("box", series.coordinateSystemUsage.unsafeCast<String?>())
+            assertNotNull(series.coord)
+            assertEquals(2, series.links!!.size)
+            assertEquals(2, series.typedData!!.size)
+            assertTrue(chart.getWidth() > 0)
         } finally {
             destroyChart(chart, container)
         }

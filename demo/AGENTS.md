@@ -88,12 +88,12 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **214 个示例**（覆盖 25 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **222 个示例**（覆盖 25 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
 一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。这批页面按依赖分三个文件：
-`examples/DocExamples.kt`（静态页，28 个）、`examples/DocMore.kt`（象形柱图教程、dataZoom 散点、
+`examples/DocExamples.kt`（静态页，29 个）、`examples/DocMore.kt`（象形柱图教程、dataZoom 散点、
 文本 / 标签、动画、旭日图 / 矩形树图入门与 `baseOption` + `media` 教程，16 个）与
 `examples/DocInteractive.kt`（首次绘制后还要 `setOption` / `dispatchAction` / 起定时器，或使用 timeline
 组件的 12 个）。
@@ -111,15 +111,19 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `public/data/asset/geo/` 下的 GeoJSON 或 SVG，就能继续补这两个家族。
 
 个别被移植家族内的长尾示例（动画竞速、下钻、真实指针交互）留待下一批，例如 `bar-race`、
-`bar-drilldown`、`line-easing`、`scatter-clustering`、`custom-gantt-flight`、
+`bar-drilldown`、`scatter-clustering`、`custom-gantt-flight`、
 `custom-calendar-icon`（图标是 `path://` 素材）、`custom-gauge`。
 
 `path://` 素材不是障碍：上游的 path 字符串原样内联即可，gauge 家族的五个面板图就是这么落地的
 （`examples/GaugeLongTail.kt`，同时把 `Math.random()` 换成 `Lcg`、定时器交给 `ChartHolder`），
 `custom-gauge` 照这个先例做。
 
+line 家族的数据生成长尾在 `examples/LineLongTail.kt`：两万点的 `area-time-axis`、按 easing 函数逐个
+建 grid 的 `line-easing`、每秒滚动窗口的 `dynamic-data2`，以及 piecewise visualMap 涂面积、双 x 轴、
+双 continuous visualMap、渐变堆叠面积图这几条 option 组合。随机序列同样换成 `Lcg`。
+
 `doc-example/` 里还没有移植的（上游 80 个文件 = 79 个 `.js` + 1 个 `.ts`、已按 `doc-example/` id 落地
-56 个、`bar-large` / `pie-highlight` 按家族 id 落地，剩 22 条）。按原因分类：
+57 个、`bar-large` / `pie-highlight` 按家族 id 落地，剩 21 条）。按原因分类：
 
 - 图标是官方站的 PNG / base64 素材，按排除策略不做：`pictorialBar-graphicType`、
   `pictorialBar-patternSize`、`pictorialBar-repeatDirection`、`pictorialBar-repeatLayout`、
@@ -130,9 +134,9 @@ demo/src/jvmTest/kotlin/demo/e2e/
   `coordinateSystem: 'geo'`）、`geo-svg-label-basic`、`geo-svg-layout-basic`、`geo-svg-named-basic`、
   `geo-roam-indicator`；
 - 真实指针漫游 + 官方站的 `app.config`：`graph-roam-indicator`；
-- 下一批的可移植项：`matrix-graph-box`（`graph` 用 matrix 坐标系的 `coordinateSystemUsage: 'box'`）、
-  `scatter-visualMap-categories`（内联 dataset + 两个 `visualMap`）、`canvas-vs-svg`（含 `-en`，
-  只有两张画布分别用 canvas / SVG 渲染器才有意义，要先给站点加渲染器开关）。
+- 下一批的可移植项：`scatter-visualMap-categories`（内联 dataset + 两个 `visualMap`，但
+  `inRange.symbol` / `outOfRange.symbolSize` 是按类目索引的字典、`left: null`，要先放宽 wrapper）、
+  `canvas-vs-svg`（含 `-en`，只有两张画布分别用 canvas / SVG 渲染器才有意义，要先给站点加渲染器开关）。
 
 ## 移植过程中修掉的 wrapper 缺口
 
@@ -196,6 +200,12 @@ demo/src/jvmTest/kotlin/demo/e2e/
 - `GaugeSeriesOption.clockwise`：上游 `GaugeSeries.ts` 声明 `clockwise?: boolean`（仪表盘指针的增数
   方向），wrapper 漏了；`gauge-car` 的档位盘用 `clockwise: false` 逆序刻度，已补上并在
   `SymbolAndKeywordOptionsTest` 里断言回读。
+- `SeriesOption.coordinateSystemUsage` / `SeriesOption.coord`：上游 `ComponentOption` 声明
+  `coordinateSystemUsage?: 'data' | 'box'`（把系列放进宿主坐标系的哪种盒子里）与 `coord`，之前只有
+  `GridOption` 带这两个字段。新增 `CoordinateSystemUsage` 字面量与 `CoordinateSystemUsages` 常量、
+  复用已有的 `CoordinateSystemDataCoord`；`doc-example/matrix-graph-box` 就靠
+  `coordinateSystemUsage: 'box'` + `coord: [2, 1]` 把关系图画进矩阵的某个单元格，
+  `MatrixAndGraphicOptionTest.graphSeriesCanUseTheMatrixAsABox` 覆盖这一写法。
 
 ## 兜底说明：图表与主题
 

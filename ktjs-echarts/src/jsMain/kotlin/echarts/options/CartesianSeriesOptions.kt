@@ -3,6 +3,7 @@ package echarts.options
 import echarts.SeriesType
 import echarts.SeriesLayoutBy
 import echarts.ProgressiveChunkMode
+import echarts.CoordinateSystemUsage
 import echarts.CustomSeriesRenderItem
 import echarts.CartesianPolarCoordinateSystem
 import echarts.CartesianCoordinateSystem
@@ -146,6 +147,18 @@ external interface SeriesOption {
      * JavaScript property; see [LineSeriesOption.typedCoordinateSystem].
      */
     var coordinateSystem: String?
+
+    /**
+     * How the series uses [coordinateSystem]; `"data"` (the default) lays every data item out on it,
+     * `"box"` takes only the bounding rect or the anchor point from it.
+     */
+    var coordinateSystemUsage: CoordinateSystemUsage?
+
+    /**
+     * Position of the series on the coordinate system named by [coordinateSystem] when
+     * [coordinateSystemUsage] is `"box"`, e.g. one cell of a matrix.
+     */
+    var coord: CoordinateSystemDataCoord?
 
     /** Whether the series participates in the legend. */
     var legendHoverLink: Boolean?

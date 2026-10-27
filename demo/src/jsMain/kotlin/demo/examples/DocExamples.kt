@@ -22,12 +22,14 @@ import zrender.ZRLineTypes
  *
  * The second batch of the folder lives in `DocMore.kt`: the pictorial bar tutorials, the dataZoom
  * scatter pages, the text / label pages, the animation pages and the sunburst / treemap
- * introductions.
+ * introductions; the pages that drive the chart themselves live in `DocInteractive.kt`.
  *
- * Still not ported: the pages that need a second renderer (`canvas-vs-svg`), an asynchronous
- * `setOption` (`tutorial-async`, `tutorial-loading`, `tutorial-dynamic-data`), the timeline and
- * media components, the map / `visualMap` combinations, and the pages built on official-site image
- * assets.
+ * Still not ported: the pages that read a JSONP file at run time or `getScript` a renderer, the map /
+ * `geo` combinations, the ones whose only content is an official-site image, and `canvas-vs-svg`,
+ * which switches between two renderers.
+ *
+ * `matrix-graph-box` keeps the node coordinates of the original; they are local to the cell box, so
+ * they land inside it whatever the container size is.
  *
  * The stored tutorials (`tutorial-styling-step*`) still use the ECharts 4 shape with a `normal`
  * state inside `itemStyle` / `label` / `labelLine`; ECharts 6 dropped that state, so the ports set
@@ -1337,4 +1339,75 @@ val docExampleEntries: List<CatalogEntry> =
                     )
             }
         },
+        docExample.chart(
+            "doc-example/matrix-graph-box",
+            "矩阵坐标系上的关系图（box 用法）",
+            "Graph on a matrix (box usage)",
+            "关系图把 `coordinateSystemUsage` 设为 `\"box\"`、`coord` 设为一个单元格，节点与连线就画在" +
+                "该单元格的盒子里，坐标即盒子的局部坐标。",
+            "A graph placed on one matrix cell: with `coordinateSystemUsage: \"box\"` and `coord` naming " +
+                "the cell, the nodes and links are drawn inside the box of that cell.",
+        ) {
+            unsafeJso<EChartsOption> {
+                matrix =
+                    matrixOption {
+                        x = dimension { levelSize = StringOrDouble(50.0); data = names("a", "b", "c", "d") }
+                        y = dimension { levelSize = StringOrDouble(50.0); data = names("x", "y", "z") }
+                    }
+                series =
+                    arrayOf<SeriesOption>(
+                        graphSeries {
+                            coordinateSystem = "matrix"
+                            coordinateSystemUsage = CoordinateSystemUsages.box
+                            coord = CoordinateSystemDataCoord(arrayOf(OptionDataValue(2.0), OptionDataValue(1.0)))
+                            edgeSymbol = StringOrStringArray(arrayOf("none", "arrow"))
+                            symbolSize = SymbolSize(15.0)
+                            links =
+                                arrayOf(
+                                    graphEdge(1.0, 0.0),
+                                    graphEdge(2.0, 0.0),
+                                    graphEdge(3.0, 0.0),
+                                    graphEdge(4.0, 3.0),
+                                    graphEdge(4.0, 2.0),
+                                    graphEdge(5.0, 1.0),
+                                    graphEdge(6.0, 3.0),
+                                )
+                            typedData =
+                                arrayOf(
+                                    matrixNode("a", 110.0, 100.0, 134.0),
+                                    matrixNode("b", 270.0, 10.0, 421.0),
+                                    matrixNode("c", 330.0, 100.0, 152.0),
+                                    matrixNode("d", 401.0, 500.0, 216.0),
+                                    matrixNode("e", 530.0, 200.0, 155.0),
+                                    matrixNode("f", 610.0, 140.0, 212.0),
+                                    matrixNode("g", 780.0, 70.0, 161.0),
+                                )
+                            lineStyle =
+                                unsafeJso<LineStyleOption> {
+                                    color = ZRColor("#9af")
+                                    width = 2.0
+                                    opacity = 1.0
+                                }
+                        },
+                    )
+            }
+        },
     )
+
+/** One node of `doc-example/matrix-graph-box`, placed by the local coordinates of the cell box. */
+private fun matrixNode(name: String, x: Double, y: Double, value: Double): GraphDataItem =
+    GraphDataItem(
+        unsafeJso<GraphNodeItemOption> {
+            this.name = name
+            this.x = x
+            this.y = y
+            this.value = OptionDataValueOrArray(arrayOf(OptionDataValue(value)))
+        },
+    )
+
+/** One directed link of `doc-example/matrix-graph-box`, by index of the node it joins. */
+private fun graphEdge(source: Double, target: Double): GraphEdgeItemOption =
+    unsafeJso<GraphEdgeItemOption> {
+        this.source = StringOrDouble(source)
+        this.target = StringOrDouble(target)
+    }

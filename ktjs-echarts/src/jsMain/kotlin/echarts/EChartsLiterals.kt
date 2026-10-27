@@ -805,6 +805,30 @@ object MatrixDimensionTypes {
 }
 
 /**
+ * How a component or a series uses the coordinate system named by its `coordinateSystem`.
+ *
+ * Upstream `CoordinateSystemUsageOption`, `'data' | 'box'`. `"data"` lays every data item out on the
+ * coordinate system; `"box"` only takes the bounding rect or the anchor point from it, which is the
+ * default for non-series components and what a series has to ask for explicitly.
+ */
+sealed external interface CoordinateSystemUsage
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [CoordinateSystemUsages]. */
+inline fun CoordinateSystemUsage(value: String): CoordinateSystemUsage =
+    value.unsafeCast<CoordinateSystemUsage>()
+
+/**
+ * The documented values of [CoordinateSystemUsage].
+ */
+object CoordinateSystemUsages {
+    /** Lay every data item out on the coordinate system; the default of a series. */
+    inline val data: CoordinateSystemUsage get() = CoordinateSystemUsage("data")
+
+    /** Take only the bounding rect or the anchor point from the coordinate system. */
+    inline val box: CoordinateSystemUsage get() = CoordinateSystemUsage("box")
+}
+
+/**
  * How one bound of a data zoom is interpreted.
  */
 sealed external interface DataZoomRangeMode

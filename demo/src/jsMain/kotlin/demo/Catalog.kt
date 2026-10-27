@@ -25,6 +25,7 @@ import demo.examples.heatmapEntries
 import demo.examples.lineEntries
 import demo.examples.linesExtraEntries
 import demo.examples.lineExtraEntries
+import demo.examples.lineLongTailEntries
 import demo.examples.matrixEntries
 import demo.examples.matrixExtraEntries
 import demo.examples.overviewEntries
@@ -125,6 +126,7 @@ val catalog: List<CatalogEntry> =
         lineEntries,
         linesExtraEntries,
         lineExtraEntries,
+        lineLongTailEntries,
         pieEntries,
         scatterEntries,
         candlestickEntries,

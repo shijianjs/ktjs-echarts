@@ -233,13 +233,13 @@
 - 提交：`0a1f9ca`（第一批 69 个）、`6edff97`（第二批 tree / sunburst / dataset / calendar / matrix /
   custom，41 个）；`588381b`（第三批：文档示例 17 个 + `matrix-mini-bar-data-collection` + 主题按钮修复）、`4fd0dda`（三张显示修复）、
   已推送到 `origin/main`。
-- 提交：每批一个 `feat(demo): …` 提交并推送到 `origin/main`；最近的是 `eded407`（第二十一批）。
+- 提交：每批一个 `feat(demo): …` 提交并推送到 `origin/main`。
 - 目录：`demo/src/jsMain/kotlin/demo/`（shell/router/主题/语言/ui/examples），
   e2e 在 `demo/src/jvmTest/kotlin/demo/e2e/DemoPageTest.kt`。
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（214 个示例 / 25 个家族 + 文档示例组 + 总览页）
+### 已落地（222 个示例 / 25 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -273,6 +273,22 @@
 - 第九批（2 个）：`geo-graph`（瑞士 GeoJSON 上的 graph 系列，节点用经纬度定位）、
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
+
+- 第二十三批（8 个，line 数据长尾 + 矩阵坐标系文档示例）：新建 `examples/LineLongTail.kt` 的
+  `area-stack-gradient`（五个堆叠面积，`lineStyle.width: 0` + `LinearGradient(0,0,0,1)` 填充）、
+  `area-pieces`（piecewise visualMap 按 x 维度涂两块面积，`markLine` 用 `symbol: ['none','none']`
+  画边界，`yAxis.boundaryGap: [0,'30%']`）、`area-time-axis`（2 万点时间轴面积，`tooltip.position`
+  回调固定在顶部 10%）、`line-gradient`（两个 grid + 两个 continuous visualMap，第二个按
+  `dimension: 0` 沿 x 渐变）、`multiple-x-axis`（两个 category x 轴各带一年，`tooltip.trigger: 'none'`，
+  `axisPointer.label.formatter` 回调读 `seriesData[0].data`）、`dynamic-data2`（1000 点滚动窗口，
+  `ChartHolder.setInterval` 每秒移 5 步）、`line-easing`（31 个 easing 函数逐个建 grid/x 轴/y 轴/系列/
+  标题，按 `ceil(sqrt(n))` 排成百分比网格）。同批在 `DocExamples.kt` 落地
+  `doc-example/matrix-graph-box`，为此给 wrapper 补上游 `ComponentOption` 的
+  `coordinateSystemUsage`（新增 `CoordinateSystemUsage` 字面量 + `CoordinateSystemUsages` 常量）与
+  `coord`（复用 `CoordinateSystemDataCoord`），`MatrixAndGraphicOptionTest` 新增
+  `graphSeriesCanUseTheMatrixAsABox` 覆盖 graph-on-matrix 写法；`LineExtra.kt` 头注释里
+  「line-easing 约 30 系列 × 2000 点」的旧说法按上游 `N_POINT = 30` 改正。e2e 新增
+  「line 长尾画出内容且动态页每秒换画面」用例，目录整站遍历仍逐页断言画布。
 
 - 第二十二批（8 个，gauge 长尾 + line 变体 + 异步 option，gauge 家族至此 12/12 全）：新建
   `examples/GaugeLongTail.kt` 的 `gauge-speed` / `gauge-clock` / `gauge-barometer` /
@@ -344,23 +360,28 @@
 ### 下一批（按可做性排序）
 
 1. **无外部依赖、可直接做**：
-   - `doc-example` 剩余 22 条（逐个核对过上游文件，排除原因见 `demo/AGENTS.md`）里只有 3 条可做：
-     `matrix-graph-box`（`graph` 用 matrix 坐标系的 `coordinateSystemUsage: 'box'`，50 行）、
-     `scatter-visualMap-categories`（内联 dataset + 两个 `visualMap`，232 行）、
-     `canvas-vs-svg`（含 `-en`，要有渲染器开关才说得通）。
-   - `custom` 剩余：`custom-calendar-icon`（`params.coordSys.cellWidth/cellHeight` 已补）、
-     `custom-gantt-flight`（长动画）、`custom-gauge`（`path://` 面板图的先例是
+   - `doc-example` 剩余 21 条（逐个核对过上游文件，排除原因见 `demo/AGENTS.md`）里只有 2 条可做：
+     `scatter-visualMap-categories`（内联 dataset + 两个 `visualMap`，232 行，但 `inRange.symbol` /
+     `outOfRange.symbolSize` 是按类目索引的字典、`left: null`，要先放宽 wrapper）、
+     `canvas-vs-svg`（含 `-en`，要有渲染器开关才说得通）。`matrix-graph-box` 已在第二十三批落地。
+   - `custom` 剩余：`custom-gantt-flight`（长动画）、`custom-gauge`（`path://` 面板图的先例是
      `examples/GaugeLongTail.kt`，原样内联即可）。
    - `matrix` 剩余：`matrix-mbti`、`matrix-periodic-table`、`matrix-stock`（数据表 8-17KB，
      需要先写一个把上游数组转成 Kotlin 的小脚本）、`matrix-mini-bar-geo`（需要 geo）。
-   - 已移植家族的长尾里可直接做的：`line-markarea`、`area-pieces`、`area-time-axis`、`bump-chart`（127 行，
+   - 已移植家族的长尾里可直接做的：`line-markarea`、`line-graphic`、`bump-chart`（127 行，
      内联数据）、`confidence-band`（要先按 `line-aqi` 的先例把 `data/asset/data/confidence-band.json`
-     拷进 `resources/data/`）、`grid-multiple`、`multiple-x-axis`、`line-easing`（296 行，无外部依赖）、
-     `line-graphic`、`line-pen`、
+     拷进 `resources/data/`）、`grid-multiple` / `area-rainfall`（85KB 内联表，先看要不要转成资源）、
+     `line-pen`（需指针事件，按排除策略搁置）、
      `line-race`/`bar-race`/`bar-race-country`（竞速要先决定用哪个定时器与假数据）、
      `bar-drilldown`/`bar-multi-drilldown`（下钻要 `dispatchAction` 替代表演）、`bar-breaks-brush`、
-     `dynamic-data`/`dynamic-data2`、`scatter-clustering`、`candlestick-sh`（26KB 内联表）/
-     `candlestick-large`/`candlestick-brush`/`intraday-breaks-1|2`、`graph-force2` 之外的 graph 变体。
+     `bar-stack-normalization`/`-and-variation`、`bar-waterfall2`、`bar1`、`bar-stack-borderRadius`、
+     `bar-histogram`、`dataset-link`、`graph-grid`、`graph-force-dynamic`、`heatmap-large`
+     （`-piecewise`）、`parallel-aqi`、`watermark`、`cycle-plot`、`scatter-matrix`、
+     `graphic-stroke-animation`/`graphic-loading`/`graphic-wave-animation`、
+     `candlestick-sh`（26KB 内联表）/`candlestick-large`/`candlestick-brush`/`intraday-breaks-1|2`、
+     `scatter-clustering`、`graph-force2` 之外的 graph 变体。
+     line/area 家族的 `area-stack-gradient`、`area-pieces`、`area-time-axis`、`line-gradient`、
+     `multiple-x-axis`、`dynamic-data2`、`line-easing` 已在第二十三批落地。
      gauge 家族已 12/12 全，`radar` 家族已全，`treemap` 只剩需要外部数据的，`pie-pattern` 要贴图，
      `line-fisheye-lens` 靠 `getZr().on('mousemove')` 的真实指针序列，按排除策略不做。
 2. **需要先补 wrapper 建模**：
@@ -395,7 +416,8 @@
    - `js(...)` 里不要写箭头函数返回对象字面量（`=> ({...})`）：Kotlin/JS 会重新打印函数体、吃掉括号，
      要写成 `function (a, b) { return {...} }`（`styledItem` 踩过）。
    - 内联示例里别把局部变量叫 `data` / `legend`：会遮蔽 `unsafeJso` 接收者的同名成员（`scatter-jitter`、
-     `custom-error-scatter` 踩过）。
+     `custom-error-scatter` 踩过）。类字段也一样：`DynamicDataWindow` 的 `value` 在 `unsafeJso` 里被
+     `OptionDataItemObject.value` 遮住，编译器只报「类型不匹配」，改叫 `walkingValue` 就好了。
    - 表驱动示例要检查表长与名称表长度是否一致：`themeRiver-lastfm` 的表比专辑名长，越界会让整页不渲染。
 4. 收尾：`./gradlew build` + `:demo:e2eTest` 都要过；e2e 现在逐页检查，新增页面自动覆盖；截图目视
    核对至少一两个新页面。
@@ -410,8 +432,8 @@
 ## 待办
 
 - 类型建模：暂无未完成项（见上面各轮）。
-- 示例站（demo）：见「示例站（demo）移植进度」一节。第二十二批（8 个，gauge 长尾 + `line-sections` /
-  `line-marker` + `doc-example/tutorial-async`）之后，下一批按「下一批」清单的第一条做
-  `doc-example/matrix-graph-box`、`doc-example/scatter-visualMap-categories` 与 `custom` / `matrix`
-  剩余项、各家族长尾；`custom-calendar-icon` 因上游源码只剩缩略图，不移植。
-- 提交：全部已推送到 `origin/main`（最新 本批：第二十二批 8 个示例）。
+- 示例站（demo）：见「示例站（demo）移植进度」一节。第二十三批（8 个，`examples/LineLongTail.kt` 的
+  line/area 数据长尾 + `doc-example/matrix-graph-box`）之后，下一批按「下一批」清单的第一条做
+  `doc-example/scatter-visualMap-categories`（先放宽 `visualMap` 的按类目字典与 `left: null`）、
+  `custom` / `matrix` 剩余项与各家族长尾；`custom-calendar-icon` 因上游源码只剩缩略图，不移植。
+- 提交：全部已推送到 `origin/main`（最新 本批：第二十三批 8 个示例）。

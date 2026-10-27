@@ -35,7 +35,10 @@ import echarts.options.VisualOptionUnit
 import echarts.options.dataItems
 import echarts.options.one
 import echarts.options.pieSeries
+import js.objects.Record
 import js.objects.unsafeJso
+import kotlin.js.unsafeCast
+import web.cssom.TextAlign
 import zrender.ZRColor
 import zrender.ZRFontWeights
 
@@ -356,11 +359,43 @@ val pieEntries: List<CatalogEntry> =
                             labelLine = unsafeJso<LabelLineOption> { length = 30.0 }
                             typedLabel =
                                 unsafeJso<PieLabelOption> {
-                                    formatter = LabelFormatter("{b|{b}：}{c}  {per|{d}%}  ")
+                                    // The `{tag|...}` sections only render when the tags are declared
+                                    // in `rich`; without them ECharts prints the markup as text.
+                                    formatter = LabelFormatter("{a|{a}}{abg|}\n{hr|}\n  {b|{b}：}{c}  {per|{d}%}  ")
                                     backgroundColor = ZRColor("#F6F8FC")
                                     borderColor = "#8C8D8E"
                                     borderWidth = 1.0
                                     borderRadius = DoubleOrDoubleArray(4.0)
+                                    rich =
+                                        recordOf(
+                                            "a" to
+                                                unsafeJso<TextStyleOption> {
+                                                    color = "#6E7079"
+                                                    lineHeight = 22.0
+                                                    align = TextAlign.center
+                                                },
+                                            "hr" to
+                                                unsafeJso<TextStyleOption> {
+                                                    borderColor = "#8C8D8E"
+                                                    width = StringOrDouble("100%")
+                                                    borderWidth = 1.0
+                                                    height = 0.0
+                                                },
+                                            "b" to
+                                                unsafeJso<TextStyleOption> {
+                                                    color = "#4C5058"
+                                                    fontSize = StringOrDouble(14.0)
+                                                    fontWeight = ZRFontWeights.bold
+                                                    lineHeight = 33.0
+                                                },
+                                            "per" to
+                                                unsafeJso<TextStyleOption> {
+                                                    color = "#fff"
+                                                    backgroundColor = ZRColor("#4C5058")
+                                                    padding = DoubleOrDoubleArray(arrayOf(3.0, 4.0))
+                                                    borderRadius = DoubleOrDoubleArray(4.0)
+                                                },
+                                        ).unsafeCast<Record<String, TextStyleOption>>()
                                 }
                             typedData = nestOuter()
                         },

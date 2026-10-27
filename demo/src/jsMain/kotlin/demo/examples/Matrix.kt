@@ -39,6 +39,7 @@ import echarts.options.MatrixOption
 import echarts.options.OptionDataItem
 import echarts.options.ScatterDataItem
 import echarts.options.SymbolSize
+import echarts.options.TextStyleOption
 import echarts.options.SeriesOption
 import echarts.options.StringOrDouble
 import echarts.options.StringOrDoubleOrArray
@@ -53,9 +54,11 @@ import echarts.options.heatmapSeries
 import echarts.options.one
 import echarts.options.pieSeries
 import echarts.options.scatterSeries
+import js.objects.Record
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import zrender.ZRFontWeights
+import web.cssom.TextAlign
 import zrender.ZRColor
 import zrender.ZRShapeProps
 import zrender.ZRStyleProps
@@ -306,7 +309,17 @@ val matrixEntries: List<CatalogEntry> =
                     )
             }
         },
-        matrix.chart("matrix-covariance", "协方差矩阵", "Covariance Matrix") {
+        matrix.chart("matrix-covariance", "协方差矩阵", "Covariance Matrix", height = "620px") {
+            // The matrix header is two levels deep: five groups of five columns / rows, and the
+            // 25x25 data below is addressed by the leaf cell names ("1" .. "25"). A flat header of
+            // five cells leaves the heatmap without a cell for every point, which renders empty.
+            fun grouped(prefix: String): Array<MatrixDimensionCellLooseOption> =
+                Array(5) { group ->
+                    branch(
+                        "$prefix${group + 1}",
+                        *Array(5) { index -> cell((group * 5 + index + 1).toString()) },
+                    )
+                }
             // The 25x25 grid is symmetric: the upper triangle is generated and mirrored below it.
             val random = sequence(20260604L)
             val values = HashMap<String, Double>()
@@ -333,12 +346,12 @@ val matrixEntries: List<CatalogEntry> =
                     matrixOption {
                         x =
                             dimension {
-                                data = names(*(1..5).map { "X$it" }.toTypedArray())
+                                data = grouped("X")
                                 show = false
                             }
                         y =
                             dimension {
-                                data = names(*(1..5).map { "Y$it" }.toTypedArray())
+                                data = grouped("Y")
                                 show = false
                             }
                         width = StringOrDouble(500.0)
@@ -462,6 +475,8 @@ val matrixEntries: List<CatalogEntry> =
                 )
             val custom =
                 unsafeJso<CustomSeriesOption> {
+                    // Without the type ECharts drops the series and the cells stay empty.
+                    type = echarts.SeriesTypes.custom
                     coordinateSystem = "matrix"
                     clip = false
                     typedData =
@@ -477,8 +492,27 @@ val matrixEntries: List<CatalogEntry> =
                                     val x = textAt(params.value, 0)
                                     val y = textAt(params.value, 1)
                                     val prefix = if (x == y) "True " else "False "
-                                    "$prefix$y\n${numberAt(params.value, 2).toInt()}"
+                                    "{name|$prefix$y}\n{value|${numberAt(params.value, 2).toInt()}}"
                                 }
+                            rich =
+                                recordOf(
+                                    "name" to
+                                        unsafeJso<TextStyleOption> {
+                                            color = "#fff"
+                                            backgroundColor = ZRColor("#999")
+                                            textBorderColor = "#333"
+                                            padding = DoubleOrDoubleArray(5.0)
+                                            fontSize = StringOrDouble(18.0)
+                                        },
+                                    "value" to
+                                        unsafeJso<TextStyleOption> {
+                                            color = "#444"
+                                            textBorderWidth = 0.0
+                                            padding = DoubleOrDoubleArray(5.0)
+                                            fontSize = StringOrDouble(16.0)
+                                            align = TextAlign.center
+                                        },
+                                ).unsafeCast<Record<String, TextStyleOption>>()
                         }
                     renderItem = { _, api ->
                         val x = api.value(DimensionLoose(0.0))
@@ -526,11 +560,11 @@ val matrixEntries: List<CatalogEntry> =
                             unsafeJso<GraphicComponentOption> {
                                 elements =
                                     arrayOf(
-                                        textElement("True Class", StringOrDouble("70%"), StringOrDouble(40.0), 0.0),
+                                        textElement("True Class", StringOrDouble("70%"), StringOrDouble(20.0), 0.0),
                                         textElement(
                                             "Predicted Class",
-                                            StringOrDouble("12%"),
-                                            StringOrDouble("55%"),
+                                            StringOrDouble("10%"),
+                                            StringOrDouble("50%"),
                                             90.0,
                                         ),
                                     )
@@ -662,12 +696,22 @@ private fun linearMap(value: Double, domain: DoubleArray, range: DoubleArray): D
     }
 }
 
-/** A `text` element of a `graphic` component, optionally rotated in degrees. */
-private fun textElement(text: String, x: StringOrDouble, y: StringOrDouble, rotation: Double): echarts.options.GraphicElement =
+/**
+ * A `text` element of a `graphic` component, optionally rotated in degrees.
+ *
+ * The position goes through `left` / `top` rather than `x` / `y`: the latter is the raw zrender
+ * prop, which takes a number only, so a percentage string would land the element at the origin.
+ */
+private fun textElement(
+    text: String,
+    left: StringOrDouble,
+    top: StringOrDouble,
+    rotation: Double,
+): echarts.options.GraphicElement =
     unsafeJso {
         type = "text"
-        this.x = x
-        this.y = y
+        this.left = left
+        this.top = top
         this.rotation = rotation
         style =
             unsafeJso {

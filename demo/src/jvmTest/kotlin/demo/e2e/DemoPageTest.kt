@@ -190,6 +190,10 @@ class DemoPageTest {
     /**
      * Asserts that the newest coordinate systems really paint: a canvas that exists but stays
      * transparent would pass [assertChartRendered] on its own.
+     *
+     * `matrix-covariance` guards the nested matrix header (a flat header renders nothing) and
+     * `matrix-confusion` the custom series `type` — without it the cells stay empty and the labels
+     * pile up in the corner.
      */
     @RetryingTest(maxAttempts = 2)
     fun `the matrix and custom series pages draw content`(page: Page) {
@@ -197,9 +201,11 @@ class DemoPageTest {
         assertChartRendered(page)
         assertTrue(hasDrawnPixels(page), "matrix-simple should paint the matrix cells")
 
-        page.evaluate("() => { location.hash = '#/custom-bar-trend' }")
-        assertChartRendered(page)
-        assertTrue(hasDrawnPixels(page), "custom-bar-trend should paint the bars and the trend line")
+        for (route in listOf("custom-bar-trend", "matrix-covariance", "matrix-confusion", "pie-nest")) {
+            page.evaluate("(value) => { location.hash = '#/' + value }", route)
+            assertChartRendered(page)
+            assertTrue(hasDrawnPixels(page), "$route should paint its series")
+        }
     }
 
     /** Samples the alpha channel of the chart canvas; `false` when nothing was painted. */

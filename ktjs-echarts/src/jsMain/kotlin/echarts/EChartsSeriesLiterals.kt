@@ -483,3 +483,44 @@ object PictorialBarSymbolRepeatDirections {
         PictorialBarSymbolRepeatDirection("end")
 
 }
+
+/**
+ * Chunking mode of progressive rendering.
+ */
+sealed external interface ProgressiveChunkMode
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [ProgressiveChunkModes]. */
+inline fun ProgressiveChunkMode(value: String): ProgressiveChunkMode = value.unsafeCast<ProgressiveChunkMode>()
+
+/**
+ * The documented values of [ProgressiveChunkMode].
+ */
+object ProgressiveChunkModes {
+    /** Split the remaining elements into chunks of `progressive` size. */
+    inline val mod: ProgressiveChunkMode get() = ProgressiveChunkMode("mod")
+}
+
+/**
+ * Origin of an area fill: a keyword, or the axis value the fill starts from.
+ */
+sealed external interface AreaOrigin
+
+/** Wraps a keyword that comes from JavaScript. Prefer the constants in [AreaOrigins]. */
+inline fun AreaOrigin(value: String): AreaOrigin = value.unsafeCast<AreaOrigin>()
+
+/** Wraps a numeric baseline on the value axis. */
+inline fun AreaOrigin(value: Double): AreaOrigin = value.unsafeCast<AreaOrigin>()
+
+/**
+ * The documented keyword values of [AreaOrigin].
+ */
+object AreaOrigins {
+    /** Use the axis extent closest to the data. */
+    inline val auto: AreaOrigin get() = AreaOrigin("auto")
+
+    /** Fill from the start of the axis. */
+    inline val start: AreaOrigin get() = AreaOrigin("start")
+
+    /** Fill from the end of the axis. */
+    inline val end: AreaOrigin get() = AreaOrigin("end")
+}

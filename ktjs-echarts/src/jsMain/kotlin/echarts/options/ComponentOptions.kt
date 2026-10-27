@@ -2,10 +2,17 @@ package echarts.options
 
 import echarts.TooltipTriggerOn
 import echarts.TooltipTrigger
+import echarts.AxisNameLocation
+import echarts.HorizontalAlign
+import echarts.LegendPageButtonPosition
+import echarts.OuterBoundsContain
+import echarts.OuterBoundsMode
+import echarts.TooltipOrder
 import echarts.Orient
 import echarts.LegendType
 import echarts.AxisType
 import echarts.AxisPosition
+import echarts.TitleTarget
 import echarts.AnimationEasing
 import js.objects.Record
 import kotlin.js.JsAny
@@ -35,8 +42,11 @@ external interface TitleOption {
     /** Hyperlink of the subtitle. */
     var sublink: String?
 
-    /** Target of [link] and [sublink]: `"self"` or `"blank"`. */
-    var target: String?
+    /** Target of [link]: `"self"` or `"blank"`. */
+    var target: TitleTarget?
+
+    /** Target of [sublink]: `"self"` or `"blank"`. */
+    var subtarget: TitleTarget?
 
     /** Style of the main title. */
     var textStyle: TextStyleOption?
@@ -143,7 +153,10 @@ external interface LegendOption {
     var orient: Orient?
 
     /** Alignment of the items: `"auto"`, `"left"` or `"right"`. */
-    var align: String?
+    var align: HorizontalAlign?
+
+    /** Position of the page buttons of a scrollable legend: `"start"` or `"end"`. */
+    var pageButtonPosition: LegendPageButtonPosition?
 
     /** Padding of the component. */
     var padding: DoubleOrDoubleArray?
@@ -363,7 +376,7 @@ external interface TooltipOption {
     var extraCssText: String?
 
     /** Order of the tooltip content: `"seriesAsc"`, `"seriesDesc"`, `"valueAsc"` or `"valueDesc"`. */
-    var order: String?
+    var order: TooltipOrder?
 }
 
 /**
@@ -450,13 +463,13 @@ external interface GridOption {
     var shadowOffsetY: Double?
 
     /** Mode of the outer bounds: `"auto"`, `"same"` or `"none"`. */
-    var outerBoundsMode: String?
+    var outerBoundsMode: OuterBoundsMode?
 
     /** Outer bounds of the grid. */
     var outerBounds: BoxLayoutOption?
 
     /** What the outer bounds contain: `"all"`, `"axisLabel"` or `"auto"`. */
-    var outerBoundsContain: String?
+    var outerBoundsContain: OuterBoundsContain?
 
     /** Minimum width of the grid when the outer bounds shrink it. */
     var outerBoundsClampWidth: StringOrDouble?
@@ -502,8 +515,8 @@ external interface AxisOption {
     /** Name displayed next to the axis. */
     var name: String?
 
-    /** Location of [name]: `"start"`, `"middle"` or `"end"`. */
-    var nameLocation: String?
+    /** Location of [name]: `"start"`, `"middle"`, `"center"` or `"end"`. */
+    var nameLocation: AxisNameLocation?
 
     /** Style of [name]. */
     var nameTextStyle: LabelOption?

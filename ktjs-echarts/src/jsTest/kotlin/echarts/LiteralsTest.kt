@@ -1,13 +1,29 @@
 package echarts
 
+import echarts.options.AreaStyleOption
+import echarts.options.AxisPointerOption
 import echarts.options.BooleanOrString
+import echarts.options.BrushOption
+import echarts.options.DataZoomOption
 import echarts.options.EChartsOption
 import echarts.options.GaugeSeriesOption
+import echarts.options.GraphicElement
+import echarts.options.GridOption
+import echarts.options.LabelOption
+import echarts.options.LegendOption
 import echarts.options.LineSeriesOption
+import echarts.options.MatrixDimensionOption
+import echarts.options.ParallelOption
 import echarts.options.PieSeriesOption
+import echarts.options.SelectionModes
 import echarts.options.StringOrDouble
 import echarts.options.StringOrDoubleOrArray
 import echarts.options.SymbolOffset
+import echarts.options.TimelineControlStyle
+import echarts.options.TimelineOption
+import echarts.options.TitleOption
+import echarts.options.TooltipOption
+import echarts.options.VisualMapOption
 import echarts.options.XAxisOption
 import echarts.options.YAxisOption
 import echarts.options.gaugeSeries
@@ -17,6 +33,7 @@ import echarts.options.numbers
 import echarts.options.one
 import echarts.options.strings
 import js.objects.unsafeJso
+import kotlin.js.JsName
 import kotlin.js.unsafeCast
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -28,6 +45,14 @@ import zrender.ZRFontWeight
 import zrender.ZRFontWeights
 import zrender.ZRLineType
 import zrender.ZRLineTypes
+
+/**
+ * Reads the upstream `$action` property, which cannot be written as a Kotlin identifier.
+ */
+private external interface ActionProbe {
+    @JsName("\$action")
+    var action: String?
+}
 
 /**
  * Tests for the string-literal unions.
@@ -328,5 +353,229 @@ class LiteralsTest {
         assertEquals("bottom", AxisPositions.bottom.unsafeCast<String>())
         assertEquals("left", AxisPositions.left.unsafeCast<String>())
         assertEquals("right", AxisPositions.right.unsafeCast<String>())
+    }
+
+    @Test
+    fun optionKeywordLiteralsMatchTheUpstreamNames() {
+        assertEquals("start", AxisNameLocations.start.unsafeCast<String>())
+        assertEquals("middle", AxisNameLocations.middle.unsafeCast<String>())
+        assertEquals("center", AxisNameLocations.center.unsafeCast<String>())
+        assertEquals("end", AxisNameLocations.end.unsafeCast<String>())
+        assertEquals("self", TitleTargets.self.unsafeCast<String>())
+        assertEquals("blank", TitleTargets.blank.unsafeCast<String>())
+        assertEquals("auto", HorizontalAligns.auto.unsafeCast<String>())
+        assertEquals("left", HorizontalAligns.left.unsafeCast<String>())
+        assertEquals("right", HorizontalAligns.right.unsafeCast<String>())
+        assertEquals("start", LegendPageButtonPositions.start.unsafeCast<String>())
+        assertEquals("end", LegendPageButtonPositions.end.unsafeCast<String>())
+        assertEquals("left", TimelineControlPositions.left.unsafeCast<String>())
+        assertEquals("right", TimelineControlPositions.right.unsafeCast<String>())
+        assertEquals("top", TimelineControlPositions.top.unsafeCast<String>())
+        assertEquals("bottom", TimelineControlPositions.bottom.unsafeCast<String>())
+        assertEquals("truncate", LabelLineOverflows.truncate.unsafeCast<String>())
+        assertEquals("raw", GraphicBoundings.raw.unsafeCast<String>())
+        assertEquals("all", GraphicBoundings.all.unsafeCast<String>())
+        assertEquals("merge", GraphicActions.merge.unsafeCast<String>())
+        assertEquals("replace", GraphicActions.replace.unsafeCast<String>())
+        assertEquals("remove", GraphicActions.remove.unsafeCast<String>())
+        assertEquals("category", MatrixDimensionTypes.category.unsafeCast<String>())
+        assertEquals("value", DataZoomRangeModes.value.unsafeCast<String>())
+        assertEquals("percent", DataZoomRangeModes.percent.unsafeCast<String>())
+        assertEquals("auto", OuterBoundsModes.auto.unsafeCast<String>())
+        assertEquals("same", OuterBoundsModes.same.unsafeCast<String>())
+        assertEquals("none", OuterBoundsModes.none.unsafeCast<String>())
+        assertEquals("all", OuterBoundsContains.all.unsafeCast<String>())
+        assertEquals("axisLabel", OuterBoundsContains.axisLabel.unsafeCast<String>())
+        assertEquals("auto", OuterBoundsContains.auto.unsafeCast<String>())
+        assertEquals("seriesAsc", TooltipOrders.seriesAsc.unsafeCast<String>())
+        assertEquals("seriesDesc", TooltipOrders.seriesDesc.unsafeCast<String>())
+        assertEquals("valueAsc", TooltipOrders.valueAsc.unsafeCast<String>())
+        assertEquals("valueDesc", TooltipOrders.valueDesc.unsafeCast<String>())
+        assertEquals("click", AxisPointerTriggerOns.click.unsafeCast<String>())
+        assertEquals("mousemove", AxisPointerTriggerOns.mouseMove.unsafeCast<String>())
+        assertEquals("none", AxisPointerTriggerOns.none.unsafeCast<String>())
+        assertEquals("mousemove|click", AxisPointerTriggerOns.mouseMoveClick.unsafeCast<String>())
+        assertEquals("show", AxisPointerStatuses.show.unsafeCast<String>())
+        assertEquals("hide", AxisPointerStatuses.hide.unsafeCast<String>())
+        assertEquals("click", ParallelAxisExpandTriggerOns.click.unsafeCast<String>())
+        assertEquals("mousemove", ParallelAxisExpandTriggerOns.mouseMove.unsafeCast<String>())
+    }
+
+    @Test
+    fun brushKeywordLiteralsMatchTheUpstreamNames() {
+        assertEquals("polygon", BrushTypes.polygon.unsafeCast<String>())
+        assertEquals("rect", BrushTypes.rect.unsafeCast<String>())
+        assertEquals("lineX", BrushTypes.lineX.unsafeCast<String>())
+        assertEquals("lineY", BrushTypes.lineY.unsafeCast<String>())
+        assertEquals("auto", BrushTypeUncertains.auto.unsafeCast<String>())
+        assertFalse(BrushTypeUncertain(false).unsafeCast<Boolean>())
+        assertEquals("single", BrushModes.single.unsafeCast<String>())
+        assertEquals("multiple", BrushModes.multiple.unsafeCast<String>())
+        assertEquals("fixRate", BrushThrottleTypes.fixRate.unsafeCast<String>())
+        assertEquals("debounce", BrushThrottleTypes.debounce.unsafeCast<String>())
+        assertEquals("polygon", BrushToolboxIconTypes.polygon.unsafeCast<String>())
+        assertEquals("rect", BrushToolboxIconTypes.rect.unsafeCast<String>())
+        assertEquals("lineX", BrushToolboxIconTypes.lineX.unsafeCast<String>())
+        assertEquals("lineY", BrushToolboxIconTypes.lineY.unsafeCast<String>())
+        assertEquals("keep", BrushToolboxIconTypes.keep.unsafeCast<String>())
+        assertEquals("clear", BrushToolboxIconTypes.clear.unsafeCast<String>())
+    }
+
+    @Test
+    fun seriesKeywordLiteralsMatchTheUpstreamNames() {
+        assertEquals("mod", ProgressiveChunkModes.mod.unsafeCast<String>())
+        assertEquals("auto", AreaOrigins.auto.unsafeCast<String>())
+        assertEquals("start", AreaOrigins.start.unsafeCast<String>())
+        assertEquals("end", AreaOrigins.end.unsafeCast<String>())
+        assertEquals(30.0, AreaOrigin(30.0).unsafeCast<Double>())
+    }
+
+    /**
+     * `graphic.$action` cannot be a Kotlin identifier, so the property is exposed as [GraphicElement.action]
+     * with `@JsName`; this proves the mapping still writes `$action` on the JavaScript object.
+     */
+    @Test
+    fun graphicActionIsWrittenToTheActionProperty() {
+        val element = unsafeJso<GraphicElement> {
+            type = "group"
+            action = GraphicActions.replace
+        }
+        val probe = element.unsafeCast<ActionProbe>()
+        assertEquals("replace", probe.action)
+    }
+
+    /**
+     * Assigning the constants to the typed fields checks the narrowed types at compile time, and
+     * reading them back checks that the names and values reach the underlying JavaScript objects.
+     */
+    @Test
+    fun typedOptionKeywordFieldsKeepTheirValues() {
+        val option = cartesianLineOption(1.0, 2.0) {
+            title = one(
+                unsafeJso<TitleOption> {
+                    text = "title"
+                    target = TitleTargets.blank
+                    subtarget = TitleTargets.self
+                },
+            )
+            legend = one(
+                unsafeJso<LegendOption> {
+                    align = HorizontalAligns.left
+                    pageButtonPosition = LegendPageButtonPositions.end
+                },
+            )
+            tooltip = unsafeJso<TooltipOption> { order = TooltipOrders.valueDesc }
+            grid = one(
+                unsafeJso<GridOption> {
+                    outerBoundsMode = OuterBoundsModes.none
+                    outerBoundsContain = OuterBoundsContains.axisLabel
+                },
+            )
+            xAxis = one(
+                unsafeJso<XAxisOption> {
+                    type = AxisTypes.category
+                    data = strings("a", "b")
+                    name = "x"
+                    nameLocation = AxisNameLocations.middle
+                },
+            )
+            yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
+            dataZoom = one(
+                unsafeJso<DataZoomOption> {
+                    type = DataZoomTypes.inside
+                    rangeMode = arrayOf(DataZoomRangeModes.value, DataZoomRangeModes.percent)
+                    showDataShadow = BooleanOrString("auto")
+                },
+            )
+            visualMap = one(
+                unsafeJso<VisualMapOption> {
+                    type = VisualMapTypes.piecewise
+                    align = HorizontalAligns.right
+                    selectedMode = SelectionModes.multiple
+                },
+            )
+            series = one(
+                lineSeries {
+                    data = numbers(1.0, 2.0)
+                    progressiveChunkMode = ProgressiveChunkModes.mod
+                    areaStyle = unsafeJso<AreaStyleOption> { origin = AreaOrigins.start }
+                    label = unsafeJso<LabelOption> {
+                        show = true
+                        lineOverflow = LabelLineOverflows.truncate
+                    }
+                },
+            )
+        }
+
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(option)
+            val stored = chart.getOption()
+            assertEquals(TitleTargets.blank, stored.title!![0].target)
+            assertEquals(TitleTargets.self, stored.title!![0].subtarget)
+            assertEquals(HorizontalAligns.left, stored.legend!![0].align)
+            assertEquals(LegendPageButtonPositions.end, stored.legend!![0].pageButtonPosition)
+            // `tooltip.order` is an option-only field; ECharts does not keep it in the merged option.
+            assertEquals(TooltipOrders.valueDesc, option.tooltip!!.order)
+            assertEquals(OuterBoundsModes.none, stored.grid!![0].outerBoundsMode)
+            assertEquals(OuterBoundsContains.axisLabel, stored.grid!![0].outerBoundsContain)
+            assertEquals(AxisNameLocations.middle, stored.xAxis!![0].nameLocation)
+            assertEquals(DataZoomRangeModes.value, stored.dataZoom!![0].rangeMode!![0])
+            assertEquals(DataZoomRangeModes.percent, stored.dataZoom!![0].rangeMode!![1])
+            assertEquals(HorizontalAligns.right, stored.visualMap!![0].align)
+            assertEquals(SelectionModes.multiple, stored.visualMap!![0].selectedMode)
+            val line = stored.series!![0].unsafeCast<LineSeriesOption>()
+            assertEquals(ProgressiveChunkModes.mod, line.progressiveChunkMode)
+            assertEquals(AreaOrigins.start, line.areaStyle!!.origin)
+            assertEquals(LabelLineOverflows.truncate, line.label!!.lineOverflow)
+        } finally {
+            destroyChart(chart, container)
+        }
+    }
+
+    /**
+     * Timeline, parallel, brush and timeline control options are only valid in specific option
+     * shapes, so their narrowed fields are checked on the plain option objects instead of a chart.
+     */
+    @Test
+    fun componentOptionObjectsKeepTheNarrowedKeywords() {
+        val timeline = unsafeJso<TimelineOption> {
+            controlPosition = TimelineControlPositions.right
+            controlStyle = unsafeJso<TimelineControlStyle> { position = TimelineControlPositions.bottom }
+        }
+        assertEquals(TimelineControlPositions.right, timeline.controlPosition)
+        assertEquals(TimelineControlPositions.bottom, timeline.controlStyle!!.position)
+
+        val parallel = unsafeJso<ParallelOption> {
+            layout = Orients.vertical
+            axisExpandTriggerOn = ParallelAxisExpandTriggerOns.mouseMove
+        }
+        assertEquals(Orients.vertical, parallel.layout)
+        assertEquals(ParallelAxisExpandTriggerOns.mouseMove, parallel.axisExpandTriggerOn)
+
+        val brush = unsafeJso<BrushOption> {
+            brushType = BrushTypeUncertains.auto
+            brushMode = BrushModes.multiple
+            throttleType = BrushThrottleTypes.debounce
+            toolbox = arrayOf(
+                BrushToolboxIconTypes.rect,
+                BrushToolboxIconTypes.keep,
+                BrushToolboxIconTypes.clear,
+            )
+        }
+        assertEquals(BrushTypeUncertains.auto, brush.brushType)
+        assertEquals(BrushModes.multiple, brush.brushMode)
+        assertEquals(BrushThrottleTypes.debounce, brush.throttleType)
+        assertEquals(3, brush.toolbox!!.size)
+
+        val pointer = unsafeJso<AxisPointerOption> {
+            triggerOn = AxisPointerTriggerOns.mouseMoveClick
+            status = AxisPointerStatuses.show
+        }
+        assertEquals(AxisPointerTriggerOns.mouseMoveClick, pointer.triggerOn)
+        assertEquals(AxisPointerStatuses.show, pointer.status)
+
+        val matrix = unsafeJso<MatrixDimensionOption> { type = MatrixDimensionTypes.category }
+        assertEquals(MatrixDimensionTypes.category, matrix.type)
     }
 }

@@ -508,3 +508,459 @@ object AxisPositions {
     inline val right: AxisPosition get() = AxisPosition("right")
 
 }
+
+/**
+ * Location of an axis name relative to the axis line.
+ */
+sealed external interface AxisNameLocation
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [AxisNameLocations]. */
+inline fun AxisNameLocation(value: String): AxisNameLocation = value.unsafeCast<AxisNameLocation>()
+
+/**
+ * The documented values of [AxisNameLocation].
+ */
+object AxisNameLocations {
+    /** At the start of the axis line. */
+    inline val start: AxisNameLocation get() = AxisNameLocation("start")
+
+    /** In the middle of the axis line. */
+    inline val middle: AxisNameLocation get() = AxisNameLocation("middle")
+
+    /** In the middle of the axis line; kept for compatibility with the upstream union. */
+    inline val center: AxisNameLocation get() = AxisNameLocation("center")
+
+    /** At the end of the axis line. */
+    inline val end: AxisNameLocation get() = AxisNameLocation("end")
+}
+
+/**
+ * Window a title link is opened in.
+ */
+sealed external interface TitleTarget
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [TitleTargets]. */
+inline fun TitleTarget(value: String): TitleTarget = value.unsafeCast<TitleTarget>()
+
+/**
+ * The documented values of [TitleTarget].
+ */
+object TitleTargets {
+    /** The current window. */
+    inline val self: TitleTarget get() = TitleTarget("self")
+
+    /** A new window. */
+    inline val blank: TitleTarget get() = TitleTarget("blank")
+}
+
+/**
+ * Horizontal alignment of the legend items.
+ */
+sealed external interface HorizontalAlign
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [HorizontalAligns]. */
+inline fun HorizontalAlign(value: String): HorizontalAlign = value.unsafeCast<HorizontalAlign>()
+
+/**
+ * The documented values of [HorizontalAlign].
+ */
+object HorizontalAligns {
+    /** Aligned automatically with the legend position. */
+    inline val auto: HorizontalAlign get() = HorizontalAlign("auto")
+
+    /** Aligned to the left. */
+    inline val left: HorizontalAlign get() = HorizontalAlign("left")
+
+    /** Aligned to the right. */
+    inline val right: HorizontalAlign get() = HorizontalAlign("right")
+}
+
+/**
+ * Position of the page buttons of a scrollable legend.
+ */
+sealed external interface LegendPageButtonPosition
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [LegendPageButtonPositions]. */
+inline fun LegendPageButtonPosition(value: String): LegendPageButtonPosition =
+    value.unsafeCast<LegendPageButtonPosition>()
+
+/**
+ * The documented values of [LegendPageButtonPosition].
+ */
+object LegendPageButtonPositions {
+    /** Buttons at the start of the legend. */
+    inline val start: LegendPageButtonPosition get() = LegendPageButtonPosition("start")
+
+    /** Buttons at the end of the legend. */
+    inline val end: LegendPageButtonPosition get() = LegendPageButtonPosition("end")
+}
+
+/**
+ * Position of the play controls of a timeline.
+ */
+sealed external interface TimelineControlPosition
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [TimelineControlPositions]. */
+inline fun TimelineControlPosition(value: String): TimelineControlPosition =
+    value.unsafeCast<TimelineControlPosition>()
+
+/**
+ * The documented values of [TimelineControlPosition].
+ */
+object TimelineControlPositions {
+    /** Left of the timeline axis. */
+    inline val left: TimelineControlPosition get() = TimelineControlPosition("left")
+
+    /** Right of the timeline axis. */
+    inline val right: TimelineControlPosition get() = TimelineControlPosition("right")
+
+    /** Above the timeline axis. */
+    inline val top: TimelineControlPosition get() = TimelineControlPosition("top")
+
+    /** Below the timeline axis. */
+    inline val bottom: TimelineControlPosition get() = TimelineControlPosition("bottom")
+}
+
+/**
+ * Behaviour of a label whose text is wider than the available space.
+ */
+sealed external interface LabelLineOverflow
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [LabelLineOverflows]. */
+inline fun LabelLineOverflow(value: String): LabelLineOverflow = value.unsafeCast<LabelLineOverflow>()
+
+/**
+ * The documented values of [LabelLineOverflow].
+ */
+object LabelLineOverflows {
+    /** Truncate the text and append an ellipsis. */
+    inline val truncate: LabelLineOverflow get() = LabelLineOverflow("truncate")
+}
+
+/**
+ * Bounding box used when a graphic element is laid out inside its container.
+ */
+sealed external interface GraphicBounding
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [GraphicBoundings]. */
+inline fun GraphicBounding(value: String): GraphicBounding = value.unsafeCast<GraphicBounding>()
+
+/**
+ * The documented values of [GraphicBounding].
+ */
+object GraphicBoundings {
+    /** Only the element itself, before the transform is applied. */
+    inline val raw: GraphicBounding get() = GraphicBounding("raw")
+
+    /** The element and all of its descendants. */
+    inline val all: GraphicBounding get() = GraphicBounding("all")
+}
+
+/**
+ * Shape drawn by the brush component.
+ */
+sealed external interface BrushType
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [BrushTypes]. */
+inline fun BrushType(value: String): BrushType = value.unsafeCast<BrushType>()
+
+/**
+ * The documented values of [BrushType].
+ */
+object BrushTypes {
+    /** Polygon selection. */
+    inline val polygon: BrushType get() = BrushType("polygon")
+
+    /** Rectangle selection. */
+    inline val rect: BrushType get() = BrushType("rect")
+
+    /** Vertical line selection. */
+    inline val lineX: BrushType get() = BrushType("lineX")
+
+    /** Horizontal line selection. */
+    inline val lineY: BrushType get() = BrushType("lineY")
+}
+
+/**
+ * Brush type that can also be disabled with `false` or decided automatically with `"auto"`.
+ */
+sealed external interface BrushTypeUncertain
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [BrushTypeUncertains]. */
+inline fun BrushTypeUncertain(value: String): BrushTypeUncertain = value.unsafeCast<BrushTypeUncertain>()
+
+/** Wraps `false`, which disables the brush. */
+inline fun BrushTypeUncertain(value: Boolean): BrushTypeUncertain = value.unsafeCast<BrushTypeUncertain>()
+
+/**
+ * The documented values of [BrushTypeUncertain] that are not already in [BrushTypes].
+ */
+object BrushTypeUncertains {
+    /** The brush type is decided by the toolbox. */
+    inline val auto: BrushTypeUncertain get() = BrushTypeUncertain("auto")
+}
+
+/**
+ * How many brush areas can exist at the same time.
+ */
+sealed external interface BrushMode
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [BrushModes]. */
+inline fun BrushMode(value: String): BrushMode = value.unsafeCast<BrushMode>()
+
+/**
+ * The documented values of [BrushMode].
+ */
+object BrushModes {
+    /** Only one brush area at a time. */
+    inline val single: BrushMode get() = BrushMode("single")
+
+    /** Several brush areas at the same time. */
+    inline val multiple: BrushMode get() = BrushMode("multiple")
+}
+
+/**
+ * Throttling strategy of the brush event handler.
+ */
+sealed external interface BrushThrottleType
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [BrushThrottleTypes]. */
+inline fun BrushThrottleType(value: String): BrushThrottleType = value.unsafeCast<BrushThrottleType>()
+
+/**
+ * The documented values of [BrushThrottleType].
+ */
+object BrushThrottleTypes {
+    /** Emit at a fixed rate. */
+    inline val fixRate: BrushThrottleType get() = BrushThrottleType("fixRate")
+
+    /** Emit after the input settles. */
+    inline val debounce: BrushThrottleType get() = BrushThrottleType("debounce")
+}
+
+/**
+ * Type of one dimension of a matrix coordinate system.
+ */
+sealed external interface MatrixDimensionType
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [MatrixDimensionTypes]. */
+inline fun MatrixDimensionType(value: String): MatrixDimensionType = value.unsafeCast<MatrixDimensionType>()
+
+/**
+ * The documented values of [MatrixDimensionType].
+ */
+object MatrixDimensionTypes {
+    /** Category dimension; the only supported type. */
+    inline val category: MatrixDimensionType get() = MatrixDimensionType("category")
+}
+
+/**
+ * How one bound of a data zoom is interpreted.
+ */
+sealed external interface DataZoomRangeMode
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [DataZoomRangeModes]. */
+inline fun DataZoomRangeMode(value: String): DataZoomRangeMode = value.unsafeCast<DataZoomRangeMode>()
+
+/**
+ * The documented values of [DataZoomRangeMode].
+ */
+object DataZoomRangeModes {
+    /** Bound expressed as a data value. */
+    inline val value: DataZoomRangeMode get() = DataZoomRangeMode("value")
+
+    /** Bound expressed as a percentage of the axis extent. */
+    inline val percent: DataZoomRangeMode get() = DataZoomRangeMode("percent")
+}
+
+/**
+ * Event that triggers an axis pointer.
+ *
+ * Upstream `'click' | 'mousemove' | 'none' | 'mousemove|click'`; the combined value is available as
+ * [AxisPointerTriggerOns.mouseMoveClick].
+ */
+sealed external interface AxisPointerTriggerOn
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [AxisPointerTriggerOns]. */
+inline fun AxisPointerTriggerOn(value: String): AxisPointerTriggerOn =
+    value.unsafeCast<AxisPointerTriggerOn>()
+
+/**
+ * The documented values of [AxisPointerTriggerOn].
+ */
+object AxisPointerTriggerOns {
+    /** Trigger on a click. */
+    inline val click: AxisPointerTriggerOn get() = AxisPointerTriggerOn("click")
+
+    /** Trigger while the pointer moves. */
+    inline val mouseMove: AxisPointerTriggerOn get() = AxisPointerTriggerOn("mousemove")
+
+    /** Never trigger. */
+    inline val none: AxisPointerTriggerOn get() = AxisPointerTriggerOn("none")
+
+    /** Trigger on a pointer move or a click. */
+    inline val mouseMoveClick: AxisPointerTriggerOn get() = AxisPointerTriggerOn("mousemove|click")
+}
+
+/**
+ * Visibility of an axis pointer, driven by `dispatchAction`.
+ */
+sealed external interface AxisPointerStatus
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [AxisPointerStatuses]. */
+inline fun AxisPointerStatus(value: String): AxisPointerStatus = value.unsafeCast<AxisPointerStatus>()
+
+/**
+ * The documented values of [AxisPointerStatus].
+ */
+object AxisPointerStatuses {
+    /** Show the pointer. */
+    inline val show: AxisPointerStatus get() = AxisPointerStatus("show")
+
+    /** Hide the pointer. */
+    inline val hide: AxisPointerStatus get() = AxisPointerStatus("hide")
+}
+
+/**
+ * Action applied to a graphic element when the option is merged.
+ */
+sealed external interface GraphicAction
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [GraphicActions]. */
+inline fun GraphicAction(value: String): GraphicAction = value.unsafeCast<GraphicAction>()
+
+/**
+ * The documented values of [GraphicAction].
+ */
+object GraphicActions {
+    /** Merge the new members into the existing element. */
+    inline val merge: GraphicAction get() = GraphicAction("merge")
+
+    /** Replace the existing element with the new one. */
+    inline val replace: GraphicAction get() = GraphicAction("replace")
+
+    /** Remove the existing element. */
+    inline val remove: GraphicAction get() = GraphicAction("remove")
+}
+
+/**
+ * Icon of a brush type shown in the toolbox: a brush type, `"keep"` or `"clear"`.
+ */
+sealed external interface BrushToolboxIconType
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [BrushToolboxIconTypes]. */
+inline fun BrushToolboxIconType(value: String): BrushToolboxIconType =
+    value.unsafeCast<BrushToolboxIconType>()
+
+/**
+ * The documented values of [BrushToolboxIconType].
+ */
+object BrushToolboxIconTypes {
+    /** Polygon selection icon. */
+    inline val polygon: BrushToolboxIconType get() = BrushToolboxIconType("polygon")
+
+    /** Rectangle selection icon. */
+    inline val rect: BrushToolboxIconType get() = BrushToolboxIconType("rect")
+
+    /** Vertical line selection icon. */
+    inline val lineX: BrushToolboxIconType get() = BrushToolboxIconType("lineX")
+
+    /** Horizontal line selection icon. */
+    inline val lineY: BrushToolboxIconType get() = BrushToolboxIconType("lineY")
+
+    /** Keep the current selection. */
+    inline val keep: BrushToolboxIconType get() = BrushToolboxIconType("keep")
+
+    /** Clear the current selection. */
+    inline val clear: BrushToolboxIconType get() = BrushToolboxIconType("clear")
+}
+
+/**
+ * Bounds of a grid, expressed as percentages or as `"auto"`, `"same"` or `"none"`.
+ */
+sealed external interface OuterBoundsMode
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [OuterBoundsModes]. */
+inline fun OuterBoundsMode(value: String): OuterBoundsMode = value.unsafeCast<OuterBoundsMode>()
+
+/**
+ * The documented keyword values of [OuterBoundsMode].
+ */
+object OuterBoundsModes {
+    /** Compute the bounds automatically from the axes and labels. */
+    inline val auto: OuterBoundsMode get() = OuterBoundsMode("auto")
+
+    /** Use the same bounds as `containLabel`. */
+    inline val same: OuterBoundsMode get() = OuterBoundsMode("same")
+
+    /** Do not add outer bounds. */
+    inline val none: OuterBoundsMode get() = OuterBoundsMode("none")
+}
+
+/**
+ * Elements included in the outer bounds of a grid.
+ */
+sealed external interface OuterBoundsContain
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [OuterBoundsContains]. */
+inline fun OuterBoundsContain(value: String): OuterBoundsContain =
+    value.unsafeCast<OuterBoundsContain>()
+
+/**
+ * The documented values of [OuterBoundsContain].
+ */
+object OuterBoundsContains {
+    /** Axes and labels. */
+    inline val all: OuterBoundsContain get() = OuterBoundsContain("all")
+
+    /** Axis labels only. */
+    inline val axisLabel: OuterBoundsContain get() = OuterBoundsContain("axisLabel")
+
+    /** Decide from the axis type. */
+    inline val auto: OuterBoundsContain get() = OuterBoundsContain("auto")
+}
+
+/**
+ * Order of the items inside a tooltip.
+ */
+sealed external interface TooltipOrder
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [TooltipOrders]. */
+inline fun TooltipOrder(value: String): TooltipOrder = value.unsafeCast<TooltipOrder>()
+
+/**
+ * The documented values of [TooltipOrder].
+ */
+object TooltipOrders {
+    /** Series order, ascending. */
+    inline val seriesAsc: TooltipOrder get() = TooltipOrder("seriesAsc")
+
+    /** Series order, descending. */
+    inline val seriesDesc: TooltipOrder get() = TooltipOrder("seriesDesc")
+
+    /** Value order, ascending. */
+    inline val valueAsc: TooltipOrder get() = TooltipOrder("valueAsc")
+
+    /** Value order, descending. */
+    inline val valueDesc: TooltipOrder get() = TooltipOrder("valueDesc")
+}
+
+/**
+ * Event that expands the parallel axes.
+ */
+sealed external interface ParallelAxisExpandTriggerOn
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [ParallelAxisExpandTriggerOns]. */
+inline fun ParallelAxisExpandTriggerOn(value: String): ParallelAxisExpandTriggerOn =
+    value.unsafeCast<ParallelAxisExpandTriggerOn>()
+
+/**
+ * The documented values of [ParallelAxisExpandTriggerOn].
+ */
+object ParallelAxisExpandTriggerOns {
+    /** Expand on a click. */
+    inline val click: ParallelAxisExpandTriggerOn get() = ParallelAxisExpandTriggerOn("click")
+
+    /** Expand while the pointer moves. */
+    inline val mouseMove: ParallelAxisExpandTriggerOn get() = ParallelAxisExpandTriggerOn("mousemove")
+}

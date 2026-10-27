@@ -2,6 +2,7 @@ package echarts.api
 
 import echarts.AxisTypes
 import echarts.ModelFinder
+import echarts.OuterBoundsModes
 import echarts.createChart
 import echarts.destroyChart
 import echarts.finder
@@ -161,7 +162,7 @@ class ContainPixelTest {
                             top = StringOrDouble(30.0)
                             bottom = StringOrDouble(40.0)
                             containLabel = false
-                            outerBoundsMode = "none"
+                            outerBoundsMode = OuterBoundsModes.none
                         },
                         unsafeJso<GridOption> {
                             id = "g1"
@@ -170,7 +171,7 @@ class ContainPixelTest {
                             top = StringOrDouble(30.0)
                             bottom = StringOrDouble(40.0)
                             containLabel = false
-                            outerBoundsMode = "none"
+                            outerBoundsMode = OuterBoundsModes.none
                         },
                     )
                     xAxis = arrayOf(
@@ -291,7 +292,7 @@ class ContainPixelTest {
  * Builds a graph node with fixed coordinates.
  *
  * `GraphNodeItemOption` is not an `OptionDataItemObject` (its `value` is wider), so the series
- * `data` slot needs an explicit cast — the same thing upstream does with its `GraphNodeItemOption`
+ * `data` slot needs an explicit cast �?the same thing upstream does with its `GraphNodeItemOption`
  * union.
  */
 private fun node(x: Double, y: Double): OptionDataItem? =

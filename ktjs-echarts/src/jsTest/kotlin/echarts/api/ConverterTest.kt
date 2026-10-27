@@ -2,6 +2,7 @@ package echarts.api
 
 import echarts.AxisTypes
 import echarts.ModelFinder
+import echarts.OuterBoundsModes
 import echarts.asList
 import echarts.assertPointEquals
 import echarts.asScalar
@@ -227,7 +228,7 @@ class ConverterTest {
                             top = StringOrDouble(30.0)
                             bottom = StringOrDouble(40.0)
                             containLabel = false
-                            outerBoundsMode = "none"
+                            outerBoundsMode = OuterBoundsModes.none
                         },
                         unsafeJso<GridOption> {
                             id = "g1"
@@ -236,7 +237,7 @@ class ConverterTest {
                             top = StringOrDouble(30.0)
                             bottom = StringOrDouble(40.0)
                             containLabel = false
-                            outerBoundsMode = "none"
+                            outerBoundsMode = OuterBoundsModes.none
                         },
                     )
                     xAxis = arrayOf(

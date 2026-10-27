@@ -1,8 +1,10 @@
 package echarts.options
 
 import echarts.AnimationEasing
+import echarts.AreaOrigin
 import echarts.BlurScope
 import echarts.EmphasisFocus
+import echarts.LabelLineOverflow
 import echarts.MoveOverlap
 import js.objects.Record
 import kotlin.js.unsafeCast
@@ -206,8 +208,8 @@ external interface AreaStyleOption : ShadowOption {
     /** Opacity, `0..1`. */
     var opacity: Double?
 
-    /** Fill origin: `"auto"`, `"start"` or `"end"`. */
-    var origin: String?
+    /** Fill origin: `"auto"`, `"start"`, `"end"`, or the axis value the fill starts from. */
+    var origin: AreaOrigin?
 
     /** Decal pattern applied to the area, or `"none"`. */
     var decal: DecalSetting?
@@ -258,6 +260,9 @@ external interface LabelOption : TextStyleOption {
     /** Rotation in degrees, `-90..90`. */
     var rotate: Double?
 
+    /** Behaviour when the text is wider than the available space; `"truncate"`. */
+    var lineOverflow: LabelLineOverflow?
+
     /** Offset from the computed position, `[x, y]`. */
     var offset: Array<Double>?
 
@@ -278,9 +283,6 @@ external interface LabelOption : TextStyleOption {
 
     /** Space kept around the label to avoid overlapping. */
     var textMargin: DoubleOrDoubleArray?
-
-    /** Overflow behaviour of a single line. */
-    var lineOverflow: String?
 }
 
 /**

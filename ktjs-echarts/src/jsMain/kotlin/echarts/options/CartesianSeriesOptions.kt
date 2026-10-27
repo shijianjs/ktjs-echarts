@@ -2,6 +2,7 @@ package echarts.options
 
 import echarts.SeriesType
 import echarts.SeriesLayoutBy
+import echarts.ProgressiveChunkMode
 import echarts.CustomSeriesRenderItem
 import echarts.AnimationEasing
 import zrender.ZRColor
@@ -123,8 +124,8 @@ external interface SeriesOption {
     /** Number of elements above which progressive rendering is used. */
     var progressiveThreshold: Double?
 
-    /** Chunking mode of the progressive rendering: `"sequential"` or `"mod"`. */
-    var progressiveChunkMode: String?
+    /** Chunking mode of the progressive rendering; `"mod"` splits the rest into equal chunks. */
+    var progressiveChunkMode: ProgressiveChunkMode?
 
     /** Coordinate system used by the series. */
     var coordinateSystem: String?

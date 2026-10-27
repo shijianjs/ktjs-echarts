@@ -58,6 +58,21 @@
     `ComponentOnCalendarOptionMixin` / `ComponentOnMatrixOptionMixin`，22 个系列接口按上游 `.d.ts` 逐个继承，
     各接口里重复的 `xAxisIndex` / `geoIndex` 等 40 余处字段删掉（改由 mixin 提供），`*Id` 字段随之补齐。
 
+### ④ 剩余关键字字面量收尾
+
+- 新增字面量并替换字段：`AxisNameLocation`、`TitleTarget`、`HorizontalAlign`（legend 与 visualMap 共用）、
+  `LegendPageButtonPosition`、`TimelineControlPosition`、`LabelLineOverflow`、`GraphicBounding`、
+  `GraphicAction`（`graphic.$action`，Kotlin 侧叫 `action` 并用 `@JsName` 映射）、`BrushType` /
+  `BrushTypeUncertain` / `BrushMode` / `BrushThrottleType` / `BrushToolboxIconType`、`MatrixDimensionType`、
+  `DataZoomRangeMode`、`OuterBoundsMode` / `OuterBoundsContain`、`TooltipOrder`、`AxisPointerTriggerOn` /
+  `AxisPointerStatus`、`ParallelAxisExpandTriggerOn`、`ProgressiveChunkMode`、`AreaOrigin`（字符串或数字）。
+- `TitleOption` 补 `subtarget`；`LegendOption` 补 `pageButtonPosition`；`LabelOption` 补 `lineOverflow`；
+  `ParallelOption` 补 `axisExpand*` 系列字段；`TimelineOption.controlPosition` 与
+  `TimelineControlStyle.position` 一起换掉。
+- 修正插入 `MediaUnit` 时被挤到前面的 `EChartsOption` KDoc。
+- 测试：`LiteralsTest` 新增 5 组字面量断言与 2 组字段读写用例（含 `graphic.$action` 的 `@JsName` 映射），
+  浏览器用例 189 → 195，全过。
+
 ### 遗留提醒
 
 `GraphSeriesOption` 里原 `directed` / `edgeShape` / `edgeForkPosition` / `selectedMode` 在 6.1.0 的
@@ -65,25 +80,18 @@
 
 ## 待办
 
-### 1. 剩下的关键字字面量字段
+### 1. 系列自身的 `coordinateSystem` 收窄
 
-上一轮补齐了 series 级与部分组件级的字面量，以下仍是 `String?`（都要先查 `.d.ts` 确认取值）：
+上游基接口 `SeriesOption.coordinateSystem` 是 `string`，子类型收窄成 `'cartesian2d' | 'polar'`、
+`'none'`、`'view'` 等（line/bar/scatter/effectScatter、chord、sankey、heatmap、parallel、custom、graphic 系列）。
+Kotlin 的 `var` 覆盖要求类型完全一致，只能：
 
-- `series.progressiveChunkMode`（`'mod'`）、各 series 自己的 `coordinateSystem`（如 line `'cartesian2d' | 'polar'`、
-  chord `'none'`、sankey `'view'`；注意基接口 `SeriesOption.coordinateSystem` 是 `string`，子类型只能用
-  `override` 且类型必须一致，想收窄得先把基接口改成联合或放弃收窄）
-- `areaStyle.origin`（`'auto' | 'start' | 'end' | number`，line series 会再收窄）
-- gauge `axisLabel`（上游 `Omit<LabelOption,'rotate'> & { formatter; rotate?: 'tangential' | 'radial' | number }`）
-  与 `label.rotate`
-- `label.lineOverflow`（`'truncate'`）
-- `timeline.controlStyle.position`（`'left' | 'right'`）
-- `title.target` / `subtarget`（`'self' | 'blank'`）
-- `legend.align`（`'auto' | 'left' | 'right'`）、`legend.pageButtonPosition`（`'start' | 'end'`）
-- `axis.nameLocation`（`'start' | 'middle' | 'end'`）
-- `visualMap.selectedMode`（Kotlin 现在写的是「`"auto"` 或 `"all"`」，要核对上游再定）
-- `graphic` 元素、`matrix`、`parallel`、`dataZoom` 里零散的 `String` 字段
+- 把基接口改成联合（子类型仍不能收窄，只是调用方拿到联合），或
+- 按 `AGENTS.md` 的同名字段约定用 `@JsName("coordinateSystem")` + `Property` 后缀另起一个 Kotlin 名，
+  先验证 `external interface` 继承里两个成员映射到同一 JS 属性名是否被编译器接受。
 
 ### 2. `Omit<...> & { ... }`、var 收窄带来的限制（需要新写法才解）
+
 
 - series 级 `itemStyle` / `label` 上游会收窄成子类型（`TreemapSeriesItemStyleOption`、`SunburstLabelOption`、
   `ChordItemStyleOption` …），Kotlin 的 `var` 覆盖要求类型完全相同，这些字段只能保留基接口类型；

@@ -1,6 +1,19 @@
 package echarts.options
 
 import echarts.VisualMapType
+import echarts.BrushMode
+import echarts.BrushThrottleType
+import echarts.BrushToolboxIconType
+import echarts.BrushTypeUncertain
+import echarts.DataZoomRangeMode
+import echarts.GraphicAction
+import echarts.GraphicBounding
+import echarts.HorizontalAlign
+import echarts.MatrixDimensionType
+import echarts.AxisPointerStatus
+import echarts.AxisPointerTriggerOn
+import echarts.ParallelAxisExpandTriggerOn
+import echarts.TimelineControlPosition
 import echarts.RadarShape
 import echarts.Orient
 import echarts.NameMap
@@ -11,6 +24,7 @@ import echarts.AxisPointerType
 import echarts.AnimationEasing
 import js.objects.Record
 import kotlin.js.JsAny
+import kotlin.js.JsName
 import web.html.HTMLDivElement
 import zrender.ZRColor
 import zrender.ZRElementEvent
@@ -18,17 +32,6 @@ import zrender.ZRFontWeight
 import zrender.ZRShapeProps
 import zrender.ZRStyleProps
 
-/**
- * The root ECharts option object accepted by `setOption`.
- *
- * Top-level fields configure components and global defaults; [series] holds the data series.
- * Every component field is an array because ECharts supports multiple instances of the same
- * component type; use [one] for the common single-instance case.
- *
- * This model covers the documented public options. For a fragment that is not modelled, pass a
- * JavaScript object through `setOption` with a `JsAny` value, or build extra fields with
- * [echartsOption] and assign them to the typed object.
- */
 /**
  * One responsive option of [EChartsOption.media].
  */
@@ -57,6 +60,17 @@ external interface MediaQueryOption {
     var maxHeight: Double?
 }
 
+/**
+ * The root ECharts option object accepted by `setOption`.
+ *
+ * Top-level fields configure components and global defaults; [series] holds the data series.
+ * Every component field is an array because ECharts supports multiple instances of the same
+ * component type; use [one] for the common single-instance case.
+ *
+ * This model covers the documented public options. For a fragment that is not modelled, pass a
+ * JavaScript object through `setOption` with a `JsAny` value, or build extra fields with
+ * [echartsOption] and assign them to the typed object.
+ */
 external interface EChartsOption {
     /**
      * Base option of a timeline / media option.
@@ -339,8 +353,8 @@ external interface DataZoomOption {
     /** Throttle delay of wheel events in milliseconds. */
     var throttle: Double?
 
-    /** Zoom range mode: `"value"` or `"percent"`. */
-    var rangeMode: Array<String>?
+    /** How each bound of the zoom range is interpreted: `"value"` or `"percent"`. */
+    var rangeMode: Array<DataZoomRangeMode>?
 
     /** Whether brush selection is enabled. */
     var brushSelect: Boolean?
@@ -351,8 +365,8 @@ external interface DataZoomOption {
     /** Whether to show the detail text. */
     var showDetail: Boolean?
 
-    /** Whether to show data shadows. */
-    var showDataShadow: String?
+    /** Whether to show the data shadow behind the slider: `"auto"` or a boolean. */
+    var showDataShadow: BooleanOrString?
 
     /** Zoom lock on the inside variant. */
     var preventDefaultMouseMove: Boolean?
@@ -655,8 +669,8 @@ external interface VisualMapOption {
     /** Precision of displayed values. */
     var precision: Double?
 
-    /** Whether to align the component to the right. */
-    var align: String?
+    /** Alignment of the component: `"auto"`, `"left"` or `"right"`. */
+    var align: HorizontalAlign?
 
     /** Text displayed next to the range. */
     var text: Array<String>?
@@ -704,7 +718,7 @@ external interface VisualMapOption {
     var categories: JsAny?
 
     /** How to select the piece style: `"auto"` or `"all"`. */
-    var selectedMode: String?
+    var selectedMode: SelectionMode?
 
     /** Items per row or column. */
     var itemGap: Double?
@@ -1111,8 +1125,8 @@ external interface TimelineOption {
     /** Playback speed in milliseconds per point. */
     var playbackSpeed: Double?
 
-    /** Position of the control buttons. */
-    var controlPosition: String?
+    /** Position of the control buttons: `"left"` or `"right"`. */
+    var controlPosition: TimelineControlPosition?
 
     /** Distance to the left side. */
     var left: StringOrDouble?
@@ -1233,8 +1247,8 @@ external interface TimelineControlStyle : ItemStyleOption {
     /** Gap between the buttons. */
     var itemGap: Double?
 
-    /** Position of the controls. */
-    var position: String?
+    /** Position of the controls: `"left"`, `"right"`, `"top"` or `"bottom"`. */
+    var position: TimelineControlPosition?
 
     /** Icon of the play button. */
     var playIcon: String?
@@ -1297,8 +1311,16 @@ external interface GraphicElement {
     /** Distance to the bottom side. */
     var bottom: StringOrDouble?
 
-    /** Bounding box used to position the element. */
-    var bounding: String?
+    /** Bounding box used to position the element: `"raw"` or `"all"`. */
+    var bounding: GraphicBounding?
+
+    /**
+     * How the element reacts when the option is merged: `"merge"`, `"replace"` or `"remove"`.
+     *
+     * Upstream property is `$action`.
+     */
+    @JsName("\$action")
+    var action: GraphicAction?
 
     /** z-index of the element. */
     var z: Double?
@@ -1386,14 +1408,14 @@ external interface AriaLabelOption {
  * Brush component: selects a region and emits `brushSelected`.
  */
 external interface BrushOption {
-    /** Button configuration for the toolbox. */
-    var toolbox: Array<String>?
+    /** Icon of the brush types shown in the toolbox: `"rect"`, `"polygon"`, `"lineX"`, `"lineY"`, `"keep"` or `"clear"`. */
+    var toolbox: Array<BrushToolboxIconType>?
 
-    /** Brush type: `"rect"`, `"polygon"`, `"lineX"`, `"lineY"`, `"keep"` or `"clear"`. */
-    var brushType: String?
+    /** Brush type: `"rect"`, `"polygon"`, `"lineX"`, `"lineY"`, `"auto"` or `false`. */
+    var brushType: BrushTypeUncertain?
 
     /** Brush mode: `"single"` or `"multiple"`. */
-    var brushMode: String?
+    var brushMode: BrushMode?
 
     /** Whether the selection can be transformed. */
     var transformable: Boolean?
@@ -1402,7 +1424,7 @@ external interface BrushOption {
     var brushStyle: BrushStyleOption?
 
     /** Throttle type of the `brushselected` event: `"debounce"` or `"fixRate"`. */
-    var throttleType: String?
+    var throttleType: BrushThrottleType?
 
     /** Throttle delay in milliseconds. */
     var throttleDelay: Double?
@@ -1453,8 +1475,8 @@ external interface AxisPointerOption {
     /** Shape of the pointer. */
     var type: AxisPointerType?
 
-    /** How the pointer is triggered. */
-    var triggerOn: String?
+    /** How the pointer is triggered: `"click"`, `"mousemove"`, `"none"` or `"mousemove|click"`. */
+    var triggerOn: AxisPointerTriggerOn?
 
     /** Whether hovering highlights the related series. */
     var triggerEmphasis: Boolean?
@@ -1463,7 +1485,7 @@ external interface AxisPointerOption {
     var value: OptionDataValue?
 
     /** `"show"` or `"hide"`; drives the pointer from `dispatchAction`. */
-    var status: String?
+    var status: AxisPointerStatus?
 
     /** Whether the pointer snaps to data points. */
     var snap: Boolean?
@@ -1662,7 +1684,7 @@ external interface MatrixOption {
  */
 external interface MatrixDimensionOption {
     /** Dimension type; only `"category"` is supported. */
-    var type: String?
+    var type: MatrixDimensionType?
 
     /** Whether the dimension is shown. */
     var show: Boolean?
@@ -1792,7 +1814,37 @@ external interface ParallelOption {
     var height: StringOrDouble?
 
     /** Orientation: `"horizontal"` or `"vertical"`. */
-    var layout: String?
+    var layout: Orient?
+
+    /** Whether the axes can be expanded. */
+    var axisExpandable: Boolean?
+
+    /** Index of the axis expanded at first. */
+    var axisExpandCenter: Double?
+
+    /** Number of axes shown when expanded. */
+    var axisExpandCount: Double?
+
+    /** Width of one axis when expanded. */
+    var axisExpandWidth: Double?
+
+    /** Event that expands the axes: `"click"` or `"mousemove"`. */
+    var axisExpandTriggerOn: ParallelAxisExpandTriggerOn?
+
+    /** Expansion speed, `0` means no animation. */
+    var axisExpandRate: Double?
+
+    /** Debounce delay of the expansion, in milliseconds. */
+    var axisExpandDebounce: Double?
+
+    /**
+     * Area that triggers the expansion while the pointer moves, as `[left, right, middle]`
+     * fractions of the parallel width.
+     */
+    var axisExpandSlideTriggerArea: Array<Double>?
+
+    /** Range of the expanded window. */
+    var axisExpandWindow: Array<Double>?
 
     /** Index of the parallel axes used by this coordinate system. */
     var parallelAxisDefault: ParallelAxisOption?

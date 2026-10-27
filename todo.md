@@ -187,14 +187,7 @@
 - 顺带收紧：`GaugeSeriesOption.axisLabel` 直接用 `GaugeAxisLabelOption?`（去掉中转的 `typedAxisLabel`），
   `SunburstSeriesOption` 补 `@JsName("label") var typedLabel`。
 
-### 遗留提醒
-
-`GraphSeriesOption` 里原 `directed` / `edgeShape` / `edgeForkPosition` / `selectedMode` 在 6.1.0 的
-`.d.ts` 中查不到，已按上游删除；上游若加回来则按新 `.d.ts` 恢复。
-
-## 待办
-
-### 1. `Omit<...> & { ... }` 与 var 收窄的残留
+### 10. `Omit<...> & { ... }` 与 var 收窄的残留
 
 - series 级 `itemStyle` / `label` 上游收窄成**另一套对象**（`TreemapSeriesItemStyleOption`、
   `SunburstLabelOption`、`CandlestickItemStyleOption`…）：精确类型本身就是基类型的子接口，调用方直接
@@ -204,7 +197,7 @@
 - `rotate` 的收窄已在 ⑨ 用 `typedRotate` 补齐（gauge axis label / pie / sunburst）。
 - 关键字收窄（`coordinateSystem` 等）沿用 `@JsName` 同名字段，见 `TYPE-MAPPING.md` §12。
 
-### 2. 已确认「保持现状」的项（不要重复修）
+### 11. 已确认「保持现状」的项（不要重复修）
 
 - `LegendOption` 保留 `ScrollableLegendOption` 的分页字段：`EChartsOption.legend` 是 `Array<LegendOption>`，
   拆成子类型后调用方无法直接访问分页字段；与上游的联合建模等价，属于有意的更宽类型。
@@ -224,3 +217,13 @@
   收窄成字面量反而挡住自定义方法名。
 - `Payload.type` 保持 `String?`：上游每个具体 payload 才收窄成字面量，共用 `Payload` 时无法表达；
   调用方本来就要写自己的 action 名。
+
+### 遗留提醒
+
+`GraphSeriesOption` 里原 `directed` / `edgeShape` / `edgeForkPosition` / `selectedMode` 在 6.1.0 的
+`.d.ts` 中查不到，已按上游删除；上游若加回来则按新 `.d.ts` 恢复。
+
+## 待办
+
+
+

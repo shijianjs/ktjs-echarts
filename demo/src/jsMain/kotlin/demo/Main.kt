@@ -136,7 +136,7 @@ private fun buildOption(
         text = "Monthly revenue"
         subtext = "Revenue and orders, in thousands"
     })
-    tooltip = unsafeJso<TooltipOption> { trigger = TooltipTriggers.axis }
+    tooltip = one(unsafeJso<TooltipOption> { trigger = TooltipTriggers.axis })
     legend = one(unsafeJso<LegendOption> { top = StringOrDouble(6.0) })
     grid = one(unsafeJso<GridOption> {
         top = StringOrDouble(96.0)

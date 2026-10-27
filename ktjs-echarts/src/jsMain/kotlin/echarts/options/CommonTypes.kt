@@ -423,6 +423,34 @@ fun LabelPosition(value: String): LabelPosition = value.unsafeCast<LabelPosition
 fun LabelPosition(values: Array<StringOrDouble>): LabelPosition = values.unsafeCast<LabelPosition>()
 
 /**
+ * Parameters of a tooltip formatter or position callback: the single item branch, or the array
+ * branch used by an `"axis"` trigger.
+ *
+ * Upstream `TopLevelFormatterParams`. `TooltipPositionCallbackParams` is declared with the same
+ * shape, so it is modelled as [TopLevelFormatterParams] instead of a second opaque type.
+ */
+external interface TopLevelFormatterParams
+
+/** Wraps the single-item branch. */
+fun TopLevelFormatterParams(value: CallbackDataParams): TopLevelFormatterParams =
+    value.unsafeCast<TopLevelFormatterParams>()
+
+/** Wraps the `"axis"` trigger branch. */
+fun TopLevelFormatterParams(values: Array<CallbackDataParams>): TopLevelFormatterParams =
+    values.unsafeCast<TopLevelFormatterParams>()
+
+/** Upstream `TooltipPositionCallbackParams`, structurally identical to [TopLevelFormatterParams]. */
+typealias TooltipPositionCallbackParams = TopLevelFormatterParams
+
+/**
+ * Signature of a tooltip `formatter` callback.
+ *
+ * Upstream `TooltipFormatterCallback<TopLevelFormatterParams>` also passes the async ticket and
+ * accepts an async result callback; the wrapper keeps the synchronous shape.
+ */
+typealias TooltipFormatterCallback = (params: TopLevelFormatterParams) -> TooltipContent
+
+/**
  * Position of a tooltip: an array, a built-in position, a callback or a box layout.
  */
 external interface TooltipPosition
@@ -436,16 +464,21 @@ fun TooltipPosition(values: Array<StringOrDouble>): TooltipPosition = values.uns
 /** Wraps a box layout. */
 fun TooltipPosition(value: TooltipBoxLayoutOption): TooltipPosition = value.unsafeCast<TooltipPosition>()
 
+/**
+ * Signature of a tooltip `position` callback: receives the pointer `[x, y]`, the formatter
+ * parameters (a single object or an array, like [TooltipFormatterCallback]), the tooltip element,
+ * the rect of the hovered elements and the content/view sizes.
+ */
+typealias TooltipPositionCallback = (
+    point: Array<Double>,
+    params: TopLevelFormatterParams,
+    el: JsAny?,
+    rect: RectLike?,
+    size: TooltipSize,
+) -> TooltipPosition
+
 /** Wraps a callback that computes the position from the pointer and content rect. */
-fun TooltipPosition(
-    callback: (
-        point: Array<Double>,
-        params: CallbackDataParams,
-        el: JsAny?,
-        rect: RectLike?,
-        size: TooltipSize,
-    ) -> TooltipPosition,
-): TooltipPosition = callback.unsafeCast<TooltipPosition>()
+fun TooltipPosition(callback: TooltipPositionCallback): TooltipPosition = callback.unsafeCast<TooltipPosition>()
 
 /**
  * Tooltip position expressed as distances to the container edges.

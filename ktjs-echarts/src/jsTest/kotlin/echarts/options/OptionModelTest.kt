@@ -31,14 +31,14 @@ class OptionModelTest {
         val option = unsafeJso<EChartsOption> {
             backgroundColor = ZRColor("#f5f5f5")
             animation = false
-            animationDuration = 1200.0
+            animationDuration = AnimationDuration(1200.0)
             color = arrayOf(ZRColor("#111111"), ZRColor("#222222"))
         }
 
         assertEquals("object", jsTypeOf(option))
         assertEquals("#f5f5f5", option.backgroundColor.unsafeCast<String>())
         assertFalse(option.animation!!)
-        assertEquals(1200.0, option.animationDuration)
+        assertEquals(1200.0, option.animationDuration!!.unsafeCast<Double>())
         assertEquals(2, option.color?.size)
         assertEquals("#222222", option.color!![1].unsafeCast<String>())
     }
@@ -47,7 +47,7 @@ class OptionModelTest {
     fun optionBuilderSupportsNestedComponents() {
         val option = unsafeJso<EChartsOption> {
             title = one(unsafeJso<TitleOption> { text = "Sales"; subtext = "2026" })
-            tooltip = unsafeJso<TooltipOption> { show = true; trigger = TooltipTriggers.axis }
+            tooltip = one(unsafeJso<TooltipOption> { show = true; trigger = TooltipTriggers.axis })
             legend = one(unsafeJso<LegendOption> { show = true; type = LegendTypes.scroll })
             grid = one(unsafeJso<GridOption> { left = StringOrDouble("5%"); containLabel = true })
             xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.category; data = numbers(1.0, 2.0, 3.0) })
@@ -57,7 +57,7 @@ class OptionModelTest {
 
         assertEquals("Sales", option.title!![0].text)
         assertEquals("2026", option.title!![0].subtext)
-        assertEquals(TooltipTriggers.axis, option.tooltip!!.trigger)
+        assertEquals(TooltipTriggers.axis, option.tooltip!![0].trigger)
         assertEquals(LegendTypes.scroll, option.legend!![0].type)
         assertTrue(option.grid!![0].containLabel!!)
         assertEquals(AxisTypes.category, option.xAxis!![0].type)
@@ -242,7 +242,15 @@ class OptionModelTest {
 
         val tooltipTemplate = TooltipFormatter("{b}")
         assertEquals("{b}", tooltipTemplate.unsafeCast<String>())
-        assertEquals("function", jsTypeOf(TooltipFormatter { arrayOfParams -> TooltipContent("${arrayOfParams.size}") }))
+        val tooltipCallback = TooltipFormatter { params ->
+            TooltipContent(params.unsafeCast<Array<CallbackDataParams>>().size.toString())
+        }
+        assertEquals("function", jsTypeOf(tooltipCallback))
+        val callTooltip = tooltipCallback.unsafeCast<(TopLevelFormatterParams) -> TooltipContent>()
+        assertEquals(
+            "0",
+            callTooltip(TopLevelFormatterParams(emptyArray())).unsafeCast<String>(),
+        )
 
         val valueFormatter = TooltipValueFormatter("{c}")
         assertEquals("{c}", valueFormatter.unsafeCast<String>())

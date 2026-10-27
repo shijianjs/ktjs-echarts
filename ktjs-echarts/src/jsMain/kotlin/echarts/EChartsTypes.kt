@@ -1,5 +1,6 @@
 package echarts
 
+import echarts.options.AxisBreakIdentifier
 import echarts.options.DimensionLoose
 import echarts.options.EChartsOption
 import echarts.options.ModelFinderIndexQuery
@@ -8,6 +9,7 @@ import echarts.options.StringOrDouble
 import echarts.options.StringOrStringArray
 import js.objects.unsafeJso
 import kotlin.js.JsAny
+import kotlin.js.JsName
 import kotlin.js.unsafeCast
 import web.cssom.FontStyle
 import zrender.RendererType
@@ -856,8 +858,8 @@ external interface SelectChangedEvent {
     /** Whether the event was caused by a click. */
     val isFromClick: Boolean
 
-    /** Action that produced the change. */
-    val fromAction: String
+    /** Action that produced the change; see [SelectChangedFromActions]. */
+    val fromAction: SelectChangedFromAction
 
     /** Payload of the action that produced the change. */
     val fromActionPayload: Payload
@@ -869,12 +871,29 @@ external interface SelectChangedEvent {
 /**
  * One break of an [AxisBreakChangedEvent].
  */
-external interface AxisBreakChangedEventBreak {
-    /** Whether the break is expanded. */
+external interface AxisBreakChangedEventBreak : AxisBreakIdentifier {
+    /** Whether the break is expanded after the change. */
     val isExpanded: Boolean
 
-    /** State before the change. */
-    val old: JsAny
+    /** State of the break before the change. */
+    val old: AxisBreakChangedEventOldState
+
+    /** Index of the x axis the break belongs to. */
+    val xAxisIndex: ModelFinderIndexQuery?
+
+    /** Index of the y axis the break belongs to. */
+    val yAxisIndex: ModelFinderIndexQuery?
+
+    /** Index of the single axis the break belongs to. */
+    val singleAxisIndex: ModelFinderIndexQuery?
+}
+
+/**
+ * State of a break before an [AxisBreakChangedEvent].
+ */
+external interface AxisBreakChangedEventOldState {
+    /** Whether the break was expanded. */
+    val isExpanded: Boolean
 }
 
 /**
@@ -884,8 +903,8 @@ external interface AxisBreakChangedEvent {
     /** Always `"axisbreakchanged"`. */
     val type: String
 
-    /** Action that produced the change: `"expandAxisBreak"`, `"collapseAxisBreak"` or `"toggleAxisBreak"`. */
-    val fromAction: String
+    /** Action that produced the change; see [AxisBreakActions]. */
+    val fromAction: AxisBreakAction
 
     /** Payload of the action that produced the change. */
     val fromActionPayload: Payload
@@ -966,6 +985,105 @@ external interface PayloadAnimationPart {
 }
 
 /**
+ * Payload of the `highlight` action.
+ *
+ * Upstream narrows `type` to `"highlight"` and adds `notBlur`; the wrapper keeps the shared
+ * [Payload] members, so a plain [Payload] and this type are interchangeable.
+ */
+external interface HighlightPayload : Payload
+
+/**
+ * Payload of the `downplay` action.
+ *
+ * See [HighlightPayload] for why the upstream `type` narrowing has no Kotlin counterpart.
+ */
+external interface DownplayPayload : Payload
+
+/**
+ * Payload of the `selectchanged` event.
+ *
+ * Upstream keeps this type for backward compatibility and points at [SelectChangedEvent].
+ */
+external interface SelectChangedPayload : Payload {
+    /** Whether the change was caused by a click. */
+    var isFromClick: Boolean?
+
+    /** Action that produced the change: `"select"`, `"unselect"` or `"toggleSelected"`. */
+    var fromAction: SelectChangedFromAction?
+
+    /** Payload of the action that produced the change. */
+    var fromActionPayload: Payload?
+
+    /** Selected items per series. */
+    var selected: Array<SelectedInfo>?
+}
+
+/**
+ * Fields shared by the axis break action payloads: the axis to address and the breaks to apply.
+ *
+ * `xAxisIndex` / `yAxisIndex` come from [Payload] and are typed as a single index; the upstream
+ * `ModelFinderIndexQuery` form (including `"all"`) is available as [typedXAxisIndex] and
+ * [typedYAxisIndex], which map back to the same JavaScript property.
+ */
+external interface BaseAxisBreakPayload : Payload {
+    /**
+     * Index of the x axis, including `"all"` and index arrays.
+     *
+     * `@JsName("xAxisIndex")`: same JavaScript property as [Payload.xAxisIndex], see
+     * `TYPE-MAPPING.md` §12.
+     */
+    @JsName("xAxisIndex")
+    var typedXAxisIndex: ModelFinderIndexQuery?
+
+    /**
+     * Index of the y axis, including `"all"` and index arrays.
+     *
+     * `@JsName("yAxisIndex")`: same JavaScript property as [Payload.yAxisIndex].
+     */
+    @JsName("yAxisIndex")
+    var typedYAxisIndex: ModelFinderIndexQuery?
+
+    /** Id of the x axis, takes precedence over the index. */
+    var xAxisId: String?
+
+    /** Name of the x axis, takes precedence over the index. */
+    var xAxisName: String?
+
+    /** Id of the y axis, takes precedence over the index. */
+    var yAxisId: String?
+
+    /** Name of the y axis, takes precedence over the index. */
+    var yAxisName: String?
+
+    /** Index of the single axis. */
+    var singleAxisIndex: ModelFinderIndexQuery?
+
+    /** Id of the single axis, takes precedence over the index. */
+    var singleAxisId: String?
+
+    /** Name of the single axis, takes precedence over the index. */
+    var singleAxisName: String?
+
+    /** Breaks the action applies to; required by the upstream action. */
+    var breaks: Array<AxisBreakIdentifier>
+}
+
+/**
+ * Payload of the `expandAxisBreak` action.
+ */
+external interface ExpandAxisBreakPayload : BaseAxisBreakPayload
+
+/**
+ * Payload of the `collapseAxisBreak` action.
+ */
+external interface CollapseAxisBreakPayload : BaseAxisBreakPayload
+
+/**
+ * Payload of the `toggleAxisBreak` action.
+ */
+external interface ToggleAxisBreakPayload : BaseAxisBreakPayload
+
+/**
  * Description of a custom action registered with [ECharts.registerAction].
  *
  * Create one with `ActionInfo("myAction")` and set the optional fields.
@@ -977,7 +1095,7 @@ external interface ActionInfo {
     /** Event name emitted after the action; defaults to [type]. */
     var event: String?
 
-    /** Update method used to refresh the chart after the action. */
+    /** Update method used to refresh the chart after the action; see [ECUpdateMethodNames]. */
     var update: String?
 
     /** Handler invoked with the action payload. */

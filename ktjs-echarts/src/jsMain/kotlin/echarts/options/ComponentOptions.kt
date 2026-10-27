@@ -8,6 +8,7 @@ import echarts.LegendPageButtonPosition
 import echarts.OuterBoundsContain
 import echarts.OuterBoundsMode
 import echarts.TooltipOrder
+import echarts.TooltipRenderMode
 import echarts.Orient
 import echarts.LegendType
 import echarts.AxisType
@@ -19,6 +20,8 @@ import kotlin.js.JsAny
 import kotlin.js.unsafeCast
 import web.canvas.CanvasLineCap
 import web.canvas.CanvasLineJoin
+import web.cssom.VerticalAlign
+import web.html.HTMLElement
 import zrender.TextOverflow
 import zrender.ZRColor
 import zrender.ZRLineType
@@ -430,17 +433,32 @@ external interface TooltipOption {
     /** Whether the mouse can enter the tooltip. */
     var enterable: Boolean?
 
-    /** Render mode: `"html"` or `"richText"`. */
-    var renderMode: String?
+    /** Render mode: `"auto"`, `"html"` or `"richText"`. */
+    var renderMode: TooltipRenderMode?
 
     /** Whether the tooltip is confined to the chart container. */
     var confine: Boolean?
 
+    /** Horizontal alignment of the tooltip relative to the pointer. */
+    var align: HorizontalAlign?
+
+    /** Vertical alignment of the tooltip relative to the pointer. */
+    var verticalAlign: VerticalAlign?
+
+    /** Whether showing and hiding the tooltip is animated. */
+    var displayTransition: Boolean?
+
     /** Whether the tooltip is appended to the document body. */
     var appendToBody: Boolean?
 
+    /** Element or selector the tooltip element is appended to; only used by the HTML renderer. */
+    var appendTo: TooltipAppendTo?
+
     /** Class name added to the HTML tooltip. */
     var className: String?
+
+    /** Border color used when several series are shown and a series has no own color. */
+    var defaultBorderColor: String?
 
     /** Duration of the position transition in milliseconds. */
     var transitionDuration: Double?
@@ -463,6 +481,21 @@ external interface TooltipOption {
     /** Border width of the tooltip. */
     var borderWidth: Double?
 
+    /** Border radius of the HTML tooltip in pixels. */
+    var borderRadius: Double?
+
+    /** Blur of the tooltip shadow. */
+    var shadowBlur: Double?
+
+    /** Color of the tooltip shadow. */
+    var shadowColor: String?
+
+    /** Horizontal offset of the tooltip shadow. */
+    var shadowOffsetX: Double?
+
+    /** Vertical offset of the tooltip shadow. */
+    var shadowOffsetY: Double?
+
     /** Padding of the tooltip. */
     var padding: DoubleOrDoubleArray?
 
@@ -477,6 +510,22 @@ external interface TooltipOption {
 }
 
 /**
+ * Target the HTML tooltip element is appended to: a selector, an element or a callback that
+ * receives the chart container.
+ */
+external interface TooltipAppendTo
+
+/** Wraps a CSS selector. */
+fun TooltipAppendTo(selector: String): TooltipAppendTo = selector.unsafeCast<TooltipAppendTo>()
+
+/** Wraps an element. */
+fun TooltipAppendTo(element: HTMLElement): TooltipAppendTo = element.unsafeCast<TooltipAppendTo>()
+
+/** Wraps a callback that chooses the element from the chart container. */
+fun TooltipAppendTo(callback: (chartContainer: HTMLElement) -> HTMLElement?): TooltipAppendTo =
+    callback.unsafeCast<TooltipAppendTo>()
+
+/**
  * Tooltip formatter: a template string or a callback.
  */
 external interface TooltipFormatter
@@ -484,8 +533,13 @@ external interface TooltipFormatter
 /** Wraps a template string such as `"{b}: {c}"`. */
 fun TooltipFormatter(template: String): TooltipFormatter = template.unsafeCast<TooltipFormatter>()
 
-/** Wraps a callback that receives the item parameters and returns HTML, an element or elements. */
-fun TooltipFormatter(callback: (Array<CallbackDataParams>) -> TooltipContent): TooltipFormatter =
+/**
+ * Wraps a callback that receives the formatter parameters and returns HTML, an element or elements.
+ *
+ * The parameters are a single object when [TooltipOption.trigger] is `"item"` and an array when it
+ * is `"axis"`; use the [TopLevelFormatterParams] factories to read the matching branch.
+ */
+fun TooltipFormatter(callback: TooltipFormatterCallback): TooltipFormatter =
     callback.unsafeCast<TooltipFormatter>()
 
 /**
@@ -693,11 +747,26 @@ external interface AxisOption {
     /** Whether the axis animates. */
     var animation: Boolean?
 
-    /** Duration of the axis animation. */
-    var animationDuration: Double?
+    /** Number of elements above which animation is disabled. */
+    var animationThreshold: Double?
+
+    /** Duration of the axis animation in milliseconds, or a callback per element. */
+    var animationDuration: AnimationDuration?
 
     /** Easing of the axis animation. */
     var animationEasing: AnimationEasing?
+
+    /** Delay of the axis animation in milliseconds, or a callback per element. */
+    var animationDelay: AnimationDelay?
+
+    /** Duration of the update animation in milliseconds, or a callback per element. */
+    var animationDurationUpdate: AnimationDuration?
+
+    /** Easing of the update animation. */
+    var animationEasingUpdate: AnimationEasing?
+
+    /** Delay of the update animation in milliseconds, or a callback per element. */
+    var animationDelayUpdate: AnimationDelay?
 
     /** z-index of the axis. */
     var z: Double?
@@ -705,8 +774,122 @@ external interface AxisOption {
     /** z-level of the axis. */
     var zlevel: Double?
 
+    /** Whether the axis shows a tooltip; the axis itself only supports `show`. */
+    var tooltip: AxisTooltipOption?
+
+    /** Value the axis extent is expanded to, usually the base of a bar or area series. */
+    var startValue: Double?
+
+    /** Magnitude of the random offset applied to symbols on a category axis. */
+    var jitter: Double?
+
+    /** Whether symbols that would overlap share the same jitter offset. */
+    var jitterOverlap: Boolean?
+
+    /** Extra distance kept between jittered symbols. */
+    var jitterMargin: Double?
+
+    /** Breaks drawn on the axis, see [AxisBreakOption]. */
+    var breaks: Array<AxisBreakOption>?
+
+    /** Style of the break areas. */
+    var breakArea: AxisBreakAreaOption?
+
+    /** Layout of the labels next to the breaks. */
+    var breakLabelLayout: AxisBreakLabelLayoutOption?
+
+    /** Whether the axis shape (for example the zigzag of a break) is drawn. */
+    var containShape: Boolean?
+
+    /** Data minimum included in the axis extent, in addition to the data extent. */
+    var dataMin: OptionDataValue?
+
+    /** Data maximum included in the axis extent, in addition to the data extent. */
+    var dataMax: OptionDataValue?
+
+    /** Whether duplicated category values are removed. */
+    var deduplication: Boolean?
+
+    /** Order of the categories of a category axis. */
+    var categorySortInfo: OrdinalSortInfo?
+
     /** Data of a category axis: raw values or [CategoryAxisDataItem] objects. */
     var data: Array<OptionDataItem?>?
+}
+
+/**
+ * One break of an axis: the range between [start] and [end] is compressed when the break is not
+ * expanded.
+ */
+external interface AxisBreakOption : AxisBreakIdentifier {
+    /** Size of the gap that replaces the range: a pixel number or a percentage string. */
+    var gap: StringOrDouble?
+
+    /** Whether the break starts expanded. */
+    var isExpanded: Boolean?
+}
+
+/**
+ * The range of a break, as used by the `*AxisBreak` action payloads.
+ *
+ * Upstream `AxisBreakOptionIdentifierInAxis`, which is `Pick<AxisBreakOption, "start" | "end">`.
+ */
+external interface AxisBreakIdentifier {
+    /** Start of the compressed range. */
+    var start: OptionDataValue
+
+    /** End of the compressed range. */
+    var end: OptionDataValue
+}
+
+/**
+ * Style of the areas drawn over the breaks of an axis.
+ */
+external interface AxisBreakAreaOption {
+    /** Whether the areas are shown. */
+    var show: Boolean?
+
+    /** Style of the areas. */
+    var itemStyle: ItemStyleOption?
+
+    /** Amplitude of the zigzag edges in pixels. */
+    var zigzagAmplitude: Double?
+
+    /** Minimum span of one zigzag segment in pixels. */
+    var zigzagMinSpan: Double?
+
+    /** Maximum span of one zigzag segment in pixels. */
+    var zigzagMaxSpan: Double?
+
+    /** z-index of the zigzag. */
+    var zigzagZ: Double?
+
+    /** Whether clicking the area expands or collapses the break. */
+    var expandOnClick: Boolean?
+}
+
+/**
+ * Layout of the axis labels that are moved away from a break.
+ */
+external interface AxisBreakLabelLayoutOption {
+    /** Whether labels are moved when they overlap a break: `true`, `false` or `"auto"`. */
+    var moveOverlap: BooleanOrString?
+}
+
+/**
+ * Tooltip configuration available on an axis; only [show] can be set per axis.
+ */
+external interface AxisTooltipOption {
+    /** Whether the axis tooltip is shown. */
+    var show: Boolean?
+}
+
+/**
+ * Order of the categories of a category axis when `categorySortInfo` is used.
+ */
+external interface OrdinalSortInfo {
+    /** Ordinal numbers of the categories. */
+    var ordinalNumbers: Array<Double>
 }
 
 /**

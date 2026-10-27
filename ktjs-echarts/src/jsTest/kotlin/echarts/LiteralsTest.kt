@@ -137,6 +137,36 @@ class LiteralsTest {
     }
 
     @Test
+    fun exportSurfaceLiteralsMatchTheUpstreamNames() {
+        assertEquals("auto", TooltipRenderModes.auto.unsafeCast<String>())
+        assertEquals("html", TooltipRenderModes.html.unsafeCast<String>())
+        assertEquals("richText", TooltipRenderModes.richText.unsafeCast<String>())
+        assertEquals("richText", TooltipRenderMode("richText").unsafeCast<String>())
+
+        assertEquals("left", HorizontalAligns.left.unsafeCast<String>())
+        assertEquals("center", HorizontalAligns.center.unsafeCast<String>())
+        assertEquals("right", HorizontalAligns.right.unsafeCast<String>())
+        assertEquals("auto", HorizontalAligns.auto.unsafeCast<String>())
+
+        // Upstream derives the update method names from the keys of its `updateMethods` table.
+        assertEquals("prepareAndUpdate", ECUpdateMethodNames.prepareAndUpdate.unsafeCast<String>())
+        assertEquals("update", ECUpdateMethodNames.update.unsafeCast<String>())
+        assertEquals("updateTransform", ECUpdateMethodNames.updateTransform.unsafeCast<String>())
+        assertEquals("updateView", ECUpdateMethodNames.updateView.unsafeCast<String>())
+        assertEquals("updateVisual", ECUpdateMethodNames.updateVisual.unsafeCast<String>())
+        assertEquals("updateLayout", ECUpdateMethodNames.updateLayout.unsafeCast<String>())
+        assertEquals("none", ECUpdateMethodNames.none.unsafeCast<String>())
+
+        assertEquals("expandAxisBreak", AxisBreakActions.expand.unsafeCast<String>())
+        assertEquals("collapseAxisBreak", AxisBreakActions.collapse.unsafeCast<String>())
+        assertEquals("toggleAxisBreak", AxisBreakActions.toggle.unsafeCast<String>())
+
+        assertEquals("select", SelectChangedFromActions.select.unsafeCast<String>())
+        assertEquals("unselect", SelectChangedFromActions.unselect.unsafeCast<String>())
+        assertEquals("toggleSelected", SelectChangedFromActions.toggleSelected.unsafeCast<String>())
+    }
+
+    @Test
     fun everySeriesTypeMatchesTheUpstreamName() {
         val seriesTypes = arrayOf(
             Pair("line", SeriesTypes.line),
@@ -643,7 +673,7 @@ class LiteralsTest {
                     pageButtonPosition = LegendPageButtonPositions.end
                 },
             )
-            tooltip = unsafeJso<TooltipOption> { order = TooltipOrders.valueDesc }
+            tooltip = one(unsafeJso<TooltipOption> { order = TooltipOrders.valueDesc })
             grid = one(
                 unsafeJso<GridOption> {
                     outerBoundsMode = OuterBoundsModes.none
@@ -695,7 +725,7 @@ class LiteralsTest {
             assertEquals(HorizontalAligns.left, stored.legend!![0].align)
             assertEquals(LegendPageButtonPositions.end, stored.legend!![0].pageButtonPosition)
             // `tooltip.order` is an option-only field; ECharts does not keep it in the merged option.
-            assertEquals(TooltipOrders.valueDesc, option.tooltip!!.order)
+            assertEquals(TooltipOrders.valueDesc, option.tooltip!![0].order)
             assertEquals(OuterBoundsModes.none, stored.grid!![0].outerBoundsMode)
             assertEquals(OuterBoundsContains.axisLabel, stored.grid!![0].outerBoundsContain)
             assertEquals(AxisNameLocations.middle, stored.xAxis!![0].nameLocation)

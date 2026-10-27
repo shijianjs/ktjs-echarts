@@ -92,8 +92,8 @@ external interface EChartsOption {
     /** Legend components. */
     var legend: Array<LegendOption>?
 
-    /** Tooltip component. */
-    var tooltip: TooltipOption?
+    /** Tooltip components. */
+    var tooltip: Array<TooltipOption>?
 
     /** Grid components (cartesian coordinate systems). */
     var grid: Array<GridOption>?
@@ -110,11 +110,14 @@ external interface EChartsOption {
     /** Data zoom components. */
     var dataZoom: Array<DataZoomOption>?
 
-    /** Toolbox component. */
-    var toolbox: ToolboxOption?
+    /** Toolbox components. */
+    var toolbox: Array<ToolboxOption>?
 
     /** Visual map components. */
     var visualMap: Array<VisualMapOption>?
+
+    /** Thumbnail components: a miniature movable view of a coordinate system. */
+    var thumbnail: Array<ThumbnailOption>?
 
     /** Geo components. */
     var geo: Array<GeoOption>?
@@ -152,11 +155,11 @@ external interface EChartsOption {
     /** Accessibility settings. */
     var aria: AriaOption?
 
-    /** Brush component. */
-    var brush: BrushOption?
+    /** Brush components. */
+    var brush: Array<BrushOption>?
 
-    /** Global axis pointer configuration. */
-    var axisPointer: AxisPointerOption?
+    /** Global axis pointer configurations. */
+    var axisPointer: Array<AxisPointerOption>?
 
     /** Matrix coordinate systems. */
     var matrix: Array<MatrixOption>?
@@ -166,6 +169,9 @@ external interface EChartsOption {
 
     /** Color palette. */
     var color: Array<ZRColor>?
+
+    /** Color palette layers, one per `colorBy` layer group. */
+    var colorLayer: Array<Array<ZRColor>>?
 
     /** Background color of the whole chart. */
     var backgroundColor: ZRColor?
@@ -179,23 +185,23 @@ external interface EChartsOption {
     /** Number of elements above which animation is disabled. */
     var animationThreshold: Double?
 
-    /** Duration of the initial animation in milliseconds. */
-    var animationDuration: Double?
+    /** Duration of the initial animation in milliseconds, or a callback per element. */
+    var animationDuration: AnimationDuration?
 
     /** Easing of the initial animation. */
     var animationEasing: AnimationEasing?
 
-    /** Delay of the initial animation in milliseconds. */
-    var animationDelay: Double?
+    /** Delay of the initial animation in milliseconds, or a callback per element. */
+    var animationDelay: AnimationDelay?
 
-    /** Duration of the update animation in milliseconds. */
-    var animationDurationUpdate: Double?
+    /** Duration of the update animation in milliseconds, or a callback per element. */
+    var animationDurationUpdate: AnimationDuration?
 
     /** Easing of the update animation. */
     var animationEasingUpdate: AnimationEasing?
 
-    /** Delay of the update animation in milliseconds. */
-    var animationDelayUpdate: Double?
+    /** Delay of the update animation in milliseconds, or a callback per element. */
+    var animationDelayUpdate: AnimationDelay?
 
     /** Animation of state transitions (hover, select, ...). */
     var stateAnimation: StateAnimationOption?
@@ -209,6 +215,21 @@ external interface EChartsOption {
     /** Number of elements above which a separate hover layer is used. */
     var hoverLayerThreshold: Double?
 
+    /**
+     * Restore the centring of roamable coordinate systems used before 6.0.
+     *
+     * Upstream `legacyViewCoordSysCenterBase`, a compatibility switch for the coordinate system
+     * refactoring.
+     */
+    var legacyViewCoordSysCenterBase: Boolean?
+
+    /**
+     * Keep `min` / `max` from being inverted by an inverse axis.
+     *
+     * Upstream `legacyMinMaxDontInverseAxis`, a compatibility switch for the axis refactoring.
+     */
+    var legacyMinMaxDontInverseAxis: Boolean?
+
     /** Blend mode used by the renderer. */
     var blendMode: String?
 
@@ -218,6 +239,15 @@ external interface EChartsOption {
     /** Number of elements rendered per frame during progressive rendering. */
     var progressive: Double?
 }
+
+/**
+ * Base option shape accepted by `setOption`.
+ *
+ * Upstream declares `ECBasicOption` as the supertype of `EChartsOption`; every member is optional,
+ * so the wrapper models both with [EChartsOption] and keeps this alias for callers that follow the
+ * upstream name.
+ */
+typealias ECBasicOption = EChartsOption
 
 /**
  * Dataset component: provides data shared by series.
@@ -381,6 +411,32 @@ external interface DataZoomDataBackgroundOption {
 
     /** Style of the areas of the data shadow. */
     var areaStyle: AreaStyleOption?
+}
+
+/**
+ * Thumbnail component: a miniature, movable view of a coordinate system.
+ *
+ * Thumbnail is implemented as a component so that one thumbnail can serve several series and a
+ * geo coordinate system at the same time.
+ */
+external interface ThumbnailOption : BoxLayoutOptionMixin, ComponentOnCalendarOptionMixin, ComponentOnMatrixOptionMixin {
+    /** Component id. */
+    var id: String?
+
+    /** Whether the thumbnail is shown. */
+    var show: Boolean?
+
+    /** Style of the thumbnail window. */
+    var itemStyle: ItemStyleOption?
+
+    /** Style of the window that marks the visible part of the main coordinate system. */
+    var windowStyle: ItemStyleOption?
+
+    /** Indices of the series drawn inside the thumbnail. */
+    var seriesIndex: IndexOrIndexArray?
+
+    /** Ids of the series drawn inside the thumbnail. */
+    var seriesId: StringOrStringArray?
 }
 
 /**

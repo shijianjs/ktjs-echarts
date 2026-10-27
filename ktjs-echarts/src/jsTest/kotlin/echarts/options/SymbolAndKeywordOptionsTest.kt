@@ -158,7 +158,7 @@ class SymbolAndKeywordOptionsTest {
     @Test
     fun componentKeywordFieldsAreLiterals() {
         val option = unsafeJso<EChartsOption> {
-            tooltip = unsafeJso<TooltipOption> { triggerOn = TooltipTriggerOns.mouseMoveClickWheel }
+            tooltip = one(unsafeJso<TooltipOption> { triggerOn = TooltipTriggerOns.mouseMoveClickWheel })
             xAxis = one(
                 unsafeJso<XAxisOption> {
                     position = AxisPositions.bottom
@@ -173,7 +173,7 @@ class SymbolAndKeywordOptionsTest {
             )
         }
 
-        assertEquals("mousemove|click|mousewheel", option.tooltip!!.triggerOn!!.unsafeCast<String>())
+        assertEquals("mousemove|click|mousewheel", option.tooltip!![0].triggerOn!!.unsafeCast<String>())
         assertEquals("bottom", option.xAxis!![0].position!!.unsafeCast<String>())
         assertEquals(2, option.xAxis!![0].axisLine!!.symbol!!.unsafeCast<Array<String>>().size)
         assertEquals("inherit", option.legend!![0].symbolRotate!!.unsafeCast<String>())
@@ -255,7 +255,7 @@ class SymbolAndKeywordChartTest {
         try {
             chart.setOption(
                 unsafeJso<EChartsOption> {
-                    tooltip = unsafeJso<TooltipOption> { trigger = echarts.TooltipTriggers.axis }
+                    tooltip = one(unsafeJso<TooltipOption> { trigger = echarts.TooltipTriggers.axis })
                     xAxis = one(
                         unsafeJso<XAxisOption> {
                             type = echarts.AxisTypes.category

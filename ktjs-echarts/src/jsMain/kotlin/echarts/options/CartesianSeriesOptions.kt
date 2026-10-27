@@ -41,23 +41,23 @@ external interface SeriesOption {
     /** Number of elements above which animation is disabled. */
     var animationThreshold: Double?
 
-    /** Duration of the initial animation in milliseconds. */
-    var animationDuration: Double?
+    /** Duration of the initial animation in milliseconds, or a callback per element. */
+    var animationDuration: AnimationDuration?
 
     /** Easing of the initial animation. */
     var animationEasing: AnimationEasing?
 
-    /** Delay of the initial animation in milliseconds. */
-    var animationDelay: Double?
+    /** Delay of the initial animation in milliseconds, or a callback per element. */
+    var animationDelay: AnimationDelay?
 
-    /** Duration of the update animation in milliseconds. */
-    var animationDurationUpdate: Double?
+    /** Duration of the update animation in milliseconds, or a callback per element. */
+    var animationDurationUpdate: AnimationDuration?
 
     /** Easing of the update animation. */
     var animationEasingUpdate: AnimationEasing?
 
-    /** Delay of the update animation in milliseconds. */
-    var animationDelayUpdate: Double?
+    /** Delay of the update animation in milliseconds, or a callback per element. */
+    var animationDelayUpdate: AnimationDelay?
 
     /** Emphasis (hover) state. */
     var emphasis: EmphasisOption?

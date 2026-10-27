@@ -127,6 +127,40 @@
   映射、联合工厂、关键帧动画、真实图表渲染），`LiteralsTest` 新增 3 组字面量断言；
   浏览器用例 202 → 212，全过。
 
+### ⑧ 上游导出清单复核与类型收口（提交 `48f2135`）
+
+- 按 `types/dist/echarts.d.ts` 的导出清单逐个核对：`echarts/core`、`echarts/charts`、`echarts/components`、
+  `echarts/features`、`echarts/renderers` 入口的安装函数已齐全；`innerDrawElementOnCanvas`、
+  `color` / `format` / `number` / `graphic` / `helper` / `matrix` / `vector` 命名空间与 `connect` /
+  `disconnect` / `register*` 系列都在对应对象上，这轮没有新增。
+- 新增字面量：`TooltipRenderMode` / `TooltipRenderModes`、`ECUpdateMethodName` / `ECUpdateMethodNames`、
+  `AxisBreakAction` / `AxisBreakActions`、`SelectChangedFromAction` / `SelectChangedFromActions`，
+  `HorizontalAligns` 补 `center`（tooltip 的 `align` 用它）。
+- 回调类型：`TopLevelFormatterParams`（联合，两个工厂；`TooltipPositionCallbackParams` 用 `typealias`
+  指过来）、`TooltipFormatterCallback`、`TooltipPositionCallback`（`params` 从 `CallbackDataParams` 改成
+  联合）、`LabelFormatterCallback`、`LabelLayoutOptionCallback` / `LabelLayoutOptionCallbackParams`。
+- 动画：`AnimationDuration` / `AnimationDelay` 联合与 `AnimationDurationCallback` /
+  `AnimationDelayCallback(Params)`；`AnimationOption`、`SeriesOption`、`AxisOption`、`EChartsOption` 与
+  `TreeSeriesOption` 的对应字段一起从 `Double?` 放宽。
+- 轴：`breaks` / `breakArea` / `breakLabelLayout`（`AxisBreakOption` / `AxisBreakAreaOption` /
+  `AxisBreakLabelLayoutOption` / `AxisBreakIdentifier`）、`startValue`、`dataMin` / `dataMax`、`jitter*`、
+  `deduplication`、`containShape`、`categorySortInfo`、`tooltip`，并补齐更新动画字段。
+- tooltip：`renderMode` 换成 `TooltipRenderMode`，补 `align` / `verticalAlign` / `displayTransition` /
+  `appendTo`（`TooltipAppendTo` 联合：选择器、元素、回调）/ `defaultBorderColor` / `borderRadius` /
+  `shadow*`；`align` 从 `web.cssom.TextAlign` 改成 `HorizontalAlign`（上游是 `left|center|right`）。
+- 顶层选项：新增 `thumbnail`（`ThumbnailOption`，只有 `graph` 系列会消费）、`colorLayer`、
+  `legacyViewCoordSysCenterBase` / `legacyMinMaxDontInverseAxis` 与 `ECBasicOption` 别名。
+- `tooltip` / `toolbox` / `axisPointer` / `brush` 由单值改成 `Array<T>`：上游是 `T | T[]`，ECharts 的
+  `getOption()` 也把组件字段归一成数组；之前按单值建模时回读到的是数组本身。
+- 事件与 action：`HighlightPayload` / `DownplayPayload` / `SelectChangedPayload`、
+  `BaseAxisBreakPayload` 与三个具体 payload（`@JsName` 同名字段承载 `"all"` / 数组形式）、
+  `AxisBreakChangedEventBreak` 补 `start` / `end` / 轴索引并把 `old` 细化成展开状态。
+- 测试：新增 `options/ExportSurfaceTest`（11 例：动画回调、label / tooltip 回调、tooltip 字段、
+  轴断点 action 与事件、轴扩展字段、`categorySortInfo`、thumbnail、`ECBasicOption`），`LiteralsTest`
+  新增 1 组字面量断言；浏览器用例 212 → 224，全过。
+- `TYPE-MAPPING.md` 补「同一个联合有两个上游名字」「`number | callback`」两节，并把 `T | T[]`
+  一条改成统一用 `Array<T>`（模板仓库同步）。
+
 ### 遗留提醒
 
 `GraphSeriesOption` 里原 `directed` / `edgeShape` / `edgeForkPosition` / `selectedMode` 在 6.1.0 的
@@ -160,14 +194,7 @@
   代价是 `option.series[i].data` 这种基类访问会消失（`OptionModelTest` / `LiteralsTest` 里有用例依赖它）。
 - 决定前先评估：下放后是否需要给 `EChartsOption.series` 之外再提供一个「只读 data」的视图。
 
-### 4. 上游导出清单的全量复核
-
-- 目前只补「已知空缺」，没有重新逐个核对 `echarts` 的公开导出（`EChartsType` / `ChartView` / `SeriesModel` /
-  `ComponentModel` / `Payload` / 各 `*Payload` / `*Event` …）与各入口
-  （`echarts/core`、`echarts/charts`、`echarts/components`、`echarts/features`、`echarts/renderers`）的差异。
-- 建议单独开一轮：从 `types/dist/*.d.ts` 生成导出清单再逐项比对（参考 `custom-elements.json` 式清单的做法）。
-
-### 5. 已确认「保持现状」的项（不要重复修）
+### 4. 已确认「保持现状」的项（不要重复修）
 
 - `LegendOption` 保留 `ScrollableLegendOption` 的分页字段：`EChartsOption.legend` 是 `Array<LegendOption>`，
   拆成子类型后调用方无法直接访问分页字段；与上游的联合建模等价，属于有意的更宽类型。
@@ -179,3 +206,11 @@
 - `GraphSeriesOption` 里已删除的 `directed` / `edgeShape` / `edgeForkPosition` / `selectedMode`：
   6.1.0 的 `.d.ts` 里查不到（`edgeShape` / `edgeForkPosition` 只属于 tree 系列）；上游若加回来再恢复。
 - `MarkAreaOption` 没有 symbol 成员、`MarkOption` 不再有 `show`：都按上游声明处理，不是遗漏。
+- `ComposeOption` / `RegisteredSeriesOption`：上游用于「按需安装时裁剪选项联合」，wrapper 的
+  `EChartsOption` / `SeriesOption` 已覆盖全部系列，不另建别名；调用方直接用具名选项类型。
+- 上游的 `*ComponentOption` 别名（`TooltipComponentOption`、`XAxisComponentOption`、`LegendComponentOption`
+  等）：同一接口的多个导出名，Kotlin 侧只保留基名，避免同一类型出现两套名字。
+- `ActionInfo.update` 保持 `String?`：上游是 `string`，具体取值已由 `ECUpdateMethodNames` 提供，
+  收窄成字面量反而挡住自定义方法名。
+- `Payload.type` 保持 `String?`：上游每个具体 payload 才收窄成字面量，共用 `Payload` 时无法表达；
+  调用方本来就要写自己的 action 名。

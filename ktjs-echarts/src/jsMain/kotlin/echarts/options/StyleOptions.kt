@@ -296,7 +296,15 @@ external interface LabelFormatter
 fun LabelFormatter(template: String): LabelFormatter = template.unsafeCast<LabelFormatter>()
 
 /** Wraps a callback that receives the item parameters and returns the label text. */
-fun LabelFormatter(callback: (CallbackDataParams) -> String): LabelFormatter = callback.unsafeCast<LabelFormatter>()
+fun LabelFormatter(callback: LabelFormatterCallback): LabelFormatter = callback.unsafeCast<LabelFormatter>()
+
+/**
+ * Signature of a label `formatter` callback.
+ *
+ * Upstream declares it generic over the formatter parameters and defaults to
+ * `CallbackDataParams`, which is the shape every series shares.
+ */
+typealias LabelFormatterCallback = (params: CallbackDataParams) -> String
 
 /**
  * Layout of the labels of a series, used by `labelLayout`.
@@ -384,6 +392,16 @@ external interface LabelLayoutCallbackParams {
  * Callback that computes the layout of one label.
  */
 typealias LabelLayoutCallback = (params: LabelLayoutCallbackParams) -> LabelLayoutOption
+
+/**
+ * Upstream `LabelLayoutOptionCallback`; the same signature as [LabelLayoutCallback].
+ */
+typealias LabelLayoutOptionCallback = LabelLayoutCallback
+
+/**
+ * Upstream `LabelLayoutOptionCallbackParams`; the same shape as [LabelLayoutCallbackParams].
+ */
+typealias LabelLayoutOptionCallbackParams = LabelLayoutCallbackParams
 
 /**
  * Layout of the labels of a series: a fixed [LabelLayoutOption] or a callback.
@@ -641,6 +659,57 @@ external interface MarkAreaOption : MarkOption, MarkAreaStateOption {
 }
 
 /**
+ * Callback form of `animationDuration`: returns the duration of one element, in milliseconds.
+ *
+ * Upstream `AnimationDurationCallback`.
+ */
+typealias AnimationDurationCallback = (index: Double) -> Double
+
+/**
+ * Extra parameters passed to an [AnimationDelayCallback].
+ *
+ * Upstream declares this type as `AnimationDelayCallbackParam` and exports it as
+ * `AnimationDelayCallbackParams`.
+ */
+external interface AnimationDelayCallbackParams {
+    /** Number of elements that are animated by the same call. */
+    val count: Double
+
+    /** Index of the element inside that group. */
+    val index: Double
+}
+
+/**
+ * Callback form of `animationDelay`: returns the delay of one element, in milliseconds.
+ *
+ * Upstream `AnimationDelayCallback`.
+ */
+typealias AnimationDelayCallback = (index: Double, params: AnimationDelayCallbackParams?) -> Double
+
+/**
+ * Duration of an animation: a fixed number of milliseconds or an [AnimationDurationCallback].
+ */
+external interface AnimationDuration
+
+/** Wraps a fixed duration. */
+fun AnimationDuration(value: Double): AnimationDuration = value.unsafeCast<AnimationDuration>()
+
+/** Wraps a callback that computes the duration of every element. */
+fun AnimationDuration(callback: AnimationDurationCallback): AnimationDuration =
+    callback.unsafeCast<AnimationDuration>()
+
+/**
+ * Delay of an animation: a fixed number of milliseconds or an [AnimationDelayCallback].
+ */
+external interface AnimationDelay
+
+/** Wraps a fixed delay. */
+fun AnimationDelay(value: Double): AnimationDelay = value.unsafeCast<AnimationDelay>()
+
+/** Wraps a callback that computes the delay of every element. */
+fun AnimationDelay(callback: AnimationDelayCallback): AnimationDelay = callback.unsafeCast<AnimationDelay>()
+
+/**
  * Animation configuration shared by series and components.
  */
 external interface AnimationOption {
@@ -650,11 +719,11 @@ external interface AnimationOption {
     /** Threshold of the number of elements above which animation is disabled. */
     var animationThreshold: Double?
 
-    /** Duration of the initial animation in milliseconds. */
-    var animationDuration: Double?
+    /** Duration of the initial animation in milliseconds, or a callback per element. */
+    var animationDuration: AnimationDuration?
 
-    /** Duration of the update animation in milliseconds. */
-    var animationDurationUpdate: Double?
+    /** Duration of the update animation in milliseconds, or a callback per element. */
+    var animationDurationUpdate: AnimationDuration?
 
     /** Easing of the initial animation. */
     var animationEasing: AnimationEasing?
@@ -662,11 +731,11 @@ external interface AnimationOption {
     /** Easing of the update animation. */
     var animationEasingUpdate: AnimationEasing?
 
-    /** Delay of the initial animation in milliseconds. */
-    var animationDelay: Double?
+    /** Delay of the initial animation in milliseconds, or a callback per element. */
+    var animationDelay: AnimationDelay?
 
-    /** Delay of the update animation in milliseconds. */
-    var animationDelayUpdate: Double?
+    /** Delay of the update animation in milliseconds, or a callback per element. */
+    var animationDelayUpdate: AnimationDelay?
 }
 
 /**

@@ -98,8 +98,8 @@ external interface TreeSeriesOption :
     /** Whether to expand or collapse a node on click. */
     var expandAndCollapse: Boolean?
 
-    /** Duration of the layout animation. */
-    override var animationDuration: Double?
+    /** Duration of the layout animation, or a callback per element. */
+    override var animationDuration: AnimationDuration?
 
     /** Easing of the layout animation. */
     override var animationEasing: AnimationEasing?

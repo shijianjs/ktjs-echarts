@@ -554,7 +554,10 @@ object TitleTargets {
 }
 
 /**
- * Horizontal alignment of the legend items.
+ * Horizontal alignment: `"auto"`, `"left"`, `"center"` or `"right"`.
+ *
+ * Shared by legend items and the tooltip. `"auto"` is legend-only; the tooltip uses
+ * [HorizontalAligns.left] / [HorizontalAligns.center] / [HorizontalAligns.right].
  */
 sealed external interface HorizontalAlign
 
@@ -570,6 +573,9 @@ object HorizontalAligns {
 
     /** Aligned to the left. */
     inline val left: HorizontalAlign get() = HorizontalAlign("left")
+
+    /** Aligned to the center. */
+    inline val center: HorizontalAlign get() = HorizontalAlign("center")
 
     /** Aligned to the right. */
     inline val right: HorizontalAlign get() = HorizontalAlign("right")
@@ -963,4 +969,110 @@ object ParallelAxisExpandTriggerOns {
 
     /** Expand while the pointer moves. */
     inline val mouseMove: ParallelAxisExpandTriggerOn get() = ParallelAxisExpandTriggerOn("mousemove")
+}
+
+/**
+ * How the tooltip content is rendered: `"auto"`, `"html"` or `"richText"`.
+ *
+ * `"auto"` renders HTML when `document` exists and falls back to the canvas/SVG tooltip in SSR.
+ */
+sealed external interface TooltipRenderMode
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [TooltipRenderModes]. */
+inline fun TooltipRenderMode(value: String): TooltipRenderMode = value.unsafeCast<TooltipRenderMode>()
+
+/**
+ * The documented values of [TooltipRenderMode].
+ */
+object TooltipRenderModes {
+    /** Use HTML when possible, otherwise the non-HTML renderer. */
+    inline val auto: TooltipRenderMode get() = TooltipRenderMode("auto")
+
+    /** Render the tooltip as an HTML element. */
+    inline val html: TooltipRenderMode get() = TooltipRenderMode("html")
+
+    /** Render the tooltip with the chart renderer (canvas or SVG). */
+    inline val richText: TooltipRenderMode get() = TooltipRenderMode("richText")
+}
+
+/**
+ * Update method a custom action uses to refresh the chart, or `"none"`.
+ *
+ * Upstream `ECUpdateMethodName`, computed from the keys of its `updateMethods` table.
+ */
+sealed external interface ECUpdateMethodName
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [ECUpdateMethodNames]. */
+inline fun ECUpdateMethodName(value: String): ECUpdateMethodName = value.unsafeCast<ECUpdateMethodName>()
+
+/**
+ * The documented values of [ECUpdateMethodName].
+ */
+object ECUpdateMethodNames {
+    /** Prepare the model and update it. */
+    inline val prepareAndUpdate: ECUpdateMethodName get() = ECUpdateMethodName("prepareAndUpdate")
+
+    /** Run the full update pipeline. */
+    inline val update: ECUpdateMethodName get() = ECUpdateMethodName("update")
+
+    /** Re-run the data transforms and update. */
+    inline val updateTransform: ECUpdateMethodName get() = ECUpdateMethodName("updateTransform")
+
+    /** Update the views only. */
+    inline val updateView: ECUpdateMethodName get() = ECUpdateMethodName("updateView")
+
+    /** Update the visual encoding only. */
+    inline val updateVisual: ECUpdateMethodName get() = ECUpdateMethodName("updateVisual")
+
+    /** Update the layout only. */
+    inline val updateLayout: ECUpdateMethodName get() = ECUpdateMethodName("updateLayout")
+
+    /** Do not update after the action. */
+    inline val none: ECUpdateMethodName get() = ECUpdateMethodName("none")
+}
+
+/**
+ * Action that produced an `axisbreakchanged` event: `"expandAxisBreak"`, `"collapseAxisBreak"` or
+ * `"toggleAxisBreak"`.
+ */
+sealed external interface AxisBreakAction
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [AxisBreakActions]. */
+inline fun AxisBreakAction(value: String): AxisBreakAction = value.unsafeCast<AxisBreakAction>()
+
+/**
+ * The documented values of [AxisBreakAction].
+ */
+object AxisBreakActions {
+    /** Expand the addressed breaks. */
+    inline val expand: AxisBreakAction get() = AxisBreakAction("expandAxisBreak")
+
+    /** Collapse the addressed breaks. */
+    inline val collapse: AxisBreakAction get() = AxisBreakAction("collapseAxisBreak")
+
+    /** Toggle the addressed breaks. */
+    inline val toggle: AxisBreakAction get() = AxisBreakAction("toggleAxisBreak")
+}
+
+/**
+ * Action that produced a `selectchanged` event: `"select"`, `"unselect"` or `"toggleSelected"`.
+ */
+sealed external interface SelectChangedFromAction
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [SelectChangedFromActions]. */
+inline fun SelectChangedFromAction(value: String): SelectChangedFromAction =
+    value.unsafeCast<SelectChangedFromAction>()
+
+/**
+ * The documented values of [SelectChangedFromAction].
+ */
+object SelectChangedFromActions {
+    /** Select the addressed data items. */
+    inline val select: SelectChangedFromAction get() = SelectChangedFromAction("select")
+
+    /** Unselect the addressed data items. */
+    inline val unselect: SelectChangedFromAction get() = SelectChangedFromAction("unselect")
+
+    /** Toggle the selection of the addressed data items. */
+    inline val toggleSelected: SelectChangedFromAction get() = SelectChangedFromAction("toggleSelected")
 }

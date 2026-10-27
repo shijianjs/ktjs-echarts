@@ -136,7 +136,17 @@ external interface GraphCategoryItemOption : GraphNodeStateOption, SymbolOptionM
 /**
  * Graph series: a node-link diagram.
  */
-external interface GraphSeriesOption : SeriesOption, SymbolOptionMixin {
+external interface GraphSeriesOption :
+    SeriesOption,
+    SymbolOptionMixin,
+    BoxLayoutOptionMixin,
+    SeriesOnCartesianOptionMixin,
+    SeriesOnPolarOptionMixin,
+    ComponentOnCalendarOptionMixin,
+    ComponentOnMatrixOptionMixin,
+    SeriesOnGeoOptionMixin,
+    SeriesOnSingleOptionMixin
+{
     /** Layout of the nodes. */
     var layout: GraphLayout?
 
@@ -193,15 +203,6 @@ external interface GraphSeriesOption : SeriesOption, SymbolOptionMixin {
 
     /** Whether the edges are curved automatically; `[0, 1]` per edge when an array. */
     var autoCurveness: BooleanOrDouble?
-
-    /** Index of the x axis. */
-    var xAxisIndex: Double?
-
-    /** Index of the y axis. */
-    var yAxisIndex: Double?
-
-    /** Index of the geo coordinate system. */
-    var geoIndex: Double?
 }
 
 /**
@@ -275,7 +276,16 @@ external interface ChordEdgeItemOption : ChordEdgeStateOption, OptionDataItemObj
 /**
  * Chord series introduced in ECharts 6.
  */
-external interface ChordSeriesOption : SeriesOption, SymbolOptionMixin {
+external interface ChordSeriesOption :
+    SeriesOption,
+    SymbolOptionMixin,
+    SeriesOnCartesianOptionMixin,
+    SeriesOnPolarOptionMixin,
+    ComponentOnCalendarOptionMixin,
+    ComponentOnMatrixOptionMixin,
+    SeriesOnGeoOptionMixin,
+    SeriesOnSingleOptionMixin
+{
     /** Width of the nodes. */
     var nodeWidth: Double?
 
@@ -404,7 +414,7 @@ external interface SankeyLevelOption : SankeyNodeStateOption, SankeyEdgeStateOpt
 /**
  * Sankey diagram.
  */
-external interface SankeySeriesOption : SeriesOption {
+external interface SankeySeriesOption : SeriesOption, ComponentOnCalendarOptionMixin, ComponentOnMatrixOptionMixin {
     /** Width of the nodes. */
     var nodeWidth: Double?
 

@@ -71,15 +71,21 @@ external interface TimeNamespace {
     /**
      * Parses a date value (timestamp, ISO string, `Date`, ...). Returns an invalid date when the
      * input cannot be parsed.
+     *
+     * Upstream declares the parameter as `unknown`, so `null` and `undefined` are accepted and
+     * yield an invalid date.
      */
-    fun parse(value: JsAny): Date
+    fun parse(value: JsAny?): Date
 
     /**
      * Formats a date with an ECharts time template such as `"{yyyy}-{MM}-{dd} {HH}:{mm}:{ss}"`.
      *
      * @param isUTC when `true`, the date is formatted in UTC.
+     * @param lang locale name such as `"EN"`, or a locale model; the system locale when omitted.
+     *   Upstream declares this parameter as `string | Model<LocaleOption>`; the model class is not
+     *   modelled by this wrapper, so the parameter stays untyped.
      */
-    fun format(time: JsAny, template: String, isUTC: Boolean): String
+    fun format(time: JsAny, template: String, isUTC: Boolean, lang: JsAny? = definedExternally): String
 
     /**
      * Rounds a date down to the given time unit (`"year"`, `"month"`, `"day"`, `"hour"`, ...).
@@ -124,8 +130,13 @@ external interface NumberNamespace {
     /** Whether a radian value is close to zero. */
     fun isRadianAroundZero(radian: Double): Boolean
 
-    /** Parses a date value; see [TimeNamespace.parse]. */
-    fun parseDate(value: JsAny): Date
+    /**
+     * Parses a date value; see [TimeNamespace.parse].
+     *
+     * Upstream declares the parameter as `unknown`, so `null` and `undefined` are accepted and
+     * yield an invalid date.
+     */
+    fun parseDate(value: JsAny?): Date
 
     /** Returns the order of magnitude of a number, e.g. `100` for `0.1`. */
     fun quantity(value: Double): Double
@@ -142,11 +153,21 @@ external interface NumberNamespace {
     /** Orders and splits overlapping intervals. */
     fun reformIntervals(list: Array<JsAny>): Array<JsAny>
 
-    /** Whether a value can be interpreted as a number. */
-    fun isNumeric(value: JsAny): Boolean
+    /**
+     * Whether a value can be interpreted as a number.
+     *
+     * Upstream declares the parameter as `unknown`, so `null` and `undefined` are accepted and
+     * return `false`.
+     */
+    fun isNumeric(value: JsAny?): Boolean
 
-    /** Converts a numeric value to a number, returning `NaN` for non-numeric input. */
-    fun numericToNumber(value: JsAny): Double
+    /**
+     * Converts a numeric value to a number, returning `NaN` for non-numeric input.
+     *
+     * Upstream declares the parameter as `unknown`, so `null` and `undefined` are accepted and
+     * return `NaN`.
+     */
+    fun numericToNumber(value: JsAny?): Double
 }
 
 /**

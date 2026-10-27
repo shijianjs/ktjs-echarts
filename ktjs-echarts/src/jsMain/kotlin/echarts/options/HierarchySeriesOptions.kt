@@ -59,7 +59,12 @@ external interface TreeSeriesLeavesOption : TreeSeriesStateOption
 /**
  * Tree series: a hierarchy laid out as a node-link diagram.
  */
-external interface TreeSeriesOption : SeriesOption, SymbolOptionMixin {
+external interface TreeSeriesOption :
+    SeriesOption,
+    SymbolOptionMixin,
+    ComponentOnCalendarOptionMixin,
+    ComponentOnMatrixOptionMixin
+{
     /** Layout of the tree. */
     var layout: TreeLayout?
 
@@ -264,7 +269,12 @@ external interface TreemapBreadcrumbOption : BoxLayoutOption {
 /**
  * Treemap series: a hierarchy laid out as nested rectangles.
  */
-external interface TreemapSeriesOption : SeriesOption, TreemapSeriesVisualOption {
+external interface TreemapSeriesOption :
+    SeriesOption,
+    TreemapSeriesVisualOption,
+    ComponentOnCalendarOptionMixin,
+    ComponentOnMatrixOptionMixin
+{
     /** Whether the nodes are sorted by value: `true`/`false` or an explicit order. */
     var sort: BooleanOrSortOrder?
 
@@ -431,7 +441,7 @@ fun SunburstSort(compare: (a: SortParam, b: SortParam) -> Double): SunburstSort 
 /**
  * Sunburst series: a hierarchy laid out as concentric rings.
  */
-external interface SunburstSeriesOption : SeriesOption {
+external interface SunburstSeriesOption : SeriesOption, ComponentOnCalendarOptionMixin, ComponentOnMatrixOptionMixin {
     /** Center of the sunburst. */
     var center: Array<StringOrDouble>?
 

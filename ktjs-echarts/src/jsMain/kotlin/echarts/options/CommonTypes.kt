@@ -465,6 +465,129 @@ external interface TooltipBoxLayoutOption {
 }
 
 /**
+ * Position and size of a component or series inside its container.
+ *
+ * Upstream `BoxLayoutOptionMixin`; a component that mixes it in can be positioned either by
+ * distances to the edges or by an explicit size, or both.
+ */
+external interface BoxLayoutOptionMixin {
+    /** Distance to the top edge, in pixels or as a percentage of the container. */
+    var top: StringOrDouble?
+
+    /** Distance to the right edge, in pixels or as a percentage of the container. */
+    var right: StringOrDouble?
+
+    /** Distance to the bottom edge, in pixels or as a percentage of the container. */
+    var bottom: StringOrDouble?
+
+    /** Distance to the left edge, in pixels or as a percentage of the container. */
+    var left: StringOrDouble?
+
+    /** Width, in pixels or as a percentage of the container. */
+    var width: StringOrDouble?
+
+    /** Height, in pixels or as a percentage of the container. */
+    var height: StringOrDouble?
+}
+
+/**
+ * Series drawn on a cartesian coordinate system.
+ *
+ * Upstream `SeriesOnCartesianOptionMixin`. `*Id` takes precedence over the matching `*Index`.
+ */
+external interface SeriesOnCartesianOptionMixin {
+    /** Index of the x axis. */
+    var xAxisIndex: Double?
+
+    /** Index of the y axis. */
+    var yAxisIndex: Double?
+
+    /** Id of the x axis. */
+    var xAxisId: String?
+
+    /** Id of the y axis. */
+    var yAxisId: String?
+}
+
+/**
+ * Series drawn on a polar coordinate system.
+ *
+ * Upstream `SeriesOnPolarOptionMixin`.
+ */
+external interface SeriesOnPolarOptionMixin {
+    /** Index of the polar coordinate system. */
+    var polarIndex: Double?
+
+    /** Id of the polar coordinate system. */
+    var polarId: String?
+}
+
+/**
+ * Series drawn on a single axis.
+ *
+ * Upstream `SeriesOnSingleOptionMixin`.
+ */
+external interface SeriesOnSingleOptionMixin {
+    /** Index of the single axis. */
+    var singleAxisIndex: Double?
+
+    /** Id of the single axis. */
+    var singleAxisId: String?
+}
+
+/**
+ * Series drawn on a geo coordinate system.
+ *
+ * Upstream `SeriesOnGeoOptionMixin`.
+ */
+external interface SeriesOnGeoOptionMixin {
+    /** Index of the geo coordinate system. */
+    var geoIndex: Double?
+
+    /** Id of the geo coordinate system. */
+    var geoId: String?
+}
+
+/**
+ * Series drawn on a radar coordinate system.
+ *
+ * Upstream `SeriesOnRadarOptionMixin`.
+ */
+external interface SeriesOnRadarOptionMixin {
+    /** Index of the radar coordinate system. */
+    var radarIndex: Double?
+
+    /** Id of the radar coordinate system. */
+    var radarId: String?
+}
+
+/**
+ * Component placed on a calendar coordinate system.
+ *
+ * Upstream `ComponentOnCalendarOptionMixin`.
+ */
+external interface ComponentOnCalendarOptionMixin {
+    /** Index of the calendar coordinate system. */
+    var calendarIndex: Double?
+
+    /** Id of the calendar coordinate system. */
+    var calendarId: String?
+}
+
+/**
+ * Component placed on a matrix coordinate system.
+ *
+ * Upstream `ComponentOnMatrixOptionMixin`.
+ */
+external interface ComponentOnMatrixOptionMixin {
+    /** Index of the matrix coordinate system. */
+    var matrixIndex: Double?
+
+    /** Id of the matrix coordinate system. */
+    var matrixId: String?
+}
+
+/**
  * Sizes passed to a tooltip position callback.
  */
 external interface TooltipSize {
@@ -593,31 +716,35 @@ fun DataZoomValue(value: Date): DataZoomValue = value.unsafeCast<DataZoomValue>(
 
 /**
  * Visual style applied by a visual map.
+ *
+ * Upstream declares every numeric field as `number | number[]` and `color` as
+ * `string | string[] | Dictionary<string>`; the array form maps one value per piece. The dictionary
+ * form of `color` (used together with `categories`) is not modelled — cast it at the call site.
  */
 external interface VisualOptionUnit {
     /** Symbol shape. */
     var symbol: String?
 
     /** Symbol size. */
-    var symbolSize: Double?
+    var symbolSize: DoubleOrDoubleArray?
 
     /** Color. */
-    var color: String?
+    var color: StringOrStringArray?
 
     /** Alpha of the color, `0..1`. */
-    var colorAlpha: Double?
+    var colorAlpha: DoubleOrDoubleArray?
 
     /** Opacity, `0..1`. */
-    var opacity: Double?
+    var opacity: DoubleOrDoubleArray?
 
     /** Lightness of the color, `0..1`. */
-    var colorLightness: Double?
+    var colorLightness: DoubleOrDoubleArray?
 
     /** Saturation of the color, `0..1`. */
-    var colorSaturation: Double?
+    var colorSaturation: DoubleOrDoubleArray?
 
     /** Hue of the color, `0..360`. */
-    var colorHue: Double?
+    var colorHue: DoubleOrDoubleArray?
 
     /** Decal pattern. */
     var decal: DecalObject?

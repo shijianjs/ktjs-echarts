@@ -21,7 +21,13 @@ import zrender.ZRLineType
 /**
  * Pie series.
  */
-external interface PieSeriesOption : SeriesOption {
+external interface PieSeriesOption :
+    SeriesOption,
+    SeriesOnGeoOptionMixin,
+    SeriesOnCartesianOptionMixin,
+    ComponentOnCalendarOptionMixin,
+    ComponentOnMatrixOptionMixin
+{
     /** Coordinate system, always `"none"` for pie charts. */
     override var coordinateSystem: String?
 
@@ -83,7 +89,7 @@ external interface PieSeriesOption : SeriesOption {
 /**
  * Funnel series.
  */
-external interface FunnelSeriesOption : SeriesOption {
+external interface FunnelSeriesOption : SeriesOption, ComponentOnCalendarOptionMixin, ComponentOnMatrixOptionMixin {
     /** Minimum value of the funnel. */
     var min: Double?
 
@@ -115,7 +121,7 @@ external interface FunnelSeriesOption : SeriesOption {
 /**
  * Gauge series.
  */
-external interface GaugeSeriesOption : SeriesOption {
+external interface GaugeSeriesOption : SeriesOption, ComponentOnCalendarOptionMixin, ComponentOnMatrixOptionMixin {
     /** Radius of the gauge, or `[inner, outer]`. */
     var radius: StringOrDouble?
 
@@ -396,10 +402,7 @@ external interface GaugeSplitLineOption {
 /**
  * Radar series.
  */
-external interface RadarSeriesOption : SeriesOption, SymbolOptionMixin {
-    /** Index of the radar coordinate system. */
-    var radarIndex: Double?
-
+external interface RadarSeriesOption : SeriesOption, SymbolOptionMixin, SeriesOnRadarOptionMixin {
     /** How the data maps to the radar axes. */
     var seriesLayoutBy: SeriesLayoutBy?
 }
@@ -407,7 +410,13 @@ external interface RadarSeriesOption : SeriesOption, SymbolOptionMixin {
 /**
  * Map series.
  */
-external interface MapSeriesOption : SeriesOption {
+external interface MapSeriesOption :
+    SeriesOption,
+    BoxLayoutOptionMixin,
+    SeriesOnGeoOptionMixin,
+    ComponentOnCalendarOptionMixin,
+    ComponentOnMatrixOptionMixin
+{
     /** Name of the registered map. */
     var map: String?
 
@@ -435,8 +444,17 @@ external interface MapSeriesOption : SeriesOption {
     /** Per-region configuration. */
     var regions: Array<RegionOption>?
 
-    /** Index of the geo coordinate system, when the map is drawn by geo. */
-    var geoIndex: Double?
+    /** Layout mode that centers the map with [layoutSize] instead of the box layout. */
+    var layoutCenter: Array<StringOrDouble>?
+
+    /** Size of the map when [layoutCenter] is used. */
+    var layoutSize: StringOrDouble?
+
+    /** Aspect ratio of the map. */
+    var aspectScale: Double?
+
+    /** Bounding coordinates of the map, `[[left, top], [right, bottom]]`. */
+    var boundingCoords: Array<Array<Double>>?
 
     /** How multiple values are combined: `"sum"` or `"average"`. */
     var mapValueCalculation: String?
@@ -469,7 +487,7 @@ fun themeRiverDataItem(date: OptionDataValue, value: OptionDataValue, name: Opti
 /**
  * Theme river series.
  */
-external interface ThemeRiverSeriesOption : SeriesOption {
+external interface ThemeRiverSeriesOption : SeriesOption, SeriesOnSingleOptionMixin {
     /** Color palette of the river bands. */
     var color: Array<ZRColor>?
 
@@ -479,9 +497,6 @@ external interface ThemeRiverSeriesOption : SeriesOption {
     /** Whether the axis has gaps at both ends. */
     var boundaryGap: Array<StringOrDouble>?
 
-    /** Index of the single axis. */
-    var singleAxisIndex: Double?
-
     /** Whether to show the tooltip. */
     override var tooltip: TooltipOption?
 }
@@ -489,7 +504,7 @@ external interface ThemeRiverSeriesOption : SeriesOption {
 /**
  * Pictorial bar series.
  */
-external interface PictorialBarSeriesOption : SeriesOption {
+external interface PictorialBarSeriesOption : SeriesOption, SeriesOnCartesianOptionMixin, SeriesOnPolarOptionMixin {
     /** Symbol shape of the bars. */
     var symbol: String?
 
@@ -537,12 +552,6 @@ external interface PictorialBarSeriesOption : SeriesOption {
 
     /** Minimum width of the bars. */
     var barMinWidth: StringOrDouble?
-
-    /** Index of the x axis. */
-    var xAxisIndex: Double?
-
-    /** Index of the y axis. */
-    var yAxisIndex: Double?
 
     /** Whether to clip the bars to the coordinate system. */
     var clip: Boolean?

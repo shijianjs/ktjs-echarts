@@ -484,6 +484,9 @@ external interface AxisOption {
     /** Index of the grid this axis belongs to. */
     var gridIndex: Double?
 
+    /** Id of the grid this axis belongs to, takes precedence over [gridIndex]. */
+    var gridId: String?
+
     /** Whether ticks of multiple axes are aligned. */
     var alignTicks: Boolean?
 

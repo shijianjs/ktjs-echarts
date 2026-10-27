@@ -29,7 +29,49 @@ import zrender.ZRStyleProps
  * JavaScript object through `setOption` with a `JsAny` value, or build extra fields with
  * [echartsOption] and assign them to the typed object.
  */
+/**
+ * One responsive option of [EChartsOption.media].
+ */
+external interface MediaUnit {
+    /** Condition under which [option] is applied; omitted for the default option. */
+    var query: MediaQueryOption?
+
+    /** Option applied when [query] matches. */
+    var option: EChartsOption
+}
+
+/**
+ * Container size condition of a [MediaUnit].
+ */
+external interface MediaQueryOption {
+    /** Minimum container width, in pixels. */
+    var minWidth: Double?
+
+    /** Maximum container width, in pixels. */
+    var maxWidth: Double?
+
+    /** Minimum container height, in pixels. */
+    var minHeight: Double?
+
+    /** Maximum container height, in pixels. */
+    var maxHeight: Double?
+}
+
 external interface EChartsOption {
+    /**
+     * Base option of a timeline / media option.
+     *
+     * When the option is a timeline or a media option, the shared part goes here and the
+     * per-state parts go into [options] (timeline) or [media].
+     */
+    var baseOption: EChartsOption?
+
+    /** One option per timeline point; only used together with [baseOption]. */
+    var options: Array<EChartsOption>?
+
+    /** Responsive options selected by container size. */
+    var media: Array<MediaUnit>?
+
     /** Title components. */
     var title: Array<TitleOption>?
 
@@ -701,7 +743,7 @@ external interface VisualMapOption {
 /**
  * Geo component: draws a map without needing a series.
  */
-external interface GeoOption {
+external interface GeoOption : BoxLayoutOptionMixin {
     /** Component id. */
     var id: String?
 

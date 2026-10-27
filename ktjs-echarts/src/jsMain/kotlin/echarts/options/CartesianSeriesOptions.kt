@@ -157,7 +157,12 @@ external interface SeriesOption {
 /**
  * Line series.
  */
-external interface LineSeriesOption : SeriesOption, SymbolOptionMixin {
+external interface LineSeriesOption :
+    SeriesOption,
+    SymbolOptionMixin,
+    SeriesOnCartesianOptionMixin,
+    SeriesOnPolarOptionMixin
+{
     /** Coordinate system: `"cartesian2d"` or `"polar"`. */
     override var coordinateSystem: String?
 
@@ -203,15 +208,6 @@ external interface LineSeriesOption : SeriesOption, SymbolOptionMixin {
     /** How the data maps to the axes. */
     var seriesLayoutBy: SeriesLayoutBy?
 
-    /** Index of the x axis. */
-    var xAxisIndex: Double?
-
-    /** Index of the y axis. */
-    var yAxisIndex: Double?
-
-    /** Index of the polar coordinate system. */
-    var polarIndex: Double?
-
     /** Stack strategy: `"samesign"`, `"all"` or `"positive"`. */
     var stackStrategy: String?
 
@@ -225,7 +221,7 @@ external interface LineSeriesOption : SeriesOption, SymbolOptionMixin {
 /**
  * Bar series.
  */
-external interface BarSeriesOption : SeriesOption {
+external interface BarSeriesOption : SeriesOption, SeriesOnCartesianOptionMixin, SeriesOnPolarOptionMixin {
     /** Coordinate system: `"cartesian2d"` or `"polar"`. */
     override var coordinateSystem: String?
 
@@ -277,15 +273,6 @@ external interface BarSeriesOption : SeriesOption {
     /** Downsampling method. */
     var sampling: String?
 
-    /** Index of the x axis. */
-    var xAxisIndex: Double?
-
-    /** Index of the y axis. */
-    var yAxisIndex: Double?
-
-    /** Index of the polar coordinate system. */
-    var polarIndex: Double?
-
     /** Whether to enable large-data mode. */
     var large: Boolean?
 
@@ -296,7 +283,16 @@ external interface BarSeriesOption : SeriesOption {
 /**
  * Scatter series.
  */
-external interface ScatterSeriesOption : SeriesOption, SymbolOptionMixin {
+external interface ScatterSeriesOption :
+    SeriesOption,
+    SymbolOptionMixin,
+    SeriesOnCartesianOptionMixin,
+    SeriesOnPolarOptionMixin,
+    ComponentOnCalendarOptionMixin,
+    ComponentOnMatrixOptionMixin,
+    SeriesOnGeoOptionMixin,
+    SeriesOnSingleOptionMixin
+{
     /** Coordinate system: `"cartesian2d"`, `"polar"`, `"geo"`, `"singleAxis"`, `"calendar"`. */
     override var coordinateSystem: String?
 
@@ -305,24 +301,6 @@ external interface ScatterSeriesOption : SeriesOption, SymbolOptionMixin {
 
     /** Data size above which large-data mode is used. */
     var largeThreshold: Double?
-
-    /** Index of the x axis. */
-    var xAxisIndex: Double?
-
-    /** Index of the y axis. */
-    var yAxisIndex: Double?
-
-    /** Index of the polar coordinate system. */
-    var polarIndex: Double?
-
-    /** Index of the geo coordinate system. */
-    var geoIndex: Double?
-
-    /** Index of the single axis. */
-    var singleAxisIndex: Double?
-
-    /** Index of the calendar coordinate system. */
-    var calendarIndex: Double?
 
     /** How the data maps to the axes. */
     var seriesLayoutBy: SeriesLayoutBy?
@@ -368,7 +346,7 @@ external interface RippleEffectOption {
 /**
  * Candlestick series.
  */
-external interface CandlestickSeriesOption : SeriesOption {
+external interface CandlestickSeriesOption : SeriesOption, SeriesOnCartesianOptionMixin {
     /** Coordinate system: `"cartesian2d"`. */
     override var coordinateSystem: String?
 
@@ -396,12 +374,6 @@ external interface CandlestickSeriesOption : SeriesOption {
     /** Data size above which large-data mode is used. */
     var largeThreshold: Double?
 
-    /** Index of the x axis. */
-    var xAxisIndex: Double?
-
-    /** Index of the y axis. */
-    var yAxisIndex: Double?
-
     /** Whether to clip the candles to the coordinate system. */
     var clip: Boolean?
 }
@@ -409,7 +381,7 @@ external interface CandlestickSeriesOption : SeriesOption {
 /**
  * Boxplot series.
  */
-external interface BoxplotSeriesOption : SeriesOption {
+external interface BoxplotSeriesOption : SeriesOption, SeriesOnCartesianOptionMixin {
     /** Coordinate system: `"cartesian2d"`. */
     override var coordinateSystem: String?
 
@@ -419,12 +391,6 @@ external interface BoxplotSeriesOption : SeriesOption {
     /** Width of a box. */
     var boxWidth: DoubleOrDoubleArray?
 
-    /** Index of the x axis. */
-    var xAxisIndex: Double?
-
-    /** Index of the y axis. */
-    var yAxisIndex: Double?
-
     /** Whether to clip the boxes to the coordinate system. */
     var clip: Boolean?
 }
@@ -432,7 +398,13 @@ external interface BoxplotSeriesOption : SeriesOption {
 /**
  * Heatmap series.
  */
-external interface HeatmapSeriesOption : SeriesOption {
+external interface HeatmapSeriesOption :
+    SeriesOption,
+    SeriesOnCartesianOptionMixin,
+    SeriesOnGeoOptionMixin,
+    ComponentOnCalendarOptionMixin,
+    ComponentOnMatrixOptionMixin
+{
     /** Coordinate system: `"cartesian2d"`, `"calendar"`, `"geo"` or `"none"`. */
     override var coordinateSystem: String?
 
@@ -448,18 +420,6 @@ external interface HeatmapSeriesOption : SeriesOption {
     /** Maximum opacity of the heatmap. */
     var maxOpacity: Double?
 
-    /** Index of the x axis. */
-    var xAxisIndex: Double?
-
-    /** Index of the y axis. */
-    var yAxisIndex: Double?
-
-    /** Index of the geo coordinate system. */
-    var geoIndex: Double?
-
-    /** Index of the calendar coordinate system. */
-    var calendarIndex: Double?
-
     /** Whether to clip the heatmap to the coordinate system. */
     var clip: Boolean?
 }
@@ -467,7 +427,14 @@ external interface HeatmapSeriesOption : SeriesOption {
 /**
  * Lines series: data lines on a coordinate system, for example flight routes.
  */
-external interface LinesSeriesOption : SeriesOption {
+external interface LinesSeriesOption :
+    SeriesOption,
+    SeriesOnCartesianOptionMixin,
+    SeriesOnGeoOptionMixin,
+    SeriesOnPolarOptionMixin,
+    ComponentOnCalendarOptionMixin,
+    ComponentOnMatrixOptionMixin
+{
     /** Coordinate system: `"cartesian2d"`, `"geo"` or `"none"`. */
     override var coordinateSystem: String?
 
@@ -488,18 +455,6 @@ external interface LinesSeriesOption : SeriesOption {
 
     /** Symbol size of the line ends. */
     var symbolSize: DoubleOrDoubleArray?
-
-    /** Index of the geo coordinate system. */
-    var geoIndex: Double?
-
-    /** Index of the x axis. */
-    var xAxisIndex: Double?
-
-    /** Index of the y axis. */
-    var yAxisIndex: Double?
-
-    /** Index of the polar coordinate system. */
-    var polarIndex: Double?
 }
 
 /**
@@ -534,7 +489,7 @@ external interface LinesEffectOption {
 /**
  * Parallel series: one polyline per data item on a parallel coordinate system.
  */
-external interface ParallelSeriesOption : SeriesOption {
+external interface ParallelSeriesOption : SeriesOption, ComponentOnCalendarOptionMixin, ComponentOnMatrixOptionMixin {
     /** Coordinate system, always `"parallel"`. */
     override var coordinateSystem: String?
 
@@ -563,7 +518,15 @@ external interface ParallelSeriesOption : SeriesOption {
 /**
  * Custom series: renders data with a user-provided render item function.
  */
-external interface CustomSeriesOption : SeriesOption {
+external interface CustomSeriesOption :
+    SeriesOption,
+    SeriesOnCartesianOptionMixin,
+    SeriesOnPolarOptionMixin,
+    SeriesOnSingleOptionMixin,
+    SeriesOnGeoOptionMixin,
+    ComponentOnCalendarOptionMixin,
+    ComponentOnMatrixOptionMixin
+{
     /** Coordinate system: `"cartesian2d"`, `"polar"`, `"geo"`, `"singleAxis"`, `"calendar"`, `"none"`. */
     override var coordinateSystem: String?
 
@@ -572,24 +535,6 @@ external interface CustomSeriesOption : SeriesOption {
 
     /** Whether to clip the elements to the coordinate system. */
     var clip: Boolean?
-
-    /** Index of the x axis. */
-    var xAxisIndex: Double?
-
-    /** Index of the y axis. */
-    var yAxisIndex: Double?
-
-    /** Index of the polar coordinate system. */
-    var polarIndex: Double?
-
-    /** Index of the geo coordinate system. */
-    var geoIndex: Double?
-
-    /** Index of the single axis. */
-    var singleAxisIndex: Double?
-
-    /** Index of the calendar coordinate system. */
-    var calendarIndex: Double?
 }
 
 /**

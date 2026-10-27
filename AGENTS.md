@@ -177,6 +177,42 @@ Gradle 9 / JDK 25。升级时注意 2.0 的插件 ID 是 `dev.detekt`，规则�
    `hasAttribute`。
 
 **测试发现 bug 时修 wrapper，不改断言**：能定位到生成器的问题就修生成器并重新生成，提交信息里说明。
+
+### 上游单元测试的翻译状态
+
+上游单元测试在 `test/ut/spec/`（26 个 `*.test.ts`），**不是** `test/*.html` 那些可视化用例。逐个文件的状态如下，
+新增/修改时保持这张表同步：
+
+| 上游文件 | Kotlin 测试 | 状态 |
+| --- | --- | --- |
+| `util/number.test.ts` | `util/NumberTest` | 全量翻译；`addSafe`、`getAcceptableTickPrecision` 不在 npm 导出里，无法覆盖 |
+| `util/time.test.ts` | `util/TimeTest` | 全量翻译（用 `lang = "EN"` 固定语言，见下） |
+| `api/containPixel.test.ts` | `api/ContainPixelTest` | 全量翻译 |
+| `api/converter.test.ts` | `api/ConverterTest` | 全量翻译；网格加了 `outerBoundsMode: "none"`，因为 jsdom 的 canvas mock 量不出文字宽度 |
+| `api/getVisual.test.ts` | `api/GetVisualTest` | 全量翻译，并补了上游标为 TODO 的 `symbol` / `symbolSize` |
+| `model/timelineMediaOptions.test.ts` | `model/TimelineMediaOptionsTest` | 全量翻译；数据改从 `getOption().series[i].data` 读，代替上游的 `getECModel` |
+| `component/visualMap/setOption.test.ts` | `component/visualMap/SetOptionTest` | 除 `normalizeVisualRange`（读 `targetVisuals` 私有结构）外全量翻译 |
+| `data/dataTransform.test.ts` | `data/DataTransformTest` | 只翻译可观测部分；维度探测断言需要 `SeriesData` 私有对象 |
+
+**不翻译的文件及原因**（都是断言上游内部结构或私有成员，`echarts` 的 npm 入口拿不到）：
+
+- `util/model.test.ts`、`util/layout.test.ts`（`mergeLayoutParam`）、`util/graphic.test.ts`：测的是未导出的工具函数。
+- `data/createDimensions.test.ts`、`data/SeriesData.test.ts`、`data/dataValueHelper.test.ts`、
+  `scale/interval.test.ts`：测 `createDimensions` 的返回结构、`SeriesData` 与 `IntervalScale` 的内部状态。
+- `component/graphic/setOption.test.ts`：断言挂在 zrender 元素树（`getGraphicElements` → `_componentsMap`）上；
+  `zr.storage.getDisplayList()` 也没在 `ZRenderType` 里建模，要看元素树得先补 zrender 成员。
+- `component/dataZoom/helper.test.ts`、`component/helper/BrushController.test.ts`、
+  `component/helper/sliderMove.test.ts`、`component/matrix/event.test.ts`：同上，都依赖内部控制器或元素树。
+- `model/Global.test.ts`、`model/componentDependency.test.ts`、`model/componentMissing.test.ts`：断言
+  `_componentsMap` / `_chartsMap` 里的模型与视图实例是否被复用。
+- `series/bar.test.ts`、`series/custom.test.ts`、`series/aria-columns-exclude.test.ts`：断言 `getModel()` 内部状态。
+
+上游没覆盖、wrapper 独有的部分由 `options/SeriesCoverageTest` 兜底：每种系列类型都要能被 `setOption` 接受、
+`type` 在 `getOption()` 里能回读、并且真的渲染出画布。
+
+`echarts.time.format` 的月份/星期名走 ECharts 自己的 locale 模型，默认取浏览器语言。上游在 jsdom（`en-US`）下跑，
+所以浏览器用例里断言英文名时必须显式传 `lang = "EN"`，否则中文环境会拿到「四月」。
+
 上游新增或修改测试时同步翻译，保持用例名可追溯。
 
 ## UI 编程约定

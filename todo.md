@@ -240,7 +240,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（135 个示例 / 23 个家族 + 文档示例组 + 总览页）
+### 已落地（137 个示例 / 23 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -260,6 +260,7 @@
   （矩阵表头要两级嵌套）、`pie-nest`（label 富文本缺 `rich`）。
 - 第五批（4 个）：`line-polar`、`line-polar2`、`line-function`（`LineExtra.kt`）、
   `gauge-stage`、`gauge-temperature`（`GaugeExtra.kt`，官方的 setInterval 未移植，显示初始值）。
+- 第六批（2 个）：`doc-example/text-block-fragment`、`doc-example/text-options`（scatter 的 label 富文本，`rich` 用法与官方一致）。
 
 ### 下一批（按可做性排序）
 

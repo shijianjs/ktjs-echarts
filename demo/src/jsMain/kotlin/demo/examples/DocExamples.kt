@@ -4,7 +4,9 @@ import demo.CatalogEntry
 import echarts.*
 import echarts.options.*
 import demo.Groups
+import js.objects.Record
 import js.objects.unsafeJso
+import kotlin.js.unsafeCast
 import web.cssom.TextAlign
 import zrender.ZRColor
 import zrender.ZRLineTypes
@@ -70,6 +72,32 @@ private fun insideLabel(align: TextAlign): SunburstLabelOption = unsafeJso {
     this.align = align
     position = LabelPosition("inside")
 }
+
+/** The hidden `-1..1` x axis the text examples sit on. */
+private fun hiddenXAxis(): Array<XAxisOption> =
+    one(
+        unsafeJso<XAxisOption> {
+            axisLabel = unsafeJso<AxisLabelOption> { show = false }
+            axisLine = unsafeJso<AxisLineOption> { show = BooleanOrString(false) }
+            splitLine = unsafeJso<SplitLineOption> { show = false }
+            axisTick = unsafeJso<AxisTickOption> { show = BooleanOrString(false) }
+            min = AxisMinMax(-1.0)
+            max = AxisMinMax(1.0)
+        },
+    )
+
+/** The hidden `-1..1` y axis the text examples sit on. */
+private fun hiddenYAxis(): Array<YAxisOption> =
+    one(
+        unsafeJso<YAxisOption> {
+            axisLabel = unsafeJso<AxisLabelOption> { show = false }
+            axisLine = unsafeJso<AxisLineOption> { show = BooleanOrString(false) }
+            splitLine = unsafeJso<SplitLineOption> { show = false }
+            axisTick = unsafeJso<AxisTickOption> { show = BooleanOrString(false) }
+            min = AxisMinMax(-1.0)
+            max = AxisMinMax(1.0)
+        },
+    )
 
 val docExampleEntries: List<CatalogEntry> =
     listOf(
@@ -567,6 +595,153 @@ val docExampleEntries: List<CatalogEntry> =
                                     )
                             }
                     }
+            }
+        },
+        docExample.chart("doc-example/text-block-fragment", "文本块与文本片段", "Text Block and Fragment") {
+            unsafeJso<EChartsOption> {
+                xAxis = hiddenXAxis()
+                yAxis = hiddenYAxis()
+                series =
+                    arrayOf<SeriesOption>(
+                        scatterSeries {
+                            symbolSize = SymbolSize(1.0)
+                            typedData =
+                                dataItems(
+                                    ScatterDataItem(arrayOf<OptionDataValue?>(OptionDataValue(0.0), OptionDataValue(0.0))),
+                                )
+                            label =
+                                unsafeJso<LabelOption> {
+                                    show = true
+                                    formatter =
+                                        LabelFormatter(
+                                            "The whole box is a {term|Text Block}, with\n" +
+                                                "red border and grey background.\n" +
+                                                "{fragment1|A Text Fragment} {fragment2|Another Text Fragment}\n" +
+                                                "Text fragments can be customized.",
+                                        )
+                                    backgroundColor = ZRColor("#eee")
+                                    borderColor = "rgb(199,86,83)"
+                                    borderWidth = 2.0
+                                    borderRadius = DoubleOrDoubleArray(5.0)
+                                    padding = DoubleOrDoubleArray(10.0)
+                                    color = "#000"
+                                    fontSize = StringOrDouble(14.0)
+                                    shadowBlur = 3.0
+                                    shadowColor = ZRColor("#888")
+                                    shadowOffsetX = 0.0
+                                    shadowOffsetY = 3.0
+                                    lineHeight = 30.0
+                                    rich =
+                                        recordOf(
+                                            "term" to
+                                                unsafeJso<TextStyleOption> {
+                                                    fontSize = StringOrDouble(18.0)
+                                                    color = "rgb(199,86,83)"
+                                                },
+                                            "fragment1" to
+                                                unsafeJso<TextStyleOption> {
+                                                    backgroundColor = ZRColor("#000")
+                                                    color = "yellow"
+                                                    padding = DoubleOrDoubleArray(5.0)
+                                                },
+                                            "fragment2" to
+                                                unsafeJso<TextStyleOption> {
+                                                    backgroundColor = ZRColor("#339911")
+                                                    color = "#fff"
+                                                    borderRadius = DoubleOrDoubleArray(15.0)
+                                                    padding = DoubleOrDoubleArray(5.0)
+                                                },
+                                        ).unsafeCast<Record<String, TextStyleOption>>()
+                                }
+                        },
+                    )
+            }
+        },
+        docExample.chart("doc-example/text-options", "文本样式选项", "Text Options") {
+            unsafeJso<EChartsOption> {
+                xAxis = hiddenXAxis()
+                yAxis = hiddenYAxis()
+                series =
+                    arrayOf<SeriesOption>(
+                        scatterSeries {
+                            symbolSize = SymbolSize(1.0)
+                            typedData =
+                                dataItems(
+                                    ScatterDataItem(arrayOf<OptionDataValue?>(OptionDataValue(0.0), OptionDataValue(0.0))),
+                                )
+                            // The original puts the label on the single data item; a series-level
+                            // label renders the same text for one point.
+                            label =
+                                unsafeJso<LabelOption> {
+                                    show = true
+                                    formatter =
+                                        LabelFormatter(
+                                            "Plain text\n" +
+                                                "{textBorder|textBorderColor + textBorderWidth}\n" +
+                                                "{textShadow|textShadowColor + textShadowBlur + textShadowOffsetX + textShadowOffsetY}\n" +
+                                                "{bg|backgroundColor + borderRadius + padding}\n" +
+                                                "{border|borderColor + borderWidth + borderRadius + padding}\n" +
+                                                "{shadow|shadowColor + shadowBlur + shadowOffsetX + shadowOffsetY}",
+                                        )
+                                    backgroundColor = ZRColor("#eee")
+                                    borderColor = "#333"
+                                    borderWidth = 2.0
+                                    borderRadius = DoubleOrDoubleArray(5.0)
+                                    padding = DoubleOrDoubleArray(10.0)
+                                    color = "#000"
+                                    fontSize = StringOrDouble(14.0)
+                                    shadowBlur = 3.0
+                                    shadowColor = ZRColor("#888")
+                                    shadowOffsetX = 0.0
+                                    shadowOffsetY = 3.0
+                                    lineHeight = 30.0
+                                    rich =
+                                        recordOf(
+                                            "textBorder" to
+                                                unsafeJso<TextStyleOption> {
+                                                    fontSize = StringOrDouble(20.0)
+                                                    textBorderColor = "#000"
+                                                    textBorderWidth = 3.0
+                                                    color = "#fff"
+                                                },
+                                            "textShadow" to
+                                                unsafeJso<TextStyleOption> {
+                                                    fontSize = StringOrDouble(16.0)
+                                                    textShadowBlur = 5.0
+                                                    textShadowColor = "#000"
+                                                    textShadowOffsetX = 3.0
+                                                    textShadowOffsetY = 3.0
+                                                    color = "#fff"
+                                                },
+                                            "bg" to
+                                                unsafeJso<TextStyleOption> {
+                                                    backgroundColor = ZRColor("#339911")
+                                                    color = "#fff"
+                                                    borderRadius = DoubleOrDoubleArray(15.0)
+                                                    padding = DoubleOrDoubleArray(5.0)
+                                                },
+                                            "border" to
+                                                unsafeJso<TextStyleOption> {
+                                                    color = "#000"
+                                                    borderColor = "#449911"
+                                                    borderWidth = 1.0
+                                                    borderRadius = DoubleOrDoubleArray(3.0)
+                                                    padding = DoubleOrDoubleArray(5.0)
+                                                },
+                                            "shadow" to
+                                                unsafeJso<TextStyleOption> {
+                                                    backgroundColor = ZRColor("#992233")
+                                                    padding = DoubleOrDoubleArray(5.0)
+                                                    color = "#fff"
+                                                    shadowBlur = 5.0
+                                                    shadowColor = ZRColor("#336699")
+                                                    shadowOffsetX = 6.0
+                                                    shadowOffsetY = 6.0
+                                                },
+                                        ).unsafeCast<Record<String, TextStyleOption>>()
+                                }
+                        },
+                    )
             }
         },
     )

@@ -293,8 +293,8 @@
    - `doc-example` 剩余（约 42 个）：`tutorial-styling` 之后的教程页、`text-*`、`title-block`、
      `label-position`、`grid-outerBounds`、`parallel-all`、`radar`、`sunburst-highlight-*`（需要
      `dispatchAction`）、`pictorialBar-*`；`map-*`/`geo-*` 除外。
-   - `custom` 剩余：`custom-calendar-icon`（`params.coordSys.cellWidth/cellHeight` 已补，可直接做）、
-     `custom-hexbin`（取数）、`custom-spiral-race`/`custom-gantt-flight`（长动画）、`custom-gauge`
+   - `custom` 剩余：     `custom-calendar-icon`（`params.coordSys.cellWidth/cellHeight` 已补，可直接做）、
+     `custom-spiral-race`/`custom-gantt-flight`（长动画）、`custom-gauge`
      （`path://` 面板图）。
    - `matrix` 剩余：`matrix-mbti`、`matrix-periodic-table`、`matrix-stock`（数据表 8-17KB，
      需要先写一个把上游数组转成 Kotlin 的小脚本）、`matrix-mini-bar-geo`（需要 geo）。
@@ -305,15 +305,15 @@
      `bar-large`/`bar-breaks-simple`/`bar-breaks-brush`/`bar-label-rotation`/`bar-polar-*`/`polar-*`、
      `line-easing`/`line-fisheye-lens`/`line-graphic`/`line-pen`/`line-draggable`/`line-race`/`line-polar*`/
      `area-pieces`/`area-time-axis`/`dynamic-data`/`dynamic-data2`/`bump-chart`/`confidence-band`/
-     `grid-multiple`/`multiple-x-axis`/`line-aqi`（需要 AQI 表，数据在官方示例文件里内联）、
-     `candlestick-sh`（26KB 内联表）/`candlestick-large`/`candlestick-brush`/`intraday-breaks-1|2`、
+     `grid-multiple`/`multiple-x-axis`/`candlestick-sh`（26KB 内联表）/`candlestick-large`/
+     `candlestick-brush`/`intraday-breaks-1|2`、
      `graph-force2` 之外的 graph 变体、`gauge-clock`/`gauge-speed`/`gauge-stage`/`gauge-temperature`/
      `gauge-barometer`/`gauge-multi-title`、`radar` 家族已全、`treemap` 只剩需要外部数据的、
      `pie-labelLine-adjust`/`pie-legend`/`pie-pattern`（图案需要贴图）等。
 2. **需要先补 wrapper 建模**：
    - `calendar-lunar`：366 行农历表（数据而非 API）。
    - 极坐标的 `renderItem`：`params.coordSys` 的 `cx` / `cy` 还没有 Kotlin 声明（`.d.ts` 只写了
-     `type`），要补才能做 `custom-gauge` / `custom-polar-heatmap`。
+     `type`），要补才能做 `custom-gauge`。
 3. **明确排除，不要重复尝试**（原因记在 `demo/AGENTS.md`）：
    - 地图 / `geo` / GeoJSON、百度地图（`tags: ["bmap"]`）、`echarts-gl`（`public/examples/ts/gl`）。
    - 运行时取数：`$.get` / `XMLHttpRequest` / `fetch` + `ROOT_PATH`、`*.json`、`*.bin`。

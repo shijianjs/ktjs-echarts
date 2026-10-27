@@ -99,24 +99,24 @@ private fun sequence(seed: Long): () -> Double {
 }
 
 /** One `matrix` component. */
-private fun matrixOption(block: MatrixOption.() -> Unit): Array<MatrixOption> = one(unsafeJso(block))
+internal fun matrixOption(block: MatrixOption.() -> Unit): Array<MatrixOption> = one(unsafeJso(block))
 
 /** One dimension of the matrix: a header row or a header column. */
-private fun dimension(block: MatrixDimensionOption.() -> Unit): MatrixDimensionOption = unsafeJso(block)
+internal fun dimension(block: MatrixDimensionOption.() -> Unit): MatrixDimensionOption = unsafeJso(block)
 
 /** A header cell, optionally with nested cells. */
-private fun cell(value: String, vararg kids: MatrixDimensionCellOption): MatrixDimensionCellOption =
+internal fun cell(value: String, vararg kids: MatrixDimensionCellOption): MatrixDimensionCellOption =
     unsafeJso {
         this.value = value
         if (kids.isNotEmpty()) children = arrayOf(*kids)
     }
 
 /** Header cells that are plain names. */
-private fun names(vararg values: String): Array<MatrixDimensionCellLooseOption> =
+internal fun names(vararg values: String): Array<MatrixDimensionCellLooseOption> =
     Array(values.size) { MatrixDimensionCellLooseOption(values[it]) }
 
 /** A header cell that has children of its own. */
-private fun branch(value: String, vararg kids: MatrixDimensionCellOption): MatrixDimensionCellLooseOption =
+internal fun branch(value: String, vararg kids: MatrixDimensionCellOption): MatrixDimensionCellLooseOption =
     MatrixDimensionCellLooseOption(cell(value, *kids))
 
 /** `[x, y, value]` points of a matrix heatmap. */

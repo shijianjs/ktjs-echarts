@@ -291,6 +291,18 @@ external interface CustomSeriesRenderItemCoordSys {
 
     /** Height of the layout rectangle of a cartesian coordinate system. */
     val height: Double?
+
+    /** X coordinate of the centre of a polar coordinate system. */
+    val cx: Double?
+
+    /** Y coordinate of the centre of the polar coordinate system. */
+    val cy: Double?
+
+    /** Width of one calendar cell. */
+    val cellWidth: Double?
+
+    /** Height of one calendar cell. */
+    val cellHeight: Double?
 }
 
 /**

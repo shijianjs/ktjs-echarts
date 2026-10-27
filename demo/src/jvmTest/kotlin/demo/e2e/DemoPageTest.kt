@@ -201,7 +201,16 @@ class DemoPageTest {
         assertChartRendered(page)
         assertTrue(hasDrawnPixels(page), "matrix-simple should paint the matrix cells")
 
-        for (route in listOf("custom-bar-trend", "matrix-covariance", "matrix-confusion", "pie-nest")) {
+        val painted =
+            listOf(
+                "custom-bar-trend",
+                "custom-polar-heatmap",
+                "matrix-covariance",
+                "matrix-confusion",
+                "matrix-sparkline",
+                "pie-nest",
+            )
+        for (route in painted) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)
             assertChartRendered(page)
             assertTrue(hasDrawnPixels(page), "$route should paint its series")

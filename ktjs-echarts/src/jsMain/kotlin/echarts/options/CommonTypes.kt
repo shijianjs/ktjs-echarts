@@ -752,6 +752,9 @@ fun IndexOrIndexArray(value: Double): IndexOrIndexArray = value.unsafeCast<Index
 /** Wraps several indices. */
 fun IndexOrIndexArray(values: Array<Double>): IndexOrIndexArray = values.unsafeCast<IndexOrIndexArray>()
 
+/** Wraps the keywords `"all"` and `"none"`, used by `dataZoom` to reach every axis. */
+fun IndexOrIndexArray(value: String): IndexOrIndexArray = value.unsafeCast<IndexOrIndexArray>()
+
 /**
  * Query for the index of one or more components: a number, an array, `"all"`, `"none"` or `false`.
  */

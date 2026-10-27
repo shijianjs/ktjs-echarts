@@ -6,6 +6,7 @@ import demo.examples.calendarEntries
 import demo.examples.candlestickEntries
 import demo.examples.chordEntries
 import demo.examples.customEntries
+import demo.examples.customExtraEntries
 import demo.examples.datasetEntries
 import demo.examples.docExampleEntries
 import demo.examples.funnelEntries
@@ -14,6 +15,7 @@ import demo.examples.graphEntries
 import demo.examples.heatmapEntries
 import demo.examples.lineEntries
 import demo.examples.matrixEntries
+import demo.examples.matrixExtraEntries
 import demo.examples.overviewEntries
 import demo.examples.parallelEntries
 import demo.examples.pictorialBarEntries
@@ -118,7 +120,9 @@ val catalog: List<CatalogEntry> =
         datasetEntries,
         calendarEntries,
         matrixEntries,
+        matrixExtraEntries,
         customEntries,
+        customExtraEntries,
         graphEntries,
         chordEntries,
         sankeyEntries,

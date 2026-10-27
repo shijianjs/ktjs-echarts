@@ -10,6 +10,7 @@ import demo.examples.customEntries
 import demo.examples.customHexbinEntries
 import demo.examples.customExtraEntries
 import demo.examples.datasetEntries
+import demo.examples.datasetExtraEntries
 import demo.examples.docExampleEntries
 import demo.examples.funnelEntries
 import demo.examples.gaugeEntries
@@ -133,6 +134,7 @@ val catalog: List<CatalogEntry> =
         treemapExtraEntries,
         sunburstEntries,
         datasetEntries,
+        datasetExtraEntries,
         calendarEntries,
         matrixEntries,
         matrixExtraEntries,

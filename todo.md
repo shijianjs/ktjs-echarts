@@ -239,7 +239,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（222 个示例 / 25 个家族 + 文档示例组 + 总览页）
+### 已落地（230 个示例 / 25 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -273,6 +273,24 @@
 - 第九批（2 个）：`geo-graph`（瑞士 GeoJSON 上的 graph 系列，节点用经纬度定位）、
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
+
+- 第二十四批（8 个，计算出来的柱状图长尾 + bump/graphic/graph 页）：新建 `examples/BarLongTail.kt`
+  的 `bar1`（上游同一份降雨/蒸发表画三种柱）、`bar-stack-normalization`（5 渠道 × 7 天，按天合计
+  归一化成百分比堆叠，标签用 `valueText` 在 JS 侧格式化，否则 Kotlin 插值会把 `30` 写成 `30.0`）、
+  `bar-stack-normalization-and-variation`（同一份归一化数据 + `graphic` 多边形画出「变化」，页面尺寸
+  要到 `setOption` 时才拿得到，因此走 `Category.interactive` 的双参重载读 `chart.getWidth()`）、
+  `bar-stack-borderRadius`（栈顶圆角，上游判断是 `data && data !== '-'`，所以 0 也算「空」，照抄）、
+  `bar-waterfall2`（透明底柱 + 正负值拼出的瀑布，tooltip 在 `params[1]` 为 `'-'` 时回退到 `params[2]`）；
+  `examples/LineLongTail.kt` 的 `bump-chart`（6 年排行榜，上游 `Math.random` 换成 `Lcg`，Fisher–Yates
+  的自减位置按原代码逐行对齐，`yAxis.inverse` + `interval: 1` + `min/max` 锁名次，`endLabel` 收尾）、
+  `line-graphic`（`graphic` 的 `group` + `rotation` 斜置横幅与带阴影的说明面板，`overflow: 'break'`
+  换行）；`examples/GraphExtra.kt` 的 `graph-grid`（`layout: 'none'` + `coordinateSystem: 'cartesian2d'`
+  把 graph 节点摆在日历网格上，不需要数据文件）。同批删掉 `bar1` 根节点的 `calculable: true`：6.x 已不
+  再读这个字段，wrapper 里只有 `visualMap` 还有同名成员。e2e 新增「bar 长尾画出算出来的堆叠」用例，
+  用 `bar-stack-normalization` 与 `bar-stack-normalization-and-variation` 的内容像素数比较证明
+  `graphic` 层真的建了出来（只看有没有像素分不出两者）；`assertChartRendered` 的等待条件从
+  「canvas 存在」改成「canvas 已有非零尺寸」，整站遍历时偶发的 `chart canvas box of null` 是这里
+  抢在布局之前取值，不是页面缺陷。
 
 - 第二十三批（8 个，line 数据长尾 + 矩阵坐标系文档示例）：新建 `examples/LineLongTail.kt` 的
   `area-stack-gradient`（五个堆叠面积，`lineStyle.width: 0` + `LinearGradient(0,0,0,1)` 填充）、
@@ -368,20 +386,21 @@
      `examples/GaugeLongTail.kt`，原样内联即可）。
    - `matrix` 剩余：`matrix-mbti`、`matrix-periodic-table`、`matrix-stock`（数据表 8-17KB，
      需要先写一个把上游数组转成 Kotlin 的小脚本）、`matrix-mini-bar-geo`（需要 geo）。
-   - 已移植家族的长尾里可直接做的：`line-markarea`、`line-graphic`、`bump-chart`（127 行，
-     内联数据）、`confidence-band`（要先按 `line-aqi` 的先例把 `data/asset/data/confidence-band.json`
+   - 已移植家族的长尾里可直接做的：`confidence-band`（要先按 `line-aqi` 的先例把 `data/asset/data/confidence-band.json`
      拷进 `resources/data/`）、`grid-multiple` / `area-rainfall`（85KB 内联表，先看要不要转成资源）、
      `line-pen`（需指针事件，按排除策略搁置）、
      `line-race`/`bar-race`/`bar-race-country`（竞速要先决定用哪个定时器与假数据）、
      `bar-drilldown`/`bar-multi-drilldown`（下钻要 `dispatchAction` 替代表演）、`bar-breaks-brush`、
-     `bar-stack-normalization`/`-and-variation`、`bar-waterfall2`、`bar1`、`bar-stack-borderRadius`、
-     `bar-histogram`、`dataset-link`、`graph-grid`、`graph-force-dynamic`、`heatmap-large`
+     `dataset-link`、`graph-force-dynamic`、`heatmap-large`
      （`-piecewise`）、`parallel-aqi`、`watermark`、`cycle-plot`、`scatter-matrix`、
      `graphic-stroke-animation`/`graphic-loading`/`graphic-wave-animation`、
      `candlestick-sh`（26KB 内联表）/`candlestick-large`/`candlestick-brush`/`intraday-breaks-1|2`、
      `scatter-clustering`、`graph-force2` 之外的 graph 变体。
      line/area 家族的 `area-stack-gradient`、`area-pieces`、`area-time-axis`、`line-gradient`、
-     `multiple-x-axis`、`dynamic-data2`、`line-easing` 已在第二十三批落地。
+     `multiple-x-axis`、`dynamic-data2`、`line-easing` 已在第二十三批落地；bar 家族的 `bar1`、
+     `bar-stack-normalization`/`-and-variation`、`bar-stack-borderRadius`、`bar-waterfall2` 与
+     `bump-chart`、`line-graphic`、`graph-grid` 已在第二十四批落地（清单里的 `line-markarea`
+     上游并没有这个文件，是误记）。
      gauge 家族已 12/12 全，`radar` 家族已全，`treemap` 只剩需要外部数据的，`pie-pattern` 要贴图，
      `line-fisheye-lens` 靠 `getZr().on('mousemove')` 的真实指针序列，按排除策略不做。
 2. **需要先补 wrapper 建模**：
@@ -392,6 +411,8 @@
    - 官方站点图片素材：`image://` 图标、纹理贴图、大块 `data:image/...base64`。
    - 真实键鼠序列：拖拽、触摸、`sendInput`（`line-draggable`、`candlestick-touch`、`bar-brush` 之类
      需要真交互的，若要做得先想清楚怎么用 `dispatchAction` 替代表演）。
+   - 需要另一个 npm 包的：`bar-histogram` 一类要先 `echarts.registerTransform(ecStat.transform.histogram)`，
+     数据与直方图分箱都在 `echarts-stat` 里，移植它等于再包一层 wrapper，不在示例站范围内。
 
 ### 下次接着做的具体做法
 
@@ -419,6 +440,14 @@
      `custom-error-scatter` 踩过）。类字段也一样：`DynamicDataWindow` 的 `value` 在 `unsafeJso` 里被
      `OptionDataItemObject.value` 遮住，编译器只报「类型不匹配」，改叫 `walkingValue` 就好了。
    - 表驱动示例要检查表长与名称表长度是否一致：`themeRiver-lastfm` 的表比专辑名长，越界会让整页不渲染。
+   - `unsafeJso` 的隐式接收者会吃掉同名外部名字：局部变量、函数参数、类字段只要和 option 成员的
+     `width` / `height` / `top` / `style` / `name` / `value` 撞名，`this.x = x` 就变成自我赋值且照样
+     编译通过（`bar-stack-normalization-and-variation` 的 `panelWidth` / `captionStyle`、
+     `bump-chart` 的 `lineName`、`DynamicDataWindow` 的 `walkingValue` 都是这么改名的）。
+   - `numbers(...)` 收的是 `DoubleArray` 可变参数：自己 `Array(n) { ... }` 造出来的是 `Array<Double>`，
+     传 `*` 展开会报「actual type is Array<Double>, but DoubleArray was expected」，用 `DoubleArray { }`。
+   - `one(...)` 的界是 `T : JsAny`，可空元素类型（`MarkLineDataItem?`）传不进去，要写
+     `arrayOf<MarkLineDataItem?>(...)`。
 4. 收尾：`./gradlew build` + `:demo:e2eTest` 都要过；e2e 现在逐页检查，新增页面自动覆盖；截图目视
    核对至少一两个新页面。
 
@@ -432,8 +461,8 @@
 ## 待办
 
 - 类型建模：暂无未完成项（见上面各轮）。
-- 示例站（demo）：见「示例站（demo）移植进度」一节。第二十三批（8 个，`examples/LineLongTail.kt` 的
-  line/area 数据长尾 + `doc-example/matrix-graph-box`）之后，下一批按「下一批」清单的第一条做
+- 示例站（demo）：见「示例站（demo）移植进度」一节。第二十四批（8 个，`examples/BarLongTail.kt` 的
+  计算堆叠柱 + `bump-chart`、`line-graphic`、`graph-grid`）之后，下一批按「下一批」清单的第一条做
   `doc-example/scatter-visualMap-categories`（先放宽 `visualMap` 的按类目字典与 `left: null`）、
   `custom` / `matrix` 剩余项与各家族长尾；`custom-calendar-icon` 因上游源码只剩缩略图，不移植。
-- 提交：全部已推送到 `origin/main`（最新 本批：第二十三批 8 个示例）。
+- 提交：全部已推送到 `origin/main`（最新 本批：第二十四批 8 个示例）。

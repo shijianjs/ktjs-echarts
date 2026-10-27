@@ -19,6 +19,9 @@ import kotlin.math.sqrt
 import web.cssom.FontWeight
 import zrender.ZRColor
 import zrender.ZRFontWeight
+import zrender.ZRShapeProps
+import zrender.ZRStyleProps
+import zrender.TextOverflows
 import zrender.gradientColorStop
 import zrender.linearGradient
 
@@ -26,14 +29,15 @@ import zrender.linearGradient
  * The line/area pages that generate their data or assemble their layout at run time.
  *
  * `area-time-axis` plots twenty thousand points, `line-easing` builds one grid per easing function of
- * zrender, `dynamic-data2` shifts its window once a second; the rest are option combinations of the
- * family: a piecewise visual map painted over an area, two x axes carrying two years, two continuous
- * visual maps on two grids, and a stacked area filled by a gradient.
+ * zrender, `dynamic-data2` shifts its window once a second, `bump-chart` shuffles a ranking every
+ * visit; the rest are option combinations of the family: a piecewise visual map painted over an area,
+ * two x axes carrying two years, two continuous visual maps on two grids, a stacked area filled by a
+ * gradient, and the `graphic` overlay page of the original gallery.
  *
  * Changed on purpose:
  *
- * - `Math.random()` of `area-time-axis` and `dynamic-data2` is replaced by [Lcg]: the curves still look
- *   like a random walk, but a page renders the same one every time;
+ * - `Math.random()` of `area-time-axis`, `dynamic-data2` and `bump-chart` is replaced by [Lcg]: the
+ *   curves and the ranking still look random, but a page renders the same one every time;
  * - `area-time-axis` keeps the misspelled title `Large Ara Chart` of the original;
  * - `line-easing` inlines the elastic branch that zrender always takes (`a < 1` forces `a = 1`), and
  *   computes the percentage geometry instead of re-reading it with `parseFloat` as upstream does;
@@ -499,6 +503,162 @@ private fun easingCell(easing: Easing, index: Int, columns: Int, rows: Int): Eas
 /** Number of samples of one easing curve of `line-easing`. */
 private const val SAMPLE_COUNT = 30
 
+/** The foods the bump chart ranks. */
+private val BUMP_NAMES =
+    arrayOf("Orange", "Tomato", "Apple", "Sakana", "Banana", "Iwashi", "Snappy Fish", "Lemon", "Pasta")
+
+/** The years of the bump chart, which are also its categories. */
+private val BUMP_YEARS = arrayOf("2001", "2002", "2003", "2004", "2005", "2006")
+
+/**
+ * The ranks of one year, shuffled out of the natural order.
+ *
+ * This is the Fisher-Yates loop of the original, including the order in which it decrements the
+ * index; [Lcg] replaces `Math.random()` so a visit always draws the same chart.
+ */
+private fun bumpYearOrder(random: Lcg): MutableList<Int> {
+    val order = (1..BUMP_NAMES.size).toMutableList()
+    var currentIndex = order.size
+    while (currentIndex > 0) {
+        val randomIndex = floor(random.next() * currentIndex).toInt()
+        currentIndex--
+        val held = order[currentIndex]
+        order[currentIndex] = order[randomIndex]
+        order[randomIndex] = held
+    }
+    return order
+}
+
+/** `[name][year]` ranks of the bump chart. */
+private fun bumpRankings(): Array<DoubleArray> {
+    val random = Lcg(20060101)
+    val orders = Array(BUMP_YEARS.size) { bumpYearOrder(random) }
+    return Array(BUMP_NAMES.size) { name -> DoubleArray(BUMP_YEARS.size) { year -> orders[year][name].toDouble() } }
+}
+
+/** One ranking line of the bump chart, with the food name written at its end. */
+private fun bumpSeries(
+    lineName: String,
+    ranks: DoubleArray,
+): LineSeriesOption =
+    lineSeries {
+        name = lineName
+        symbolSize = SymbolSize(20.0)
+        smooth = BooleanOrDouble(true)
+        emphasis = unsafeJso<EmphasisOption> { focus = EmphasisFocuses.series }
+        endLabel =
+            unsafeJso<LabelOption> {
+                show = true
+                formatter = LabelFormatter("{a}")
+                distance = 20.0
+            }
+        lineStyle = unsafeJso<LineStyleOption> { width = 4.0 }
+        typedData = numbers(*ranks)
+    }
+
+/**
+ * The centered rectangle of a `line-graphic` group.
+ *
+ * [verticalPosition] is `"center"` or `"middle"`, as upstream; the parameter names stay clear of the
+ * receiver's own `width`, `height`, `top` and `style` members, which would shadow them.
+ */
+private fun graphicPanel(
+    panelWidth: Double,
+    panelHeight: Double,
+    verticalPosition: String,
+    panelStyle: ZRStyleProps,
+): GraphicElement =
+    unsafeJso<GraphicElement> {
+        type = "rect"
+        z = 100.0
+        left = StringOrDouble("center")
+        top = StringOrDouble(verticalPosition)
+        shape = unsafeJso<ZRShapeProps> {
+            width = panelWidth
+            height = panelHeight
+        }
+        style = panelStyle
+    }
+
+/** The centered text of a `line-graphic` group; see [graphicPanel] for [verticalPosition]. */
+private fun graphicCaption(
+    verticalPosition: String,
+    captionStyle: ZRStyleProps,
+): GraphicElement =
+    unsafeJso<GraphicElement> {
+        type = "text"
+        z = 100.0
+        left = StringOrDouble("center")
+        top = StringOrDouble(verticalPosition)
+        style = captionStyle
+    }
+
+/** The rotated banner of `line-graphic`, drawn over the plot at forty-five degrees. */
+private fun graphicBanner(): GraphicElement =
+    unsafeJso<GraphicElement> {
+        type = "group"
+        rotation = PI / 4
+        bounding = GraphicBoundings.raw
+        right = StringOrDouble(110.0)
+        bottom = StringOrDouble(110.0)
+        z = 100.0
+        children =
+            arrayOf(
+                graphicPanel(
+                    400.0,
+                    50.0,
+                    "center",
+                    unsafeJso<ZRStyleProps> { fill = ZRColor("rgba(0,0,0,0.3)") },
+                ),
+                graphicCaption(
+                    "center",
+                    unsafeJso<ZRStyleProps> {
+                        fill = ZRColor("#fff")
+                        text = "ECHARTS LINE CHART"
+                        font = "bold 26px sans-serif"
+                    },
+                ),
+            )
+    }
+
+/** The text box of `line-graphic`, which explains the axes. */
+private fun graphicExplanation(): GraphicElement =
+    unsafeJso<GraphicElement> {
+        type = "group"
+        left = StringOrDouble("10%")
+        top = StringOrDouble("center")
+        children =
+            arrayOf(
+                graphicPanel(
+                    240.0,
+                    90.0,
+                    "middle",
+                    unsafeJso<ZRStyleProps> {
+                        fill = ZRColor("#fff")
+                        stroke = ZRColor("#555")
+                        lineWidth = 1.0
+                        shadowBlur = 8.0
+                        shadowOffsetX = 3.0
+                        shadowOffsetY = 3.0
+                        shadowColor = "rgba(0,0,0,0.2)"
+                    },
+                ),
+                graphicCaption(
+                    "middle",
+                    unsafeJso<ZRStyleProps> {
+                        fill = ZRColor("#333")
+                        width = StringOrDouble(220.0)
+                        overflow = TextOverflows.`break`
+                        text =
+                            "xAxis represents temperature in °C, yAxis represents altitude in km, " +
+                            "An image watermark in the upper right, " +
+                            "This text block can be placed in any place"
+                        font = "14px Microsoft YaHei"
+                    },
+                ),
+            )
+    }
+
 val lineLongTailEntries: List<CatalogEntry> =
     listOf(
         lineLongTail.chart("area-stack-gradient", "渐变堆叠面积图", "Gradient Stacked Area Chart") {
@@ -835,6 +995,114 @@ val lineLongTailEntries: List<CatalogEntry> =
                 xAxis = cells.map { it.xAxis }.toTypedArray()
                 yAxis = cells.map { it.yAxis }.toTypedArray()
                 series = cells.map { it.series }.toTypedArray()
+            }
+        },
+        lineLongTail.chart(
+            "bump-chart",
+            "凹凸图",
+            "Bump Chart (Ranking)",
+            "九种食物在六年里的名次曲线：名次作 y 轴并倒序，每条线末端用 endLabel 写出自己的名字。",
+            "The ranking lines of nine foods over six years: the y axis is the rank, inverted, and each " +
+                "line writes its own name at its end with `endLabel`.",
+        ) {
+            val rankings = bumpRankings()
+            unsafeJso<EChartsOption> {
+                title = one(unsafeJso<TitleOption> { text = "Bump Chart (Ranking)" })
+                tooltip = one(unsafeJso<TooltipOption> { trigger = TooltipTriggers.item })
+                grid =
+                    one(
+                        unsafeJso<GridOption> {
+                            left = StringOrDouble(30.0)
+                            right = StringOrDouble(110.0)
+                            bottom = StringOrDouble(30.0)
+                            containLabel = true
+                        },
+                    )
+                toolbox = toolbox(saveAsImage = true)
+                xAxis =
+                    one(
+                        unsafeJso<XAxisOption> {
+                            type = AxisTypes.category
+                            splitLine = unsafeJso<SplitLineOption> { show = true }
+                            axisLabel = unsafeJso<AxisLabelOption> { margin = 30.0; fontSize = StringOrDouble(16.0) }
+                            boundaryGap = BooleanOrStringArray(false)
+                            data = strings(*BUMP_YEARS)
+                        },
+                    )
+                yAxis =
+                    one(
+                        unsafeJso<YAxisOption> {
+                            type = AxisTypes.value
+                            axisLabel =
+                                unsafeJso<AxisLabelOption> {
+                                    margin = 30.0
+                                    fontSize = StringOrDouble(16.0)
+                                    formatter = LabelFormatter("#{value}")
+                                }
+                            inverse = true
+                            interval = AxisInterval(1.0)
+                            min = AxisMinMax(1.0)
+                            max = AxisMinMax(BUMP_NAMES.size.toDouble())
+                        },
+                    )
+                series =
+                    Array<SeriesOption>(BUMP_NAMES.size) { index ->
+                        bumpSeries(BUMP_NAMES[index], rankings[index])
+                    }
+            }
+        },
+        lineLongTail.chart(
+            "line-graphic",
+            "自定义图形组件",
+            "Custom Graphic Component",
+            "折线之外用 graphic 画两块浮层：一块 45° 旋转的标题横幅，一个带阴影和自动换行的说明框。",
+            "A line chart with two graphic overlays: a banner rotated by 45 degrees and a shadowed text " +
+                "box that wraps inside its own width.",
+        ) {
+            unsafeJso<EChartsOption> {
+                legend = one(unsafeJso<LegendOption> { data = legendNames("Altitude (km) vs Temperature (°C)") })
+                tooltip =
+                    one(
+                        unsafeJso<TooltipOption> {
+                            trigger = TooltipTriggers.axis
+                            formatter = TooltipFormatter("Temperature : <br/>{b}km : {c}°C")
+                        },
+                    )
+                grid =
+                    one(
+                        unsafeJso<GridOption> {
+                            left = StringOrDouble("3%")
+                            right = StringOrDouble("4%")
+                            bottom = StringOrDouble("3%")
+                            containLabel = true
+                        },
+                    )
+                xAxis =
+                    one(
+                        unsafeJso<XAxisOption> {
+                            type = AxisTypes.value
+                            axisLabel = unsafeJso<AxisLabelOption> { formatter = LabelFormatter("{value} °C") }
+                        },
+                    )
+                yAxis =
+                    one(
+                        unsafeJso<YAxisOption> {
+                            type = AxisTypes.category
+                            axisLine = unsafeJso<AxisLineOption> { onZero = BooleanOrString(false) }
+                            axisLabel = unsafeJso<AxisLabelOption> { formatter = LabelFormatter("{value} km") }
+                            boundaryGap = BooleanOrStringArray(true)
+                            data = strings("0", "10", "20", "30", "40", "50", "60", "70", "80")
+                        },
+                    )
+                graphic = arrayOf(GraphicComponentLooseOption(graphicBanner()), GraphicComponentLooseOption(graphicExplanation()))
+                series =
+                    arrayOf<SeriesOption>(
+                        lineSeries {
+                            name = "高度(km)与气温(°C)变化关系"
+                            smooth = BooleanOrDouble(true)
+                            typedData = numbers(15.0, -50.0, -56.5, -46.5, -22.1, -2.5, -27.7, -55.7, -76.5)
+                        },
+                    )
             }
         },
     )

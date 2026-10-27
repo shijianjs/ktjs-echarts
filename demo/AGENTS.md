@@ -82,13 +82,15 @@ demo/src/jvmTest/kotlin/demo/e2e/
 
 - 需要百度地图的（清单里 `tags: ["bmap"]`），
 - 需要 `echarts-gl` 的（`public/examples/ts/gl`，wrapper 没有覆盖），
+- 需要另一个 npm 包的（`bar-histogram` 一类要先 `echarts.registerTransform(ecStat.transform.histogram)`，
+  数据在 `echarts-stat` 里，wrapper 与 demo 都还没有引这个包），
 - 依赖官方站点图片素材的（`image://` 图标、纹理贴图、`data:image/...` 大块 base64），
 - 依赖真实键鼠序列的（拖拽、触摸、`sendInput`）。
 
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **222 个示例**（覆盖 25 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **230 个示例**（覆盖 25 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -119,8 +121,16 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `custom-gauge` 照这个先例做。
 
 line 家族的数据生成长尾在 `examples/LineLongTail.kt`：两万点的 `area-time-axis`、按 easing 函数逐个
-建 grid 的 `line-easing`、每秒滚动窗口的 `dynamic-data2`，以及 piecewise visualMap 涂面积、双 x 轴、
+建 grid 的 `line-easing`、每秒滚动窗口的 `dynamic-data2`、名次随机但种子固定的 `bump-chart`、用
+`graphic` 浮层画横幅与说明框的 `line-graphic`，以及 piecewise visualMap 涂面积、双 x 轴、
 双 continuous visualMap、渐变堆叠面积图这几条 option 组合。随机序列同样换成 `Lcg`。
+
+bar 家族的计算长尾在 `examples/BarLongTail.kt`：归一化堆叠（`bar-stack-normalization`）和它的
+`graphic` 多边形变体（`-and-variation`，因为要用图表实际宽高摆多边形，走 `Category.interactive`）、
+只有真正封住栈顶的柱子才带圆角的 `bar-stack-borderRadius`、透明占位柱顶起的 `bar-waterfall2`，
+以及带 `markPoint` / `markLine` 的 `bar1`。上游根 option 上的 `calculable: true` 是 ECharts 6
+已经不读的老字段，wrapper 里也没有对应声明，移植时直接去掉。
+`graph-grid`（笛卡尔坐标系上的 graph）补在 `examples/GraphExtra.kt`。
 
 `doc-example/` 里还没有移植的（上游 80 个文件 = 79 个 `.js` + 1 个 `.ts`、已按 `doc-example/` id 落地
 57 个、`bar-large` / `pie-highlight` 按家族 id 落地，剩 21 条）。按原因分类：

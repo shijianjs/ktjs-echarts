@@ -349,6 +349,56 @@ class DemoPageTest {
     }
 
     /**
+     * The computed-stack pages of `BarLongTail.kt`, the cartesian graph of `GraphExtra.kt` and the two
+     * lines pages of `LineLongTail.kt` that draw their shape out of a table.
+     *
+     * `bar-stack-normalization` and `bar-stack-borderRadius` build their bars out of the same array of
+     * counts, so a mistake in that arithmetic shows up as an empty or half-empty canvas;
+     * `bar-waterfall2` hides its placeholder series with a transparent style, which leaves the two
+     * visible segments as the only content. The variation page is compared against the plain
+     * normalization page: it draws the same bars plus the translucent polygons that connect them, so
+     * it has to hold strictly more painted pixels — a graphic layer that never got built would leave
+     * the two counts equal.
+     */
+    @RetryingTest(maxAttempts = 2)
+    fun `the bar long tail pages draw their computed stacks`(page: Page) {
+        val consoleErrors = mutableListOf<String>()
+        page.onConsoleMessage { message ->
+            if (message.type() == "error") consoleErrors += message.text()
+        }
+        openPage(page)
+        for (
+            route in
+                listOf(
+                    "bar1",
+                    "bar-stack-borderRadius",
+                    "bar-waterfall2",
+                    "graph-grid",
+                    "bump-chart",
+                    "line-graphic",
+                )
+        ) {
+            page.evaluate("(value) => { location.hash = '#/' + value }", route)
+            assertChartRendered(page)
+            waitForPainted(page, route)
+        }
+        page.evaluate("(value) => { location.hash = '#/' + value }", "bar-stack-normalization")
+        assertChartRendered(page)
+        waitForPainted(page, "bar-stack-normalization")
+        val plainBars = paintedPixels(page)
+        page.evaluate("(value) => { location.hash = '#/' + value }", "bar-stack-normalization-and-variation")
+        assertChartRendered(page)
+        waitForPainted(page, "bar-stack-normalization-and-variation")
+        val withPolygons = paintedPixels(page)
+        assertTrue(
+            withPolygons > plainBars,
+            "the polygons of bar-stack-normalization-and-variation are missing: " +
+                "$plainBars painted pixels without them, $withPolygons with them",
+        )
+        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
+    }
+
+    /**
      * Waits until the chart canvas holds a painted pixel.
      *
      * The pages that fetch their data set the option later, so a single sample would race with the
@@ -463,9 +513,20 @@ class DemoPageTest {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)
         }
         try {
-            page.waitForFunction("() => document.querySelector('.chart canvas') !== null")
+            page.waitForFunction(
+                """
+                () => {
+                    const canvas = document.querySelector('.chart canvas');
+                    if (canvas === null) {
+                        return false;
+                    }
+                    const box = canvas.getBoundingClientRect();
+                    return box.width > 0 && box.height > 0;
+                }
+                """,
+            )
         } catch (error: com.microsoft.playwright.TimeoutError) {
-            throw AssertionError("route $route did not mount a chart canvas", error)
+            throw AssertionError("route $route did not mount a laid-out chart canvas", error)
         }
         val canvas = page.locator(".chart canvas").first()
         val box = canvas.boundingBox()

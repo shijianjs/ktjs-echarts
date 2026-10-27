@@ -225,6 +225,44 @@ class DemoPageTest {
     }
 
     /**
+     * The `doc-example` pages of `DocInteractive.kt` paint on their own: a timer replaces the data,
+     * `showLoading` covers the canvas for three seconds, and the sunburst pages dispatch an action
+     * after the first frame. Sampling once right after the route switch would miss all of that, so
+     * each page is left running long enough for at least one tick of its timer; an exception in a
+     * timer callback is what the console assertion catches.
+     */
+    @Test
+    fun `the interactive doc examples paint and run their timers`(page: Page) {
+        val consoleErrors = mutableListOf<String>()
+        page.onConsoleMessage { message ->
+            if (message.type() == "error") consoleErrors += message.text()
+        }
+        openPage(page)
+        val routes =
+            listOf(
+                "doc-example/barGrid-barGap",
+                "doc-example/tutorial-dynamic-data",
+                "doc-example/tutorial-loading",
+                "doc-example/sunburst-highlight-ancestor",
+                "doc-example/sunburst-highlight-descendant",
+                "doc-example/graphic-bounding",
+                "doc-example/timeline-dynamic-series",
+                "doc-example/pictorialBar-clip",
+            )
+        for (route in routes) {
+            page.evaluate("(value) => { location.hash = '#/' + value }", route)
+            assertChartRendered(page)
+            waitForPainted(page, route)
+            if (route == "doc-example/tutorial-loading") {
+                // The loading effect occupies the canvas until the faked request resolves.
+                page.waitForTimeout(3300.0)
+                assertChartRendered(page)
+            }
+        }
+        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
+    }
+
+    /**
      * Waits until the chart canvas holds a painted pixel.
      *
      * The pages that fetch their data set the option later, so a single sample would race with the

@@ -12,6 +12,7 @@ import demo.examples.customExtraEntries
 import demo.examples.datasetEntries
 import demo.examples.datasetExtraEntries
 import demo.examples.docExampleEntries
+import demo.examples.docInteractiveEntries
 import demo.examples.docMoreEntries
 import demo.examples.funnelEntries
 import demo.examples.gaugeEntries
@@ -154,6 +155,7 @@ val catalog: List<CatalogEntry> =
         themeRiverEntries,
         docExampleEntries,
         docMoreEntries,
+        docInteractiveEntries,
     ).flatten()
 
 private val catalogById: Map<String, CatalogEntry> = catalog.associateBy { it.id }

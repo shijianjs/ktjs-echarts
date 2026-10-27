@@ -1169,6 +1169,9 @@ external interface TimelineOption {
     /** z-level of the component. */
     var zlevel: Double?
 
+    /** Whether the component is shown. */
+    var show: Boolean?
+
     /** Type of the timeline axis: `"value"` or `"category"`. */
     var axisType: String?
 
@@ -1252,6 +1255,13 @@ external interface TimelineOption {
 
     /** Whether the component updates in realtime. */
     var realtime: Boolean?
+
+    /**
+     * Components that are replaced instead of merged when the timeline switches to another option.
+     *
+     * When omitted, the option of the new point is merged into the current one (`normalMerge`).
+     */
+    var replaceMerge: StringOrStringArray?
 }
 
 /**
@@ -1434,7 +1444,7 @@ external interface GraphicElement {
     /** Scale, `[x, y]`. */
     var scale: Array<Double>?
 
-    /** Rotation in degrees. */
+    /** Rotation in radians, as in the zrender element props. */
     var rotation: Double?
 
     /** Origin of the rotation, `[x, y]`. */

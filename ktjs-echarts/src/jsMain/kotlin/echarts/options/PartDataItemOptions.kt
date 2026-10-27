@@ -283,7 +283,11 @@ fun MapDataItem(value: MapDataItemOption): MapDataItem = value.unsafeCast<MapDat
  *
  * Upstream `PictorialBarDataItemOption`.
  */
-external interface PictorialBarDataItemOption : PictorialBarSeriesSymbolOption, OptionDataItemObject, DataItemStateOption {
+external interface PictorialBarDataItemOption :
+    PictorialBarSeriesSymbolOption,
+    OptionDataItemObject,
+    DataItemStateOption,
+    AnimationOption {
     /** z-index of the item. */
     var z: Double?
 

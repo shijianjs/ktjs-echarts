@@ -240,7 +240,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（184 个示例 / 25 个家族 + 文档示例组 + 总览页）
+### 已落地（192 个示例 / 25 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -274,6 +274,16 @@
 - 第九批（2 个）：`geo-graph`（瑞士 GeoJSON 上的 graph 系列，节点用经纬度定位）、
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
+
+- 第十九批（8 个，`examples/DocInteractive.kt`，文档示例的交互页）：
+  `barGrid-barGap`（定时切换同轴柱间距）、`tutorial-dynamic-data`（500ms 追加一天的滚动折线）、
+  `tutorial-loading`（`showLoading` + 3 秒后 `hideLoading` 并设 option）、
+  `sunburst-highlight-ancestor` / `sunburst-highlight-descendant`、`graphic-bounding`（`graphic` 组按
+  弧度匀速旋转，对比 `bounding: 'raw'` 与 `'all'`）、`timeline-dynamic-series`（`replaceMerge: 'series'`
+  切换系列数量）、`pictorialBar-clip`。`sunburstHighlight` / `targetNodeId` 在 6.1.0 下不产生任何状态
+  （官方页面同样全黄），改为按拍平后的 `dataIndex` 派发 `highlight`。同批补 wrapper 的
+  `TimelineOption.replaceMerge` / `show`、`PictorialBarDataItemOption` 的 `AnimationOption`，并修正
+  `GraphicElement.rotation` 的 KDoc（弧度）。
 
 - 第十八批（13 个，`examples/DocMore.kt`，文档示例的第二批）：
   `pictorialBar-repeat` / `pictorialBar-position` / `pictorialBar-symbolSize` /
@@ -309,11 +319,10 @@
 ### 下一批（按可做性排序）
 
 1. **无外部依赖、可直接做**：
-   - `doc-example` 剩余（37 个）：象形柱图长尾 `pictorialBar-clip` / `pictorialBar-graphicType` /
+   - `doc-example` 剩余（29 个）：象形柱图长尾 `pictorialBar-graphicType` /
      `pictorialBar-patternSize` / `pictorialBar-repeatDirection` / `pictorialBar-repeatLayout`；
-     `barGrid-barGap`、`bar-dataZoom-filterMode`、`candlestick-axisPointer`、`grid-outerBounds`、
-     `title-block`、`pie-media`、`graphic-bounding`、`aria-decal`；`sunburst-highlight-*`
-     （需要 `dispatchAction`）；timeline 组件 `mix-timeline-all` / `timeline-dynamic-series` /
+     `bar-dataZoom-filterMode`、`candlestick-axisPointer`、`grid-outerBounds`、
+     `title-block`、`pie-media`、`aria-decal`；timeline 组件 `mix-timeline-all` /
      `bar-media-timeline`；其余是地图 / visualMap 组合、第二个渲染器与异步设 option 的页面
      （清单见 `demo/AGENTS.md`）。
    - `custom` 剩余：     `custom-calendar-icon`（`params.coordSys.cellWidth/cellHeight` 已补，可直接做）、
@@ -380,7 +389,7 @@
 ## 待办
 
 - 类型建模：暂无未完成项（见上面各轮）。
-- 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 `doc-example` 剩余 37 页（象形柱图长尾、
+- 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 `doc-example` 剩余 29 页（象形柱图长尾、
   单字段小页、timeline 组件）、`custom` / `matrix` 剩余项与各家族长尾；`custom-calendar-icon` 因上游源码
   只剩缩略图，不移植。
-- 提交：全部已推送到 `origin/main`（最新 本批：第十八批 13 个示例）。
+- 提交：全部已推送到 `origin/main`（最新 本批：第十九批 8 个示例）。

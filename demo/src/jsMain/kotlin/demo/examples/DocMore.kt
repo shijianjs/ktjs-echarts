@@ -72,6 +72,10 @@ private const val ROCKET_SYMBOL =
 private const val STAR_SYMBOL =
     "path://m15.5,19c-0.082,0 -0.164,-0.02 -0.239,-0.061l-5.261,-2.869l-5.261,2.869c-0.168,0.092 -0.373,0.079 -0.529,-0.032s-0.235,-0.301 -0.203,-0.49l0.958,-5.746l-3.818,-3.818c-0.132,-0.132 -0.18,-0.328 -0.123,-0.506s0.209,-0.31 0.394,-0.341l5.749,-0.958l2.386,-4.772c0.085,-0.169 0.258,-0.276 0.447,-0.276s0.363,0.107 0.447,0.276l2.386,4.772l5.749,0.958c0.185,0.031 0.337,0.162 0.394,0.341s0.01,0.374 -0.123,0.506l-3.818,3.818l0.958,5.746c0.031,0.189 -0.048,0.379 -0.203,0.49c-0.086,0.061 -0.188,0.093 -0.29,0.093z"
 
+/** The paw of `pictorialBar-clip`. */
+private const val PAW_SYMBOL =
+    "path://M36.7,102.84c-1.17,2.54-2.99,4.98-3.39,7.63c-1.51,9.89-3.31,19.58-1.93,29.95 c0.95,7.15-2.91,14.82-3.57,22.35c-0.64,7.36-0.2,14.86,0.35,22.25c0.12,1.68,2.66,3.17,4.67,5.4c-0.6,0.82-1.5,2.22-2.58,3.48 c-0.96,1.12-1.96,2.35-3.21,3.04c-1.71,0.95-3.71,2.03-5.51,1.9c-1.18-0.08-3.04-2.13-3.16-3.43c-0.44-4.72,0-9.52-0.41-14.25 c-0.94-10.88-2.32-21.72-3.24-32.61c-0.49-5.84-1.63-12.01-0.35-17.54c3.39-14.56,2.8-28.84,0.36-43.4 c-2.71-16.16-1.06-32.4,0.54-48.59c0.91-9.22,4.62-17.36,8.53-25.57c1.32-2.77,1.88-6.84,0.87-9.62C21.89-3.77,18.09-11,14.7-18.38 c-0.56,0.1-1.13,0.21-1.69,0.31C10.17-11.52,6.29-5.2,4.71,1.65C2.05,13.21-4.42,22.3-11.43,31.28c-1.32,1.69-2.51,3.5-3.98,5.04 c-4.85,5.08-3.25,10.98-2.32,16.82c0.25,1.53,0.52,3.06,0.77,4.59c-0.53,0.22-1.07,0.43-1.6,0.65c-1.07-2.09-2.14-4.19-3.28-6.44 c-6.39,2.91-2.67,9.6-5.23,15.16c-1.61-3.31-2.77-5.68-3.93-8.06c0-0.33,0-0.67,0-1c6.96-16.08,14.63-31.9,20.68-48.31 C-5.24-4.07-2.03-18.55,2-32.73c0.36-1.27,0.75-2.53,0.98-3.82c1.36-7.75,4.19-10.23,11.88-10.38c1.76-0.04,3.52-0.21,5.76-0.35 c-0.55-3.95-1.21-7.3-1.45-10.68c-0.61-8.67,0.77-16.69,7.39-23.19c2.18-2.14,4.27-4.82,5.25-7.65c2.39-6.88,11.66-9,16.94-8.12 c5.92,0.99,12.15,7.93,12.16,14.12c0.01,9.89-5.19,17.26-12.24,23.68c-2.17,1.97-5.35,4.77-5.17,6.94c0.31,3.78,4.15,5.66,8.08,6.04 c1.82,0.18,3.7,0.37,5.49,0.1c5.62-0.85,8.8,2.17,10.85,6.73C73.38-27.19,78.46-14.9,84.2-2.91c1.52,3.17,4.52,5.91,7.41,8.09 c7.64,5.77,15.57,11.16,23.45,16.61c2.28,1.58,4.64,3.23,7.21,4.14c5.18,1.84,8.09,5.63,9.82,10.46c0.45,1.24,0.19,3.71-0.6,4.18 c-1.06,0.63-3.15,0.27-4.44-0.38c-7.05-3.54-12.84-8.88-19.14-13.5c-3.5-2.57-7.9-4-12.03-5.6c-9.44-3.66-17.73-8.42-22.5-18.09 c-2.43-4.94-6.09-9.27-9.69-14.61c-1.2,10.98-4.46,20.65,1.14,31.19c6.62,12.47,5.89,26.25,1.21,39.49 c-2.52,7.11-6.5,13.74-8.67,20.94c-1.91,6.33-2.2,13.15-3.23,19.75c-0.72,4.63-0.84,9.48-2.36,13.84 c-2.49,7.16-6.67,13.83-5.84,21.82c0.42,4.02,1.29,7.99,2.1,12.8c-3.74-0.49-7.47-0.4-10.67-1.66c-1.33-0.53-2.43-4.11-2.07-6.01 c1.86-9.94,3.89-19.69,0.07-29.74C34.55,108.63,36.19,105.52,36.7,102.84c1.25-8.45,2.51-16.89,3.71-24.9 c-0.83-0.58-0.85-0.59-0.87-0.61c-0.03,0.16-0.07,0.32-0.09,0.48C38.53,86.15,37.62,94.5,36.7,102.84z"
+
 /** One pictorial bar item: the value plus the symbol options of that bar. */
 private fun pictorialItem(
     value: Double,
@@ -548,6 +552,90 @@ val docMoreEntries: List<CatalogEntry> =
                             symbolRepeat = BooleanOrDoubleOrString(true)
                             symbolClip = true
                             symbolBoundingData = DoubleOrDoubleArray(arrayOf(-60.0, 40.0))
+                        },
+                    )
+            }
+        },
+        docMore.chart(
+            "doc-example/pictorialBar-clip",
+            "象形柱图：裁剪",
+            "Pictorial bar: symbolClip",
+        ) {
+            fun symbolHalfSize(): StringOrDoubleOrArray =
+                StringOrDoubleOrArray(arrayOf(StringOrDouble("50%"), StringOrDouble("80%")))
+            unsafeJso<EChartsOption> {
+                color = arrayOf(ZRColor("#bb0004"), ZRColor("#ccc"))
+                xAxis =
+                    one(
+                        unsafeJso<XAxisOption> {
+                            data =
+                                strings(
+                                    "symbolClip: true\nsymbolRepeat: false",
+                                    "symbolClip: true\nsymbolRepeat: true",
+                                    "symbolClip: false\nsymbolRepeat: true",
+                                )
+                            axisTick = unsafeJso<AxisTickOption> { show = BooleanOrString(false) }
+                            axisLabel = unsafeJso<AxisLabelOption> { interval = AxisInterval(0.0) }
+                        },
+                    )
+                yAxis =
+                    one(
+                        unsafeJso<YAxisOption> {
+                            max = AxisMinMax(80.0)
+                            splitLine = unsafeJso<SplitLineOption> { show = false }
+                        },
+                    )
+                series =
+                    arrayOf<SeriesOption>(
+                        // The series that holds the real value; it sits above the background.
+                        pictorialBarSeries {
+                            name = "realValue"
+                            symbol = PAW_SYMBOL
+                            z = 10.0
+                            symbolBoundingData = DoubleOrDoubleArray(80.0)
+                            typedData =
+                                dataItems(
+                                    pictorialItem(40.0) { symbolClip = true },
+                                    pictorialItem(40.0) {
+                                        symbolSize = symbolHalfSize()
+                                        symbolClip = true
+                                        symbolRepeat = BooleanOrDoubleOrString(true)
+                                    },
+                                    pictorialItem(40.0) {
+                                        symbolSize = symbolHalfSize()
+                                        symbolClip = false
+                                        symbolRepeat = BooleanOrDoubleOrString(true)
+                                    },
+                                )
+                        },
+                        // The background series repeats the same symbols in grey.
+                        pictorialBarSeries {
+                            name = "background"
+                            symbol = PAW_SYMBOL
+                            symbolBoundingData = DoubleOrDoubleArray(80.0)
+                            // The original nests these fields under `label.normal.textStyle`.
+                            label =
+                                unsafeJso<LabelOption> {
+                                    show = true
+                                    position = LabelPosition("outside")
+                                    formatter = LabelFormatter("value: {c}")
+                                    color = "#bb0004"
+                                }
+                            typedData =
+                                dataItems(
+                                    // Zero disables the initial animation of the background but
+                                    // keeps the animation of later updates.
+                                    pictorialItem(40.0) { animationDuration = AnimationDuration(0.0) },
+                                    pictorialItem(40.0) {
+                                        symbolSize = symbolHalfSize()
+                                        symbolRepeat = BooleanOrDoubleOrString("fixed")
+                                        animationDuration = AnimationDuration(0.0)
+                                    },
+                                    pictorialItem(40.0) {
+                                        symbolSize = symbolHalfSize()
+                                        symbolRepeat = BooleanOrDoubleOrString("fixed")
+                                    },
+                                )
                         },
                     )
             }

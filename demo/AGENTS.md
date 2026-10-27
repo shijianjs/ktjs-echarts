@@ -88,12 +88,13 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **184 个**（覆盖 25 个家族 + 一个「文档示例」组），其余按批推进。
+筛选后仍有 250+ 个候选，目前已落地 **192 个**（覆盖 25 个家族 + 一个「文档示例」组），其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
-一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。这批页面分两个文件：
-`examples/DocExamples.kt`（第一批，28 个）与 `examples/DocMore.kt`（第二批，13 个，象形柱图教程、
-dataZoom 散点、文本 / 标签、动画与旭日图 / 矩形树图入门）。
+一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。这批页面按依赖分三个文件：
+`examples/DocExamples.kt`（静态页，28 个）、`examples/DocMore.kt`（象形柱图教程、dataZoom 散点、
+文本 / 标签、动画与旭日图 / 矩形树图入门，14 个）与 `examples/DocInteractive.kt`（首次绘制后还要
+`setOption` / `dispatchAction` / 起定时器，或使用 timeline 组件的 7 个）。
 
 ### 尚未移植的家族与原因
 
@@ -111,21 +112,18 @@ dataZoom 散点、文本 / 标签、动画与旭日图 / 矩形树图入门）�
 `bar-drilldown`、`line-easing`、`scatter-clustering`、`custom-gantt-flight`、
 `custom-gauge`（需要 `path://` 面板图）、`custom-calendar-icon`（图标是 `path://` 素材）。
 
-`doc-example/` 里还没有移植的（39 条，其中 `bar-large` / `pie-highlight` 已按家族 id 落地）：
+`doc-example/` 里还没有移植的（31 条，其中 `bar-large` / `pie-highlight` 已按家族 id 落地）：
 
-- 象形柱图长尾：`pictorialBar-clip`、`pictorialBar-graphicType`、`pictorialBar-patternSize`、
+- 象形柱图长尾：`pictorialBar-graphicType`、`pictorialBar-patternSize`、
   `pictorialBar-repeatDirection`、`pictorialBar-repeatLayout`；
-- 单字段小页：`barGrid-barGap`、`bar-dataZoom-filterMode`、`candlestick-axisPointer`、
-  `grid-outerBounds`、`title-block`、`pie-media`、`bar-media-timeline`、`graphic-bounding`、
-  `aria-decal`；
-- 需要 `dispatchAction`：`sunburst-highlight-ancestor`、`sunburst-highlight-descendant`；
-- 第二个渲染器 / 异步设 option：`canvas-vs-svg`（含 `-en`）、`tutorial-async`、`tutorial-loading`、
-  `tutorial-dynamic-data`；
+- 单字段小页：`bar-dataZoom-filterMode`、`candlestick-axisPointer`、`grid-outerBounds`、
+  `title-block`、`pie-media`、`bar-media-timeline`、`aria-decal`；
+- 第二个渲染器 / 异步设 option：`canvas-vs-svg`（含 `-en`）、`tutorial-async`；
 - 地图与 visualMap 组合：`map-example`、`map-visualMap-continuous`、`map-visualMap-continuous-text`、
   `map-visualMap-pieces`、`map-visualMap-piecewise-text`、`scatter-visualMap-categories`、
   `scatter-visualMap-piecewise`、`geo-svg-label-basic`、`geo-svg-layout-basic`、
   `geo-svg-named-basic`、`geo-roam-indicator`、`graph-roam-indicator`；
-- timeline 组件：`mix-timeline-all`、`timeline-dynamic-series`；
+- timeline 组件：`mix-timeline-all`；
 - 外部图片素材：`axisPointer-handle-image`。
 
 ## 移植过程中修掉的 wrapper 缺口
@@ -165,6 +163,12 @@ dataZoom 散点、文本 / 标签、动画与旭日图 / 矩形树图入门）�
   `BaseBarSeriesOption` 声明为 `string | number`，wrapper 之前只允许 `String?`；现已放宽为
   `StringOrDouble?`（`value-animation-simple` 的 `barCategoryGap: 200` 需要）。烛台图不继承
   `BaseBarSeriesOption`，字段保持原样。
+- `TimelineOption`：补 `replaceMerge`（`timeline-dynamic-series` 用 `'series'` 让切换播放点时整组
+  替换系列，否则从 3 个切回 1 个会残留）与 `show`。
+- `PictorialBarDataItemOption`：上游继承 `AnimationOptionMixin`，wrapper 漏了 `AnimationOption`
+  （`pictorialBar-clip` 背景系列的 `animationDuration: 0` 需要）。
+- `GraphicElement.rotation`：KDoc 原先写「角度」，实际 zrender 元素读的是弧度
+  （`graphic-bounding` 按弧度做匀速旋转），已改正。
 
 ## 兜底说明：图表与主题
 

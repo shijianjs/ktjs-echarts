@@ -47,6 +47,14 @@ demo/src/jvmTest/kotlin/demo/e2e/
 - **`Array<Double>` 不能顶 `vararg Double`**：`numbers(*values)` 要求 `DoubleArray`，集合先
   `toDoubleArray()`；反过来 `Array<T?>`（`strings` / `numbers` / `dataItems` 的返回）也不能直接赋给
   需要非空元素的字段。
+- **手写 `CustomSeriesOption` 必须带 `type`**：用 `customSeries { }` 时由构造器补上，直接
+  `unsafeJso<CustomSeriesOption> { }` 时不会，ECharts 会静默丢掉整个系列（格子空白、label 堆在原点）。
+- **矩阵表头有几层就写几层**：`MatrixDimensionOption.data` 里父单元格要用 `children` 挂出叶子，
+  数据里引用的单元格名必须能落到叶子上；只写五个父单元格时 25x25 的热力图整页空白。
+- **`rich` 必须与 formatter 的 `{tag|...}` 一一对应**：缺了 `rich` 的定义，ECharts 把 `{b|{b}：}` 原样
+  当文本画出来（`pie-nest` 踩过）。
+- **`graphic` 元素定位用 `left` / `top`**：`x` / `y` 是 zrender 原始属性，只认数字，传百分比字符串会
+  落到原点（`matrix-confusion` 的「True Class」踩过）。
 
 ## 选例范围
 
@@ -59,7 +67,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 - 依赖官方站点图片素材的（`image://` 图标、纹理贴图、`data:image/...` 大块 base64），
 - 依赖真实键鼠序列的（拖拽、触摸、`sendInput`）。
 
-筛选后仍有 250+ 个候选，目前已落地 **127 个**（覆盖 23 个家族 + 一个「文档示例」组），其余按批推进。
+筛选后仍有 250+ 个候选，目前已落地 **135 个**（覆盖 23 个家族 + 一个「文档示例」组），其余按批推进。
 
 「文档示例」组（`Groups.DOC`，`examples/DocExamples.kt`）对应官方清单里的 `doc-example/*` 条目：它们
 不属于任何家族，一个例子只讲一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。

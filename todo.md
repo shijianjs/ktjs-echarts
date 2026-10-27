@@ -231,7 +231,7 @@
 ### 状态
 
 - 提交：`0a1f9ca`（第一批 69 个）、`6edff97`（第二批 tree / sunburst / dataset / calendar / matrix /
-  custom，41 个）；`588381b`（第三批：文档示例 17 个 + `matrix-mini-bar-data-collection` + 主题按钮修复），
+  custom，41 个）；`588381b`（第三批：文档示例 17 个 + `matrix-mini-bar-data-collection` + 主题按钮修复）、`4fd0dda`（三张显示修复）、
   已推送到 `origin/main`。
 - **`git push` 一直未成功**：本机到 `github.com:443` 连接被重置/超时，重试多次仍失败；下一次先
   `git push`（含后面两批）。
@@ -240,7 +240,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（127 个示例 / 23 个家族 + 文档示例组 + 总览页）
+### 已落地（135 个示例 / 23 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -254,19 +254,27 @@
 - 同批修掉：右上角亮色/暗色按钮切换后两个按钮都高亮（`syncThemeButtons` 用 `withClass` 累加，
   改成 `classList.toggle`），暗色主题下选中按钮白字压在浅蓝底上看不清（新增 `--switch-on-fg`），
   e2e 增加「只有一个按钮高亮 + 对比度 ≥ 4.5」的断言。
+- 第四批（3 个 + 3 个显示修复）：`matrix-sparkline`（`MatrixExtra.kt`）、`custom-polar-heatmap`
+  （`CustomExtra.kt`）、`bar-label-rotation`（`BarExtra.kt`）。同时修好三张展示异常的图：
+  `matrix-confusion`（custom series 缺 `type` + graphic 用 `left/top`）、`matrix-covariance`
+  （矩阵表头要两级嵌套）、`pie-nest`（label 富文本缺 `rich`）。
+- 第五批（4 个）：`line-polar`、`line-polar2`、`line-function`（`LineExtra.kt`）、
+  `gauge-stage`、`gauge-temperature`（`GaugeExtra.kt`，官方的 setInterval 未移植，显示初始值）。
 
 ### 下一批（按可做性排序）
 
 1. **无外部依赖、可直接做**：
-   - `doc-example` 剩余（约 45 个）：`tutorial-styling` 之后的教程页、`text-*`、`title-block`、
+   - `doc-example` 剩余（约 42 个）：`tutorial-styling` 之后的教程页、`text-*`、`title-block`、
      `label-position`、`grid-outerBounds`、`parallel-all`、`radar`、`sunburst-highlight-*`（需要
-     `dispatchAction`）、`pictorialBar-*`、`aria-decal*`；`map-*`/`geo-*` 除外。
-   - `custom` 剩余：`custom-calendar-icon`（需要 `params.coordSys.cellWidth/cellHeight`）、
-     `custom-gauge` / `custom-polar-heatmap`（需要极坐标中心 `params.coordSys.cx` / `cy`）；
-     `custom-hexbin`、`custom-spiral-race`、`custom-gantt-flight` 是长动画或大数据。
-   - `matrix` 剩余：`matrix-sparkline`（25 个网格 + `dataZoom` 覆盖全部 x 轴）、`matrix-mbti`、
-     `matrix-periodic-table`、`matrix-stock`（`body.data` 单元格 + `graphic` 标题）、
-     `matrix-mini-bar-geo`（需要 geo）。
+     `dispatchAction`）、`pictorialBar-*`；`map-*`/`geo-*` 除外。
+   - `custom` 剩余：`custom-calendar-icon`（`params.coordSys.cellWidth/cellHeight` 已补，可直接做）、
+     `custom-hexbin`（取数）、`custom-spiral-race`/`custom-gantt-flight`（长动画）、`custom-gauge`
+     （`path://` 面板图）。
+   - `matrix` 剩余：`matrix-mbti`、`matrix-periodic-table`、`matrix-stock`（数据表 8-17KB，
+     需要先写一个把上游数组转成 Kotlin 的小脚本）、`matrix-mini-bar-geo`（需要 geo）。
+   - 已移植家族的长尾里可直接做的：`line-markline`、`line-markarea`、`line-smooth` 之外的 line 变体、
+     `pie-legend`、`gauge-clock`/`gauge-speed`/`gauge-barometer`（`path://` 图标，需先决定是否搬运
+     几 KB 的 path 字符串）、`bar-polar-*`、`polar-*`。
    - 已移植家族的长尾：`bar-race`/`bar-race-country`/`bar-drilldown`/`bar-multi-drilldown`/`bar-gradient`/
      `bar-large`/`bar-breaks-simple`/`bar-breaks-brush`/`bar-label-rotation`/`bar-polar-*`/`polar-*`、
      `line-easing`/`line-fisheye-lens`/`line-graphic`/`line-pen`/`line-draggable`/`line-race`/`line-polar*`/
@@ -328,4 +336,4 @@
 - 示例站（demo）：见「示例站（demo）移植进度」一节，下一批是 `doc-example` 剩余约 45 页、`custom` /
   `matrix` 剩余项与各家族长尾；极坐标 `renderItem` 需要先补 `params.coordSys.cx/cy`，
   `custom-calendar-icon` 需要 `params.coordSys.cellWidth/cellHeight`。
-- 提交：`6edff97` / `588381b` 已推送到 `origin/main`；本轮的 aria-decal 两个页面与文档更新待提交。
+- 提交：全部已推送到 `origin/main`（最新 `edf2a62`）。

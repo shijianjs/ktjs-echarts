@@ -1,0 +1,111 @@
+# ktjs-echarts 的 CNB 流水线：把 CNB 当云端 AI 开发机，结果同步回 GitHub。
+#
+#   Issue/PR 评论 @shijianjs/ktjs-echarts(kotlin)
+#     → 准备 /refs 下的上游参考仓库
+#     → npc:go 在工具链镜像里改代码、跑测试
+#     → 把分支推到 CNB 与 GitHub
+#
+# GitHub 仍然是公开仓库和社区入口；CNB 只负责「AI 干活」这一段。
+#
+# 文档：
+#   NPC          https://docs.cnb.cool/zh/build/npc.md
+#   npc:go       https://docs.cnb.cool/zh/build/internal-steps/npc/go.md
+#   流水线缓存    https://docs.cnb.cool/zh/build/pipeline-cache.md
+#   数据卷        https://docs.cnb.cool/zh/build/grammar.md#pipeline-volumes
+#
+# 镜像名在两处出现（构建、使用），改的时候一起改。
+
+main:
+  push:
+    # 只在工具链 Dockerfile 变化时重建镜像。
+    # 首次导入仓库时没有「文件变动」可比，需要手动跑一次这条流水线
+    # （CNB 页面「构建」→ 选 main → 运行），否则 NPC 拉不到镜像。
+    - services:
+        - docker
+      stages:
+        - name: 重建 NPC 工具链镜像
+          ifModify: .cnb/npc-env.Dockerfile
+          script: |
+            set -euo pipefail
+            IMAGE="${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}/npc-env:latest"
+            echo "构建 $IMAGE"
+            docker build -f .cnb/npc-env.Dockerfile -t "$IMAGE" .cnb
+            docker push "$IMAGE"
+
+$:
+  # ── 自建 NPC 被 @ 时执行 ────────────────────────────────────────────────
+  # 注意：系统 NPC（@//npc/CodeBuddy(deepseek-v4.1-flash)）的流水线配置来自
+  # npc 仓库，本文件改不动它。所以这里配的是 .cnb/settings.yml 里自建的
+  # kotlin 角色——同样的模型，但镜像、缓存、挂载都能自己定。
+  issue.comment@npc:
+    - docker:
+        image: ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}/npc-env:latest
+        # 节点缓存：只在当前构建节点有效（平台默认 3 个节点），命中时省掉
+        # Gradle 依赖 / Kotlin 编译器 / npm 包 / Chromium 的下载。
+        # 跨节点要共享时改用 docker:cache 把依赖固化成镜像。
+        volumes:
+          - main:/root/.gradle:copy-on-write
+          - main:/root/.npm:copy-on-write
+          - main:/root/.cache/ms-playwright:copy-on-write
+          - refs:/refs:copy-on-write
+      env:
+        # 上游参考仓库来源：cnb 走 CNB 内网镜像（快），github 直连。
+        # 没在 CNB 上镜像 apache/echarts 之前，先用 github。
+        REFS_ORIGIN: github
+        # Kotlin/JS 的 npm 安装走国内镜像；官方源在国内经常卡住。
+        NPM_CONFIG_REGISTRY: https://registry.npmmirror.com
+      stages:
+        - name: 准备上游参考仓库
+          script: bash .cnb/scripts/prepare-refs.sh
+
+        - name: NPC 执行任务
+          type: npc:go
+          options:
+            # 指定 model 后，下面四个能力参数不再继承平台默认值，
+            # 必须按模型实际能力给，否则上下文超限会直接报错。
+            model: deepseek-v4.1-flash
+            contextWindow: 128k
+            maxTokens: 48k
+            maxTurns: 300
+            thinkingLevel: medium
+            supportImage: true
+
+        - name: 同步到 GitHub
+          # 密钥仓库 shijianjs/cnb-secrets 里的 github.yml。
+          # 它必须声明 allow_events: issue.comment@npc —— NPC 事件属于不可信事件，
+          # 没这句引用会被直接拒绝。
+          # 首次只验证 NPC 链路时，把这一段连同 imports 一起注释掉。
+          script: bash .cnb/scripts/push-to-github.sh
+          imports: https://cnb.cool/shijianjs/cnb-secrets/-/blob/main/github.yml
+
+  # PR 评论触发，内容与上面一致。CNB 按事件独立合并配置，
+  # 只配 issue 不配 pull_request 的话，PR 里 @ 仍走系统默认行为。
+  pull_request.comment@npc:
+    - docker:
+        image: ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}/npc-env:latest
+        volumes:
+          - main:/root/.gradle:copy-on-write
+          - main:/root/.npm:copy-on-write
+          - main:/root/.cache/ms-playwright:copy-on-write
+          - refs:/refs:copy-on-write
+      env:
+        REFS_ORIGIN: github
+        NPM_CONFIG_REGISTRY: https://registry.npmmirror.com
+      stages:
+        - name: 准备上游参考仓库
+          script: bash .cnb/scripts/prepare-refs.sh
+
+        - name: NPC 执行任务
+          type: npc:go
+          options:
+            model: deepseek-v4.1-flash
+            contextWindow: 128k
+            maxTokens: 48k
+            maxTurns: 300
+            thinkingLevel: medium
+            supportImage: true
+
+        - name: 同步到 GitHub
+          # 同 issue.comment@npc：密钥文件必须声明 allow_events: pull_request.comment@npc。
+          script: bash .cnb/scripts/push-to-github.sh
+          imports: https://cnb.cool/shijianjs/cnb-secrets/-/blob/main/github.yml

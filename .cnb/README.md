@@ -10,7 +10,7 @@
 | 能设置 `@//npc/CodeBuddy(...)` 的执行环境吗 | **不能。** NPC 事件流水线用的是 **NPC 所属仓库** 的 `.cnb.yml`；系统 NPC 属于 `npc` 仓库，镜像和挂载都改不动。要自定义环境，只能在本仓库 `.cnb/settings.yml` 定义角色，让它「属于本仓库」 |
 | 能继续用 `deepseek-v4.1-flash` 吗 | 能。模型不在角色定义里，而是 `.cnb.yml` 中 `npc:go` 的 `options.model`。自建角色 + 同款模型，行为和系统 NPC 一致，环境自己定 |
 | JDK / Gradle / Kotlin 编译器每次重拉吗 | 不。分三层：镜像装「装一次就不变」的（JDK 21、Node 22、Chromium 系统依赖、NPC 运行时）；`volumes` 缓存「经常变」的（Gradle 依赖、Kotlin 编译器、npm 包、Chromium 本体）；只有真跨节点才需要 `docker:cache` |
-| 三个仓库的上下文怎么给 | `apache/echarts`（pin 到 `package.json` 的版本）和 `apache/echarts-examples` 直接**固化进镜像**的 `/refs`。不用把上游导入 CNB、不用维护同步、不用 volumes 缓存；镜像层天然只读，AI 改了也只在上层可写层，容器销毁即消失 |
+| 三个仓库的上下文怎么给 | `apache/echarts`（pin 到 `package.json` 的版本）、`apache/echarts-examples`（sparse）、`JetBrains/kotlin-wrappers`（写 wrapper 的方法论参考）全部**固化进镜像**的 `/refs`。不用把上游导入 CNB、不用维护同步、不用 volumes 缓存；镜像层天然只读，AI 改了也只在上层可写层，容器销毁即消失 |
 
 ## 文件
 
@@ -201,6 +201,25 @@ NPC 自己指出的两个坑值得记下来：`charts.ts` / `option.ts` 里有�
 还有一个不是 bug 但要知道的：`/refs/echarts` pin 的是 tag，master 比它新几个文件。
 上游 `AGENTS.md` 描述的是 master，引用到的个别文件在 tag 里不存在。NPC 角色提示词里
 已经写明「以磁盘上的实际文件为准」。
+
+## 参考官方 NPC 配置改的三处
+
+官方 NPC 仓库是 `npc/CodeBuddy`（`cnb git get-content --repo npc/CodeBuddy --file-path .cnb.yml`）。
+对着它抄了三件事：
+
+1. **`npc:go` 参数**：`contextWindow: 1m`、`thinkingLevel: "off"`、不设 `maxTurns`/`maxTokens`。
+   之前给 `128k` + `medium` + `300`，以为更省，其实官方对 `deepseek-v4.1-flash` 就是关思考、
+   给满上下文。**`off` 必须加引号**——YAML 1.1 里裸 `off` 是布尔 `false`，平台要的是字符串。
+2. **提示词精简**：官方角色 prompt 只有「开干吧各位」五个字。我们原来两千字，把系统指令
+   （尤其是「用 `cnb issues comment` 回复」）冲淡了。项目约定交给 `AGENTS.md`，prompt 只留
+   铁律 + `/refs` 路径 + 几条禁令。
+3. **`/refs` 加 kotlin-wrappers**：写 Kotlin/JS wrapper 要对着上游看 mixin 怎么拆、
+   `external interface` 怎么建、生成与手写怎么分层，只有 echarts 的 TS 源码不够。
+   实测 68M、77 个 `kotlin-*` 目录（72 个是真 Gradle 模块）。
+
+顺带：`settings.gradle.kts` 去掉了 `exclusiveContent`。它把 kotlin-wrappers 钉死在 Central，
+导致每次冷构建必撞 429。镜像第一次缺 klib 是 Nexus 还没回源，拉过一次就缓存了，
+靠 `warmup-gradle.sh` 的重试能过，不值得为此硬钉 Central。
 
 ## 已知限制
 

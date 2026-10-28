@@ -289,6 +289,8 @@ NPC 自己指出的两个坑值得记下来：`charts.ts` / `option.ts` 里有�
   `refusing to allow a Personal Access Token to create or update workflow`。
   fine-grained PAT 要在 Repository permissions 里开 **Workflows: Read and write**，
   classic PAT 要勾 **workflow**。NPC 以后改 workflow 文件同样受这条约束。
+- **NPC 超过 `maxTurns` 会中止**：默认 500 轮，实测约 4.5 轮/分钟。现在设 4000。
+  中止时改动由 endStages 兜底推送，成功推 main、失败推 `npc/wip-<时间戳>`。
 - **PR 评论触发没实测过**：`pull_request.comment@npc` 和 `issue.comment@npc` 共用同一份
   锚点定义（`&npc-pipeline`），issue 侧已跑通，PR 侧只是入口不同。第一次真实 PR 里 @ 时
   留意一下构建日志。

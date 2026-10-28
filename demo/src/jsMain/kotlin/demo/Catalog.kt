@@ -43,6 +43,7 @@ import demo.examples.overviewEntries
 import demo.examples.parallelAqiEntries
 import demo.examples.parallelEntries
 import demo.examples.pictorialBarEntries
+import demo.examples.pictorialBarLongTailEntries
 import demo.examples.pieEntries
 import demo.examples.radarEntries
 import demo.examples.richTextEntries
@@ -51,6 +52,7 @@ import demo.examples.scatterEntries
 import demo.examples.scatterExtraEntries
 import demo.examples.scatterLongTailEntries
 import demo.examples.scatterMatrixEntries
+import demo.examples.scatterWeightEntries
 import demo.examples.sunburstEntries
 import demo.examples.themeRiverEntries
 import demo.examples.treeEntries
@@ -158,10 +160,12 @@ val catalog: List<CatalogEntry> =
         scatterExtraEntries,
         scatterLongTailEntries,
         scatterMatrixEntries,
+        scatterWeightEntries,
         candlestickEntries,
         candlestickLongTailEntries,
         boxplotEntries,
         pictorialBarEntries,
+        pictorialBarLongTailEntries,
         parallelEntries,
         parallelAqiEntries,
         heatmapEntries,

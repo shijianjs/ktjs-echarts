@@ -90,7 +90,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **267 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **272 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -122,7 +122,11 @@ option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
 
 `path://` 素材不是障碍：上游的 path 字符串原样内联即可，gauge 家族的五个面板图就是这么落地的
 （`examples/GaugeLongTail.kt`，同时把 `Math.random()` 换成 `Lcg`、定时器交给 `ChartHolder`），
-`custom-gauge` 照这个先例做。
+`custom-gauge` 照这个先例做。象形柱图的四页 `pictorialBar-vehicle` / `-body-fill` / `-velocity` /
+`-bar-transition` 也照此落地（`examples/PictorialBarLongTail.kt`，path 常量与身高体重表分别由
+一次性脚本生成到 `PictorialBarPaths.kt` / `ScatterWeightData.kt`）；上游 `pictorialBar-body-fill`
+在根级写的 `markLine: { z: -100 }` 没有移植，因为 wrapper 的 `EChartsOption` 不建模根级 mark 组件，
+该字段只影响层级、不影响画面。
 
 ## 数据自己算的页面
 

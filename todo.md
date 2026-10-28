@@ -239,7 +239,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（267 个示例 / 26 个家族 + 文档示例组 + 总览页）
+### 已落地（272 个示例 / 26 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -274,6 +274,19 @@
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
 
+- 第三十一批（5 个，象形柱图 path:// 面板图 + 身高体重分布）：新建
+  `examples/PictorialBarLongTail.kt` 的 `pictorialBar-vehicle`（驯鹿 / 轮船 / 飞机 / 高铁 / 汽车的
+  `path://` 剪影按 `symbolRepeat` 沿柱子平铺，2015/2016 两组并列）、`pictorialBar-body-fill`
+  （五个人体剪影靠 `symbolClip` + `symbolBoundingData` 按含水量裁切，底层灰色 `full` 系列画完整身高，
+  标签把数值换算成百分比，`markLine` 标出两组最大值/最小值）、`pictorialBar-velocity`
+  （透明小山柱做背景，柱顶用 `symbolPosition: end` + `symbolOffset` 挂速度剪影）、
+  `pictorialBar-bar-transition`（同一 option 在象形柱 / 普通柱 / 菱形柱之间切换，两个系列共用 id +
+  `universalTransition` 按 dataIndex 形变，`ChartHolder.setInterval` 每 2.5 秒换一次）；新建
+  `examples/ScatterWeight.kt` 的 `scatter-weight`（260 位女性 + 247 位男性身高体重散点，
+  每系列带取值范围的 `markArea`、极值 `markPoint`、平均值与 160cm 的 `markLine`，
+  tooltip 区分元组/单个值的写法与上游一致）。数据与 path 常量由一次性脚本生成为
+  `PictorialBarPaths.kt` 与 `ScatterWeightData.kt`。上游 `pictorialBar-body-fill` 根级的
+  `markLine: { z: -100 }` 没有移植（wrapper 不建模根级 mark 组件，只影响层级）。
 - 第二十七批（9 个，图形元素 + 平行坐标 + 散点矩阵）：新建 `examples/CanvasGraphics.kt` 的
   `watermark`（canvas 画一块 ECHARTS 斜向水印当 `backgroundColor` 的重复 pattern，两个柱块两个饼）、
   `bar-drilldown`（点击柱体走 `universalTransition` 下钻，`event.data.groupId` 上游是 `unknown`，
@@ -466,9 +479,9 @@
    `intraday-breaks-*` / `parallel-aqi` / `scatter-matrix` / `pie-parliament-transition` /
    `calendar-effectscatter` / `bar-multi-drilldown` 已完成。
 2. **要写数据转换脚本**：`grid-multiple` / `area-rainfall`（各 85KB，先看要不要落成资源文件）、
-   `matrix-stock` / `matrix-mbti` / `matrix-periodic-table`、`scatter-world-population`、
+   `matrix-stock` / `matrix-mbti` / `matrix-periodic-table`、`scatter-world-population`；
    `scatter-weight`、`pictorialBar-vehicle` / `-body-fill` / `-velocity` / `-bar-transition`
-   （`path://` 面板图，先例是 `examples/GaugeLongTail.kt`）。`candlestick-sh` /
+   （`path://` 面板图，先例是 `examples/GaugeLongTail.kt`）已在第三十一批完成。`candlestick-sh` /
    `candlestick-sh-2015` 已在第三十批完成。
 3. **要补交互表演方式**：`bar-brush` / `bar-breaks-brush`（`brushSelected` + `dispatchAction`）、
    `bar-race` 已完成；`line-pen` / `line-draggable` / `candlestick-touch` 之类真实键鼠序列按
@@ -540,8 +553,10 @@
 ## 待办
 
 - 类型建模：暂无未完成项（见上面各轮）。
-- 示例站（demo）：见「示例站（demo）移植进度」一节。第三十批（2 个，`candlestick-sh`、
-  `candlestick-sh-2015`）之后，下一批按第二档做 `grid-multiple` / `area-rainfall`（先定要不要落成
-  资源文件）、`matrix-*`、`scatter-world-population` / `scatter-weight` 或 `pictorialBar` 的
-  `path://` 面板图；`custom-calendar-icon` 因上游源码只剩缩略图，不移植。
-- 提交：全部已推送到 `origin/main`（最新：第三十批 2 个示例）。
+- 示例站（demo）：见「示例站（demo）移植进度」一节。第三十一批（5 个，`pictorialBar` 的
+  `path://` 四页与 `scatter-weight`）之后，下一批按第二档做 `grid-multiple` / `area-rainfall`
+  （先定要不要落成资源文件）、`matrix-stock` / `matrix-mbti` / `matrix-periodic-table`、
+  `scatter-world-population`；第三档的 `bar-brush` / `bar-breaks-brush` 可做，但上游没给
+  `brushSelected` 的 payload 类型，事件内容要按 `batch[].selected` 在例子侧强转再读；
+  `custom-calendar-icon` 因上游源码只剩缩略图，不移植。
+- 提交：全部已推送到 `origin/main`（最新：第三十一批 5 个示例）。

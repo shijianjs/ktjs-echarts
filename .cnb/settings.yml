@@ -32,4 +32,5 @@ npc:
         测试覆盖要求都在里面。常用命令：`./gradlew compileKotlinJs`、
         `./gradlew :ktjs-echarts:jsBrowserTest`、`./gradlew build`（含 Detekt）。
         不手工改 package.json 的 echarts 版本（Dependabot 管），不改 gradle wrapper。
-        提交信息用中文，写清「为什么」。提交后不用自己推送，流水线末尾会同步到 GitHub。
+        在独立分支上改，不要直接提交到 main。提交信息用中文，写清「为什么」。
+        提交后不用自己推送，流水线末尾会把你当前分支同步到 GitHub。

@@ -12,11 +12,12 @@
 #   流水线缓存    https://docs.cnb.cool/zh/build/pipeline-cache.md
 #   数据卷        https://docs.cnb.cool/zh/build/grammar.md#pipeline-volumes
 #
-# 镜像名在两处出现（构建、使用），改的时候一起改。
+# `.npc-pipeline` 是 YAML 锚点的载体，不是分支名，平台会忽略它。
+# 官方 npc/CodeBuddy 的 .cnb.yml 同样用顶层锚点（`.1m: &1m`）给多个角色复用配置。
 
 main:
   push:
-    # 只在工具链 Dockerfile 变化时重建镜像。
+    # 只在工具链 Dockerfile 或 echarts 版本变化时重建镜像。
     # 首次导入仓库时没有「文件变动」可比，需要手动跑一次这条流水线
     # （CNB 页面「构建」→ 选 main → 运行），否则 NPC 拉不到镜像。
     - services:
@@ -33,94 +34,58 @@ main:
             docker build -f .cnb/npc-env.Dockerfile -t "$IMAGE" .
             docker push "$IMAGE"
 
+# NPC 事件的完整定义。issue 与 pull_request 共用，改一处即可。
+.npc-pipeline: &npc-pipeline
+  - docker:
+      image: ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}/npc-env:latest
+      # 节点缓存：只在当前构建节点有效（平台默认 3 个节点），命中时省掉
+      # Gradle 依赖 / Kotlin 编译器 / npm 包 / Chromium 的下载。
+      volumes:
+        - main:/root/.gradle:copy-on-write
+        - main:/root/.npm:copy-on-write
+        - main:/root/.cache/ms-playwright:copy-on-write
+    env:
+      # Kotlin/JS 的 npm 安装走国内镜像；官方源在国内经常卡住。
+      NPM_CONFIG_REGISTRY: https://registry.npmmirror.com
+    stages:
+      - name: 准备环境
+        # 上游源码已固化在镜像的 /refs 里，这里只剩 git 身份和 Gradle 镜像配置。
+        # setup-gradle 必须在任何 gradle 命令之前跑。
+        script: |
+          git config user.name "cnb-npc"
+          git config user.email "npc@cnb.cool"
+          bash .cnb/scripts/setup-gradle.sh
+
+      - name: 预热 Gradle 依赖
+        # Maven Central 对 CNB 的共享出口 IP 限流（429），首次解析依赖容易失败。
+        # 这里先跑一遍并重试；依赖缓存已存在时直接跳过。
+        script: bash .cnb/scripts/warmup-gradle.sh
+
+      - name: NPC 执行任务
+        type: npc:go
+        options:
+          # 取值照抄官方 npc/CodeBuddy：
+          # - contextWindow 给满 1m，别缩到 128k，那会触发上下文压缩。
+          # - deepseek-v4.1-flash 用 thinkingLevel=off（引号必须加，YAML 1.1 里
+          #   裸 off 是布尔 false，平台要的是字符串）。
+          # - 不设 maxTurns / maxTokens，沿用平台默认。
+          model: deepseek-v4.1-flash
+          contextWindow: 1m
+          thinkingLevel: "off"
+          supportImage: true
+
+      - name: 同步到 GitHub
+        # 密钥仓库 shijianjs/cnb-secrets 里的 github.yml，它必须声明
+        # allow_events: issue.comment@npc, pull_request.comment@npc ——
+        # NPC 事件属于不可信事件，没这句引用会被直接拒绝。
+        script: bash .cnb/scripts/push-to-github.sh
+        imports: https://cnb.cool/shijianjs/cnb-secrets/-/blob/main/github.yml
+
 $:
-  # ── 自建 NPC 被 @ 时执行 ────────────────────────────────────────────────
-  # 注意：系统 NPC（@//npc/CodeBuddy(deepseek-v4.1-flash)）的流水线配置来自
-  # npc 仓库，本文件改不动它。所以这里配的是 .cnb/settings.yml 里自建的
-  # kotlin 角色——同样的模型，但镜像、缓存、挂载都能自己定。
-  issue.comment@npc:
-    - docker:
-        image: ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}/npc-env:latest
-        # 节点缓存：只在当前构建节点有效（平台默认 3 个节点），命中时省掉
-        # Gradle 依赖 / Kotlin 编译器 / npm 包 / Chromium 的下载。
-        # 跨节点要共享时改用 docker:cache 把依赖固化成镜像。
-        volumes:
-          - main:/root/.gradle:copy-on-write
-          - main:/root/.npm:copy-on-write
-          - main:/root/.cache/ms-playwright:copy-on-write
-      env:
-        # Kotlin/JS 的 npm 安装走国内镜像；官方源在国内经常卡住。
-        NPM_CONFIG_REGISTRY: https://registry.npmmirror.com
-      stages:
-        - name: 准备环境
-          # 上游源码已固化在镜像的 /refs 里，这里只剩 git 身份和 Gradle 镜像配置。
-          # setup-gradle 必须在任何 gradle 命令之前跑。
-          script: |
-            git config user.name "cnb-npc"
-            git config user.email "npc@cnb.cool"
-            bash .cnb/scripts/setup-gradle.sh
-
-        - name: 预热 Gradle 依赖
-          # Maven Central 对 CNB 的共享出口 IP 限流（429），首次解析依赖容易失败。
-          # 这里先跑一遍并重试；依赖缓存已存在时直接跳过。
-          script: bash .cnb/scripts/warmup-gradle.sh
-
-        - name: NPC 执行任务
-          type: npc:go
-          options:
-            # 取值照抄官方 npc/CodeBuddy 的配置。差异不是随便改的：
-            # - contextWindow 给满 1m。给 128k 会触发上下文压缩，实测会把「必须发评论」
-            #   这条指令压掉，结论只留在最终消息里，Issue 上什么都看不到。
-            # - deepseek-v4.1-flash 官方用 thinkingLevel=off。
-            # - 不设 maxTurns / maxTokens，沿用平台默认。
-            model: deepseek-v4.1-flash
-            contextWindow: 1m
-            thinkingLevel: "off"
-            supportImage: true
-
-        - name: 同步到 GitHub
-          # 密钥仓库 shijianjs/cnb-secrets 里的 github.yml。
-          # 它必须声明 allow_events: issue.comment@npc —— NPC 事件属于不可信事件，
-          # 没这句引用会被直接拒绝。
-          # 首次只验证 NPC 链路时，把这一段连同 imports 一起注释掉。
-          script: bash .cnb/scripts/push-to-github.sh
-          imports: https://cnb.cool/shijianjs/cnb-secrets/-/blob/main/github.yml
-
-  # PR 评论触发，内容与上面一致。CNB 按事件独立合并配置，
-  # 只配 issue 不配 pull_request 的话，PR 里 @ 仍走系统默认行为。
-  pull_request.comment@npc:
-    - docker:
-        image: ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}/npc-env:latest
-        volumes:
-          - main:/root/.gradle:copy-on-write
-          - main:/root/.npm:copy-on-write
-          - main:/root/.cache/ms-playwright:copy-on-write
-      env:
-        NPM_CONFIG_REGISTRY: https://registry.npmmirror.com
-      stages:
-        - name: 准备环境
-          # 上游源码已固化在镜像的 /refs 里，这里只剩 git 身份和 Gradle 镜像配置。
-          # setup-gradle 必须在任何 gradle 命令之前跑。
-          script: |
-            git config user.name "cnb-npc"
-            git config user.email "npc@cnb.cool"
-            bash .cnb/scripts/setup-gradle.sh
-
-        - name: 预热 Gradle 依赖
-          # Maven Central 对 CNB 的共享出口 IP 限流（429），首次解析依赖容易失败。
-          # 这里先跑一遍并重试；依赖缓存已存在时直接跳过。
-          script: bash .cnb/scripts/warmup-gradle.sh
-
-        - name: NPC 执行任务
-          type: npc:go
-          options:
-            # 同上：1m + thinkingLevel=off + 不设 maxTurns。
-            model: deepseek-v4.1-flash
-            contextWindow: 1m
-            thinkingLevel: "off"
-            supportImage: true
-
-        - name: 同步到 GitHub
-          # 同 issue.comment@npc：密钥文件必须声明 allow_events: pull_request.comment@npc。
-          script: bash .cnb/scripts/push-to-github.sh
-          imports: https://cnb.cool/shijianjs/cnb-secrets/-/blob/main/github.yml
+  # 系统 NPC（@//npc/CodeBuddy(...)）的流水线配置来自 npc 仓库，本文件改不动它。
+  # 这里配的是 .cnb/settings.yml 里自建的 kotlin 角色——同样的模型，
+  # 但镜像、缓存、挂载都能自己定。
+  #
+  # 两个事件必须都配：CNB 按事件独立合并配置，只配 issue 的话 PR 里 @ 仍走系统默认。
+  issue.comment@npc: *npc-pipeline
+  pull_request.comment@npc: *npc-pipeline

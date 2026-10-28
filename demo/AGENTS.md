@@ -90,7 +90,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **251 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **262 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -111,13 +111,49 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `lines` / `map` / `geo` 已经能用静态数据集（`lines-airline`、`custom-hexbin` 就是先例）：只要再拷
 `public/data/asset/geo/` 下的 GeoJSON 或 SVG，就能继续补这两个家族。
 
-个别被移植家族内的长尾示例（动画竞速、下钻、真实指针交互）留待下一批，例如 `bar-race`、
-`bar-drilldown`、`scatter-clustering`、`custom-gantt-flight`、
-`custom-calendar-icon`（图标是 `path://` 素材）、`custom-gauge`。
+竞速、下钻那一档已经落地：`bar-race`（每 3 秒加一截，定时器交给 `ChartHolder`）与
+`bar-drilldown`（点击柱体换层，`universalTransition` 做形变，Back 是带 `onclick` 的 graphic
+text）在 `examples/CanvasGraphics.kt`，`watermark` 同文件（canvas 画的斜向水印当
+`backgroundColor` 的 pattern）。剩下的长尾里还要真实交互的（`scatter-clustering` 要 ecStat、
+`custom-calendar-icon` 上游只剩缩略图、`line-pen` / `line-draggable` 要指针序列）仍不做。
 
 `path://` 素材不是障碍：上游的 path 字符串原样内联即可，gauge 家族的五个面板图就是这么落地的
 （`examples/GaugeLongTail.kt`，同时把 `Math.random()` 换成 `Lcg`、定时器交给 `ChartHolder`），
 `custom-gauge` 照这个先例做。
+
+## 数据自己算的页面
+
+`examples/IntradayBreaks.kt` 收了四个「数据不是抄的、是算出来的」页面，它们共用一个种子固定的
+`Lcg`：
+
+- `intraday-breaks-1` / `-2`：逐分钟价格 + 断轴。时间一律用 `Date.UTC` 从「天」推，**不要**
+  照抄上游那种「时间戳加加减减」的写法：第一版把夜间的跨天算错，`time` 不前进，页面直接卡死
+  （Chromium 报 `Page crashed`，Playwright 看不到任何错误）。现在外层按天循环、内层按分钟循环。
+  `breaks[].gap` 与 `breakLabelLayout.moveOverlap` 都是 `StringOrDouble` / `BooleanOrString`，
+  传裸 `0` / `false` 编译不过，要包一层。
+- `area-simple`：两万点随机游走 + `sampling: 'lttb'`。tooltip 的 `position` 回调是五参数
+  （`point` / `params` / `el` / `rect` / `size`），别按一参数写。
+- `candlestick-large`：二十万根 K 线走 `dataset`。`dataset.source` 必须**只算一次**：把
+  `largeCandles()` 放进循环里会重算二十万行 × 二十万次。涨跌颜色靠额外的 `sign` 列 + 隐藏的
+  piecewise `visualMap`，和上游一致；`itemStyle` 得用 `CandlestickItemStyleOption`
+  （`color0` / `borderColor0` 只在它上面）。
+- `scatter-matrix`（`examples/ScatterMatrix.kt`）：网格的 `left` / `top` / `width` / `height`
+  必须是**百分比字符串**。上游算的是数字再拼 `+ '%'`，Kotlin 侧如果直接写
+  `StringOrDouble(11.5)` 就是 11.5 像素，十六个单元格会全叠在左上角（画出来只有一小块，
+  e2e 仍然过，只能靠截图发现）。
+  分类 visualMap 的 `dimension` 指向的数据值必须是**城市名字符串**：上游把城市塞在元组里，
+  Kotlin 侧要用 `row(x, y, city)` 而不是把城市换成索引，否则所有点都落到 `outOfRange` 的灰色。
+
+## 轴标签的多参回调
+
+轴 / 系列的 formatter 上游常带额外的第三、四个参数（断轴页的 `extra.break`、timeline 的
+`extra`），而 wrapper 的 `LabelFormatterCallback` 只建模了第一个参数。写法是给回调套一层
+JS 适配：Kotlin 侧写成 `(value: JsAny, extra: JsAny?) -> String`，再用
+`js("(fn) => (value, index, extra) => fn(value, extra)")` 拓宽成三参（见
+`examples/IntradayBreaks.kt` 的 `axisLabel(::fn)`）。时间格式化走
+`ECharts.time.format(value, template, true)`，第三个参数是 UTC。
+
+## 家族长尾的分布
 
 line 家族的数据生成长尾在 `examples/LineLongTail.kt`：两万点的 `area-time-axis`、按 easing 函数逐个
 建 grid 的 `line-easing`、每秒滚动窗口的 `dynamic-data2`、名次随机但种子固定的 `bump-chart`、用
@@ -286,3 +322,7 @@ ECharts 实例在**页面可见时才创建**（`ChartHolder.mount()`），换�
 晚一个任务才跑，shell 在此之前仍挂着上一页：不限定路由的话，等待会在上一页的画布上通过，随后节点被
 替换，`boundingBox()` 返回 `null`（这就是那版「chart canvas box of null」偶发失败的根因）。断言因此还
 带了重试：读不到尺寸就重新等一次，最多三次，只会让真正有问题的那页慢一点，不会放过它。
+
+浏览器上下文固定 `locale = zh-CN`（`DemoOptions`）。原因是无头容器里常常没有装 CJK 字体，界面切到中文
+时字会变成豆腐块，语言切换、主题高亮、对比度三个断言就会随机失败——那不是站点的问题，是环境的字体
+问题，所以把语言钉死在中文，让断言与字体无关。

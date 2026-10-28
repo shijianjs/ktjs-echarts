@@ -239,7 +239,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（251 个示例 / 26 个家族 + 文档示例组 + 总览页）
+### 已落地（262 个示例 / 26 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -274,6 +274,28 @@
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
 
+- 第二十七批（9 个，图形元素 + 平行坐标 + 散点矩阵）：新建 `examples/CanvasGraphics.kt` 的
+  `watermark`（canvas 画一块 ECHARTS 斜向水印当 `backgroundColor` 的重复 pattern，两个柱块两个饼）、
+  `bar-drilldown`（点击柱体走 `universalTransition` 下钻，`event.data.groupId` 上游是 `unknown`，
+  只能在 JS 侧取；Back 是带 `onclick` 的 graphic text 元素）、`bar-race`（每 3 秒加一截 +
+  `realtimeSort`，随机源 `Lcg`、定时器交给 ChartHolder）；新建 `examples/ParallelAqi.kt` 的
+  `parallel-aqi`（三城各 31 天的八维 AQI 表按上游 `$.get` 的数据内联，visualMap 按 PM2.5 着色）；
+  新建 `examples/ScatterLongTail.kt` 的 `scatter-label-align-top` / `-right`（后者 `labelLayout`
+  是读 `chart.getWidth()` 的回调，走 interactive）、`scatter-effect`、`scatter-anscombe-quartet`；
+  新建 `examples/ScatterMatrix.kt` 的 `scatter-matrix`（六维散点矩阵 + 平行坐标双视图，
+  piecewise visualMap 按城市分类、brush 联动全部单元格，网格位置必须是百分比字符串，写成像素数字
+  会让所有单元格叠到左上角）。`scatter-matrix` 的城市名要走 `row(...)` 而不是 `cityIndex(...)`，
+  否则分类 visualMap 拿不到值、所有点变灰。
+  同批：e2e 的浏览器上下文加 `locale = zh-CN`，容器里没有 CJK 字体，中文界面会画成豆腐块，
+  语言/主题/对比度三个断言因此随机失败。
+- 第二十八批（4 个，断轴 + 大数据）：新建 `examples/IntradayBreaks.kt` 的 `intraday-breaks-1`
+  （四个交易日逐分钟价格，每晚折叠成 `gap: '1%'` 的断轴，轴标签在断口上写日期，靠 `rich.weak`）、
+  `intraday-breaks-2`（单日午休断轴，`breakLabelLayout.moveOverlap: false` 关掉自动避让）、
+  `area-simple`（两万点渐变面积 + `sampling: 'lttb'`）与 `candlestick-large`（二十万根分钟 K 线
+  走 dataset，成交量在第二个网格用 large 模式画柱，涨跌靠额外 sign 列 + 隐藏 visualMap）。
+  轴标签 formatter 的第三个参数（断口信息）wrapper 没建模，用 `axisLabel(::fn)` 在 JS 侧拓宽成
+  三参再收回单参。踩到的坑：第一版夜间跨天算错、`time` 不前进，页面直接卡死（Chromium
+  `Page crashed`），改成按「天」拆循环。
 - 第二十六批（13 个，桑基聚合 + 散点长尾 + 富文本 + 置信带 + 双轴动态表）：新建
   `examples/ScatterExtra.kt` 的 `scatter-large`（两条各 50 万点的正弦散点，随机源换成 `Lcg`）、
   `scatter-painter-choice`（4111 位画家的 `masterPainterColorChoice.json`，`symbolSize` 与
@@ -421,41 +443,32 @@
 
 ### 下一批（按可做性排序）
 
-1. **无外部依赖、可直接做**：
-   - `doc-example` 剩余 21 条（逐个核对过上游文件，排除原因见 `demo/AGENTS.md`）里只有 2 条可做：
-     `scatter-visualMap-categories`（内联 dataset + 两个 `visualMap`，232 行，但 `inRange.symbol` /
-     `outOfRange.symbolSize` 是按类目索引的字典、`left: null`，要先放宽 wrapper）、
-     `canvas-vs-svg`（含 `-en`，要有渲染器开关才说得通）。`matrix-graph-box` 已在第二十三批落地。
-   - `custom` 剩余：`custom-gantt-flight`（长动画）、`custom-gauge`（`path://` 面板图的先例是
-     `examples/GaugeLongTail.kt`，原样内联即可）。
-   - `matrix` 剩余：`matrix-mbti`、`matrix-periodic-table`、`matrix-stock`（数据表 8-17KB，
-     需要先写一个把上游数组转成 Kotlin 的小脚本）、`matrix-mini-bar-geo`（需要 geo）。
-   - 已移植家族的长尾里可直接做的：`confidence-band`（要先按 `line-aqi` 的先例把 `data/asset/data/confidence-band.json`
-     拷进 `resources/data/`）、`grid-multiple` / `area-rainfall`（85KB 内联表，先看要不要转成资源）、
-     `line-pen`（需指针事件，按排除策略搁置）、
-     `line-race`/`bar-race`/`bar-race-country`（竞速要先决定用哪个定时器与假数据）、
-     `bar-drilldown`/`bar-multi-drilldown`（下钻要 `dispatchAction` 替代表演）、`bar-breaks-brush`、
-     `parallel-aqi`、`watermark`、`scatter-matrix`、
-     `candlestick-sh`（26KB 内联表）/`candlestick-large`/`candlestick-brush`/`intraday-breaks-1|2`、
-     `scatter-clustering`、`graph-force2` 之外的 graph 变体。
-     line/area 家族的 `area-stack-gradient`、`area-pieces`、`area-time-axis`、`line-gradient`、
-     `multiple-x-axis`、`dynamic-data2`、`line-easing` 已在第二十三批落地；bar 家族的 `bar1`、
-     `bar-stack-normalization`/`-and-variation`、`bar-stack-borderRadius`、`bar-waterfall2` 与
-     `bump-chart`、`line-graphic`、`graph-grid` 已在第二十四批落地（清单里的 `line-markarea`
-     上游并没有这个文件，是误记）；graphic 家族三页、`heatmap-large`/`-piecewise`、`dataset-link`、
-     `graph-force-dynamic`、`cycle-plot` 已在第二十五批落地。
-     gauge 家族已 12/12 全，`radar` 家族已全，`treemap` 只剩需要外部数据的，`pie-pattern` 要贴图，
-     `line-fisheye-lens` 靠 `getZr().on('mousemove')` 的真实指针序列，按排除策略不做。
-2. **需要先补 wrapper 建模**：
-   - `calendar-lunar`：366 行农历表（数据而非 API）。
-3. **明确排除，不要重复尝试**（原因记在 `demo/AGENTS.md`）：
-   - 地图 / `geo` / GeoJSON、百度地图（`tags: ["bmap"]`）、`echarts-gl`（`public/examples/ts/gl`）。
-   - 运行时取数：`$.get` / `XMLHttpRequest` / `fetch` + `ROOT_PATH`、`*.json`、`*.bin`。
-   - 官方站点图片素材：`image://` 图标、纹理贴图、大块 `data:image/...base64`。
-   - 真实键鼠序列：拖拽、触摸、`sendInput`（`line-draggable`、`candlestick-touch`、`bar-brush` 之类
-     需要真交互的，若要做得先想清楚怎么用 `dispatchAction` 替代表演）。
-   - 需要另一个 npm 包的：`bar-histogram` 一类要先 `echarts.registerTransform(ecStat.transform.histogram)`，
-     数据与直方图分箱都在 `echarts-stat` 里，移植它等于再包一层 wrapper，不在示例站范围内。
+清单里还剩 40 个左右「无外部依赖」的候选，按可做性分三档：
+
+1. **几乎零成本（option 组合、内联表）**：
+   `pie-parliament-transition`（自定义议会图 ↔ 饼图的 `universalTransition`，两秒切换一次，
+   定时器交给 ChartHolder）、`calendar-effectscatter`（日历 + 涟漪散点，随机源换 `Lcg`）、
+   `bar-multi-drilldown`（`bar-drilldown` 的多级版）、`intraday-breaks-*` 已完成。
+   `parallel-aqi` / `scatter-matrix` 已完成。
+2. **要写数据转换脚本**：`candlestick-sh` / `candlestick-sh-2015`（9KB / 26KB 内联表，照
+   `parallel-aqi` 的脚本思路生成 `doubleArrayOf` 行）、`grid-multiple` / `area-rainfall`
+   （各 85KB，先看要不要落成资源文件）、`matrix-stock` / `matrix-mbti` /
+   `matrix-periodic-table`、`scatter-world-population`、`scatter-weight`、`pictorialBar-vehicle`
+   / `-body-fill` / `-velocity` / `-bar-transition`（`path://` 面板图，先例是
+   `examples/GaugeLongTail.kt`）。
+3. **要补交互表演方式**：`bar-brush` / `bar-breaks-brush`（`brushSelected` + `dispatchAction`）、
+   `bar-race` 已完成；`line-pen` / `line-draggable` / `candlestick-touch` 之类真实键鼠序列按
+   排除策略不做；`line-fisheye-lens` 靠 `getZr().on('mousemove')`，同样不做。
+   `geo-lines` / `geo-map-scatter` / `heatmap-map` / `effectScatter-map` / `scatter-map` 一族
+   需要 GeoJSON，可按 `geo-choropleth-scatter` 的先例拷静态数据再做。
+4. **明确排除，不要重复尝试**（原因记在 `demo/AGENTS.md`）：
+   - 地图 / `geo` 的百度地图版本（`tags: ["bmap"]`）、`echarts-gl`。
+   - 运行时取数（`$.get` / `XMLHttpRequest` / `fetch` + `ROOT_PATH`）而没有本地数据的。
+   - 官方站点图片素材（`image://`、纹理贴图、大块 `data:image/...base64`）。
+   - 真实键鼠序列（拖拽、触摸、`sendInput`）。
+   - 需要另一个 npm 包的（`ecStat` 一族的回归 / 聚类示例）。
+   - `sankey-itemstyle`（3000 行表由示例服务器现算，本仓库没有那份数据）、
+     `custom-calendar-icon`（上游源码只剩缩略图）。
 
 ### 下次接着做的具体做法
 
@@ -513,4 +526,4 @@
   计算堆叠柱 + `bump-chart`、`line-graphic`、`graph-grid`）之后，下一批按「下一批」清单的第一条做
   `doc-example/scatter-visualMap-categories`（先放宽 `visualMap` 的按类目字典与 `left: null`）、
   `custom` / `matrix` 剩余项与各家族长尾；`custom-calendar-icon` 因上游源码只剩缩略图，不移植。
-- 提交：全部已推送到 `origin/main`（最新 本批：第二十六批 13 个示例）。
+- 提交：全部已推送到 `origin/main`（最新：第二十八批 4 个示例）。

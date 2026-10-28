@@ -68,13 +68,14 @@ $:
         - name: NPC 执行任务
           type: npc:go
           options:
-            # 指定 model 后，下面四个能力参数不再继承平台默认值，
-            # 必须按模型实际能力给，否则上下文超限会直接报错。
+            # 取值照抄官方 npc/CodeBuddy 的配置。差异不是随便改的：
+            # - contextWindow 给满 1m。给 128k 会触发上下文压缩，实测会把「必须发评论」
+            #   这条指令压掉，结论只留在最终消息里，Issue 上什么都看不到。
+            # - deepseek-v4.1-flash 官方用 thinkingLevel=off。
+            # - 不设 maxTurns / maxTokens，沿用平台默认。
             model: deepseek-v4.1-flash
-            contextWindow: 128k
-            maxTokens: 48k
-            maxTurns: 300
-            thinkingLevel: medium
+            contextWindow: 1m
+            thinkingLevel: "off"
             supportImage: true
 
         - name: 同步到 GitHub
@@ -113,11 +114,10 @@ $:
         - name: NPC 执行任务
           type: npc:go
           options:
+            # 同上：1m + thinkingLevel=off + 不设 maxTurns。
             model: deepseek-v4.1-flash
-            contextWindow: 128k
-            maxTokens: 48k
-            maxTurns: 300
-            thinkingLevel: medium
+            contextWindow: 1m
+            thinkingLevel: "off"
             supportImage: true
 
         - name: 同步到 GitHub

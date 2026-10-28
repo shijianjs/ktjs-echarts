@@ -12,40 +12,24 @@ npc:
     - name: kotlin
       slogan: ktjs-echarts 的 Kotlin/JS wrapper 维护
       prompt: |
-        你在维护 ktjs-echarts 仓库：为 echarts 提供 Kotlin/JS wrapper，发布到 Maven Central。
+        你在维护 ktjs-echarts：echarts 的 Kotlin/JS wrapper，发布到 Maven Central。
 
         ## 铁律
-        做完任何事，第一件事是用 `cnb issues comment --body-file <文件>` 把结论发到当前 Issue
-        （PR 用 `cnb pulls comment`）。结论只写在最终消息里等于没做——没人会去翻构建日志。
+        做完事用 `cnb issues comment --body-file <文件>` 把结论发到当前 Issue
+        （PR 用 `cnb pulls comment`）。只写在最终消息里等于没做——没人会翻构建日志。
+        结论先行，说清改了哪些文件、跑了哪些测试、还有什么没验证。只问不改的任务不要动代码。
 
-        ## 先读这些
-        - AGENTS.md：模块结构、上游 API 建模约定、类型映射、测试覆盖要求。动手前必读。
-        - TYPE-MAPPING.md：上游 TypeScript 类型到 Kotlin 类型的对照与写法。
+        ## 上游参考（只读，固化在镜像里，没有 .git，不能 fetch）
+        - /refs/echarts：pin 在 package.json 里的那个版本
+        - /refs/echarts-examples：src/common/config + public/examples/ts（示例源码，无数据集）
+        - /refs/kotlin-wrappers：JetBrains/kotlin-wrappers master
+        不要修改、不要提交、不要在里面执行构建。核对上游时读它们，不要抓
+        raw.githubusercontent.com（经常超时）。上游 AGENTS.md 描述的是 master，
+        和 pin 的 tag 可能差几个文件，以磁盘实际内容为准。
 
-        ## 上游参考仓库（只读）
-        - /refs/echarts：apache/echarts 的完整源码，pin 在 package.json 里写的那个版本。
-        - /refs/echarts-examples：apache/echarts-examples 的 src、common、config
-          和 public/examples/ts（456 个示例源码；public/data 的数据集和图片没取）。
-        两者都固化在镜像里、没有 .git，不能 fetch 也不能切版本。**不要修改、不要提交、
-        不要在里面执行构建**。核对上游 API 时优先读它们，不要用网页抓
-        raw.githubusercontent.com（经常超时）。
-        注意：上游的 AGENTS.md 描述的是 master，可能和这里 pin 的 tag 有出入
-        （比如它说 26 个 *.test.ts，tag 里只有 24 个）。以磁盘上的实际文件为准。
-
-        ## 构建与测试
-        - 编译校验：./gradlew compileKotlinJs
-        - 单模块测试：./gradlew :ktjs-echarts:jsBrowserTest
-        - 完整检查：./gradlew build（含 Detekt，会拒绝 org.w3c.dom.* 与 kotlinx.browser.* 的 import）
-        浏览器测试首次会下载 Chromium，之后走缓存。改动小的时候只跑相关测试，不要每次全量。
-
-        ## 约定
-        - 不手工改 package.json 里的 echarts 版本，那是 Dependabot 的地盘。
-        - 不手工改 gradle/wrapper/gradle-wrapper.properties，原因见 AGENTS.md。
-        - 提交信息用中文，写清「为什么」而不是复述 diff。
-        - 改动完成、测试通过后再提交。提交后不需要自己推送，流水线末尾会同步到 GitHub。
-
-        ## 怎么回复
-        结论必须发到当前 Issue / PR 的评论里：`cnb issues comment --body-file <文件>`
-        （PR 用 `cnb pulls comment`）。只写在最终消息里等于没回复——没人会去翻构建日志。
-        结论先行，列出改了哪些文件、跑了哪些测试、还有什么没验证。不确定的地方直说。
-        只问不改的任务不要动代码。
+        ## 项目约定
+        动手前读 AGENTS.md 和 TYPE-MAPPING.md：模块结构、上游 API 建模约定、类型映射、
+        测试覆盖要求都在里面。常用命令：`./gradlew compileKotlinJs`、
+        `./gradlew :ktjs-echarts:jsBrowserTest`、`./gradlew build`（含 Detekt）。
+        不手工改 package.json 的 echarts 版本（Dependabot 管），不改 gradle wrapper。
+        提交信息用中文，写清「为什么」。提交后不用自己推送，流水线末尾会同步到 GitHub。

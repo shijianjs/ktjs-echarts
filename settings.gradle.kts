@@ -7,17 +7,14 @@ pluginManagement {
 
 dependencyResolutionManagement {
     repositories {
-        // Maven Central is the source of truth for kotlin-wrappers: the Aliyun mirror lags behind
-        // and sometimes serves metadata without the corresponding klibs. Gradle does not fall back
-        // to the next repository once metadata is found, so pin these modules to Central even when
-        // a local mirror is active.
-        exclusiveContent {
-            forRepository { mavenCentral() }
-            filter {
-                includeGroup("org.jetbrains.kotlin-wrappers")
-                includeModule("org.jetbrains.kotlin", "kotlin-js-plain-objects")
-            }
-        }
+        // kotlin-wrappers used to be pinned to Central via exclusiveContent because mirrors
+        // sometimes served its metadata without the matching klibs. That pinning is gone:
+        // in the CNB build environment it forced every kotlin-wrappers request through
+        // Maven Central, which rate-limits CNB's shared egress IP with HTTP 429.
+        //
+        // A mirror only misses a klib the first time it is asked for it — the proxy fetches
+        // it upstream and caches it, so a retry succeeds. Letting the mirror serve these
+        // modules and relying on retry is cheaper than a hard 429 every cold build.
         mavenCentral()
     }
 }

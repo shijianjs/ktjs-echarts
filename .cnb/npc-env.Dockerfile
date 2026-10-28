@@ -63,13 +63,16 @@ RUN ECHARTS_REF="$(node -p "require('/tmp/project-package.json').dependencies.ec
  && git clone --depth 1 --filter=blob:none --sparse \
       https://github.com/apache/echarts-examples.git /refs/echarts-examples \
  && git -C /refs/echarts-examples sparse-checkout set src common config public/examples/ts \
- && rm -rf /refs/echarts/.git /refs/echarts-examples/.git \
+ && git clone --depth 1 \
+      https://github.com/JetBrains/kotlin-wrappers.git /refs/kotlin-wrappers \
+ && rm -rf /refs/echarts/.git /refs/echarts-examples/.git /refs/kotlin-wrappers/.git \
  && printf '%s\n' \
       "这里是只读的上游参考仓库，不属于本仓库，不要修改、不要提交。" \
       "" \
       "  /refs/echarts            apache/echarts ${ECHARTS_REF} 的完整源码" \
       "  /refs/echarts-examples   apache/echarts-examples 的 src/common/config" \
       "                           和 public/examples/ts（示例源码，不含数据集和图片）" \
+      "  /refs/kotlin-wrappers    JetBrains/kotlin-wrappers 完整源码（master）" \
       "" \
       "固化在镜像里，没有 .git，不能 fetch、不能切分支。" \
       "要跟 master 对比就自己 git clone 到 /tmp。" \

@@ -17,6 +17,7 @@ import demo.examples.docExampleEntries
 import demo.examples.docInteractiveEntries
 import demo.examples.docMoreEntries
 import demo.examples.funnelEntries
+import demo.examples.extraPagesEntries
 import demo.examples.gaugeEntries
 import demo.examples.geoExtraEntries
 import demo.examples.gaugeExtraEntries
@@ -37,8 +38,10 @@ import demo.examples.parallelEntries
 import demo.examples.pictorialBarEntries
 import demo.examples.pieEntries
 import demo.examples.radarEntries
+import demo.examples.richTextEntries
 import demo.examples.sankeyEntries
 import demo.examples.scatterEntries
+import demo.examples.scatterExtraEntries
 import demo.examples.sunburstEntries
 import demo.examples.themeRiverEntries
 import demo.examples.treeEntries
@@ -132,12 +135,15 @@ val catalog: List<CatalogEntry> =
         barEntries,
         barExtraEntries,
         barLongTailEntries,
+        richTextEntries,
+        extraPagesEntries,
         lineEntries,
         linesExtraEntries,
         lineExtraEntries,
         lineLongTailEntries,
         pieEntries,
         scatterEntries,
+        scatterExtraEntries,
         candlestickEntries,
         boxplotEntries,
         pictorialBarEntries,

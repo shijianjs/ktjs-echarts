@@ -402,10 +402,32 @@ fun ChordDataItem(values: Array<OptionDataValue?>): ChordDataItem = values.unsaf
 fun ChordDataItem(value: ChordNodeItemOption): ChordDataItem = value.unsafeCast<ChordDataItem>()
 
 /**
- * Line style of a sankey edge; the upstream interface only adds the curvature, which
- * [LineStyleOption] already carries.
+ * Color of a sankey edge.
+ *
+ * Upstream declares `ZRColor | "gradient" | "source" | "target"`; Kotlin cannot widen the
+ * inherited `LineStyleOption.color`, so the edge line style redeclares [color] with this type.
  */
-typealias SankeyEdgeStyleOption = LineStyleOption
+external interface SankeyEdgeColor
+
+/** A plain zrender color. */
+fun SankeyEdgeColor(value: ZRColor): SankeyEdgeColor = value.unsafeCast<SankeyEdgeColor>()
+
+/** One of the keywords `"gradient"`, `"source"`, `"target"`. */
+fun SankeyEdgeColor(value: String): SankeyEdgeColor = value.unsafeCast<SankeyEdgeColor>()
+
+/**
+ * Line style of a sankey edge: the curvature comes from [LineStyleOption], the color is a
+ * [SankeyEdgeColor] because an edge can follow the color of its source or target node.
+ */
+external interface SankeyEdgeStyleOption : LineStyleOption {
+    /**
+     * Color of this edge, or the end whose color it takes.
+     *
+     * Typed view of the inherited [LineStyleOption.color]; both write the same JavaScript property.
+     */
+    @JsName("color")
+    var typedColor: SankeyEdgeColor?
+}
 
 /**
  * Style of the nodes of a sankey diagram.

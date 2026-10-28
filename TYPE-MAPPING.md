@@ -238,6 +238,12 @@ external interface TooltipOption {
 - 上游是 `T | T[]` 时统一用 `Array<T>` + 单值工厂（如 `one(x)`），不要 `Any`，也不要同一个接口里
   一会儿单值一会儿数组：ECharts 的 `getOption()` 会把每个组件字段归一成数组，只有数组类型才能和运行时
   对得上。
+- 上游是「值 | 回调」时，用两份同名工厂表达：`ZRColor("#5470c6")` 与
+  `ZRColor { params -> ... }`。回调的入参按上游签名展开（颜色回调收的是 `CallbackDataParams`，
+  不是裸 `dynamic`），Kotlin 侧返回值仍是具体类型（颜色回调返回 `String`，由调用方再包一层）。
+- 值可能是「颜色」也可能是「图案」时不要另立字段：zrender 的 `ZRColor` 本来就覆盖
+  `string | gradient | pattern`，给 `PatternObject` 补一份 `ZRColor(...)` 重载即可；
+  反过来，一个 `backgroundColor` 只给了 `String` 就必须改类型，而不是让调用方自己 `unsafeCast`。
 
 ## 8. `JsAny` 与 `dynamic` 的边界
 
@@ -345,6 +351,11 @@ external interface LineSeriesOption : SeriesOption {
 - 同一个做法覆盖三种收窄：关键字字段（`coordinateSystem` → `typedCoordinateSystem`）、data item 的 `value`
   被收窄成数组或联合（`typedValue`，如 `CandlestickDataItemOption`）、以及 label 的 `rotate` 被收窄成
   `number | 关键字`（`typedRotate`，如 `PieLabelOption` / `GaugeAxisLabelOption` / `SunburstLabelOption`）。
+- **加宽**同一个字段时也是同一套写法。上游 `SankeyEdgeStyleOption.color` 是
+  `ZRColor | "gradient" | "source" | "target"`，而基接口 `LineStyleOption.color` 是窄的 `ZRColor`：
+  建一个不透明联合（`SankeyEdgeColor` + 每支一个同名工厂），再在子接口里加 `@JsName("color") var typedColor`。
+  判断标准是「子接口要表达的类型和基接口不同、又改不了基接口」，收窄加宽都一样。
+
 
 ### `data?: unknown` 被各子类型收窄
 

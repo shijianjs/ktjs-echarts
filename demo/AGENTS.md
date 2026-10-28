@@ -90,7 +90,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **238 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **251 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -172,6 +172,21 @@ demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首�
   `inRange.symbol` / `outOfRange.symbolSize` 是按类目索引的字典、`left: null`，要先放宽 wrapper）、
   `canvas-vs-svg`（含 `-en`，只有两张画布分别用 canvas / SVG 渲染器才有意义，要先给站点加渲染器开关）。
 
+`doc-example/` 之外的数据页也按「先拷数据再做」推进：`sankey-energy` / `sankey-levels` /
+`sankey-nodeAlign-left` / `-right` 用 `energy.json` 与 `product.json`（`sankey-itemstyle` 的 3000 行表由
+示例服务器现算，本仓库没有那份数据，仍不做），`confidence-band` 用 `confidence-band.json`，
+`scatter-painter-choice` 用 `masterPainterColorChoice.json`。后者有两个坑：`x` 列是 plotly 导出的**字符串**
+（照上游的一元 `+` 用 `Number(...)` 转换），`itemStyle.color` 是按 `dataIndex` 取色的回调（wrapper 的
+`ZRColor(callback)` 就是为它加的）。
+
+`scatter-large` 的两条 50 万点序列用 `Lcg` 生成、`dynamic-data` 的两条滚动序列同样换成 `Lcg`，
+定时器交给 `ChartHolder`，所以两页每次刷新都是同一张（能稳定断言）的动画。
+
+`bar-rich-text` 与 `pie-rich-text` 是第一次用到「图片当标签背景」：图标放在
+`resources/data/img/weather/`，用 `ImagePatternObject` + `Image` 构造 pattern 再经 `ZRColor(pattern)`
+包成颜色。富文本里只有图片没有文字的 tag（`{Sunny|}`）没有固有宽度，**必须给这个 tag 显式 `width`**，
+否则 pattern 被画进零宽盒子、看起来像图标丢了。
+
 ## 移植过程中修掉的 wrapper 缺口
 
 移植是 wrapper 的一次实测；以下缺口已在 `ktjs-echarts` 里补齐（见该模块的 KDoc）：
@@ -240,6 +255,11 @@ demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首�
   复用已有的 `CoordinateSystemDataCoord`；`doc-example/matrix-graph-box` 就靠
   `coordinateSystemUsage: 'box'` + `coord: [2, 1]` 把关系图画进矩阵的某个单元格，
   `MatrixAndGraphicOptionTest.graphSeriesCanUseTheMatrixAsABox` 覆盖这一写法。
+- `SankeyEdgeStyleOption.color`：上游是 `ZRColor | "gradient" | "source" | "target"`，`LineStyleOption`
+  的 `color` 是窄的 `ZRColor`，Kotlin 不能加宽继承来的 `var`，所以边线样式新增 `SankeyEdgeColor` 联合与
+  同名字段 `typedColor`（`TYPE-MAPPING.md` §12 的写法）。
+- `ZRColor`：补「按 data item 参数取色」的回调工厂（`itemStyle.color = (params) => ...`），以及此前漏掉的
+  `ZRColor(PatternObject)` 重载 —— 没有它，图片 pattern 不是合法颜色，富文本标签挂不上图标。
 - `GraphicElement.keyframeAnimation`：上游 `ElementOption.keyframeAnimation` 与自定义系列的
   `CustomElementProps` 共用同一个 `KeyframeAnimationOption`，wrapper 只在后者上声明了它，所以 graphic
   家族那三页没法写动画。现已在 `GraphicElement` 上补 `ElementKeyframeAnimationOptionOrArray`，

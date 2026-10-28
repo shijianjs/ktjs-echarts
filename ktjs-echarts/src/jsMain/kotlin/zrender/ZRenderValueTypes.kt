@@ -1,5 +1,6 @@
 package zrender
 
+import echarts.options.CallbackDataParams
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import web.cssom.FontWeight
@@ -51,6 +52,15 @@ fun ZRColor(value: RadialGradientObject): ZRColor = value.unsafeCast<ZRColor>()
 fun ZRColor(value: PatternObject): ZRColor = value.unsafeCast<ZRColor>()
 
 /**
+ * Wraps a callback that computes the colour from the parameters of a data item.
+ *
+ * Upstream allows a color callback such as `itemStyle.color = (params) => ...` on series and data
+ * items; the callback runs once per item and returns a color string.
+ */
+fun ZRColor(callback: (params: CallbackDataParams) -> String): ZRColor =
+    callback.unsafeCast<ZRColor>()
+
+/**
  * A pattern fill: either an image pattern or an SVG pattern.
  */
 external interface PatternObject
@@ -60,6 +70,7 @@ fun PatternObject(value: ImagePatternObject): PatternObject = value.unsafeCast<P
 
 /** Wraps an SVG pattern. */
 fun PatternObject(value: SVGPatternObject): PatternObject = value.unsafeCast<PatternObject>()
+
 
 /**
  * A pattern backed by an image, canvas or video.

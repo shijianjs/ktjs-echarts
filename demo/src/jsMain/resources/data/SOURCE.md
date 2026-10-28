@@ -3,7 +3,8 @@
 Every file here is copied verbatim from the Apache ECharts examples site
 (<https://github.com/apache/echarts-examples>), which is licensed under the Apache License 2.0 — see
 [LICENSE](LICENSE) in this directory for the full text. The GeoJSON / SVG maps come from
-`public/data/asset/geo/`, the rest from `public/data/asset/data/`.
+`public/data/asset/geo/`, the small weather icons from `public/data/asset/img/weather/`, the rest from
+`public/data/asset/data/`.
 
 They are shipped as static files instead of being transcribed into Kotlin sources: several of them
 are hundreds of kilobytes, and keeping them as data makes the port of each example a diff of code
@@ -33,6 +34,13 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `stock-DJI.json` | `data/` | `doc-example/candlestick-axisPointer` |
 | `wind-barb-hobart.json` | `data/` | (not ported yet, `custom-wind`) |
 | `aqi-beijing.json` | `data/` | `line-aqi` |
+| `energy.json` | `data/` | `sankey-energy`, `sankey-nodeAlign-left`, `sankey-nodeAlign-right` |
+| `product.json` | `data/` | `sankey-levels` |
+| `confidence-band.json` | `data/` | `confidence-band` |
+| `masterPainterColorChoice.json` | `data/` | `scatter-painter-choice` |
+| `img/weather/sunny_128.png` | `img/weather/` | `bar-rich-text`, `pie-rich-text` (rich-text label icons) |
+| `img/weather/cloudy_128.png` | `img/weather/` | see `sunny_128.png` |
+| `img/weather/showers_128.png` | `img/weather/` | see `sunny_128.png` |
 
 Files added here must keep the upstream name so the example source stays traceable to
 `public/data/asset/{data,geo}/<name>`.

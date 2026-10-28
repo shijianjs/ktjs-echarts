@@ -239,7 +239,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（238 个示例 / 26 个家族 + 文档示例组 + 总览页）
+### 已落地（251 个示例 / 26 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -274,6 +274,25 @@
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
 
+- 第二十六批（13 个，桑基聚合 + 散点长尾 + 富文本 + 置信带 + 双轴动态表）：新建
+  `examples/ScatterExtra.kt` 的 `scatter-large`（两条各 50 万点的正弦散点，随机源换成 `Lcg`）、
+  `scatter-painter-choice`（4111 位画家的 `masterPainterColorChoice.json`，`symbolSize` 与
+  `itemStyle.color` 都按 `dataIndex` 取值）、`scatter-single-axis`（7 条单轴 × 24 小时的打卡表），
+  新建 `examples/ExtraPages.kt` 的 `confidence-band`（`confidence-band.json` 按最小下界取整后整体上移，
+  标签与 tooltip 的百分比都以这个 base 计算）与 `dynamic-data`（两条 2.1 秒滚动的随机序列，
+  定时器交给 `ChartHolder`、随机源换成 `Lcg`），新建 `examples/RichText.kt` 的 `bar-rich-text` 与
+  `pie-rich-text`（天气图标是 `resources/data/img/weather/*_128.png` 的图片 pattern），
+  `Sankey.kt` 补 `sankey-energy` / `sankey-levels` / `sankey-nodeAlign-left` /
+  `sankey-nodeAlign-right` 四条（`energy.json` / `product.json`）。
+  同批补齐 wrapper 的空洞：`SankeyEdgeStyleOption` 的 `color` 上游是
+  `ZRColor | "gradient" | "source" | "target"`（新增 `SankeyEdgeColor` 联合 + 同名字段
+  `typedColor`），`ZRColor` 补「按 data item 参数取色」的回调工厂，`ZRColor(PatternObject)` 这一份
+  重载之前在文件里漏了（图片 pattern 因此不是合法颜色）。测试新增
+  `options/ZRColorAndPatternTest`（3 例），浏览器用例 259 → 262，全过。
+  踩到的坑：`masterPainterColorChoice.json` 的 `x` 列是**字符串**（plotly 导出），照上游的一元
+  `+` 转成 `Number(...)` 才行，直接 `as Double` 会在 4111 次循环里抛 Kotlin 的
+  ClassCastException；富文本里「只有图片没有文字」的 tag 没有宽度，必须给 `width`，否则图片被画进
+  零宽盒子。
 - 第二十五批（8 个，graphic 关键帧动画 + 大数据热力图 + 联动/动态/周期图）：新建
   `examples/GraphicAnimations.kt` 的 `graphic-stroke-animation`（文字描边靠 `lineDash` 与
   `lineDashOffset` 的关键帧走完）、`graphic-loading`（7 条柱子错开 `delay: i * 200` 循环缩放）、
@@ -472,6 +491,11 @@
      传 `*` 展开会报「actual type is Array<Double>, but DoubleArray was expected」，用 `DoubleArray { }`。
    - `one(...)` 的界是 `T : JsAny`，可空元素类型（`MarkLineDataItem?`）传不进去，要写
      `arrayOf<MarkLineDataItem?>(...)`。
+   - JSON 里「看着像数字」的列不一定是数字：`masterPainterColorChoice.json` 的 `x` 是 plotly 导出的
+     字符串，按 `Double` 读会在循环里抛 ClassCastException，照上游的一元 `+` 写成
+     `js("(value) => Number(value)")` 才稳。
+   - 富文本里「只有图片没有文字」的 tag（`{Sunny|}`）没有宽度，图片 pattern 会被画进零宽盒子，
+     必须给这个 tag 显式 `width`。
 4. 收尾：`./gradlew build` + `:demo:e2eTest` 都要过；e2e 现在逐页检查，新增页面自动覆盖；截图目视
    核对至少一两个新页面。
 
@@ -489,4 +513,4 @@
   计算堆叠柱 + `bump-chart`、`line-graphic`、`graph-grid`）之后，下一批按「下一批」清单的第一条做
   `doc-example/scatter-visualMap-categories`（先放宽 `visualMap` 的按类目字典与 `left: null`）、
   `custom` / `matrix` 剩余项与各家族长尾；`custom-calendar-icon` 因上游源码只剩缩略图，不移植。
-- 提交：全部已推送到 `origin/main`（最新 本批：第二十四批 8 个示例）。
+- 提交：全部已推送到 `origin/main`（最新 本批：第二十六批 13 个示例）。

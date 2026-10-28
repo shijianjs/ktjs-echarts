@@ -28,6 +28,8 @@ import demo.examples.graphEntries
 import demo.examples.graphExtraEntries
 import demo.examples.heatmapEntries
 import demo.examples.heatmapLongTailEntries
+import demo.examples.generatedSeriesEntries
+import demo.examples.intradayBreaksEntries
 import demo.examples.lineEntries
 import demo.examples.linesExtraEntries
 import demo.examples.lineExtraEntries
@@ -145,6 +147,8 @@ val catalog: List<CatalogEntry> =
         linesExtraEntries,
         lineExtraEntries,
         lineLongTailEntries,
+        intradayBreaksEntries,
+        generatedSeriesEntries,
         pieEntries,
         scatterEntries,
         scatterExtraEntries,

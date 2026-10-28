@@ -458,6 +458,52 @@ class DemoPageTest {
     }
 
     /**
+     * The pages of the breaks / generated-data batch: the two intraday charts of ECharts 6, the
+     * twenty-thousand point area page and the two hundred thousand candle page.
+     *
+     * The intraday pages build their own minute series, so a wrong walk would either loop forever
+     * (a break that never advances the clock) or leave an empty canvas; the candle page turns two
+     * hundred thousand rows into a `dataset`, which the painted-pixel wait proves reached the
+     * chart. `scatter-matrix` is the one page here whose grid positions are computed: a percentage
+     * that slipped back to pixels would stack every cell on the top-left corner, so it is checked
+     * for painted pixels as well.
+     */
+    @RetryingTest(maxAttempts = 2)
+    fun `the breaks and generated pages draw content`(page: Page) {
+        val consoleErrors = mutableListOf<String>()
+        page.onConsoleMessage { message ->
+            if (message.type() == "error") consoleErrors += message.text()
+        }
+        openPage(page)
+        for (
+            route in
+                listOf(
+                    "intraday-breaks-1",
+                    "intraday-breaks-2",
+                    "area-simple",
+                    "candlestick-large",
+                    "scatter-matrix",
+                    "parallel-aqi",
+                    "watermark",
+                    "scatter-anscombe-quartet",
+                )
+        ) {
+            page.evaluate("(value) => { location.hash = '#/' + value }", route)
+            assertChartRendered(page, route)
+            waitForPainted(page, route)
+        }
+        // `bar-race` grows its bars from a timer, so a frame after one tick must differ.
+        page.evaluate("(value) => { location.hash = '#/' + value }", "bar-race")
+        assertChartRendered(page, "bar-race")
+        waitForPainted(page, "bar-race")
+        val before = paintedFrame(page)
+        page.waitForTimeout(3600.0)
+        val after = paintedFrame(page)
+        assertTrue(before != after, "bar-race did not repaint after its timer tick")
+        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
+    }
+
+    /**
      * Waits until the chart canvas of [route] holds a painted pixel.
      *
      * The pages that fetch their data set the option later, so a single sample would race with the

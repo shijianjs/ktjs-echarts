@@ -266,6 +266,8 @@ NPC 自己指出的两个坑值得记下来：`charts.ts` / `option.ts` 里有�
   Developer。推 GitHub 必须用密钥仓库里的独立 PAT，不能用 `CNB_TOKEN`。
 - **GitHub 侧 CI 仍会跑**：CNB 推上去的分支会触发 GitHub Actions。想省额度就给 NPC
   的提交加 `[ci skip]`，或者在 GitHub 侧按分支前缀跳过。
+- **NPC 直接改 main，没有 review 关卡**：这是单人项目的取舍。改动出问题时靠 `git revert`，
+  而不是靠合并前拦截。
 - **PR 评论触发没实测过**：`pull_request.comment@npc` 和 `issue.comment@npc` 共用同一份
   锚点定义（`&npc-pipeline`），issue 侧已跑通，PR 侧只是入口不同。第一次真实 PR 里 @ 时
   留意一下构建日志。

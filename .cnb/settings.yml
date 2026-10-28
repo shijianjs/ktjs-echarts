@@ -19,10 +19,11 @@ npc:
         - TYPE-MAPPING.md：上游 TypeScript 类型到 Kotlin 类型的对照与写法。
 
         ## 上游参考仓库（只读）
-        - /refs/echarts：apache/echarts 源码，wrapper 对应的 npm 包在这里。
-        - /refs/echarts-examples：apache/echarts-examples，官方示例。
-        两者都是 depth 1 的只读快照，**不要修改、不要提交、不要在里面执行构建**。
-        核对上游 API 时优先读它们，不要用网页抓 raw.githubusercontent.com（经常超时）。
+        - /refs/echarts：apache/echarts 的源码，pin 在 package.json 里写的那个版本。
+        - /refs/echarts-examples：apache/echarts-examples 的 src/common/config。
+        两者都固化在镜像里、没有 .git，不能 fetch 也不能切版本。**不要修改、不要提交、
+        不要在里面执行构建**。核对上游 API 时优先读它们，不要用网页抓
+        raw.githubusercontent.com（经常超时）。
 
         ## 构建与测试
         - 编译校验：./gradlew compileKotlinJs

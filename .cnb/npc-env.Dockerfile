@@ -38,4 +38,36 @@ RUN npx --yes playwright@1 install-deps chromium
 RUN npm install -g --registry=https://registry.npmjs.org @cnbcool/cnb-cli skills \
  && skills add https://cnb.cool/cnb/skills/cnb-skill.git -g -y
 
+# 上游参考源码，直接固化进镜像。
+#
+# 这样做的三个好处：
+#   1. 不用把 apache/echarts、apache/echarts-examples 导入 CNB 再维护同步——
+#      项目多了以后「要同步的仓库太多」的问题不存在；
+#   2. /refs 落在镜像层，容器里改了也只在上层可写层，销毁即消失，
+#      不用再靠 git clean 兜底；
+#   3. 省掉每次会话 clone 的 60 秒。
+#
+# 代价：上游发版要重建镜像。ECHARTS_REF 跟 package.json 的 echarts 版本对齐，
+# .cnb.yml 的 ifModify 同时监听 package.json，Dependabot 升级时会自动重建。
+#
+# examples 仓库 682M，大部分是 public/ 里的图片和字体，AI 只需要读示例代码，
+# 所以用 sparse-checkout 只取源码目录。
+ARG ECHARTS_REF=6.1.0
+RUN mkdir -p /refs \
+ && git clone --depth 1 --branch "${ECHARTS_REF}" \
+      https://github.com/apache/echarts.git /refs/echarts \
+ && git clone --depth 1 --filter=blob:none --sparse \
+      https://github.com/apache/echarts-examples.git /refs/echarts-examples \
+ && git -C /refs/echarts-examples sparse-checkout set src common config \
+ && rm -rf /refs/echarts/.git /refs/echarts-examples/.git \
+ && printf '%s\n' \
+      "这里是只读的上游参考仓库，不属于本仓库，不要修改、不要提交。" \
+      "" \
+      "  /refs/echarts            apache/echarts ${ECHARTS_REF} 的源码" \
+      "  /refs/echarts-examples   apache/echarts-examples 的 src/common/config" \
+      "" \
+      "固化在镜像里，没有 .git，不能 fetch。要换版本就改 ECHARTS_REF 重建镜像。" \
+      > /refs/README.txt \
+ && du -sh /refs/*
+
 WORKDIR /workspace

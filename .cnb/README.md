@@ -15,14 +15,31 @@
 ## 文件
 
 ```
-.cnb.yml                            流水线：镜像构建 / NPC 执行 / 同步 GitHub
+.cnb.yml                            流水线：镜像构建 / NPC 执行 / 分支同步 GitHub
 .cnb/settings.yml                   NPC 角色 kotlin（人设 + 项目约定）
 .cnb/npc-env.Dockerfile             工具链 + 上游源码镜像，不 COPY 项目源码
 .cnb/scripts/setup-gradle.sh        装 Maven 镜像 init 脚本与重试属性
 .cnb/scripts/gradle-mirror.init.gradle  腾讯云 Maven 镜像前置（仅 CNB 环境）
 .cnb/scripts/warmup-gradle.sh       冷启动预热依赖，绕开 Maven Central 限流
-.cnb/scripts/push-to-github.sh      把 NPC 的成果推回 GitHub
 ```
+
+## 职责怎么分
+
+```
+Issue/PR 评论 @角色
+      ↓
+NPC 流水线（不带任何 GitHub 凭证）
+  准备环境 → 预热依赖 → npc:go 改代码 → 推到 CNB 分支
+      ↓
+CNB 上出现 npc/<时间戳> 分支
+      ↓ 触发 push 事件
+同步流水线（官方 git-sync 插件）
+  CNB 分支 → GitHub 同名分支
+```
+
+两条流水线互不知道对方。NPC 那边一行 GitHub 相关的配置都没有，所以它不引用密钥仓库
+（引用过的 NPC 按平台规则不可分享），也不会在「不可信事件」里塞一个对 GitHub 有写权限的
+token。同步那条跑在 `push` 这个可信事件上，只管机械地推分支。
 
 ## 缓存怎么分层
 
@@ -69,12 +86,10 @@
    在默认分支建 `github.yml`：
 
    ```yaml
-   # 只允许 ktjs-echarts 的 NPC 事件读这个文件。
-   # 一旦声明 allow_*，平台会忽略触发者角色，完全按规则校验，所以两个事件都要列。
+   # 只允许 ktjs-echarts 的流水线读这个文件，且只允许 git-sync 这个插件镜像使用。
+   # 声明 allow_* 后平台会忽略触发者角色，完全按规则校验。
    allow_slugs: "shijianjs/ktjs-echarts"
-   allow_events:
-     - issue.comment@npc
-     - pull_request.comment@npc
+   allow_images: "tencentcom/git-sync"
 
    GITHUB_TOKEN: "github_pat_xxx"   # fine-grained，只勾目标仓库 Contents: Read and write
    GITHUB_REPO: "shijianjs/ktjs-echarts"
@@ -84,15 +99,9 @@
    `https://cnb.cool/shijianjs/cnb-secrets/-/blob/main/github.yml`。
    密钥仓库默认分支不是 `main` 的话，URL 里那段要跟着改。
 
-   **`allow_events` 不是可选项。** `issue.comment@npc` 和 `pull_request.comment@npc`
-   都在平台的「不可信事件」清单里（代码来源或触发者不可控），这类事件的流水线引用外部
-   文件时，被引用文件必须显式声明 `allow_events`，否则直接不通过。少了这一段，
-   「同步到 GitHub」这一步会以引用被拒失败。
-
-   顺带说明风险边界：官方建议把密钥操作放在 `push` / `tag_push` 这类可信事件里。
-   当前把 GitHub 推送放在 NPC 事件内，是试验期的取舍——能开工作模式的至少是仓库
-   Developer，触发者可控，且 token 本身只勾了一个仓库的 Contents 写权限。等验证了
-   「NPC 推送会触发 push 事件」之后，可以把这一步挪到 push 事件，更贴合安全模型。
+   **`allow_images` 不是可选项。** 同步跑在 `push` 事件上，那是可信事件，所以不需要
+   `allow_events`；但 git-sync 是插件任务（`image` + `settings`），平台要求被引用的密钥
+   文件显式声明 `allow_images`，否则引用会被拒。少了这一句，同步流水线会以权限错误失败。
 
 3. **先构建一次镜像**
 
@@ -122,17 +131,20 @@
    - 第二次运行时 Gradle 是否还在下载依赖（判断缓存有没有命中）
    - 末尾「同步到 GitHub」是否把分支推上去
 
-## 用户原先列的三个未知项，怎么绕开的
+## 为什么最后还是用官方 git-sync
 
-原方案想用 Git Sync 插件 + push 事件串起来，那三个问题（NPC 提交是否触发同步、插件
-能否同步 NPC 的分支、Token 怎么安全提供）都不用回答了——**改成同一条流水线里直接推**：
+第一版把推送塞在 NPC 流水线末尾，理由是「不依赖 NPC 推送是否触发 push 事件」。
+代价是三条，都很实在：
 
-- NPC 在 `npc:go` 里改完代码、提交；
-- 同一 Pipeline 的下一个 stage 执行 `push-to-github.sh`，先推 CNB 再推 GitHub；
-- 分支名取当前 `HEAD`，若在默认分支上则自动改推到 `npc/<时间戳>`，避免 AI 直接覆盖 main。
+1. NPC 事件属于**不可信事件**，却要在里面注入一个对 GitHub 有写权限的 token；
+2. 引用密钥仓库会让这个 NPC **不可分享**（不进 NPC 榜单）；
+3. 只支持 CNB → GitHub 单向，GitHub 上的改动回不来。
 
-链路确定，不依赖事件联动。代价是每次 NPC 会话都推一次，哪怕它只是回答问题——所以脚本
-里判断了「没有新提交就只推当前分支」，空推是 no-op。
+改成两条独立流水线后，这三条同时消失。原先担心的未知项「NPC 推送会不会触发 push 事件」
+是这套方案的关键前提——NPC 推 `npc/<时间戳>` 分支后，要靠 `$: push` 的兜底规则接住它。
+这条正在验证中，见下面「验证状态」。
+
+一个副产品：NPC 流水线现在完全不带 GitHub 凭证，安全边界清晰得多。
 
 ## 首轮实测记录
 

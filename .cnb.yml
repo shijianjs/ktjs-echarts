@@ -1,40 +1,49 @@
 # ktjs-echarts 的 CNB 流水线：把 CNB 当云端 AI 开发机，结果同步回 GitHub。
 #
-#   Issue/PR 评论 @shijianjs/ktjs-echarts(kotlin)
-#     → npc:go 在工具链镜像里改代码、跑测试（上游源码已固化在镜像的 /refs）
-#     → 把分支推到 CNB 与 GitHub
+# 职责分成两半，互不交叉：
+#   - NPC 只负责在 CNB 上改代码、推到 CNB 分支。它不碰 GitHub，不需要任何 GitHub 凭证。
+#   - 同步是独立的一条 push 流水线，用官方 git-sync 插件把分支机械地推过去。
 #
-# GitHub 仍然是公开仓库和社区入口；CNB 只负责「AI 干活」这一段。
+# 这样分的两个直接好处：NPC 流水线不再引用密钥仓库（按平台规则引用过的 NPC 不可分享），
+# 也不会在「不可信事件」里注入一个对 GitHub 有写权限的 token。
+#
+# GitHub 仍然是公开仓库和社区入口。
 #
 # 文档：
 #   NPC          https://docs.cnb.cool/zh/build/npc.md
 #   npc:go       https://docs.cnb.cool/zh/build/internal-steps/npc/go.md
+#   git-sync     https://cnb.cool/cnb/plugins/tencentcom/git-sync
 #   流水线缓存    https://docs.cnb.cool/zh/build/pipeline-cache.md
-#   数据卷        https://docs.cnb.cool/zh/build/grammar.md#pipeline-volumes
 #
-# `.npc-pipeline` 是 YAML 锚点的载体，不是分支名，平台会忽略它。
-# 官方 npc/CodeBuddy 的 .cnb.yml 同样用顶层锚点（`.1m: &1m`）给多个角色复用配置。
+# `.sync-github` / `.npc-pipeline` 是 YAML 锚点载体，不是分支名，平台会忽略。
+# 锚点必须先定义后引用，所以它们放在所有分支配置之前。
+# 官方 npc/CodeBuddy 的 .cnb.yml 同样用顶层锚点给多个角色复用配置。
 
-main:
-  push:
-    # 只在工具链 Dockerfile 或 echarts 版本变化时重建镜像。
-    # 首次导入仓库时没有「文件变动」可比，需要手动跑一次这条流水线
-    # （CNB 页面「构建」→ 选 main → 运行），否则 NPC 拉不到镜像。
-    - services:
-        - docker
-      stages:
-        - name: 重建 NPC 工具链镜像
-          # package.json 里是 echarts 的版本，镜像里 /refs 的源码跟着它走，
-          # 所以 Dependabot 升级 echarts 时也要重建。
-          ifModify: ".cnb/npc-env.Dockerfile,package.json"
-          script: |
-            set -euo pipefail
-            IMAGE="${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}/npc-env:latest"
-            echo "构建 $IMAGE"
-            docker build -f .cnb/npc-env.Dockerfile -t "$IMAGE" .
-            docker push "$IMAGE"
+# ── 把当前分支同步到 GitHub ───────────────────────────────────────────────
+#
+# branch 取 CNB_BRANCH，所以 NPC 推哪个分支就同步哪个，不会把 CNB 上的其他分支
+# 一起带过去。force 保持 false：GitHub 上有人直接改过同名分支时宁可失败，
+# 也不要静默覆盖。
+#
+# 密钥仓库 shijianjs/cnb-secrets 的 github.yml 需要声明：
+#   allow_images: "tencentcom/git-sync"   ← 插件任务必须声明，否则引用被拒
+# push 是可信事件，不需要 allow_events。
+.sync-github: &sync-github
+  name: 同步到 GitHub
+  image: tencentcom/git-sync
+  imports: https://cnb.cool/shijianjs/cnb-secrets/-/blob/main/github.yml
+  settings:
+    target_url: https://github.com/shijianjs/ktjs-echarts.git
+    auth_type: https
+    username: x-access-token
+    password: "${GITHUB_TOKEN}"
+    branch: "${CNB_BRANCH}"
 
-# NPC 事件的完整定义。issue 与 pull_request 共用，改一处即可。
+# ── NPC 事件 ─────────────────────────────────────────────────────────────
+#
+# 系统 NPC（@//npc/CodeBuddy(...)）的流水线配置来自 npc 仓库，本文件改不动它。
+# 这里配的是 .cnb/settings.yml 里自建的 kotlin 角色——同样的模型，
+# 但镜像、缓存、挂载都能自己定。
 .npc-pipeline: &npc-pipeline
   - docker:
       image: ${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}/npc-env:latest
@@ -74,18 +83,34 @@ main:
           thinkingLevel: "off"
           supportImage: true
 
-      - name: 同步到 GitHub
-        # 密钥仓库 shijianjs/cnb-secrets 里的 github.yml，它必须声明
-        # allow_events: issue.comment@npc, pull_request.comment@npc ——
-        # NPC 事件属于不可信事件，没这句引用会被直接拒绝。
-        script: bash .cnb/scripts/push-to-github.sh
-        imports: https://cnb.cool/shijianjs/cnb-secrets/-/blob/main/github.yml
+# ── 分支配置 ─────────────────────────────────────────────────────────────
 
+main:
+  push:
+    # 只在工具链 Dockerfile 或 echarts 版本变化时重建镜像。
+    # 首次导入仓库时没有「文件变动」可比，需要手动跑一次这条流水线
+    # （CNB 页面「构建」→ 选 main → 运行），否则 NPC 拉不到镜像。
+    - services:
+        - docker
+      stages:
+        - name: 重建 NPC 工具链镜像
+          # package.json 里是 echarts 的版本，镜像里 /refs 的源码跟着它走，
+          # 所以 Dependabot 升级 echarts 时也要重建。
+          ifModify: ".cnb/npc-env.Dockerfile,package.json"
+          script: |
+            set -euo pipefail
+            IMAGE="${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}/npc-env:latest"
+            echo "构建 $IMAGE"
+            docker build -f .cnb/npc-env.Dockerfile -t "$IMAGE" .
+            docker push "$IMAGE"
+    - *sync-github
+
+# 除 main 之外的分支（NPC 推的 npc/<时间戳> 走这里）。
+# `$` 是兜底匹配，只接住没被上面 glob 匹配到的分支。
 $:
-  # 系统 NPC（@//npc/CodeBuddy(...)）的流水线配置来自 npc 仓库，本文件改不动它。
-  # 这里配的是 .cnb/settings.yml 里自建的 kotlin 角色——同样的模型，
-  # 但镜像、缓存、挂载都能自己定。
-  #
+  push:
+    - *sync-github
+
   # 两个事件必须都配：CNB 按事件独立合并配置，只配 issue 的话 PR 里 @ 仍走系统默认。
   issue.comment@npc: *npc-pipeline
   pull_request.comment@npc: *npc-pipeline

@@ -56,7 +56,11 @@ $:
         NPM_CONFIG_REGISTRY: https://registry.npmmirror.com
       stages:
         - name: 准备上游参考仓库
-          script: bash .cnb/scripts/prepare-refs.sh
+          # 顺手固定 git 身份，让 GitHub 上的 AI 提交和人工提交能区分开。
+          script: |
+            git config user.name "cnb-npc"
+            git config user.email "npc@cnb.cool"
+            bash .cnb/scripts/prepare-refs.sh
 
         - name: 预热 Gradle 依赖
           # Maven Central 对 CNB 的共享出口 IP 限流（429），首次解析依赖容易失败。
@@ -98,7 +102,11 @@ $:
         NPM_CONFIG_REGISTRY: https://registry.npmmirror.com
       stages:
         - name: 准备上游参考仓库
-          script: bash .cnb/scripts/prepare-refs.sh
+          # 顺手固定 git 身份，让 GitHub 上的 AI 提交和人工提交能区分开。
+          script: |
+            git config user.name "cnb-npc"
+            git config user.email "npc@cnb.cool"
+            bash .cnb/scripts/prepare-refs.sh
 
         - name: 预热 Gradle 依赖
           # Maven Central 对 CNB 的共享出口 IP 限流（429），首次解析依赖容易失败。

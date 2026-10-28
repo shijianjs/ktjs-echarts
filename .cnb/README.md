@@ -147,6 +147,26 @@
 Gradle `9.4.1`（首次下载约 1 分钟）、`/refs/echarts` HEAD `34f4d92`（echarts 6.1.0）、
 `/refs` 体积 echarts 118M + echarts-examples 682M。
 
+### 工作模式跑通的那一轮
+
+任务：统计 `/refs/echarts/src/export/` 各文件的导出数，产出 `docs/upstream-exports.md`。
+冷启动节点（缓存未命中）的耗时构成：
+
+| Stage | 耗时 | 说明 |
+| --- | ---: | --- |
+| Prepare | 18s | 拉代码、起容器 |
+| 准备上游参考仓库 | 60s | 冷启动重新 clone，热节点只 fetch 增量 |
+| 预热 Gradle 依赖 | 146s | 含 Gradle 发行版、Kotlin 编译器、npm 包；热节点直接跳过 |
+| NPC 执行任务 | 176s | 分析 14 个 `.ts`、写文档、commit |
+| 同步到 GitHub | 4s | 推 CNB + 推 GitHub 新分支 |
+
+结果：GitHub 上出现 `npc/<时间戳>` 分支，`main` 没被动过。工作模式下的
+`CNB_TOKEN` 确实有 `repo-code:rw`，和只读模式形成对照。
+
+NPC 自己指出的两个坑值得记下来：`charts.ts` / `option.ts` 里有被注释掉的历史导出，
+正则容易多算；`option.ts` 的 `XxxComponentOption` 在 Kotlin 侧按语义并成了 `XxxOption`，
+名字比对只能当线索，不能当覆盖率结论。
+
 ## 已知限制
 
 - **NPC 不可分享**：流水线用了 `imports` 引用密钥仓库文件，按平台规则这个 NPC 不会出现在

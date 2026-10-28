@@ -233,8 +233,22 @@ NPC 自己指出的两个坑值得记下来：`charts.ts` / `option.ts` 里有�
   Developer。推 GitHub 必须用密钥仓库里的独立 PAT，不能用 `CNB_TOKEN`。
 - **GitHub 侧 CI 仍会跑**：CNB 推上去的分支会触发 GitHub Actions。想省额度就给 NPC
   的提交加 `[ci skip]`，或者在 GitHub 侧按分支前缀跳过。
-- **`pull_request.comment@npc` 是复制的一份**：没用 YAML 锚点，怕平台解析器对顶层
-  锚点的处理不一致。改配置时两处一起改。
+- **PR 评论触发没实测过**：`pull_request.comment@npc` 和 `issue.comment@npc` 共用同一份
+  锚点定义（`&npc-pipeline`），issue 侧已跑通，PR 侧只是入口不同。第一次真实 PR 里 @ 时
+  留意一下构建日志。
+
+## 哪些已经验证过
+
+| 路径 | 状态 |
+| --- | --- |
+| Issue 评论 `@` 触发 | ✅ 多轮，含只读问答与工作模式改代码 |
+| 自定义镜像 + `/refs` | ✅ JDK 21 / Node 22 / Gradle 9.4.1，三个上游仓库齐全 |
+| NPC 改代码 → commit → 推 CNB | ✅ 工作模式下 `CNB_TOKEN` 有 `repo-code:rw` |
+| 推 GitHub | ✅ 产生 `npc/<时间戳>` 分支，`main` 未被直接覆盖 |
+| NPC 回评论 | ✅ 结论发在 Issue 里，作者显示为角色名 |
+| YAML 锚点复用配置 | ✅ 两个事件共用 `&npc-pipeline`，平台解析正常 |
+| PR 评论触发 | ⬜ 未实测 |
+| `volumes` 缓存命中率 | ⚠️ 3 个节点轮转，冷启动约 5 分钟、热节点 30 秒 |
 
 ## 还没做的
 

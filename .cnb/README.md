@@ -268,6 +268,11 @@ NPC 自己指出的两个坑值得记下来：`charts.ts` / `option.ts` 里有�
   的提交加 `[ci skip]`，或者在 GitHub 侧按分支前缀跳过。
 - **NPC 直接改 main，没有 review 关卡**：这是单人项目的取舍。改动出问题时靠 `git revert`，
   而不是靠合并前拦截。
+- **GITHUB_TOKEN 需要 `workflow` 权限**：只要提交里碰了 `.github/workflows/` 下的文件，
+  GitHub 就会拒绝没有该 scope 的 PAT，报
+  `refusing to allow a Personal Access Token to create or update workflow`。
+  fine-grained PAT 要在 Repository permissions 里开 **Workflows: Read and write**，
+  classic PAT 要勾 **workflow**。NPC 以后改 workflow 文件同样受这条约束。
 - **PR 评论触发没实测过**：`pull_request.comment@npc` 和 `issue.comment@npc` 共用同一份
   锚点定义（`&npc-pipeline`），issue 侧已跑通，PR 侧只是入口不同。第一次真实 PR 里 @ 时
   留意一下构建日志。

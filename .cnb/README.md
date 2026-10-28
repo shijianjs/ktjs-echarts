@@ -101,7 +101,18 @@ token。同步那条跑在 `push` 这个可信事件上，只管机械地推分�
 
    **`allow_images` 不是可选项。** 同步跑在 `push` 事件上，那是可信事件，所以不需要
    `allow_events`；但 git-sync 是插件任务（`image` + `settings`），平台要求被引用的密钥
-   文件显式声明 `allow_images`，否则引用会被拒。少了这一句，同步流水线会以权限错误失败。
+   文件显式声明 `allow_images`，否则引用会被拒。
+
+   **如果之前配过 `allow_events`，要删掉。** 一旦文件里声明了 `allow_events`，平台就
+   完全按它校验，`push` 不在列表里会直接被挡：
+
+   ```
+   event: push does not conform to allow_events of
+   https://cnb.cool/shijianjs/cnb-secrets/-/blob/main/github.yml
+   ```
+
+   这条是实测踩到的——从「NPC 流水线里推 GitHub」改成「push 事件同步」之后，
+   旧的两条 npc 事件声明就把 `push` 挡在门外了。
 
 3. **先构建一次镜像**
 

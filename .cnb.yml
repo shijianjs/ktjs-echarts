@@ -77,16 +77,24 @@
           # - contextWindow 给满 1m，别缩到 128k，那会触发上下文压缩。
           # - deepseek-v4.1-flash 用 thinkingLevel=off（引号必须加，YAML 1.1 里
           #   裸 off 是布尔 false，平台要的是字符串）。
-          # - 不设 maxTurns / maxTokens，沿用平台默认。
           model: deepseek-v4.1-flash
           contextWindow: 1m
           thinkingLevel: "off"
           supportImage: true
+          # 默认 500 轮。实测 500 轮跑了 1h52m（约 4.5 轮/分钟），
+          # 而流水线硬上限是 20 小时（约 5000 轮），所以设 50000 没有意义——
+          # 会先被 20 小时超时强杀，那种情况下 endStages 未必来得及执行。
+          # 4000 轮约 15 小时，留出收尾时间。
+          maxTurns: 4000
 
-      # NPC 会建分支、commit，但不保证 push。这里只推到 CNB，GitHub 由 push 事件同步。
-      # 只读会话（没开工作模式）会自动跳过，避免 403。
-      - name: 推到 CNB
-        script: bash .cnb/scripts/push-to-cnb.sh
+    # 无论 NPC 跑没跑完，都把工作区里的改动推出去。
+    #
+    # 这是必须的：npc:go 因 maxTurns 超限失败时，stages 里后面的任务会被 skipped，
+    # 改动留在容器里，容器一销毁就没了。endStages 无论 stages 成败都会执行。
+    # 成功推 main，失败推 npc/wip-<时间戳>，见 preserve-work.sh。
+    endStages:
+      - name: 保留成果
+        script: bash .cnb/scripts/preserve-work.sh
 
 # ── 分支配置 ─────────────────────────────────────────────────────────────
 

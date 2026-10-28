@@ -43,7 +43,10 @@ sync_repo() { # $1 = 本地目录名  $2 = CNB slug  $3 = GitHub slug
     echo "[refs] 更新 $1（$(git -C "$dir" rev-parse --short HEAD)）"
     git -C "$dir" remote set-url origin "$url"
     git -C "$dir" fetch --depth 1 --quiet origin
+    # /refs 的卷是可写的（copy-on-write），NPC 在里面留下的改动会随流水线
+    # 成功合并进缓存。reset + clean 把上一轮的残留清干净。
     git -C "$dir" reset --hard --quiet FETCH_HEAD
+    git -C "$dir" clean -xfdq
   else
     echo "[refs] 克隆 $1"
     git clone --depth 1 --single-branch --quiet "$url" "$dir"

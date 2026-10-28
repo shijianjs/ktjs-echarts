@@ -58,6 +58,11 @@ $:
         - name: 准备上游参考仓库
           script: bash .cnb/scripts/prepare-refs.sh
 
+        - name: 预热 Gradle 依赖
+          # Maven Central 对 CNB 的共享出口 IP 限流（429），首次解析依赖容易失败。
+          # 这里先跑一遍并重试；依赖缓存已存在时直接跳过。
+          script: bash .cnb/scripts/warmup-gradle.sh
+
         - name: NPC 执行任务
           type: npc:go
           options:
@@ -94,6 +99,11 @@ $:
       stages:
         - name: 准备上游参考仓库
           script: bash .cnb/scripts/prepare-refs.sh
+
+        - name: 预热 Gradle 依赖
+          # Maven Central 对 CNB 的共享出口 IP 限流（429），首次解析依赖容易失败。
+          # 这里先跑一遍并重试；依赖缓存已存在时直接跳过。
+          script: bash .cnb/scripts/warmup-gradle.sh
 
         - name: NPC 执行任务
           type: npc:go

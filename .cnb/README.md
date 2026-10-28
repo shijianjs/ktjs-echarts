@@ -19,6 +19,7 @@
 .cnb/settings.yml              NPC 角色 kotlin（人设 + 项目约定）
 .cnb/npc-env.Dockerfile        工具链镜像，只装工具链，不 COPY 源码
 .cnb/scripts/prepare-refs.sh   准备 /refs 下的上游参考仓库
+.cnb/scripts/warmup-gradle.sh  冷启动预热依赖，绕开 Maven Central 限流
 .cnb/scripts/push-to-github.sh 把 NPC 的成果推回 GitHub
 ```
 
@@ -128,6 +129,23 @@
 
 链路确定，不依赖事件联动。代价是每次 NPC 会话都推一次，哪怕它只是回答问题——所以脚本
 里判断了「没有新提交就只推当前分支」，空推是 no-op。
+
+## 首轮实测记录
+
+跑通一轮只读验证（Issue #1）后确认的几件事，都已经落进配置：
+
+| 现象 | 结论 | 处理 |
+| --- | --- | --- |
+| `./gradlew` 报 Permission denied | 仓库里 `gradlew` 一直是 `100644`（从 initial commit 起），Linux 上没有可执行位 | 已改成 `100755` 并提交。Windows 上 `core.filemode=false`，改完要 `git update-index --chmod=+x` |
+| `compileKotlinJs` 首次失败，`429 Too Many Requests` | Maven Central 对 CNB 的共享出口 IP 限流，重跑即好 | 加 `warmup-gradle.sh`，在 NPC 动手前预热并重试三次；缓存命中时跳过 |
+| `/refs` 能被 `touch` 写入 | copy-on-write 卷是 rw，不是只读挂载；流水线成功后 COW 层会合并进缓存 | `prepare-refs.sh` 每次 `reset --hard` + `clean -xfd`，把上一轮残留清掉。真要硬隔离只能换 `read-only` 卷，但那样 `fetch` 也写不了 |
+| Issue 评论里没有 NPC 的回复 | NPC 把结论写在最终消息里，不会自动发评论 | 角色提示词里要求 `cnb issues comment --body-file`；实测生效，评论作者显示为 `shijianjs/ktjs-echarts(kotlin)` |
+| 只读会话也触发了同步 | 没有新提交时脚本仍会推一个和 main 相同的分支 | 比较 `HEAD` 与 `CNB_COMMIT`，一致就跳过 |
+| 只读模式下 `git push origin` 403 | `CNB_TOKEN` 没有 `repo-code:rw`，工作模式才给写权限 | 预期行为。等验证写代码时再确认工作模式下的推送 |
+
+环境实测值（2026-10-28）：Temurin `21.0.12.1+1-LTS`、Node `v22.22.2`、npm `10.9.7`、
+Gradle `9.4.1`（首次下载约 1 分钟）、`/refs/echarts` HEAD `34f4d92`（echarts 6.1.0）、
+`/refs` 体积 echarts 118M + echarts-examples 682M。
 
 ## 已知限制
 

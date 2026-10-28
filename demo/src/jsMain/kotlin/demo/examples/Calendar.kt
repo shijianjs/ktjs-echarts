@@ -4,6 +4,7 @@ import demo.CatalogEntry
 import demo.Groups
 import echarts.ECharts
 import echarts.Orients
+import echarts.TooltipTriggers
 import echarts.VisualMapTypes
 import echarts.options.CalendarDayLabelOption
 import echarts.options.CalendarMonthLabelOption
@@ -14,6 +15,7 @@ import echarts.options.DataZoomValue
 import echarts.options.DoubleOrDoubleArray
 import echarts.options.EChartsOption
 import echarts.options.EffectScatterDataItem
+import echarts.options.EffectScatterSeriesOption
 import echarts.options.GraphDataItem
 import echarts.options.HeatmapDataItem
 import echarts.options.HeatmapSeriesOption
@@ -24,19 +26,24 @@ import echarts.options.LabelPosition
 import echarts.options.LegendOption
 import echarts.options.LineStyleOption
 import echarts.options.PieSeriesOption
+import echarts.options.RippleEffectOption
 import echarts.options.ScatterDataItem
 import echarts.options.ScatterSeriesOption
 import echarts.options.SeriesOption
+import echarts.options.SplitLineOption
+import echarts.options.SplitLineStyleOption
 import echarts.options.StringOrDouble
 import echarts.options.StringOrDoubleOrArray
 import echarts.options.StringOrStringArray
 import echarts.options.SymbolSize
+import echarts.options.TitleOption
 import echarts.options.TooltipFormatter
 import echarts.options.TooltipFormatterCallback
 import echarts.options.TooltipOption
 import echarts.options.TooltipPosition
 import echarts.options.VisualMapOption
 import echarts.options.VisualOptionUnit
+import echarts.options.ZRColorOrArray
 import echarts.options.dataItems
 import echarts.options.effectScatterSeries
 import echarts.options.graphSeries
@@ -48,6 +55,7 @@ import js.objects.unsafeJso
 import kotlin.js.Date
 import kotlin.js.js
 import zrender.ZRColor
+import zrender.ZRLineType
 
 /*
  * Calendar examples ported from `public/examples/ts/calendar-*.ts` of apache/echarts-examples.
@@ -534,7 +542,110 @@ val calendarEntries: List<CatalogEntry> =
                     )
             }
         },
+        calendar.chart("calendar-effectscatter", "热力特效散点图", "Calendar EffectScatter") {
+            // The original draws the values with `Math.random()`; the seeded helper keeps the page
+            // reproducible. Its `Top 12` series sorts the shared array in place, which only changes
+            // the draw order of independent points.
+            val days = dailyValues("2016-01-01", "2017-01-01", 10000.0, 20160101L)
+            val topDays = days.sortedByDescending { it.second }.take(12)
+            unsafeJso<EChartsOption> {
+                backgroundColor = ZRColor("#404a59")
+                title =
+                    one(
+                        unsafeJso<TitleOption> {
+                            top = StringOrDouble(30.0)
+                            text = "Daily Step Count in 2016"
+                            subtext = "Fake Data"
+                            left = StringOrDouble("center")
+                            textStyle = unsafeJso<LabelOption> { color = "#fff" }
+                        },
+                    )
+                tooltip = one(unsafeJso<TooltipOption> { trigger = TooltipTriggers.item })
+                legend =
+                    one(
+                        unsafeJso<LegendOption> {
+                            top = StringOrDouble("30")
+                            left = StringOrDouble("100")
+                            data = legendNames("Steps", "Top 12")
+                            textStyle = unsafeJso<LabelOption> { color = "#fff" }
+                        },
+                    )
+                calendar =
+                    arrayOf(
+                        effectScatterCalendar("2016-01-01", "2016-06-30", 120.0, "1st"),
+                        effectScatterCalendar("2016-07-01", "2016-12-31", 340.0, "2nd"),
+                    )
+                series =
+                    arrayOf<SeriesOption>(
+                        calendarSteps(days, null),
+                        calendarSteps(days, 1.0),
+                        calendarTopSteps(topDays, 1.0),
+                        calendarTopSteps(topDays, null),
+                    )
+            }
+        },
     )
+
+/** One half-year calendar of `calendar-effectscatter`, [ordinal] labels the year. */
+private fun effectScatterCalendar(from: String, to: String, top: Double, ordinal: String): CalendarOption =
+    unsafeJso {
+        this.top = StringOrDouble(top)
+        left = StringOrDouble("center")
+        range = CalendarRange(arrayOf(DataZoomValue(from), DataZoomValue(to)))
+        splitLine =
+            unsafeJso<SplitLineOption> {
+                show = true
+                lineStyle =
+                    unsafeJso<SplitLineStyleOption> {
+                        typedColor = ZRColorOrArray(ZRColor("#000"))
+                        width = 4.0
+                        type = ZRLineType("solid")
+                    }
+            }
+        yearLabel =
+            unsafeJso<CalendarYearLabelOption> {
+                formatter = LabelFormatter("{start}  $ordinal")
+                color = "#fff"
+            }
+        monthLabel = unsafeJso<CalendarMonthLabelOption> { color = "#aaa" }
+        dayLabel = unsafeJso<CalendarDayLabelOption> { color = "#aaa" }
+        itemStyle =
+            unsafeJso<ItemStyleOption> {
+                color = ZRColor("#323c48")
+                borderWidth = 1.0
+                borderColor = ZRColor("#111")
+            }
+    }
+
+/** The plain scatter series of `calendar-effectscatter`; the size is `value / 500`. */
+private fun calendarSteps(days: List<Pair<String, Double>>, calendarIndex: Double?): ScatterSeriesOption =
+    scatterSeries {
+        name = "Steps"
+        coordinateSystem = "calendar"
+        if (calendarIndex != null) this.calendarIndex = calendarIndex
+        symbolSize = SymbolSize { value, _ -> DoubleOrDoubleArray(numberAt(value, 1) / 500.0) }
+        itemStyle = unsafeJso<ItemStyleOption> { color = ZRColor("#ddb926") }
+        typedData = dataItems(*days.map { (date, value) -> ScatterDataItem(row(date, value)) }.toTypedArray())
+    }
+
+/** The ripple series of the twelve largest days of `calendar-effectscatter`. */
+private fun calendarTopSteps(days: List<Pair<String, Double>>, calendarIndex: Double?): EffectScatterSeriesOption =
+    effectScatterSeries {
+        name = "Top 12"
+        coordinateSystem = "calendar"
+        if (calendarIndex != null) this.calendarIndex = calendarIndex
+        symbolSize = SymbolSize { value, _ -> DoubleOrDoubleArray(numberAt(value, 1) / 500.0) }
+        showEffectOn = "render"
+        rippleEffect = unsafeJso<RippleEffectOption> { brushType = "stroke" }
+        itemStyle =
+            unsafeJso<ItemStyleOption> {
+                color = ZRColor("#f4e925")
+                shadowBlur = 10.0
+                shadowColor = ZRColor("#333")
+            }
+        zlevel = 1.0
+        typedData = dataItems(*days.map { (date, value) -> EffectScatterDataItem(row(date, value)) }.toTypedArray())
+    }
 
 /** The chain that links the `[date, value]` points of `calendar-graph` / `calendar-charts`. */
 private fun calendarGraphLinks(count: Int): Array<echarts.options.GraphEdgeItemOption> =

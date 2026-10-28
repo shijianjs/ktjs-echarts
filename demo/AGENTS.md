@@ -90,7 +90,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **262 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **265 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -113,7 +113,10 @@ demo/src/jvmTest/kotlin/demo/e2e/
 
 竞速、下钻那一档已经落地：`bar-race`（每 3 秒加一截，定时器交给 `ChartHolder`）与
 `bar-drilldown`（点击柱体换层，`universalTransition` 做形变，Back 是带 `onclick` 的 graphic
-text）在 `examples/CanvasGraphics.kt`，`watermark` 同文件（canvas 画的斜向水印当
+text）在 `examples/CanvasGraphics.kt`，多层版 `bar-multi-drilldown` 单独放在
+`examples/BarDrilldown.kt`：上游用 `myChart.getOption().id` 记住当前层，wrapper 不建模这个写在
+option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
+`watermark` 同文件（canvas 画的斜向水印当
 `backgroundColor` 的 pattern）。剩下的长尾里还要真实交互的（`scatter-clustering` 要 ecStat、
 `custom-calendar-icon` 上游只剩缩略图、`line-pen` / `line-draggable` 要指针序列）仍不做。
 
@@ -186,6 +189,16 @@ bar 家族的计算长尾在 `examples/BarLongTail.kt`：归一化堆叠（`bar-
 `renderItem` 用 `api.size([0, 0])[0]` 取带宽再按 `(year - rawData.length / 2)` 平移，均值系列画带中央的
 横线。上游 `rawData.length / 2` 是 `5.5`，Kotlin 侧要写成 `/ 2.0`，整数除法会把偏移算成 `5`。
 
+`pie-parliament-transition` 在 `examples/CustomTransition.kt`：饼图与自定义系列共用 series id
+`distribution`，`universalTransition` 把扇形拆成议会席位圆点，`ChartHolder.setInterval` 每两秒换一次
+option。`renderItem` 的排座算法（环半径、按座位宽度对齐的起点）照抄上游；上游那句
+`coordinateSystem: undefined` 是没有作用的死字段，移植时直接不写。
+
+`calendar-effectscatter` 追加在 `examples/Calendar.kt`：上下两张半年历，散点用 `Lcg` 造 365 天的
+成交额，Top 12 再叠一层 `effectScatter` 涟漪。日历的 `splitLine.lineStyle.color` 在 wrapper 里叫
+`typedColor`（`ZRColorOrArray`，`@JsName("color")`），`type` 用 `ZRLineType`；标题与图例的
+`textStyle` 是 `LabelOption`，它的 `color` 是 `String` 而不是 `ZRColor`，写 `ZRColor("#fff")` 编译不过。
+
 dataset 家族的 `dataset-link` 补在 `examples/DatasetExtra.kt`：它监听 `updateAxisPointer` 把饼图的
 `encode.value` 换成指针所在的年份，上游该事件的 payload 类型是 `any`，所以 `axesInfo[0].value` 只能在
 demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首帧之后挂上，这里直接 `chart.on(...)`。
@@ -238,6 +251,8 @@ demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首�
 - `DataZoomOption`：补 `BoxLayoutOptionMixin`（上游只有 slider 变体带盒子布局，wrapper 合成了一个）。
 - `EmphasisFocuses`：补 `adjacency` / `ancestor` / `descendant`（sankey、chord、graph、tree 专用取值）。
 - `OptionEncode`：上游是开放索引签名，补上文档列出的坐标维度 `x` / `y` / `value` / `radius` / `angle`。
+  `itemChildGroupId` 之前拼成了 `childGroupdId`（对照 `apache/echarts/src/util/types.ts` 修正），
+  `OptionEncodeTest` 用它把三个分组维度的属性名钉住——多层下钻的 `bar-multi-drilldown` 就靠它。
 - `TreeSeriesOption.orient`：上游是 `TreeOrient`（`LR` / `TB` / `RL` / `BT` / `horizontal` / `vertical`
   或 `number`），之前错用了通用的 `Orient`；新增 `TreeOrient` / `TreeOrients`。
 - `MatrixOption` 系列：`MatrixDimensionOption.data` 改成上游的 `MatrixDimensionCellLooseOption[]`（单元格

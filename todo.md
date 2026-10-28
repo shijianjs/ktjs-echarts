@@ -296,6 +296,15 @@
   轴标签 formatter 的第三个参数（断口信息）wrapper 没建模，用 `axisLabel(::fn)` 在 JS 侧拓宽成
   三参再收回单参。踩到的坑：第一版夜间跨天算错、`time` 不前进，页面直接卡死（Chromium
   `Page crashed`），改成按「天」拆循环。
+- 第二十九批（3 个，多层下钻 + 议会图过渡 + 日历散点）：新建 `examples/BarDrilldown.kt` 的
+  `bar-multi-drilldown`（十二层数据表，`encode.itemGroupId` / `itemChildGroupId` 配合
+  `universalTransition` 做形变；上游把当前层写在 `myChart.getOption().id` 上，wrapper 不建模这个
+  野字段，例子侧改用 `ArrayDeque<String>` 记下钻路径）、新建 `examples/CustomTransition.kt` 的
+  `pie-parliament-transition`（饼图与自定义系列共用 series id，`ChartHolder.setInterval` 每两秒
+  换一次 option，`renderItem` 按环半径排座位）、`examples/Calendar.kt` 追加
+  `calendar-effectscatter`（上下两张半年历，365 天成交额用 `Lcg` 生成，Top 12 叠一层
+  `effectScatter` 涟漪）。顺带修掉 wrapper 的一个字段名错误：`OptionEncode` 的
+  `itemChildGroupId` 之前拼成 `childGroupdId`，补 `OptionEncodeTest` 钉住三个分组维度的属性名。
 - 第二十六批（13 个，桑基聚合 + 散点长尾 + 富文本 + 置信带 + 双轴动态表）：新建
   `examples/ScatterExtra.kt` 的 `scatter-large`（两条各 50 万点的正弦散点，随机源换成 `Lcg`）、
   `scatter-painter-choice`（4111 位画家的 `masterPainterColorChoice.json`，`symbolSize` 与
@@ -446,10 +455,8 @@
 清单里还剩 40 个左右「无外部依赖」的候选，按可做性分三档：
 
 1. **几乎零成本（option 组合、内联表）**：
-   `pie-parliament-transition`（自定义议会图 ↔ 饼图的 `universalTransition`，两秒切换一次，
-   定时器交给 ChartHolder）、`calendar-effectscatter`（日历 + 涟漪散点，随机源换 `Lcg`）、
-   `bar-multi-drilldown`（`bar-drilldown` 的多级版）、`intraday-breaks-*` 已完成。
-   `parallel-aqi` / `scatter-matrix` 已完成。
+   `intraday-breaks-*` / `parallel-aqi` / `scatter-matrix` / `pie-parliament-transition` /
+   `calendar-effectscatter` / `bar-multi-drilldown` 已完成。
 2. **要写数据转换脚本**：`candlestick-sh` / `candlestick-sh-2015`（9KB / 26KB 内联表，照
    `parallel-aqi` 的脚本思路生成 `doubleArrayOf` 行）、`grid-multiple` / `area-rainfall`
    （各 85KB，先看要不要落成资源文件）、`matrix-stock` / `matrix-mbti` /
@@ -518,12 +525,17 @@
   字符串写坏（本轮一次批量小改就把 7 个文件写成了乱码，靠官方清单反推 `titleCN` 才修回来；
   仓库里 `ContainPixelTest.kt` 那个早已损坏的破折号也是同一个原因）。要批量改文件用 Node/Python
   读写 UTF-8，或者直接用编辑工具。
+- **移植新示例时顺手核对字段名**：上游的公开类型偶尔会在生成阶段被抄错（本轮
+  `OptionEncode.itemChildGroupId` 被写成 `childGroupdId`，编译期完全看不出来，只有按上游
+  `types.ts` 逐个对名字才会发现）。凡是上游用 `unknown` / 索引签名表达、Kotlin 侧手写成员的地方，
+  都值得在示例里真正赋一次值，并补一个钉住 JS 属性名的测试。
 
 ## 待办
 
 - 类型建模：暂无未完成项（见上面各轮）。
-- 示例站（demo）：见「示例站（demo）移植进度」一节。第二十四批（8 个，`examples/BarLongTail.kt` 的
-  计算堆叠柱 + `bump-chart`、`line-graphic`、`graph-grid`）之后，下一批按「下一批」清单的第一条做
-  `doc-example/scatter-visualMap-categories`（先放宽 `visualMap` 的按类目字典与 `left: null`）、
-  `custom` / `matrix` 剩余项与各家族长尾；`custom-calendar-icon` 因上游源码只剩缩略图，不移植。
-- 提交：全部已推送到 `origin/main`（最新：第二十八批 4 个示例）。
+- 示例站（demo）：见「示例站（demo）移植进度」一节。第二十九批（3 个，`bar-multi-drilldown`、
+  `pie-parliament-transition`、`calendar-effectscatter`）之后，「下一批」第一档已经清空，下一批按
+  第二档做 `candlestick-sh` / `candlestick-sh-2015`（先写内联表生成脚本）、`grid-multiple` /
+  `area-rainfall`、`matrix-*` 或 `pictorialBar` 的 `path://` 面板图；`custom-calendar-icon` 因上游
+  源码只剩缩略图，不移植。
+- 提交：全部已推送到 `origin/main`（最新：第二十九批 3 个示例）。

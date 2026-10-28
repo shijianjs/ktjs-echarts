@@ -284,8 +284,8 @@ external interface OptionEncode {
     /** Dimension used as the item group id. */
     var itemGroupId: OptionEncodeValue?
 
-    /** Dimension used as the item child group id. */
-    var childGroupdId: OptionEncodeValue?
+    /** Dimension used as the item child group id, e.g. the next drilldown level of a bar. */
+    var itemChildGroupId: OptionEncodeValue?
 
     /**
      * Dimension used as the x coordinate, or as the category of a category axis.

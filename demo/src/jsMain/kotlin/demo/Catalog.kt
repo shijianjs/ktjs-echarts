@@ -1,5 +1,6 @@
 package demo
 
+import demo.examples.barDrilldownEntries
 import demo.examples.barEntries
 import demo.examples.barExtraEntries
 import demo.examples.barLongTailEntries
@@ -12,6 +13,7 @@ import demo.examples.customEntries
 import demo.examples.customHexbinEntries
 import demo.examples.customExtraEntries
 import demo.examples.customLongTailEntries
+import demo.examples.customTransitionEntries
 import demo.examples.datasetEntries
 import demo.examples.datasetExtraEntries
 import demo.examples.docExampleEntries
@@ -141,6 +143,7 @@ val catalog: List<CatalogEntry> =
         barEntries,
         barExtraEntries,
         barLongTailEntries,
+        barDrilldownEntries,
         richTextEntries,
         extraPagesEntries,
         lineEntries,
@@ -180,6 +183,7 @@ val catalog: List<CatalogEntry> =
         customHexbinEntries,
         customExtraEntries,
         customLongTailEntries,
+        customTransitionEntries,
         graphicAnimationEntries,
         canvasGraphicsEntries,
         graphEntries,

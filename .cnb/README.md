@@ -41,6 +41,22 @@ CNB main 更新
 （引用过的 NPC 按平台规则不可分享），也不会在「不可信事件」里塞一个对 GitHub 有写权限的
 token。同步那条跑在 `push` 这个可信事件上，只管机械地推分支。
 
+### 同步是双向的
+
+| 方向 | 触发 | 实现在哪 | 实测耗时 |
+| --- | --- | --- | ---: |
+| CNB → GitHub | CNB 的 `push` 事件 | `.cnb.yml` 里的 `git-sync` | 11~14 秒 |
+| GitHub → CNB | GitHub 的 `push` 事件 | `.github/workflows/sync-cnb.yml` | ~30 秒 |
+
+两边都不会死循环：
+
+- CNB 推过去的内容，GitHub 收到后 Actions 会跑一次，但它推回 CNB 是 no-op（sha 相同），
+  不产生新提交，也就不会再次触发 CNB 的 push 事件。
+- NPC 的提交作者是 `cnb-npc`，Actions 里直接跳过，连那次无意义的运行都省掉。
+
+前置条件：`GITHUB_TOKEN` 要有 `workflow` 权限，否则带 `.github/workflows/` 改动的
+提交会被 GitHub 整体拒绝（见「已知限制」）。
+
 ### 分支策略：直接改 main
 
 这是单人项目，main 就是工作分支，不引入 PR 那一层——git 本身就是历史记录，

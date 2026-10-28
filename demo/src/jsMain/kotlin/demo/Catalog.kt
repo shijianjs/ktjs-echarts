@@ -5,6 +5,7 @@ import demo.examples.barExtraEntries
 import demo.examples.barLongTailEntries
 import demo.examples.boxplotEntries
 import demo.examples.calendarEntries
+import demo.examples.canvasGraphicsEntries
 import demo.examples.candlestickEntries
 import demo.examples.chordEntries
 import demo.examples.customEntries
@@ -34,6 +35,7 @@ import demo.examples.lineLongTailEntries
 import demo.examples.matrixEntries
 import demo.examples.matrixExtraEntries
 import demo.examples.overviewEntries
+import demo.examples.parallelAqiEntries
 import demo.examples.parallelEntries
 import demo.examples.pictorialBarEntries
 import demo.examples.pieEntries
@@ -42,6 +44,8 @@ import demo.examples.richTextEntries
 import demo.examples.sankeyEntries
 import demo.examples.scatterEntries
 import demo.examples.scatterExtraEntries
+import demo.examples.scatterLongTailEntries
+import demo.examples.scatterMatrixEntries
 import demo.examples.sunburstEntries
 import demo.examples.themeRiverEntries
 import demo.examples.treeEntries
@@ -144,10 +148,13 @@ val catalog: List<CatalogEntry> =
         pieEntries,
         scatterEntries,
         scatterExtraEntries,
+        scatterLongTailEntries,
+        scatterMatrixEntries,
         candlestickEntries,
         boxplotEntries,
         pictorialBarEntries,
         parallelEntries,
+        parallelAqiEntries,
         heatmapEntries,
         heatmapLongTailEntries,
         gaugeEntries,
@@ -170,6 +177,7 @@ val catalog: List<CatalogEntry> =
         customExtraEntries,
         customLongTailEntries,
         graphicAnimationEntries,
+        canvasGraphicsEntries,
         graphEntries,
         graphExtraEntries,
         chordEntries,

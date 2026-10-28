@@ -18,7 +18,10 @@ class DemoOptions : OptionsFactory {
             .setOutputDir(Path.of(System.getProperty("e2e.output", "build/e2e-results")))
             .setContextOptions(
                 Browser.NewContextOptions()
-                    .setViewportSize(1280, 800),
+                    .setViewportSize(1280, 800)
+                    // The suite runs headless; a host without a CJK font would otherwise draw the
+                    // Chinese UI copy as tofu boxes and make every contrast / layout check flaky.
+                    .setLocale("zh-CN"),
             )
     }
 }

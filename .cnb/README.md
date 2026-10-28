@@ -29,17 +29,27 @@
 Issue/PR 评论 @角色
       ↓
 NPC 流水线（不带任何 GitHub 凭证）
-  准备环境 → 预热依赖 → npc:go 改代码 → 推到 CNB 分支
+  准备环境 → 预热依赖 → npc:go 改代码 → 提交到 main → 推到 CNB main
       ↓
-CNB 上出现 npc/<时间戳> 分支
+CNB main 更新
       ↓ 触发 push 事件
 同步流水线（官方 git-sync 插件）
-  CNB 分支 → GitHub 同名分支
+  CNB main → GitHub main
 ```
 
 两条流水线互不知道对方。NPC 那边一行 GitHub 相关的配置都没有，所以它不引用密钥仓库
 （引用过的 NPC 按平台规则不可分享），也不会在「不可信事件」里塞一个对 GitHub 有写权限的
 token。同步那条跑在 `push` 这个可信事件上，只管机械地推分支。
+
+### 分支策略：直接改 main
+
+这是单人项目，main 就是工作分支，不引入 PR 那一层——git 本身就是历史记录，
+多一层分支 + 合并只是给自己加环节。
+
+NPC 工作模式内置了 `git checkout -b npc/<时间戳>`，提示词里已经明确要求别建分支。
+万一它还是建了，`push-to-cnb.sh` 会把提交 fast-forward 回 main 再推，
+所以最终落到 CNB 的一定是 main。`git merge --ff-only` 失败时（会话期间 main 被别人动过）
+脚本会报错退出，不静默覆盖。
 
 ## 缓存怎么分层
 
@@ -267,8 +277,8 @@ NPC 自己指出的两个坑值得记下来：`charts.ts` / `option.ts` 里有�
 | Issue 评论 `@` 触发 | ✅ 多轮，含只读问答与工作模式改代码 |
 | 自定义镜像 + `/refs` | ✅ JDK 21 / Node 22 / Gradle 9.4.1，三个上游仓库齐全 |
 | NPC 改代码 → commit → 推 CNB | ✅ 工作模式下 `CNB_TOKEN` 有 `repo-code:rw` |
-| 推 GitHub | ✅ 产生 `npc/<时间戳>` 分支，`main` 未被直接覆盖 |
-| NPC 推送触发 push → git-sync | ✅ `npc/20261028201925` 已出现在 GitHub，同步耗时 11 秒 |
+| 推 GitHub | ✅ NPC 直接提交 main，同步到 GitHub main |
+| NPC 推送触发 push → git-sync | ✅ 分支时代验证过（`npc/20261028201925` 同步耗时 11 秒）；改直推 main 后走 `main: push` 的同一条同步 |
 | NPC 回评论 | ✅ 结论发在 Issue 里，作者显示为角色名 |
 | YAML 锚点复用配置 | ✅ 两个事件共用 `&npc-pipeline`，平台解析正常 |
 | PR 评论触发 | ⬜ 未实测 |

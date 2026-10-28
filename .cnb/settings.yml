@@ -32,5 +32,8 @@ npc:
         测试覆盖要求都在里面。常用命令：`./gradlew compileKotlinJs`、
         `./gradlew :ktjs-echarts:jsBrowserTest`、`./gradlew build`（含 Detekt）。
         不手工改 package.json 的 echarts 版本（Dependabot 管），不改 gradle wrapper。
-        在独立分支上改，不要直接提交到 main。提交信息用中文，写清「为什么」。
-        提交后不用自己推送，流水线末尾会把你当前分支同步到 GitHub。
+
+        ## 提交方式
+        直接在**当前分支**上改并提交（工作模式下发下来的就是 main），不要 `git checkout -b`
+        新建分支。这是单人项目，main 就是工作分支，git 本身就是历史记录，不需要 PR 那一层。
+        commit 后不用自己 push，流水线末尾有兜底。

@@ -73,13 +73,13 @@
       - name: NPC 执行任务
         type: npc:go
         options:
-          # 取值照抄官方 npc/CodeBuddy：
-          # - contextWindow 给满 1m，别缩到 128k，那会触发上下文压缩。
-          # - deepseek-v4.1-flash 用 thinkingLevel=off（引号必须加，YAML 1.1 里
-          #   裸 off 是布尔 false，平台要的是字符串）。
+          # contextWindow 给满 1m，别缩到 128k，那会触发上下文压缩。
+          #
+          # thinkingLevel 不设，用内置默认 medium。之前照官方 npc/CodeBuddy 对
+          # deepseek-v4.1-flash 设 off，实测工具调用失败率偏高——没有思考时
+          # 容易调错参数、漏掉前置条件。慢一点比返工划算。
           model: deepseek-v4.1-flash
           contextWindow: 1m
-          thinkingLevel: "off"
           supportImage: true
           # 默认 500 轮。实测 500 轮跑了 1h52m（约 4.5 轮/分钟），
           # 而流水线硬上限是 20 小时（约 5000 轮），所以设 50000 没有意义——

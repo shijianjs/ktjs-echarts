@@ -2,6 +2,7 @@ package demo.e2e
 
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.junit.UsePlaywright
+import com.microsoft.playwright.options.BoundingBox
 import com.microsoft.playwright.options.WaitUntilState
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -38,7 +39,7 @@ class DemoPageTest {
 
         val breadcrumb = page.locator(".topbar__breadcrumb").textContent()!!
         assertTrue(breadcrumb.contains("基础柱状图"), "breadcrumb: $breadcrumb")
-        assertChartRendered(page)
+        assertChartRendered(page, "bar-simple")
     }
 
     @RetryingTest(maxAttempts = 2)
@@ -49,7 +50,7 @@ class DemoPageTest {
         assertTrue(heading.contains("等级仪表盘"), "heading: $heading")
         val official = page.locator(".page__links a").first().getAttribute("href")!!
         assertTrue(official.contains("editor.html?c=gauge-grade"), "official link: $official")
-        assertChartRendered(page)
+        assertChartRendered(page, "gauge-grade")
     }
 
     @RetryingTest(maxAttempts = 2)
@@ -77,7 +78,7 @@ class DemoPageTest {
             englishHeading != chineseHeading && englishHeading.contains("Referer"),
             "heading is re-resolved: $englishHeading",
         )
-        assertChartRendered(page)
+        assertChartRendered(page, "pie-simple")
     }
 
     @RetryingTest(maxAttempts = 2)
@@ -87,7 +88,7 @@ class DemoPageTest {
         page.locator(".theme-switch button").nth(1).click()
         page.waitForFunction("() => document.documentElement.getAttribute('data-theme') === 'dark'")
 
-        assertChartRendered(page)
+        assertChartRendered(page, "line-simple")
     }
 
     /**
@@ -155,11 +156,11 @@ class DemoPageTest {
 
         openPage(page)
         openFromSidebar(page, "boxplot", "boxplot-light-velocity")
-        assertChartRendered(page)
+        assertChartRendered(page, "boxplot-light-velocity")
         openFromSidebar(page, "sankey", "sankey-vertical")
-        assertChartRendered(page)
+        assertChartRendered(page, "sankey-vertical")
         openFromSidebar(page, "heatmap", "heatmap-cartesian")
-        assertChartRendered(page)
+        assertChartRendered(page, "heatmap-cartesian")
 
         assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
         assertTrue(failedRequests.isEmpty(), "failed requests: $failedRequests")
@@ -198,7 +199,7 @@ class DemoPageTest {
     @RetryingTest(maxAttempts = 2)
     fun `the matrix and custom series pages draw content`(page: Page) {
         openPage(page, "#/matrix-simple")
-        assertChartRendered(page)
+        assertChartRendered(page, "matrix-simple")
         waitForPainted(page, "matrix-simple")
 
         val painted =
@@ -219,7 +220,7 @@ class DemoPageTest {
             )
         for (route in painted) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page)
+            assertChartRendered(page, route)
             waitForPainted(page, route)
         }
     }
@@ -261,12 +262,12 @@ class DemoPageTest {
             )
         for (route in routes) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page)
+            assertChartRendered(page, route)
             waitForPainted(page, route)
             if (route == "doc-example/tutorial-loading") {
                 // The loading effect occupies the canvas until the faked request resolves.
                 page.waitForTimeout(3300.0)
-                assertChartRendered(page)
+                assertChartRendered(page, route)
             }
             if (route == "doc-example/mix-timeline-all") {
                 // The timeline autoplays one year per second, so a year must reach the canvas.
@@ -303,12 +304,12 @@ class DemoPageTest {
         openPage(page)
         for (route in listOf("gauge-speed", "gauge-car")) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page)
+            assertChartRendered(page, route)
             waitForPainted(page, route)
         }
         for (route in listOf("gauge-clock", "gauge-barometer", "gauge-multi-title")) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page)
+            assertChartRendered(page, route)
             waitForPainted(page, route)
             val before = paintedFrame(page)
             page.waitForTimeout(2400.0)
@@ -334,12 +335,12 @@ class DemoPageTest {
         openPage(page)
         for (route in listOf("area-time-axis", "line-easing", "area-pieces", "doc-example/matrix-graph-box")) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page)
+            assertChartRendered(page, route)
             waitForPainted(page, route)
         }
         val route = "dynamic-data2"
         page.evaluate("(value) => { location.hash = '#/' + value }", route)
-        assertChartRendered(page)
+        assertChartRendered(page, route)
         waitForPainted(page, route)
         val before = paintedFrame(page)
         page.waitForTimeout(2400.0)
@@ -379,15 +380,15 @@ class DemoPageTest {
                 )
         ) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page)
+            assertChartRendered(page, route)
             waitForPainted(page, route)
         }
         page.evaluate("(value) => { location.hash = '#/' + value }", "bar-stack-normalization")
-        assertChartRendered(page)
+        assertChartRendered(page, "bar-stack-normalization")
         waitForPainted(page, "bar-stack-normalization")
         val plainBars = paintedPixels(page)
         page.evaluate("(value) => { location.hash = '#/' + value }", "bar-stack-normalization-and-variation")
-        assertChartRendered(page)
+        assertChartRendered(page, "bar-stack-normalization-and-variation")
         waitForPainted(page, "bar-stack-normalization-and-variation")
         val withPolygons = paintedPixels(page)
         assertTrue(
@@ -399,17 +400,77 @@ class DemoPageTest {
     }
 
     /**
-     * Waits until the chart canvas holds a painted pixel.
+     * The keyframe-driven `graphic` pages of `GraphicAnimations.kt`, the sampled perlin fields of
+     * `HeatmapLongTail.kt`, the `cycle-plot` polylines and the two pages that only reach their final
+     * shape over time.
+     *
+     * The stroke page starts from `lineDash: [0, 200]`, so nothing is drawn until the animation reaches
+     * its `lineDash: [200, 0]` keyframe — a missing `keyframeAnimation` would therefore leave the canvas
+     * empty, which is what the painted-pixel wait catches. The stroke and wave pages loop, so a frame
+     * sampled one second later must differ. `graph-force-dynamic` adds a node every 200 ms, so its
+     * canvas can only grow; `dataset-link` rewrites the pie through an `updateAxisPointer` listener that
+     * never fires on its own, so it is checked as a static page.
+     */
+    @RetryingTest(maxAttempts = 2)
+    fun `the graphic keyframe pages animate and the dynamic page grows`(page: Page) {
+        val consoleErrors = mutableListOf<String>()
+        page.onConsoleMessage { message ->
+            if (message.type() == "error") consoleErrors += message.text()
+        }
+        openPage(page)
+        for (
+            route in
+                listOf(
+                    "heatmap-large",
+                    "heatmap-large-piecewise",
+                    "cycle-plot",
+                    "dataset-link",
+                    "graphic-loading",
+                    "graphic-stroke-animation",
+                    "graphic-wave-animation",
+                    "graph-force-dynamic",
+                )
+        ) {
+            page.evaluate("(value) => { location.hash = '#/' + value }", route)
+            assertChartRendered(page, route)
+            waitForPainted(page, route)
+        }
+        for (route in listOf("graphic-stroke-animation", "graphic-wave-animation")) {
+            page.evaluate("(value) => { location.hash = '#/' + value }", route)
+            assertChartRendered(page, route)
+            waitForPainted(page, route)
+            val before = paintedFrame(page)
+            page.waitForTimeout(1500.0)
+            val after = paintedFrame(page)
+            assertTrue(before != after, "$route did not repaint its keyframe animation")
+        }
+        page.evaluate("(value) => { location.hash = '#/' + value }", "graph-force-dynamic")
+        assertChartRendered(page, "graph-force-dynamic")
+        waitForPainted(page, "graph-force-dynamic")
+        val first = paintedPixels(page)
+        page.waitForTimeout(2500.0)
+        val later = paintedPixels(page)
+        assertTrue(
+            later > first,
+            "graph-force-dynamic stopped adding nodes: $first painted pixels at first, $later after 2.5s",
+        )
+        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
+    }
+
+    /**
+     * Waits until the chart canvas of [route] holds a painted pixel.
      *
      * The pages that fetch their data set the option later, so a single sample would race with the
-     * request; the loop samples the alpha channel until something shows up.
+     * request; the loop samples the alpha channel until something shows up. The canvas is looked up
+     * inside the page of [route] for the same reason [assertChartRendered] does — the previous page is
+     * still mounted while the router has not reacted to the hash yet.
      */
     private fun waitForPainted(page: Page, route: String) {
         try {
             page.waitForFunction(
                 """
                 () => {
-                    const canvas = document.querySelector('.chart canvas');
+                    const canvas = document.querySelector(".page[data-route='$route'] .chart canvas");
                     if (!canvas) {
                         return false;
                     }
@@ -507,30 +568,44 @@ class DemoPageTest {
      *
      * A chart instance is created on mount and measures its container, so a rendered canvas with a
      * non-zero box is exactly the signal that the option survived the mount.
+     *
+     * With a [route] the canvas is looked up inside the page of that route: the shell swaps pages from
+     * the `hashchange` handler, which the browser dispatches only after the hash already changed, so an
+     * unscoped wait can pass on the page that is still mounted. Reading the box through the locator
+     * re-resolves the selector, so a null box means the swap landed in between and the check is retried
+     * until the box of the page that stayed is measured.
      */
     private fun assertChartRendered(page: Page, route: String? = null) {
         if (route != null) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)
         }
-        try {
-            page.waitForFunction(
-                """
-                () => {
-                    const canvas = document.querySelector('.chart canvas');
-                    if (canvas === null) {
-                        return false;
+        val selector = if (route == null) ".chart canvas" else ".page[data-route='$route'] .chart canvas"
+        var lastBox: BoundingBox? = null
+        repeat(3) {
+            try {
+                page.waitForFunction(
+                    """
+                    (scope) => {
+                        const canvas = document.querySelector(scope);
+                        if (canvas === null) {
+                            return false;
+                        }
+                        const box = canvas.getBoundingClientRect();
+                        return box.width > 0 && box.height > 0;
                     }
-                    const box = canvas.getBoundingClientRect();
-                    return box.width > 0 && box.height > 0;
-                }
-                """,
-            )
-        } catch (error: com.microsoft.playwright.TimeoutError) {
-            throw AssertionError("route $route did not mount a laid-out chart canvas", error)
+                    """,
+                    selector,
+                )
+            } catch (error: com.microsoft.playwright.TimeoutError) {
+                throw AssertionError("route $route did not mount a laid-out chart canvas", error)
+            }
+            val box = page.locator(selector).first().boundingBox()
+            if (box != null && box.width > 0 && box.height > 0) {
+                return
+            }
+            lastBox = box
         }
-        val canvas = page.locator(".chart canvas").first()
-        val box = canvas.boundingBox()
-        assertTrue(box != null && box.width > 0 && box.height > 0, "chart canvas box of $route: $box")
+        throw AssertionError("chart canvas box of $route stayed $lastBox after three samples")
     }
 
     private fun openPage(page: Page, hash: String = "") {

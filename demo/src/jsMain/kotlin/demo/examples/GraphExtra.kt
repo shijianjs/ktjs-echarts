@@ -2,6 +2,7 @@ package demo.examples
 
 import demo.CatalogEntry
 import demo.Groups
+import demo.ui.ChartHolder
 import demo.ui.loadJson
 import echarts.*
 import echarts.options.*
@@ -21,6 +22,10 @@ import zrender.ZRColor
  * a `cartesian2d` coordinate system by their value alone, so it lives here as the family's remaining
  * cartesian page. Its `Math.random()` magnitudes are replaced by [Lcg], which keeps the drawing
  * stable across visits.
+ *
+ * `graph-force-dynamic` grows a force layout one node at a time; it is the family's page that needs the
+ * chart's own box (`getWidth`/`getHeight` for the fixed center node), so it goes through
+ * `Category.interactive`.
  */
 
 private val graphExtra = Category(Groups.GRAPH, "examples/GraphExtra.kt")
@@ -189,4 +194,99 @@ val graphExtraEntries: List<CatalogEntry> =
                     )
             }
         },
+        graphExtra.interactive(
+            "graph-force-dynamic",
+            "动态增加图节点",
+            "Graph Dynamic",
+            summaryZh = "每 200ms 往力导向布局里加一个节点和一条边，节点从画布中心的那颗定住不动。",
+            summaryEn = "A force layout that gains a node and an edge every 200 ms, growing out of one fixed node at the center.",
+        ) { chart, holder ->
+            ForceField(chart, Lcg(20160613), holder).start()
+        },
     )
+
+/**
+ * The growing node and edge lists of `graph-force-dynamic`.
+ *
+ * The state belongs to one page view: the field is constructed with the chart and dropped when the page
+ * unmounts, so revisiting the route starts from the single fixed node again. Upstream picks the two
+ * ends of each new edge with `Math.random()`; a [Lcg] keeps the graph identical across visits, which is
+ * what lets the end-to-end suite compare frames.
+ *
+ * The node ids follow upstream literally, including the gap it produces: upstream reads the id as
+ * `data.length + ''` after the push, so the first generated node is `"2"` and `"0"`/`"1"` never appear.
+ * Here the same value is the list size plus one, taken before the add.
+ */
+private class ForceField(
+    private val chart: EChartsInstance,
+    private val random: Lcg,
+    private val holder: ChartHolder,
+) {
+    private val nodeList = mutableListOf<GraphDataItem>()
+    private val edgeList = mutableListOf<GraphEdgeItemOption>()
+
+    /** Publish the single fixed node and start the 200 ms growth loop. */
+    fun start() {
+        nodeList.add(
+            GraphDataItem(
+                unsafeJso<GraphNodeItemOption> {
+                    fixed = true
+                    x = chart.getWidth() / 2
+                    y = chart.getHeight() / 2
+                    symbolSize = SymbolSize(20.0)
+                    id = "-1"
+                },
+            ),
+        )
+        chart.setOption(
+            unsafeJso<EChartsOption> {
+                series =
+                    arrayOf<SeriesOption>(
+                        graphSeries {
+                            layout = GraphLayouts.force
+                            animation = false
+                            force =
+                                unsafeJso<GraphForceOption> {
+                                    repulsion = DoubleOrDoubleArray(100.0)
+                                    edgeLength = DoubleOrDoubleArray(5.0)
+                                }
+                            typedData = nodeList.toTypedArray()
+                            edges = arrayOf()
+                        },
+                    )
+            },
+        )
+        holder.setInterval({ tick() }, 200)
+    }
+
+    /** Add one node and, when the two ends differ, the edge between them. */
+    private fun tick() {
+        nodeList.add(
+            GraphDataItem(
+                unsafeJso<GraphNodeItemOption> { id = "${nodeList.size + 1}" },
+            ),
+        )
+        val source = round((nodeList.size - 1) * random.next())
+        val target = round((nodeList.size - 1) * random.next())
+        if (source != target) {
+            edgeList.add(
+                unsafeJso<GraphEdgeItemOption> {
+                    this.source = StringOrDouble(source)
+                    this.target = StringOrDouble(target)
+                },
+            )
+        }
+        chart.setOption(
+            unsafeJso<EChartsOption> {
+                series =
+                    one<SeriesOption>(
+                        unsafeJso<GraphSeriesOption> {
+                            roam = BooleanOrString(true)
+                            typedData = nodeList.toTypedArray()
+                            edges = edgeList.toTypedArray()
+                        },
+                    )
+            },
+        )
+    }
+}

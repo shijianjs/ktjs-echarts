@@ -10,6 +10,7 @@ import demo.examples.chordEntries
 import demo.examples.customEntries
 import demo.examples.customHexbinEntries
 import demo.examples.customExtraEntries
+import demo.examples.customLongTailEntries
 import demo.examples.datasetEntries
 import demo.examples.datasetExtraEntries
 import demo.examples.docExampleEntries
@@ -20,9 +21,11 @@ import demo.examples.gaugeEntries
 import demo.examples.geoExtraEntries
 import demo.examples.gaugeExtraEntries
 import demo.examples.gaugeLongTailEntries
+import demo.examples.graphicAnimationEntries
 import demo.examples.graphEntries
 import demo.examples.graphExtraEntries
 import demo.examples.heatmapEntries
+import demo.examples.heatmapLongTailEntries
 import demo.examples.lineEntries
 import demo.examples.linesExtraEntries
 import demo.examples.lineExtraEntries
@@ -82,6 +85,10 @@ object Groups {
     val CALENDAR = Group("calendar", "日历图", "Calendar")
     val MATRIX = Group("matrix", "矩阵坐标系", "Matrix")
     val CUSTOM = Group("custom", "自定义系列", "Custom series")
+
+    /** Elements drawn by the `graphic` component itself, animated through keyframes. */
+    val GRAPHIC = Group("graphic", "图形元素", "Graphic")
+
     val TREEMAP = Group("treemap", "矩形树图", "Treemap")
     val GRAPH = Group("graph", "关系图", "Graph")
     val CHORD = Group("chord", "和弦图", "Chord")
@@ -136,6 +143,7 @@ val catalog: List<CatalogEntry> =
         pictorialBarEntries,
         parallelEntries,
         heatmapEntries,
+        heatmapLongTailEntries,
         gaugeEntries,
         geoExtraEntries,
         gaugeExtraEntries,
@@ -154,6 +162,8 @@ val catalog: List<CatalogEntry> =
         customEntries,
         customHexbinEntries,
         customExtraEntries,
+        customLongTailEntries,
+        graphicAnimationEntries,
         graphEntries,
         graphExtraEntries,
         chordEntries,

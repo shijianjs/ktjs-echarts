@@ -90,7 +90,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **230 个示例**（覆盖 25 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **238 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -105,8 +105,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 | 家族 | 情况 |
 | --- | --- |
 | `bmap` / `echarts-gl` | 需要百度地图或 WebGL 渲染器，wrapper 没有覆盖 |
-| `graphic` | `EChartsOption.graphic` 已能表达组件与元素，但官方 `graphic` 家族的多数示例还配合
-  真实交互或外部素材，未成批移植 |
+| `graphic` | 关键帧动画那一档已落地（`examples/GraphicAnimations.kt`，见下），多数剩余示例还配合真实交互或外部素材 |
 | `visualMap` / `dataZoom` 单列家族 | 官方清单里这几条恰好都属其它被排除的类别；能力已由别的示例覆盖 |
 
 `lines` / `map` / `geo` 已经能用静态数据集（`lines-airline`、`custom-hexbin` 就是先例）：只要再拷
@@ -130,7 +129,32 @@ bar 家族的计算长尾在 `examples/BarLongTail.kt`：归一化堆叠（`bar-
 只有真正封住栈顶的柱子才带圆角的 `bar-stack-borderRadius`、透明占位柱顶起的 `bar-waterfall2`，
 以及带 `markPoint` / `markLine` 的 `bar1`。上游根 option 上的 `calculable: true` 是 ECharts 6
 已经不读的老字段，wrapper 里也没有对应声明，移植时直接去掉。
-`graph-grid`（笛卡尔坐标系上的 graph）补在 `examples/GraphExtra.kt`。
+`graph-grid`（笛卡尔坐标系上的 graph）补在 `examples/GraphExtra.kt`，同文件还有 `graph-force-dynamic`：
+节点与边靠 `ChartHolder.setInterval` 每 200ms 长出来，随机源换成种子固定的 `Lcg`，节点 id 从 `"2"`
+开始（上游就是这么漏掉 `"0"` / `"1"` 的，照抄）。
+
+`graphic` 家族的关键帧动画三页在 `examples/GraphicAnimations.kt`：描边文字（`graphic-stroke-animation`）、
+七条加载柱（`graphic-loading`）和噪点驱动的圆点波浪（`graphic-wave-animation`，要读 `chart.getWidth()`
+所以走 `Category.interactive`）。三页都不设定时器，动画交给元素的 `keyframeAnimation`；波浪页上游的
+`app.config` 面板只做「改参数再 `setOption`」，参数固定成上游默认值（含 `offsetY: 100`）后面板没有存在
+意义，直接去掉。上游的 `Math.random()` 噪声种子换成 `0.42`，否则每页每次刷新都是另一张画布，e2e 的
+帧比对就无从下手。noisejs 的那段 perlin 实现移植成 `examples/PerlinNoise.kt`，波浪动画与两张大数据
+热力图共用它。
+
+大数据热力图在 `examples/HeatmapLongTail.kt`：`heatmap-large`（continuous visualMap）和
+`heatmap-large-piecewise`（piecewise + `splitNumber: 8`）共用一份 201×101 的噪点场，靠
+`progressive: 1000` 与 `animation: false` 撑住两万格。上游的 y 轴只列 `0..99` 却采样到 `j = 100`，
+最后一行没有类目、永远不显示，这一点照原样保留并在文件头注明。
+
+`cycle-plot`（周期图）在 `examples/CustomLongTail.kt`：x 轴是月份，每年在自己的类目带里画一条折线，
+`renderItem` 用 `api.size([0, 0])[0]` 取带宽再按 `(year - rawData.length / 2)` 平移，均值系列画带中央的
+横线。上游 `rawData.length / 2` 是 `5.5`，Kotlin 侧要写成 `/ 2.0`，整数除法会把偏移算成 `5`。
+
+dataset 家族的 `dataset-link` 补在 `examples/DatasetExtra.kt`：它监听 `updateAxisPointer` 把饼图的
+`encode.value` 换成指针所在的年份，上游该事件的 payload 类型是 `any`，所以 `axesInfo[0].value` 只能在
+demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首帧之后挂上，这里直接 `chart.on(...)`。
+合并选项里上游写的是 `series: {id: 'pie', ...}` 对象形式，wrapper 的 `series` 只有数组形式，而 ECharts
+本来就按 `id` 合并，两者行为一致。
 
 `doc-example/` 里还没有移植的（上游 80 个文件 = 79 个 `.js` + 1 个 `.ts`、已按 `doc-example/` id 落地
 57 个、`bar-large` / `pie-highlight` 按家族 id 落地，剩 21 条）。按原因分类：
@@ -216,6 +240,10 @@ bar 家族的计算长尾在 `examples/BarLongTail.kt`：归一化堆叠（`bar-
   复用已有的 `CoordinateSystemDataCoord`；`doc-example/matrix-graph-box` 就靠
   `coordinateSystemUsage: 'box'` + `coord: [2, 1]` 把关系图画进矩阵的某个单元格，
   `MatrixAndGraphicOptionTest.graphSeriesCanUseTheMatrixAsABox` 覆盖这一写法。
+- `GraphicElement.keyframeAnimation`：上游 `ElementOption.keyframeAnimation` 与自定义系列的
+  `CustomElementProps` 共用同一个 `KeyframeAnimationOption`，wrapper 只在后者上声明了它，所以 graphic
+  家族那三页没法写动画。现已在 `GraphicElement` 上补 `ElementKeyframeAnimationOptionOrArray`，
+  由 `MatrixAndGraphicOptionTest.graphicElementLoopsThroughKeyframes` 断言回读与真实渲染。
 
 ## 兜底说明：图表与主题
 
@@ -232,3 +260,9 @@ ECharts 实例在**页面可见时才创建**（`ChartHolder.mount()`），换�
 并**逐页**打开目录里的每个示例，断言画布有实际尺寸且控制台无报错。早先按 1/6 抽样，结果漏掉了
 `themeRiver-lastfm`（表比专辑名长，构造 option 时越界）这类只在个别页出现的问题。`jvmTest` 本身被
 禁用，以免 `build` / `check` 依赖浏览器。
+
+`page(meta)` 会给页面根节点写上 `data-route`，`assertChartRendered` / `waitForPainted` 都按
+`.page[data-route='<id>'] .chart canvas` 找画布。原因是 `location.hash` 改完，`hashchange` 处理器还要
+晚一个任务才跑，shell 在此之前仍挂着上一页：不限定路由的话，等待会在上一页的画布上通过，随后节点被
+替换，`boundingBox()` 返回 `null`（这就是那版「chart canvas box of null」偶发失败的根因）。断言因此还
+带了重试：读不到尺寸就重新等一次，最多三次，只会让真正有问题的那页慢一点，不会放过它。

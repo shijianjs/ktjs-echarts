@@ -239,7 +239,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（230 个示例 / 25 个家族 + 文档示例组 + 总览页）
+### 已落地（238 个示例 / 26 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -273,6 +273,31 @@
 - 第九批（2 个）：`geo-graph`（瑞士 GeoJSON 上的 graph 系列，节点用经纬度定位）、
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
+
+- 第二十五批（8 个，graphic 关键帧动画 + 大数据热力图 + 联动/动态/周期图）：新建
+  `examples/GraphicAnimations.kt` 的 `graphic-stroke-animation`（文字描边靠 `lineDash` 与
+  `lineDashOffset` 的关键帧走完）、`graphic-loading`（7 条柱子错开 `delay: i * 200` 循环缩放）、
+  `graphic-wave-animation`（噪点场驱动的圆点阵，`delay = (rand - 1) * duration` 让波浪扫过画布，
+  上游 `app.config` 面板只用于重设同一份 option，参数固定成默认值后删掉），三页都不靠定时器；
+  `examples/PerlinNoise.kt` 把上游内联的 noisejs perlin 实现移植成 Kotlin（`PERMUTATION` 表与
+  `GRAD_X` / `GRAD_Y` 逐值核对过，`seed()` 的 `if (seed < 256) seed |= seed << 8` 等写法照抄），
+  波浪页与两张热力图共用，`Math.random()` 种子固定为 `0.42`；新建 `examples/HeatmapLongTail.kt` 的
+  `heatmap-large` / `heatmap-large-piecewise`（201×101 噪点场 + `progressive: 1000` +
+  `animation: false`，上游 y 轴只列 `0..99` 却采样到 `j = 100` 的毛病照原样保留）；
+  `examples/CustomLongTail.kt` 的 `cycle-plot`（月份为 x 轴、每年在自己的类目带里画折线，
+  `api.size([0,0])[0]` 取带宽后按 `(year - rawData.length / 2)` 平移——上游是 `5.5`，Kotlin 侧必须写
+  `/ 2.0`，整数除法会变成 `5`）；`examples/DatasetExtra.kt` 的 `dataset-link`（监听
+  `updateAxisPointer` 换饼图的 `encode.value`，上游该事件 payload 是 `any`，`axesInfo[0].value` 只能在
+  demo 侧 `js()` 取；上游的 `setTimeout` 包装去掉）；`examples/GraphExtra.kt` 的
+  `graph-force-dynamic`（`ChartHolder.setInterval` 每 200ms 长一个节点，随机源换成 `Lcg(20160613)`，
+  上游节点 id 从 `"2"` 开始、`"0"` / `"1"` 从未用到的写法照抄）。同批给 wrapper 的 `GraphicElement`
+  补上游 `ElementOption.keyframeAnimation`（此前只有自定义系列的 `CustomElementProps` 带它），
+  `MatrixAndGraphicOptionTest.graphicElementLoopsThroughKeyframes` 断言回读并真实渲染。
+  侧栏新增 `Groups.GRAPHIC`「图形元素」。e2e 新增「graphic 关键帧页会重绘、动态页会长大」用例；
+  同批改掉整站遍历的偶发 `chart canvas box of null`：`location.hash` 改了但 `hashchange` 处理器要晚
+  一个任务才跑，等待会先在上一页的画布上通过，随后节点被替换。`page(meta)` 因此给页面根节点写上
+  `data-route`，`assertChartRendered` / `waitForPainted` 都改成按 `.page[data-route='<id>'] .chart canvas`
+  定位，`assertChartRendered` 再加最多三次重试；调用点全部补上路由参数。
 
 - 第二十四批（8 个，计算出来的柱状图长尾 + bump/graphic/graph 页）：新建 `examples/BarLongTail.kt`
   的 `bar1`（上游同一份降雨/蒸发表画三种柱）、`bar-stack-normalization`（5 渠道 × 7 天，按天合计
@@ -391,16 +416,15 @@
      `line-pen`（需指针事件，按排除策略搁置）、
      `line-race`/`bar-race`/`bar-race-country`（竞速要先决定用哪个定时器与假数据）、
      `bar-drilldown`/`bar-multi-drilldown`（下钻要 `dispatchAction` 替代表演）、`bar-breaks-brush`、
-     `dataset-link`、`graph-force-dynamic`、`heatmap-large`
-     （`-piecewise`）、`parallel-aqi`、`watermark`、`cycle-plot`、`scatter-matrix`、
-     `graphic-stroke-animation`/`graphic-loading`/`graphic-wave-animation`、
+     `parallel-aqi`、`watermark`、`scatter-matrix`、
      `candlestick-sh`（26KB 内联表）/`candlestick-large`/`candlestick-brush`/`intraday-breaks-1|2`、
      `scatter-clustering`、`graph-force2` 之外的 graph 变体。
      line/area 家族的 `area-stack-gradient`、`area-pieces`、`area-time-axis`、`line-gradient`、
      `multiple-x-axis`、`dynamic-data2`、`line-easing` 已在第二十三批落地；bar 家族的 `bar1`、
      `bar-stack-normalization`/`-and-variation`、`bar-stack-borderRadius`、`bar-waterfall2` 与
      `bump-chart`、`line-graphic`、`graph-grid` 已在第二十四批落地（清单里的 `line-markarea`
-     上游并没有这个文件，是误记）。
+     上游并没有这个文件，是误记）；graphic 家族三页、`heatmap-large`/`-piecewise`、`dataset-link`、
+     `graph-force-dynamic`、`cycle-plot` 已在第二十五批落地。
      gauge 家族已 12/12 全，`radar` 家族已全，`treemap` 只剩需要外部数据的，`pie-pattern` 要贴图，
      `line-fisheye-lens` 靠 `getZr().on('mousemove')` 的真实指针序列，按排除策略不做。
 2. **需要先补 wrapper 建模**：

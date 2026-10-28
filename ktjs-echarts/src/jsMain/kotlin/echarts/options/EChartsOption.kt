@@ -1552,6 +1552,15 @@ external interface GraphicElement {
     /** Child elements of a `"group"` element. */
     var children: Array<GraphicElement>?
 
+    /**
+     * Keyframe animation of the element.
+     *
+     * Upstream `ElementOption.keyframeAnimation`, shared with the elements a custom series returns
+     * ([CustomElementProps.keyframeAnimation]); a `"group"` animates as a whole, so the graphic
+     * examples that loop a shape carry the timing on the group or on each child.
+     */
+    var keyframeAnimation: ElementKeyframeAnimationOptionOrArray?
+
     /** Callback invoked when the element is clicked. */
     var onclick: ((event: ZRElementEvent) -> Unit)?
 }

@@ -16,6 +16,7 @@ import kotlin.test.assertTrue
 import zrender.ElementTextConfig
 import zrender.RectLike
 import zrender.ZRColor
+import zrender.ZRLineType
 import zrender.ZRShapeProps
 import zrender.ZRStyleProps
 
@@ -206,6 +207,74 @@ class MatrixAndGraphicOptionTest {
                 },
             )
             assertTrue(chart.renderToCanvas().width > 0, "the element with attached text should render")
+        } finally {
+            destroyChart(chart, container)
+        }
+    }
+
+    /**
+     * A graphic element loops through keyframes on its own.
+     *
+     * Upstream declares `keyframeAnimation` on `ElementOption`, which every entry of the `graphic`
+     * component is, so the stroke and wave animations of the official examples need no extra element
+     * type. The keyframes reuse [AnimationKeyframe], the same shape a custom series element animates
+     * with.
+     */
+    @Test
+    fun graphicElementLoopsThroughKeyframes() {
+        val text =
+            unsafeJso<GraphicElement> {
+                type = "text"
+                left = StringOrDouble("center")
+                top = StringOrDouble("center")
+                style =
+                    unsafeJso<ZRStyleProps> {
+                        this.text = "ECharts"
+                        fill = ZRColor("transparent")
+                        stroke = ZRColor("#000")
+                        lineWidth = 1.0
+                        lineDash = ZRLineType(arrayOf(0.0, 200.0))
+                        lineDashOffset = 0.0
+                    }
+                keyframeAnimation =
+                    ElementKeyframeAnimationOptionOrArray(
+                        unsafeJso<ElementKeyframeAnimationOption> {
+                            duration = 3000.0
+                            loop = true
+                            keyframes =
+                                arrayOf(
+                                    unsafeJso<AnimationKeyframe> {
+                                        percent = 0.7
+                                        style = unsafeJso<ZRStyleProps> {
+                                            lineDash = ZRLineType(arrayOf(200.0, 0.0))
+                                            lineDashOffset = 200.0
+                                        }
+                                    },
+                                    unsafeJso<AnimationKeyframe> {
+                                        percent = 1.0
+                                        style = unsafeJso<ZRStyleProps> { fill = ZRColor("#000") }
+                                    },
+                                )
+                        },
+                    )
+            }
+
+        val animation = assertNotNull(text.keyframeAnimation).unsafeCast<ElementKeyframeAnimationOption>()
+        assertEquals(3000.0, animation.duration)
+        assertTrue(assertNotNull(animation.loop))
+        assertEquals(2, animation.keyframes!!.size)
+        assertEquals(0.7, animation.keyframes!![0].percent)
+        assertEquals(200.0, animation.keyframes!![0].style!!.lineDashOffset)
+        assertEquals("#000", animation.keyframes!![1].style!!.fill!!.unsafeCast<String>())
+
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(
+                unsafeJso<EChartsOption> {
+                    graphic = one(GraphicComponentLooseOption(text))
+                },
+            )
+            assertTrue(chart.renderToCanvas().width > 0, "the animated element should render")
         } finally {
             destroyChart(chart, container)
         }

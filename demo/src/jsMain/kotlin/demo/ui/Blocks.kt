@@ -90,6 +90,9 @@ fun page(meta: PageMeta): PageView {
     )
 
     val root = element(HtmlTagName.section, "page")
+    // Marks which route this page belongs to: the shell replaces pages asynchronously, so a consumer
+    // that waits for content needs to tell the incoming page from the one still mounted.
+    root.setAttribute("data-route", meta.id)
     root.append(heading(1, meta.title, "page__title"), paragraph(meta.summary, "page__summary"), links, body)
     return PageView(root, body, links)
 }

@@ -90,7 +90,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **265 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **267 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -236,6 +236,14 @@ demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首�
 包成颜色。富文本里只有图片没有文字的 tag（`{Sunny|}`）没有固有宽度，**必须给这个 tag 显式 `width`**，
 否则 pattern 被画进零宽盒子、看起来像图标丢了。
 
+candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candlestick-sh`（上证指数 2013 年
+上半年，88 行）与 `candlestick-sh-2015`（2015 全年，246 行）。表由一次性脚本转成 `OhlcDay` 数组，
+`calculateMA` 的等价实现按 `window` 内收盘价求和，前 `window - 1` 个点写 `OptionDataValue("-")`，
+均线才从窗口满格处开始画。2015 的上游表本身是「最后一天在前」再 `reverse()` 的，反过来的表格开头
+多出两行空记录（`+'' === 0`），它们最终是图表最左侧那两根零值蜡烛，顺序不能重排。
+`markPoint` 的 tooltip formatter 要 `unsafeCast<CallbackDataParams>` 才拿得到 `name`；`markLine` 的
+标签用 `MarkLineLabelOption`（`distance` 可以是二元数组，`LabelOption` 装不下）。
+
 ## 移植过程中修掉的 wrapper 缺口
 
 移植是 wrapper 的一次实测；以下缺口已在 `ktjs-echarts` 里补齐（见该模块的 KDoc）：
@@ -315,6 +323,13 @@ demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首�
   `CustomElementProps` 共用同一个 `KeyframeAnimationOption`，wrapper 只在后者上声明了它，所以 graphic
   家族那三页没法写动画。现已在 `GraphicElement` 上补 `ElementKeyframeAnimationOptionOrArray`，
   由 `MatrixAndGraphicOptionTest.graphicElementLoopsThroughKeyframes` 断言回读与真实渲染。
+- `CandlestickSeriesOption.typedItemStyle`：上游把 `itemStyle` 收窄成 `CandlestickItemStyleOption`
+  （多出 `color0` / `borderColor0` / `borderColorDoji`），基接口上的 `ItemStyleOption` 看不到这些字段。
+  按 `typedData` 的先例加同名 `@JsName("itemStyle")` 视图，两个属性指向同一个对象。
+- mark 数据项与 mark 组件上的 `emphasis` / `blur` / `select`：上游 `MarkPointDataItemOption` 等继承
+  `StatesOptionMixin`，`MarkPointOption` 等也带自己的状态样式，wrapper 之前一个都没声明。新增
+  `MarkStatesOption` 并混入三组 mark 数据项与三个 mark 组件，
+  `SeriesDataItemTest.marksCarryTheGenericStates` 断言回读。
 
 ## 兜底说明：图表与主题
 

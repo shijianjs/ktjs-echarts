@@ -659,7 +659,7 @@ external interface MarkOption {
 /**
  * Mark point configuration.
  */
-external interface MarkPointOption : MarkOption, MarkPointStateOption, SymbolOptionMixin {
+external interface MarkPointOption : MarkOption, MarkPointStateOption, MarkStatesOption, SymbolOptionMixin {
     /** Position and style of every mark point. */
     var data: Array<MarkPointDataItemOption>?
 }
@@ -671,7 +671,7 @@ external interface MarkPointOption : MarkOption, MarkPointStateOption, SymbolOpt
  * also accepts a `[startSymbol, endSymbol]` pair and `symbolSize` / `symbolRotate` also accept one
  * value per end.
  */
-external interface MarkLineOption : MarkOption, MarkLineStateOption {
+external interface MarkLineOption : MarkOption, MarkLineStateOption, MarkStatesOption {
     /** Symbol of both ends, or one per end. */
     var symbol: StringOrStringArray?
 
@@ -697,7 +697,7 @@ external interface MarkLineOption : MarkOption, MarkLineStateOption {
  * Upstream has no symbol members on a mark area, so the label and the item style come from
  * [MarkAreaStateOption].
  */
-external interface MarkAreaOption : MarkOption, MarkAreaStateOption {
+external interface MarkAreaOption : MarkOption, MarkAreaStateOption, MarkStatesOption {
     /**
      * Position of every mark area: a single definition `{ xAxis: 0 }` or a pair of them
      * `[{ coord: [0, 0] }, { coord: [1, 1] }]`.

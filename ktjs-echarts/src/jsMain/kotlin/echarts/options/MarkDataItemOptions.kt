@@ -88,7 +88,7 @@ external interface MarkPointStateOption {
 /**
  * One mark point of [MarkPointOption].
  */
-external interface MarkPointDataItemOption : MarkPointStateOption, MarkerPositionOption, SymbolOptionMixin {
+external interface MarkPointDataItemOption : MarkPointStateOption, MarkStatesOption, MarkerPositionOption, SymbolOptionMixin {
     /** Name of the mark point; required upstream. */
     var name: String
 }
@@ -126,9 +126,27 @@ external interface MarkLineLabelOption : LabelOption {
 }
 
 /**
+ * States of one mark, from the upstream `StatesOptionMixin<MarkPointStateOption, ...>`.
+ *
+ * Every mark option (point, line, area) also accepts these states; the state styles themselves are
+ * the generic [EmphasisOption] / [BlurOption] / [SelectOption], which is what upstream intersects
+ * with the mark's own state option.
+ */
+external interface MarkStatesOption {
+    /** Emphasis (hover) state of the mark. */
+    var emphasis: EmphasisOption?
+
+    /** Blur (non-focused) state of the mark. */
+    var blur: BlurOption?
+
+    /** Select state of the mark. */
+    var select: SelectOption?
+}
+
+/**
  * Members shared by the two shapes of a mark line definition.
  */
-external interface MarkLineDataItemOptionBase : MarkLineStateOption {
+external interface MarkLineDataItemOptionBase : MarkLineStateOption, MarkStatesOption {
     /** Name of the mark line. */
     var name: String?
 }
@@ -210,7 +228,7 @@ external interface MarkAreaStateOption {
 /**
  * Members shared by the two shapes of a mark area definition.
  */
-external interface MarkAreaDataItemOptionBase : MarkAreaStateOption {
+external interface MarkAreaDataItemOptionBase : MarkAreaStateOption, MarkStatesOption {
     /** Name of the mark area. */
     var name: String?
 }

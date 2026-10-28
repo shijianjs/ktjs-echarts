@@ -12,8 +12,8 @@ import zrender.ZRColor
 import zrender.ZRLineTypes
 
 /*
- * The scatter pages of the long tail: the two label-alignment variants, the effect scatter pair, the
- * Anscombe quartet and the axis-aligned line of `scatter-matrix`.
+ * The scatter pages of the long tail: the two label-alignment variants, the effect scatter pair and
+ * the Anscombe quartet.
  *
  * `scatter-label-align-right` reads `myChart.getWidth()` inside its `labelLayout` callback, so it is
  * an `interactive` example like the upstream page; the callback is wrapped in the wrapper's
@@ -309,10 +309,6 @@ private fun quartetMarkLine(): MarkLineOption =
             )
     }
 
-/** One cell of `scatter-matrix` where the line is `y = x`; drawn with a scatter series of two points. */
-private fun matrixLine(level: Double): Array<ScatterDataItem?> =
-    points(doubleArrayOf(0.0, 0.0), doubleArrayOf(level, level))
-
 val scatterLongTailEntries: List<CatalogEntry> =
     listOf(
         scatterLongTail.chart(
@@ -447,50 +443,6 @@ val scatterLongTailEntries: List<CatalogEntry> =
                             markLine = quartetMarkLine()
                         }
                     }
-            }
-        },
-        scatterLongTail.chart(
-            "scatter-matrix",
-            "矩阵坐标系上的散点",
-            "Scatter on Matrix",
-            "把散点放进矩阵坐标系的单元格里，`coord` 选出单元格，`symbolSize` 收成很小的点，" +
-                "像是一张相关性矩阵。",
-            "Scatter series laid out over a matrix coordinate system; `coord` selects the cell and a " +
-                "tiny `symbolSize` makes it read like a correlation matrix.",
-        ) {
-            unsafeJso<EChartsOption> {
-                matrix =
-                    one(
-                        unsafeJso<MatrixOption> {
-                            x =
-                                unsafeJso<MatrixDimensionOption> {
-                                    data = names("A", "B", "C")
-                                }
-                            y =
-                                unsafeJso<MatrixDimensionOption> {
-                                    data = names("A", "B", "C")
-                                }
-                            body =
-                                unsafeJso<MatrixBodyOption> {
-                                    itemStyle = unsafeJso<ItemStyleOption> { borderWidth = 1.0 }
-                                }
-                        },
-                    )
-                series =
-                    Array(3) { row ->
-                        Array(3) { column ->
-                            scatterSeries {
-                                coordinateSystem = "matrix"
-                                coordinateSystemUsage = CoordinateSystemUsages.`data`
-                                coord =
-                                    CoordinateSystemDataCoord(
-                                        arrayOf(OptionDataValue(column.toDouble()), OptionDataValue(row.toDouble())),
-                                    )
-                                symbolSize = SymbolSize(3.0)
-                                typedData = matrixLine(if (row == column) 10.0 else 2.0)
-                            }
-                        }
-                    }.flatMap { it.asIterable() }.toTypedArray()
             }
         },
     )

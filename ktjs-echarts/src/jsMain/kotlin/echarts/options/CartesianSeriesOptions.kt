@@ -478,6 +478,16 @@ external interface CandlestickSeriesOption : SeriesOption, SeriesOnCartesianOpti
     var clip: Boolean?
 
     /**
+     * Typed view of [SeriesOption.itemStyle] with the colors of a falling candle.
+     *
+     * Upstream narrows `CandlestickSeriesOption.itemStyle` to `CandlestickItemStyleOption`, which adds
+     * `color0` / `borderColor0` / `borderColorDoji`; both properties address the same JavaScript
+     * property, like [typedData].
+     */
+    @JsName("itemStyle")
+    var typedItemStyle: CandlestickItemStyleOption?
+
+    /**
      * Typed view of [SeriesOption.data] with the item type of a candlestick series.
      *
      * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.

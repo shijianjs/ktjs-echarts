@@ -239,7 +239,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（262 个示例 / 26 个家族 + 文档示例组 + 总览页）
+### 已落地（267 个示例 / 26 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -296,6 +296,14 @@
   轴标签 formatter 的第三个参数（断口信息）wrapper 没建模，用 `axisLabel(::fn)` 在 JS 侧拓宽成
   三参再收回单参。踩到的坑：第一版夜间跨天算错、`time` 不前进，页面直接卡死（Chromium
   `Page crashed`），改成按「天」拆循环。
+- 第三十批（2 个，上证指数日 K 长表）：新建 `examples/CandlestickLongTail.kt` 的 `candlestick-sh`
+  （2013 上半年 88 行日 K，四条均线 + 最高/最低/均价标记点 + 两条收盘极值标记线 + 双轴水印网格）与
+  `candlestick-sh-2015`（2015 全年 246 行，上游表按倒序存储后再 `reverse()`，开头两行空记录落成两根
+  零值蜡烛；自定义滑块把手、十字准星 `#376df4`、`yAxis` 从 0 起）。数据由一次性脚本转成 `OhlcDay`
+  数组，`calculateMA` 用窗口内收盘价求和实现。同批补 wrapper 的
+  `CandlestickSeriesOption.typedItemStyle`（上游收窄的 `itemStyle` 视图）与 mark 级的
+  `MarkStatesOption`（`emphasis` / `blur` / `select`），各补一条断言。顺带删掉 `ScatterLongTail.kt` 里
+  与官方 `scatter-matrix` 同 id 的自造页（目录里的两条卡片会打开同一页）。
 - 第二十九批（3 个，多层下钻 + 议会图过渡 + 日历散点）：新建 `examples/BarDrilldown.kt` 的
   `bar-multi-drilldown`（十二层数据表，`encode.itemGroupId` / `itemChildGroupId` 配合
   `universalTransition` 做形变；上游把当前层写在 `myChart.getOption().id` 上，wrapper 不建模这个
@@ -457,12 +465,11 @@
 1. **几乎零成本（option 组合、内联表）**：
    `intraday-breaks-*` / `parallel-aqi` / `scatter-matrix` / `pie-parliament-transition` /
    `calendar-effectscatter` / `bar-multi-drilldown` 已完成。
-2. **要写数据转换脚本**：`candlestick-sh` / `candlestick-sh-2015`（9KB / 26KB 内联表，照
-   `parallel-aqi` 的脚本思路生成 `doubleArrayOf` 行）、`grid-multiple` / `area-rainfall`
-   （各 85KB，先看要不要落成资源文件）、`matrix-stock` / `matrix-mbti` /
-   `matrix-periodic-table`、`scatter-world-population`、`scatter-weight`、`pictorialBar-vehicle`
-   / `-body-fill` / `-velocity` / `-bar-transition`（`path://` 面板图，先例是
-   `examples/GaugeLongTail.kt`）。
+2. **要写数据转换脚本**：`grid-multiple` / `area-rainfall`（各 85KB，先看要不要落成资源文件）、
+   `matrix-stock` / `matrix-mbti` / `matrix-periodic-table`、`scatter-world-population`、
+   `scatter-weight`、`pictorialBar-vehicle` / `-body-fill` / `-velocity` / `-bar-transition`
+   （`path://` 面板图，先例是 `examples/GaugeLongTail.kt`）。`candlestick-sh` /
+   `candlestick-sh-2015` 已在第三十批完成。
 3. **要补交互表演方式**：`bar-brush` / `bar-breaks-brush`（`brushSelected` + `dispatchAction`）、
    `bar-race` 已完成；`line-pen` / `line-draggable` / `candlestick-touch` 之类真实键鼠序列按
    排除策略不做；`line-fisheye-lens` 靠 `getZr().on('mousemove')`，同样不做。
@@ -533,9 +540,8 @@
 ## 待办
 
 - 类型建模：暂无未完成项（见上面各轮）。
-- 示例站（demo）：见「示例站（demo）移植进度」一节。第二十九批（3 个，`bar-multi-drilldown`、
-  `pie-parliament-transition`、`calendar-effectscatter`）之后，「下一批」第一档已经清空，下一批按
-  第二档做 `candlestick-sh` / `candlestick-sh-2015`（先写内联表生成脚本）、`grid-multiple` /
-  `area-rainfall`、`matrix-*` 或 `pictorialBar` 的 `path://` 面板图；`custom-calendar-icon` 因上游
-  源码只剩缩略图，不移植。
-- 提交：全部已推送到 `origin/main`（最新：第二十九批 3 个示例）。
+- 示例站（demo）：见「示例站（demo）移植进度」一节。第三十批（2 个，`candlestick-sh`、
+  `candlestick-sh-2015`）之后，下一批按第二档做 `grid-multiple` / `area-rainfall`（先定要不要落成
+  资源文件）、`matrix-*`、`scatter-world-population` / `scatter-weight` 或 `pictorialBar` 的
+  `path://` 面板图；`custom-calendar-icon` 因上游源码只剩缩略图，不移植。
+- 提交：全部已推送到 `origin/main`（最新：第三十批 2 个示例）。

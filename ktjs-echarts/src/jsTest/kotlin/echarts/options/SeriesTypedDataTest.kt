@@ -172,4 +172,29 @@ class SeriesTypedDataTest {
             destroyChart(chart, container)
         }
     }
+
+    @Test
+    fun theCandlestickItemStyleViewSharesTheBaseProperty() {
+        // Upstream narrows `CandlestickSeriesOption.itemStyle` to the item style that adds the
+        // falling colors; `typedItemStyle` is that view, mapped to the same JavaScript property.
+        val series = candlestickSeries {
+            typedItemStyle = unsafeJso<CandlestickItemStyleOption> {
+                color = ZRColor("#ec0000")
+                color0 = ZRColor("#00da3c")
+                borderColor = ZRColor("#8A0000")
+                borderColor0 = ZRColor("#008F28")
+                borderColorDoji = ZRColor("#000")
+            }
+        }
+
+        assertEquals("#00da3c", series.typedItemStyle!!.color0!!.unsafeCast<String>())
+        assertTrue(series.typedItemStyle === series.itemStyle, "both properties address one object")
+
+        series.itemStyle = unsafeJso<ItemStyleOption> { color = ZRColor("#123456") }
+        assertEquals(
+            "#123456",
+            series.typedItemStyle!!.color!!.unsafeCast<String>(),
+            "writing through the base view is visible on the typed view",
+        )
+    }
 }

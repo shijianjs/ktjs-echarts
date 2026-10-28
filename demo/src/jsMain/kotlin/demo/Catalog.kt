@@ -8,6 +8,7 @@ import demo.examples.boxplotEntries
 import demo.examples.calendarEntries
 import demo.examples.canvasGraphicsEntries
 import demo.examples.candlestickEntries
+import demo.examples.candlestickLongTailEntries
 import demo.examples.chordEntries
 import demo.examples.customEntries
 import demo.examples.customHexbinEntries
@@ -158,6 +159,7 @@ val catalog: List<CatalogEntry> =
         scatterLongTailEntries,
         scatterMatrixEntries,
         candlestickEntries,
+        candlestickLongTailEntries,
         boxplotEntries,
         pictorialBarEntries,
         parallelEntries,

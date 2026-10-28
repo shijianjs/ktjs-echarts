@@ -17,8 +17,9 @@ import js.objects.unsafeJso
 /*
  * Candlestick examples ported from `public/examples/ts/candlestick-*.ts` of apache/echarts-examples.
  *
- * `candlestick-sh`, `candlestick-sh-2015` and `candlestick-touch` are not ported: the first two read
- * a 26 KB table, the third one needs a real touch pointer.
+ * `candlestick-sh` and `candlestick-sh-2015` carry 88 and 246 rows of inline data, so they live in
+ * `CandlestickLongTail.kt` with the rest of the transcribed tables. `candlestick-touch` is not
+ * ported: it needs a real touch pointer.
  */
 
 private val candlestick = Category(Groups.CANDLESTICK, "examples/Candlestick.kt")

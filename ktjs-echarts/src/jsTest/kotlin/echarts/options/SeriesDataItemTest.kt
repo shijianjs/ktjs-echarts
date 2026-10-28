@@ -4,6 +4,7 @@ import echarts.AnimationTypes
 import echarts.ClipWindows
 import echarts.ColorMappingBys
 import echarts.EChartsInstance
+import echarts.EmphasisFocuses
 import echarts.FocusNodeAdjacencies
 import echarts.MarkerRelativeTos
 import echarts.MarkerStatisticTypes
@@ -100,6 +101,41 @@ class SeriesDataItemTest {
         val pair = mark.data!![1].unsafeCast<Array<MarkLine2DDataItemDimOption>>()
         assertEquals(2, pair.size)
         assertEquals(0.0, pair[0].coord!![0].unsafeCast<Double>())
+    }
+
+    @Test
+    fun marksCarryTheGenericStates() {
+        // Upstream mixes `StatesOptionMixin` into every mark option and every mark data item, so the
+        // emphasis / blur / select states must be writable on both levels.
+        val line = unsafeJso<MarkLineOption> {
+            emphasis = unsafeJso<EmphasisOption> { focus = EmphasisFocuses.self }
+            data =
+                arrayOf(
+                    MarkLineDataItem(
+                        unsafeJso<MarkLine1DDataItemOption> {
+                            type = MarkerStatisticTypes.min
+                            emphasis = unsafeJso<EmphasisOption> { label = unsafeJso<LabelOption> { show = false } }
+                            blur = unsafeJso<BlurOption> { label = unsafeJso<LabelOption> { show = false } }
+                            select = unsafeJso<SelectOption> { disabled = true }
+                        },
+                    ),
+                )
+        }
+
+        assertEquals("self", line.emphasis!!.focus!!.unsafeCast<String>())
+        val item = line.data!![0].unsafeCast<MarkLine1DDataItemOption>()
+        assertFalse(item.emphasis!!.label!!.show!!)
+        assertFalse(item.blur!!.label!!.show!!)
+        assertTrue(item.select!!.disabled!!)
+
+        val point =
+            unsafeJso<MarkPointOption> {
+                data = arrayOf(unsafeJso<MarkPointDataItemOption> { name = "max"; emphasis = unsafeJso<EmphasisOption> {} })
+            }
+        assertTrue(point.data!![0].emphasis != null, "a mark point carries the same states")
+
+        val area = unsafeJso<MarkAreaOption> { select = unsafeJso<SelectOption> { disabled = true } }
+        assertTrue(area.select!!.disabled!!, "a mark area carries them on the option level too")
     }
 
     @Test

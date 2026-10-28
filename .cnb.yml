@@ -108,13 +108,15 @@ main:
             echo "构建 $IMAGE"
             docker build -f .cnb/npc-env.Dockerfile -t "$IMAGE" .
             docker push "$IMAGE"
-    - *sync-github
+    - stages:
+        - *sync-github
 
 # 除 main 之外的分支（NPC 推的 npc/<时间戳> 走这里）。
 # `$` 是兜底匹配，只接住没被上面 glob 匹配到的分支。
 $:
   push:
-    - *sync-github
+    - stages:
+        - *sync-github
 
   # 两个事件必须都配：CNB 按事件独立合并配置，只配 issue 的话 PR 里 @ 仍走系统默认。
   issue.comment@npc: *npc-pipeline

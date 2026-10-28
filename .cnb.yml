@@ -57,9 +57,11 @@ $:
       stages:
         - name: 准备上游参考仓库
           # 顺手固定 git 身份，让 GitHub 上的 AI 提交和人工提交能区分开。
+          # setup-gradle 要在任何 gradle 命令之前跑，它装 Maven 镜像的 init 脚本。
           script: |
             git config user.name "cnb-npc"
             git config user.email "npc@cnb.cool"
+            bash .cnb/scripts/setup-gradle.sh
             bash .cnb/scripts/prepare-refs.sh
 
         - name: 预热 Gradle 依赖
@@ -103,9 +105,11 @@ $:
       stages:
         - name: 准备上游参考仓库
           # 顺手固定 git 身份，让 GitHub 上的 AI 提交和人工提交能区分开。
+          # setup-gradle 要在任何 gradle 命令之前跑，它装 Maven 镜像的 init 脚本。
           script: |
             git config user.name "cnb-npc"
             git config user.email "npc@cnb.cool"
+            bash .cnb/scripts/setup-gradle.sh
             bash .cnb/scripts/prepare-refs.sh
 
         - name: 预热 Gradle 依赖

@@ -1,0 +1,39 @@
+// 只在 CNB 构建环境生效：由 .cnb/scripts/setup-gradle.sh 复制到
+// ~/.gradle/init.d/，本机开发不会加载它。
+//
+// 为什么要镜像：Maven Central 对 CNB 的共享出口 IP 限流，首次解析依赖
+// 会拿到 `429 Too Many Requests`（实测 kotlin-scripting-compiler-embeddable
+// 2.4.21 命中过）。重跑就好，但 NPC 会话里没人替它重跑。
+//
+// 为什么是腾讯云：CNB 跑在腾讯云上，同网访问比阿里云快一截
+// （实测 mirrors.tencent.com 146ms / maven.aliyun.com 165ms /
+// mirrors.cloud.tencent.com 611ms）。
+//
+// 为什么必须保留 Central：kotlin-wrappers 在镜像上只有 pom，
+// 没有 .module 和 .klib（实测 kotlin-browser 2026.10.1）。项目的
+// settings.gradle.kts 已经用 exclusiveContent 把它钉到 Central，
+// 那个仓库对象不受这里影响——这里只把镜像插到普通仓库列表最前面。
+
+def MIRROR = 'https://mirrors.tencent.com/nexus/repository/maven-public/'
+
+// RepositoryHandler 按声明顺序查询，镜像加在末尾等于没用，必须插到 0 位。
+def prependMirror = { repos ->
+    def repo = repos.maven { url = MIRROR }
+    repos.remove(repo)
+    repos.add(0, repo)
+}
+
+settingsEvaluated { settings ->
+    try {
+        prependMirror(settings.pluginManagement.repositories)
+        logger.lifecycle("[mirror] pluginManagement 已前置 ${MIRROR}")
+    } catch (Throwable t) {
+        logger.lifecycle("[mirror] pluginManagement 注入跳过：${t.message}")
+    }
+    try {
+        prependMirror(settings.dependencyResolutionManagement.repositories)
+        logger.lifecycle("[mirror] dependencyResolutionManagement 已前置 ${MIRROR}")
+    } catch (Throwable t) {
+        logger.lifecycle("[mirror] dependencyResolutionManagement 注入跳过：${t.message}")
+    }
+}

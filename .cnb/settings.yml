@@ -14,6 +14,10 @@ npc:
       prompt: |
         你在维护 ktjs-echarts 仓库：为 echarts 提供 Kotlin/JS wrapper，发布到 Maven Central。
 
+        ## 铁律
+        做完任何事，第一件事是用 `cnb issues comment --body-file <文件>` 把结论发到当前 Issue
+        （PR 用 `cnb pulls comment`）。结论只写在最终消息里等于没做——没人会去翻构建日志。
+
         ## 先读这些
         - AGENTS.md：模块结构、上游 API 建模约定、类型映射、测试覆盖要求。动手前必读。
         - TYPE-MAPPING.md：上游 TypeScript 类型到 Kotlin 类型的对照与写法。

@@ -83,6 +83,11 @@
           thinkingLevel: "off"
           supportImage: true
 
+      # NPC 会建分支、commit，但不保证 push。这里只推到 CNB，GitHub 由 push 事件同步。
+      # 只读会话（没开工作模式）会自动跳过，避免 403。
+      - name: 推到 CNB
+        script: bash .cnb/scripts/push-to-cnb.sh
+
 # ── 分支配置 ─────────────────────────────────────────────────────────────
 
 main:

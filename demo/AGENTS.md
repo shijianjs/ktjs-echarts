@@ -73,7 +73,9 @@ demo/src/jvmTest/kotlin/demo/e2e/
 - 数据没有静态类型，用示例文件里的 `external interface` 描述用到的字段，再 `unsafeCast` 一次；不要把
   整个 JSON 当 `dynamic` 传下去。
 - e2e 里这些页面要等像素（`waitForPainted`），不能只在路由切换后采样一次。
-- 文件名必须与上游一致，方便把示例源码和数据集对上。
+- 文件名必须与上游一致，方便把示例源码和数据集对上。上游把数据内联在示例源码里、体量又太大时
+  （`grid-multiple` / `area-rainfall` 各 3079 点），可以由一次性脚本拆成 `data/<name>.json`，
+  在 `SOURCE.md` 里把上游目录一栏标成 derived 并写清是从哪个示例拆出来的。
 
 ## 选例范围
 
@@ -90,7 +92,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **272 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **275 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲

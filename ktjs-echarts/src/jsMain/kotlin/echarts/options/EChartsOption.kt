@@ -381,6 +381,9 @@ external interface DataZoomOption : BoxLayoutOptionMixin {
     /** Maximum span of the window. */
     var maxValueSpan: Double?
 
+    /** Whether the chart updates while the window is dragged or scrolled. */
+    var realtime: Boolean?
+
     /** Orientation of the slider: `"horizontal"` or `"vertical"`. */
     var orient: Orient?
 

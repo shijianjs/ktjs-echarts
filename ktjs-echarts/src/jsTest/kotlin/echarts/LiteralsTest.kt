@@ -694,6 +694,7 @@ class LiteralsTest {
                     type = DataZoomTypes.inside
                     rangeMode = arrayOf(DataZoomRangeModes.value, DataZoomRangeModes.percent)
                     showDataShadow = BooleanOrString("auto")
+                    realtime = true
                 },
             )
             visualMap = one(
@@ -731,6 +732,7 @@ class LiteralsTest {
             assertEquals(AxisNameLocations.middle, stored.xAxis!![0].nameLocation)
             assertEquals(DataZoomRangeModes.value, stored.dataZoom!![0].rangeMode!![0])
             assertEquals(DataZoomRangeModes.percent, stored.dataZoom!![0].rangeMode!![1])
+            assertEquals(true, stored.dataZoom!![0].realtime)
             assertEquals(HorizontalAligns.right, stored.visualMap!![0].align)
             assertEquals(SelectionModes.multiple, stored.visualMap!![0].selectedMode)
             val line = stored.series!![0].unsafeCast<LineSeriesOption>()

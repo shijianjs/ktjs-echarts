@@ -239,7 +239,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（272 个示例 / 26 个家族 + 文档示例组 + 总览页）
+### 已落地（275 个示例 / 26 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -274,6 +274,16 @@
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
 
+- 第三十二批（3 个，大数据量城市雨量 + 世界人口地图）：新建 `examples/LineRainfall.kt` 的
+  `grid-multiple`（上下两个 grid 共用 3079 个逐小时刻度，上格蒸发量 0–500，下格雨量 y 轴
+  `inverse`，两轴 `axisPointer.link` 联动，dataZoom 同时管两条 x 轴）与 `area-rainfall`
+  （双 y 轴面积图，九月两段降雨用 `markArea` 标出、`alignTicks` 让两个刻度自动对齐）；
+  两页数据体量太大，由一次性脚本从上游 `.ts` 里拆成 `resources/data/rainfall-evaporation.json`
+  与 `rainfall-flow.json`（`SOURCE.md` 标为 derived）。新建 `examples/ScatterWorld.kt` 的
+  `scatter-world-population`（169 个国家按 2011 年人口映射气泡直径，`geo` + `scatter` 共用
+  `world.json`，隐藏 visualMap 只管 `symbolSize`），国家表由脚本生成为 `WorldPopulationData.kt`。
+  顺带补上 wrapper 里 `DataZoomOption` 缺的三个上游字段（`maxValueSpan` / `realtime` / `orient`）
+  并加进 `LiteralsTest`。
 - 第三十一批（5 个，象形柱图 path:// 面板图 + 身高体重分布）：新建
   `examples/PictorialBarLongTail.kt` 的 `pictorialBar-vehicle`（驯鹿 / 轮船 / 飞机 / 高铁 / 汽车的
   `path://` 剪影按 `symbolRepeat` 沿柱子平铺，2015/2016 两组并列）、`pictorialBar-body-fill`
@@ -478,11 +488,11 @@
 1. **几乎零成本（option 组合、内联表）**：
    `intraday-breaks-*` / `parallel-aqi` / `scatter-matrix` / `pie-parliament-transition` /
    `calendar-effectscatter` / `bar-multi-drilldown` 已完成。
-2. **要写数据转换脚本**：`grid-multiple` / `area-rainfall`（各 85KB，先看要不要落成资源文件）、
-   `matrix-stock` / `matrix-mbti` / `matrix-periodic-table`、`scatter-world-population`；
-   `scatter-weight`、`pictorialBar-vehicle` / `-body-fill` / `-velocity` / `-bar-transition`
-   （`path://` 面板图，先例是 `examples/GaugeLongTail.kt`）已在第三十一批完成。`candlestick-sh` /
-   `candlestick-sh-2015` 已在第三十批完成。
+2. **要写数据转换脚本**：`matrix-stock` / `matrix-mbti` / `matrix-periodic-table`；
+   `grid-multiple` / `area-rainfall`（各 85KB，已拆成资源文件）、`scatter-world-population`
+   已在第三十二批完成；`scatter-weight`、`pictorialBar-vehicle` / `-body-fill` / `-velocity` /
+   `-bar-transition`（`path://` 面板图，先例是 `examples/GaugeLongTail.kt`）已在第三十一批完成。
+   `candlestick-sh` / `candlestick-sh-2015` 已在第三十批完成。
 3. **要补交互表演方式**：`bar-brush` / `bar-breaks-brush`（`brushSelected` + `dispatchAction`）、
    `bar-race` 已完成；`line-pen` / `line-draggable` / `candlestick-touch` 之类真实键鼠序列按
    排除策略不做；`line-fisheye-lens` 靠 `getZr().on('mousemove')`，同样不做。
@@ -553,10 +563,11 @@
 ## 待办
 
 - 类型建模：暂无未完成项（见上面各轮）。
-- 示例站（demo）：见「示例站（demo）移植进度」一节。第三十一批（5 个，`pictorialBar` 的
-  `path://` 四页与 `scatter-weight`）之后，下一批按第二档做 `grid-multiple` / `area-rainfall`
-  （先定要不要落成资源文件）、`matrix-stock` / `matrix-mbti` / `matrix-periodic-table`、
-  `scatter-world-population`；第三档的 `bar-brush` / `bar-breaks-brush` 可做，但上游没给
-  `brushSelected` 的 payload 类型，事件内容要按 `batch[].selected` 在例子侧强转再读；
-  `custom-calendar-icon` 因上游源码只剩缩略图，不移植。
-- 提交：全部已推送到 `origin/main`（最新：第三十一批 5 个示例）。
+- 示例站（demo）：见「示例站（demo）移植进度」一节。第三十二批（`grid-multiple` / `area-rainfall`
+  两个大数据量雨量页 + `scatter-world-population` 世界人口地图）之后，第二档只剩
+  `matrix-stock` / `matrix-mbti` / `matrix-periodic-table`；其中 `matrix-periodic-table` 用
+  `custom` 系列的 `renderItem` 排版，需要 wrapper 补 `renderItem` 的坐标换算（`api.coord` 已有，
+  缺 `layout`），另外两页要 decals / 点击切换矩阵，先按单个页面试做；第三档的
+  `bar-brush` / `bar-breaks-brush` 可做，但上游没给 `brushSelected` 的 payload 类型，事件内容要按
+  `batch[].selected` 在例子侧强转再读；`custom-calendar-icon` 因上游源码只剩缩略图，不移植。
+- 提交：全部已推送到 `origin/main`（最新：第三十二批 3 个示例）。

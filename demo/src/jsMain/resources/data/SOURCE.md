@@ -19,7 +19,7 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `flights.json` | `data/` | `lines-airline` |
 | `nba-court.json` | `data/` | `custom-hexbin` |
 | `kawhi-leonard-16-17-regular.json` | `data/` | `custom-hexbin` |
-| `world.json` | `geo/` | `lines-airline`, `custom-wind` |
+| `world.json` | `geo/` | `lines-airline`, `custom-wind`, `scatter-world-population` |
 | `winds.json` | `data-gl/asset/data/` | `custom-wind` |
 | `iceland.geo.json` | `geo/` | `geo-choropleth-scatter` |
 | `ch.geo.json` | `geo/` | `geo-graph` |
@@ -38,9 +38,16 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `product.json` | `data/` | `sankey-levels` |
 | `confidence-band.json` | `data/` | `confidence-band` |
 | `masterPainterColorChoice.json` | `data/` | `scatter-painter-choice` |
+| `rainfall-evaporation.json` | derived | `grid-multiple` |
+| `rainfall-flow.json` | derived | `area-rainfall` |
 | `img/weather/sunny_128.png` | `img/weather/` | `bar-rich-text`, `pie-rich-text` (rich-text label icons) |
 | `img/weather/cloudy_128.png` | `img/weather/` | see `sunny_128.png` |
 | `img/weather/showers_128.png` | `img/weather/` | see `sunny_128.png` |
+
+The two `rainfall-*.json` files are **derived**, not copied: upstream keeps these 3079-point series
+inline in `examples/ts/grid-multiple.ts` and `examples/ts/area-rainfall.ts`, so a one-off script split
+the arrays into JSON (`time` plus the two series) to keep the Kotlin port a diff of code rather than
+numbers.
 
 Files added here must keep the upstream name so the example source stays traceable to
 `public/data/asset/{data,geo}/<name>`.

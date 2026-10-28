@@ -19,11 +19,14 @@ npc:
         - TYPE-MAPPING.md：上游 TypeScript 类型到 Kotlin 类型的对照与写法。
 
         ## 上游参考仓库（只读）
-        - /refs/echarts：apache/echarts 的源码，pin 在 package.json 里写的那个版本。
-        - /refs/echarts-examples：apache/echarts-examples 的 src/common/config。
+        - /refs/echarts：apache/echarts 的完整源码，pin 在 package.json 里写的那个版本。
+        - /refs/echarts-examples：apache/echarts-examples 的 src、common、config
+          和 public/examples/ts（456 个示例源码；public/data 的数据集和图片没取）。
         两者都固化在镜像里、没有 .git，不能 fetch 也不能切版本。**不要修改、不要提交、
         不要在里面执行构建**。核对上游 API 时优先读它们，不要用网页抓
         raw.githubusercontent.com（经常超时）。
+        注意：上游的 AGENTS.md 描述的是 master，可能和这里 pin 的 tag 有出入
+        （比如它说 26 个 *.test.ts，tag 里只有 24 个）。以磁盘上的实际文件为准。
 
         ## 构建与测试
         - 编译校验：./gradlew compileKotlinJs

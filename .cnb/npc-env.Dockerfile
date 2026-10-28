@@ -47,26 +47,34 @@ RUN npm install -g --registry=https://registry.npmjs.org @cnbcool/cnb-cli skills
 #      不用再靠 git clean 兜底；
 #   3. 省掉每次会话 clone 的 60 秒。
 #
-# 代价：上游发版要重建镜像。ECHARTS_REF 跟 package.json 的 echarts 版本对齐，
-# .cnb.yml 的 ifModify 同时监听 package.json，Dependabot 升级时会自动重建。
+# 代价：上游发版要重建镜像。版本**从 package.json 读**，不在这里写死——
+# 写死的话 Dependabot 升级 echarts 后重建仍会用旧版本，得靠人记得同步。
+# 构建上下文需要包含 package.json，见 .cnb.yml 里的 docker build 和 .dockerignore。
 #
-# examples 仓库 682M，大部分是 public/ 里的图片和字体，AI 只需要读示例代码，
-# 所以用 sparse-checkout 只取源码目录。
-ARG ECHARTS_REF=6.1.0
-RUN mkdir -p /refs \
+# examples 仓库 682M，大头是 public/ 里的图片和数据集。AI 只需要读示例源码，
+# 所以 sparse-checkout 只取 src、common、config 和 public/examples/ts
+# （456 个示例源码，2.4M；数据集和图片不取）。
+COPY package.json /tmp/project-package.json
+RUN ECHARTS_REF="$(node -p "require('/tmp/project-package.json').dependencies.echarts")" \
+ && echo "[refs] echarts 版本：${ECHARTS_REF}" \
+ && mkdir -p /refs \
  && git clone --depth 1 --branch "${ECHARTS_REF}" \
       https://github.com/apache/echarts.git /refs/echarts \
  && git clone --depth 1 --filter=blob:none --sparse \
       https://github.com/apache/echarts-examples.git /refs/echarts-examples \
- && git -C /refs/echarts-examples sparse-checkout set src common config \
+ && git -C /refs/echarts-examples sparse-checkout set src common config public/examples/ts \
  && rm -rf /refs/echarts/.git /refs/echarts-examples/.git \
  && printf '%s\n' \
       "这里是只读的上游参考仓库，不属于本仓库，不要修改、不要提交。" \
       "" \
-      "  /refs/echarts            apache/echarts ${ECHARTS_REF} 的源码" \
+      "  /refs/echarts            apache/echarts ${ECHARTS_REF} 的完整源码" \
       "  /refs/echarts-examples   apache/echarts-examples 的 src/common/config" \
+      "                           和 public/examples/ts（示例源码，不含数据集和图片）" \
       "" \
-      "固化在镜像里，没有 .git，不能 fetch。要换版本就改 ECHARTS_REF 重建镜像。" \
+      "固化在镜像里，没有 .git，不能 fetch、不能切分支。" \
+      "要跟 master 对比就自己 git clone 到 /tmp。" \
+      "注意上游 AGENTS.md 描述的是 master，和这里 pin 的 tag 可能有几处对不上，" \
+      "以磁盘上的实际文件为准。" \
       > /refs/README.txt \
  && du -sh /refs/*
 

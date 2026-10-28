@@ -1,0 +1,10 @@
+# NPC 环境镜像的构建上下文。Dockerfile 只 COPY package.json 用来读 echarts 版本，
+# 其余一律不需要，排除掉以免每次构建上传几十万个文件。
+.git
+.gradle
+.kotlin
+.idea
+.workbuddy-ai
+build
+node_modules
+*.log

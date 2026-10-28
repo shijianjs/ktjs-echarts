@@ -1,8 +1,7 @@
 # ktjs-echarts 的 CNB 流水线：把 CNB 当云端 AI 开发机，结果同步回 GitHub。
 #
 #   Issue/PR 评论 @shijianjs/ktjs-echarts(kotlin)
-#     → 准备 /refs 下的上游参考仓库
-#     → npc:go 在工具链镜像里改代码、跑测试
+#     → npc:go 在工具链镜像里改代码、跑测试（上游源码已固化在镜像的 /refs）
 #     → 把分支推到 CNB 与 GitHub
 #
 # GitHub 仍然是公开仓库和社区入口；CNB 只负责「AI 干活」这一段。
@@ -31,7 +30,7 @@ main:
             set -euo pipefail
             IMAGE="${CNB_DOCKER_REGISTRY}/${CNB_REPO_SLUG_LOWERCASE}/npc-env:latest"
             echo "构建 $IMAGE"
-            docker build -f .cnb/npc-env.Dockerfile -t "$IMAGE" .cnb
+            docker build -f .cnb/npc-env.Dockerfile -t "$IMAGE" .
             docker push "$IMAGE"
 
 $:
@@ -50,9 +49,6 @@ $:
           - main:/root/.npm:copy-on-write
           - main:/root/.cache/ms-playwright:copy-on-write
       env:
-        # 上游参考仓库来源：cnb 走 CNB 内网镜像（快），github 直连。
-        # 没在 CNB 上镜像 apache/echarts 之前，先用 github。
-        REFS_ORIGIN: github
         # Kotlin/JS 的 npm 安装走国内镜像；官方源在国内经常卡住。
         NPM_CONFIG_REGISTRY: https://registry.npmmirror.com
       stages:
@@ -99,7 +95,6 @@ $:
           - main:/root/.npm:copy-on-write
           - main:/root/.cache/ms-playwright:copy-on-write
       env:
-        REFS_ORIGIN: github
         NPM_CONFIG_REGISTRY: https://registry.npmmirror.com
       stages:
         - name: 准备环境

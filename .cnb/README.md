@@ -184,6 +184,24 @@ NPC 自己指出的两个坑值得记下来：`charts.ts` / `option.ts` 里有�
 正则容易多算；`option.ts` 的 `XxxComponentOption` 在 Kotlin 侧按语义并成了 `XxxOption`，
 名字比对只能当线索，不能当覆盖率结论。
 
+## 固化上游后的两个回归（已修）
+
+把 `/refs` 从「每次 clone」改成「固化进镜像」时，第一版踩了两个坑，都是 NPC 自己查出来的：
+
+1. **`echarts-examples` 丢了 `public/`**。sparse-checkout 只写了 `src common config`，
+   而 `public/examples/ts` 里是 456 个示例源码（2.4M），`demo/AGENTS.md` 明确要求
+   porter 去读它。已加回 `public/examples/ts`；`public/data` 的 256M 数据集和图片仍然不取。
+2. **`ECHARTS_REF` 是 ARG 默认值，不会跟 `package.json` 同步**。上一版说「版本跟着
+   package.json 走」其实不成立——Dependabot 升级后重建镜像，用的还是旧默认值。
+   改成 `COPY package.json` 后用 `node -p` 读版本，构建上下文相应从 `.cnb` 改成根目录
+   并加了 `.dockerignore`。
+
+顺带清掉了 `REFS_ORIGIN` 这个已经没人读的变量。
+
+还有一个不是 bug 但要知道的：`/refs/echarts` pin 的是 tag，master 比它新几个文件。
+上游 `AGENTS.md` 描述的是 master，引用到的个别文件在 tag 里不存在。NPC 角色提示词里
+已经写明「以磁盘上的实际文件为准」。
+
 ## 已知限制
 
 - **NPC 不可分享**：流水线用了 `imports` 引用密钥仓库文件，按平台规则这个 NPC 不会出现在

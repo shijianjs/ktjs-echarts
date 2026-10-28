@@ -92,7 +92,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **275 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **277 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -210,6 +210,18 @@ dataset 家族的 `dataset-link` 补在 `examples/DatasetExtra.kt`：它监听 `
 demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首帧之后挂上，这里直接 `chart.on(...)`。
 合并选项里上游写的是 `series: {id: 'pie', ...}` 对象形式，wrapper 的 `series` 只有数组形式，而 ECharts
 本来就按 `id` 合并，两者行为一致。
+
+`matrix-periodic-table` 在 `examples/MatrixLongTail.kt`：`custom` 系列的 `renderItem` 用 `api.layout(...)`
+把 19×10 的矩阵格子铺成矩形，`api.value(2)` 对占位行返回 NaN，正好用来区分「真有元素」与 `La~Yb`
+这样的整段占位格；块说明文字是 `graphic` 元素，位置要靠 `convertToPixel` 在第一帧之后才量得出来，
+所以页面走 `Category.interactive`，用 `holder.setTimeout(..., 0)` 补第二张 option。上游把矩阵固定成
+900px 居中，demo 容器更窄，宽度改成 `chart.getWidth() - 160`（左右各留 80px 给标注）；窄屏下左侧
+`s-block` 一类的标注会略微互相压住，官方缩略图同样存在这个裁剪，属可接受偏差。上游 `label.textStyle`
+在 ECharts 6 里不被读取（label 只回退到全局 `textStyle`），没有移植。
+
+`bar-brush` 追加在 `examples/BarExtra.kt`：`brushSelected` 的 payload 上游声明成 `any`，示例侧用本地
+`external interface`（`batch[].selected[].dataIndex`）强转后再拼标题。`bar-breaks-brush` 要 zr 级的
+`mousedown` / `mousemove` 加 document 级 `mouseup` 才能改变断轴区间，属真实鼠标序列，按排除策略不做。
 
 `doc-example/` 里还没有移植的（上游 80 个文件 = 79 个 `.js` + 1 个 `.ts`、已按 `doc-example/` id 落地
 57 个、`bar-large` / `pie-highlight` 按家族 id 落地，剩 21 条）。按原因分类：

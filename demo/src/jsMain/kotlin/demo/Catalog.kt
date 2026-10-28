@@ -39,6 +39,7 @@ import demo.examples.lineExtraEntries
 import demo.examples.lineLongTailEntries
 import demo.examples.matrixEntries
 import demo.examples.matrixExtraEntries
+import demo.examples.matrixLongTailEntries
 import demo.examples.overviewEntries
 import demo.examples.parallelAqiEntries
 import demo.examples.parallelEntries
@@ -189,6 +190,7 @@ val catalog: List<CatalogEntry> =
         calendarEntries,
         matrixEntries,
         matrixExtraEntries,
+        matrixLongTailEntries,
         customEntries,
         customHexbinEntries,
         customExtraEntries,

@@ -239,7 +239,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（275 个示例 / 26 个家族 + 文档示例组 + 总览页）
+### 已落地（277 个示例 / 26 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -274,6 +274,14 @@
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
 
+- 第三十三批（2 个，柱状框选 + 元素周期表）：`bar-brush` 追加在 `examples/BarExtra.kt`，工具栏切到
+  矩形 / 多边形 / 轴向框选后，`brushSelected` 事件把命中的原始数据下标拼成右下角标题；上游把事件
+  payload 声明成 `any`，示例侧用本地 `external interface`（`batch[].selected[].dataIndex`）强转。
+  新建 `examples/MatrixLongTail.kt` 与 `PeriodicTableData.kt` 的 `matrix-periodic-table`：19×10 矩阵
+  坐标上 `custom` 系列用 `api.layout` 铺 118 个元素，`api.value(2)` 的 NaN 用来区分 `La~Yb` 一类
+  占位格，11 条块说明由 `graphic` 文字元素在第一帧后用 `convertToPixel` 定位；上游固定 900px 居中，
+  demo 改成 `chart.getWidth() - 160` 自适应并保留左右标注位。上游 `label.textStyle` 在 ECharts 6 里
+  不生效，未移植。`bar-breaks-brush` 需要 zr 级指针序列，按排除策略不做。
 - 第三十二批（3 个，大数据量城市雨量 + 世界人口地图）：新建 `examples/LineRainfall.kt` 的
   `grid-multiple`（上下两个 grid 共用 3079 个逐小时刻度，上格蒸发量 0–500，下格雨量 y 轴
   `inverse`，两轴 `axisPointer.link` 联动，dataZoom 同时管两条 x 轴）与 `area-rainfall`
@@ -488,14 +496,15 @@
 1. **几乎零成本（option 组合、内联表）**：
    `intraday-breaks-*` / `parallel-aqi` / `scatter-matrix` / `pie-parliament-transition` /
    `calendar-effectscatter` / `bar-multi-drilldown` 已完成。
-2. **要写数据转换脚本**：`matrix-stock` / `matrix-mbti` / `matrix-periodic-table`；
+2. **要写数据转换脚本**：`matrix-stock` / `matrix-mbti`；`matrix-periodic-table` 已在第三十三批完成；
    `grid-multiple` / `area-rainfall`（各 85KB，已拆成资源文件）、`scatter-world-population`
    已在第三十二批完成；`scatter-weight`、`pictorialBar-vehicle` / `-body-fill` / `-velocity` /
    `-bar-transition`（`path://` 面板图，先例是 `examples/GaugeLongTail.kt`）已在第三十一批完成。
    `candlestick-sh` / `candlestick-sh-2015` 已在第三十批完成。
-3. **要补交互表演方式**：`bar-brush` / `bar-breaks-brush`（`brushSelected` + `dispatchAction`）、
-   `bar-race` 已完成；`line-pen` / `line-draggable` / `candlestick-touch` 之类真实键鼠序列按
-   排除策略不做；`line-fisheye-lens` 靠 `getZr().on('mousemove')`，同样不做。
+3. **要补交互表演方式**：`bar-brush`（`brushSelected`）已在第三十三批完成，`bar-race` 也已完成；
+   `bar-breaks-brush` 要 zr 级 `mousedown` / `mousemove` 加 document 级 `mouseup` 改断轴区间，
+   与 `line-pen` / `line-draggable` / `candlestick-touch` 一样属真实键鼠序列，按排除策略不做；
+   `line-fisheye-lens` 靠 `getZr().on('mousemove')`，同样不做。
    `geo-lines` / `geo-map-scatter` / `heatmap-map` / `effectScatter-map` / `scatter-map` 一族
    需要 GeoJSON，可按 `geo-choropleth-scatter` 的先例拷静态数据再做。
 4. **明确排除，不要重复尝试**（原因记在 `demo/AGENTS.md`）：
@@ -563,11 +572,8 @@
 ## 待办
 
 - 类型建模：暂无未完成项（见上面各轮）。
-- 示例站（demo）：见「示例站（demo）移植进度」一节。第三十二批（`grid-multiple` / `area-rainfall`
-  两个大数据量雨量页 + `scatter-world-population` 世界人口地图）之后，第二档只剩
-  `matrix-stock` / `matrix-mbti` / `matrix-periodic-table`；其中 `matrix-periodic-table` 用
-  `custom` 系列的 `renderItem` 排版，需要 wrapper 补 `renderItem` 的坐标换算（`api.coord` 已有，
-  缺 `layout`），另外两页要 decals / 点击切换矩阵，先按单个页面试做；第三档的
-  `bar-brush` / `bar-breaks-brush` 可做，但上游没给 `brushSelected` 的 payload 类型，事件内容要按
-  `batch[].selected` 在例子侧强转再读；`custom-calendar-icon` 因上游源码只剩缩略图，不移植。
-- 提交：全部已推送到 `origin/main`（最新：第三十二批 3 个示例）。
+- 示例站（demo）：见「示例站（demo）移植进度」一节。第三十三批（`bar-brush` + `matrix-periodic-table`）
+  之后，第二档只剩 `matrix-stock` / `matrix-mbti`：前者是 713 行的 sparkline 表 + dataZoom + detail
+  视图，后者要 `decal` 图案、点击切换 `setOption(option, true)` 与窗口尺寸适配；`bar-breaks-brush`
+  需 zr 级指针序列，不做；`custom-calendar-icon` 因上游源码只剩缩略图，不移植。
+- 提交：全部已推送到 `origin/main`（最新：第三十三批 2 个示例）。

@@ -445,6 +445,24 @@ val barExtraEntries: List<CatalogEntry> =
                     )
             }
         },
+        barExtra.interactive(
+            "bar-brush",
+            "柱状图框选",
+            "Brush Select on Column Chart",
+            summaryZh = "工具栏里切到矩形、多边形或轴向框选后，右下角的标题会列出被选中的原始数据下标。",
+            summaryEn = "Brush with the toolbar; the title in the lower right lists the selected raw data indices.",
+        ) { chart ->
+            val random = Lcg(20120418)
+            val classes = Array(10) { "Class$it" }
+            val first = DoubleArray(10) { roundToCents(random.next() * 2) }
+            val second = DoubleArray(10) { roundToCents(random.next() * 5) }
+            val third = DoubleArray(10) { roundToCents(random.next() + 0.3) }
+            val fourth = DoubleArray(10) { roundToCents(random.next()) }
+            chart.setOption(barBrushOption(classes, first, second, third, fourth))
+            chart.on(EChartsEvents.BrushSelected) { event ->
+                chart.setOption(brushSelectionTitle(event.unsafeCast<BrushSelectedEvent>()))
+            }
+        },
         barExtra.chart(
             "bar-polar-label-radial",
             "极坐标柱状图标签（角度轴为类别轴）",
@@ -724,3 +742,134 @@ val barExtraEntries: List<CatalogEntry> =
             }
         },
     )
+
+/** Rounds to the two decimals the original reaches through `+(value).toFixed(2)`. */
+private fun roundToCents(value: Double): Double = kotlin.math.round(value * 100) / 100
+
+/**
+ * `brushselected` payload of `bar-brush`.
+ *
+ * Upstream declares the event content as `any` and only documents `batch[].selected[].dataIndex`, so
+ * the parts this page reads are described here and the event is cast to it.
+ */
+private external interface BrushSelectedEvent {
+    val batch: Array<BrushSelectedBatch>?
+}
+
+/** One brush area of [BrushSelectedEvent]. */
+private external interface BrushSelectedBatch {
+    val selected: Array<BrushSelectedSeries>?
+}
+
+/** Indices of the data items a brush area covers, per series. */
+private external interface BrushSelectedSeries {
+    val dataIndex: Array<Double>?
+}
+
+/** The emphasis style the four stacked series share. */
+private fun brushEmphasis(): EmphasisOption =
+    unsafeJso {
+        itemStyle = unsafeJso<ItemStyleOption> { shadowBlur = 10.0; shadowColor = ZRColor("rgba(0,0,0,0.3)") }
+    }
+
+/** The option of `bar-brush`: two stacks of two series over ten classes. */
+private fun barBrushOption(
+    classes: Array<String>,
+    first: DoubleArray,
+    second: DoubleArray,
+    third: DoubleArray,
+    fourth: DoubleArray,
+): EChartsOption =
+    unsafeJso {
+        legend = one(unsafeJso<LegendOption> { data = legendNames("bar", "bar2", "bar3", "bar4"); left = StringOrDouble("10%") })
+        brush =
+            one(
+                unsafeJso<BrushOption> {
+                    toolbox =
+                        arrayOf(
+                            BrushToolboxIconTypes.rect,
+                            BrushToolboxIconTypes.polygon,
+                            BrushToolboxIconTypes.lineX,
+                            BrushToolboxIconTypes.lineY,
+                            BrushToolboxIconTypes.keep,
+                            BrushToolboxIconTypes.clear,
+                        )
+                    xAxisIndex = ModelFinderIndexQuery(0.0)
+                },
+            )
+        toolbox =
+            one(
+                unsafeJso<ToolboxOption> {
+                    feature =
+                        unsafeJso<ToolboxFeature> {
+                            magicType = unsafeJso<MagicTypeOption> { type = arrayOf("stack") }
+                            dataView = unsafeJso<DataViewOption> {}
+                        }
+                },
+            )
+        tooltip = one(unsafeJso<TooltipOption> {})
+        xAxis =
+            one(
+                unsafeJso<XAxisOption> {
+                    data = strings(*classes)
+                    name = "X Axis"
+                    axisLine = unsafeJso<AxisLineOption> { onZero = BooleanOrString(true) }
+                    splitLine = unsafeJso<SplitLineOption> { show = false }
+                    splitArea = unsafeJso<SplitAreaOption> { show = false }
+                },
+            )
+        yAxis = one(unsafeJso<YAxisOption> {})
+        grid = one(unsafeJso<GridOption> { bottom = StringOrDouble(100.0) })
+        series =
+            arrayOf<SeriesOption>(
+                barSeries {
+                    name = "bar"
+                    stack = "one"
+                    emphasis = brushEmphasis()
+                    typedData = numbers(*first)
+                },
+                barSeries {
+                    name = "bar2"
+                    stack = "one"
+                    emphasis = brushEmphasis()
+                    typedData = numbers(*second)
+                },
+                barSeries {
+                    name = "bar3"
+                    stack = "two"
+                    emphasis = brushEmphasis()
+                    typedData = numbers(*third)
+                },
+                barSeries {
+                    name = "bar4"
+                    stack = "two"
+                    emphasis = brushEmphasis()
+                    typedData = numbers(*fourth)
+                },
+            )
+    }
+
+/**
+ * The title the original merges in after every brush: one line per series with its selected indices.
+ *
+ * The original also sets `width: 100`, which is not a title option of ECharts 6 and has no effect.
+ */
+private fun brushSelectionTitle(event: BrushSelectedEvent): EChartsOption {
+    val selected = event.batch?.firstOrNull()?.selected
+    val lines = mutableListOf<String>()
+    selected?.forEachIndexed { index, series ->
+        lines += "[Series $index] " + (series.dataIndex?.joinToString(", ") ?: "")
+    }
+    return unsafeJso {
+        title =
+            one(
+                unsafeJso<TitleOption> {
+                    backgroundColor = ZRColor("#333")
+                    text = "SELECTED DATA INDICES: \n" + lines.joinToString("\n")
+                    bottom = StringOrDouble(0.0)
+                    right = StringOrDouble("10%")
+                    textStyle = unsafeJso<TextStyleOption> { fontSize = StringOrDouble(12.0); color = "#fff" }
+                },
+            )
+    }
+}

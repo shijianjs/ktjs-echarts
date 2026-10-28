@@ -1,0 +1,36 @@
+name: Sync to CNB
+
+# GitHub 上有人直接提交时，把 main 推回 CNB。
+# 反方向（CNB → GitHub）由 CNB 的 push 事件跑 git-sync 完成，见 .cnb.yml。
+#
+# 防环：NPC 的提交作者是 cnb-npc，那些本来就是 CNB 推过来的，不再推回去。
+# 人工提交会走一轮 GitHub → CNB → CNB 的 push 事件再推回 GitHub，但第二步是
+# no-op（sha 相同），不会触发第二次 Actions，所以不会死循环。
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  sync:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.head_commit.author.name != 'cnb-npc'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # git-sync 推的是完整分支，需要历史
+          fetch-depth: 0
+
+      - name: 推送到 CNB
+        uses: docker://tencentcom/git-sync
+        env:
+          PLUGIN_TARGET_URL: "https://cnb.cool/shijianjs/ktjs-echarts.git"
+          PLUGIN_AUTH_TYPE: "https"
+          PLUGIN_USERNAME: "cnb"
+          PLUGIN_PASSWORD: ${{ secrets.CNB_TOKEN }}
+          # 只推 main。GitHub 上的 dependabot 分支不必进 CNB——
+          # 它们合并进 main 之后会随 main 一起同步过去。
+          PLUGIN_BRANCH: "main"

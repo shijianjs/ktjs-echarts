@@ -25,6 +25,13 @@ if [ -n "$(git status --porcelain)" ]; then
   git commit -m "chore: NPC 自动提交" || true
 fi
 
+# 只回答问题的会话不会有新提交。这时推一个和 main 一模一样的分支只会在
+# GitHub 上留垃圾，直接跳过。CNB_COMMIT 是触发本次构建时的提交。
+if [ -n "${CNB_COMMIT:-}" ] && [ "$(git rev-parse HEAD)" = "$CNB_COMMIT" ]; then
+  echo "[push] HEAD 与触发时的提交一致，没有新提交，跳过同步"
+  exit 0
+fi
+
 BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 
 # NPC 不应直接改默认分支。真出现了就把它挪到独立分支，

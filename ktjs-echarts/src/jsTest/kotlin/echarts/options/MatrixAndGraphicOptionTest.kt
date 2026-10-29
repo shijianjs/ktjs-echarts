@@ -5,6 +5,7 @@ import echarts.ECharts
 import echarts.GraphicActions
 import echarts.createChart
 import echarts.destroyChart
+import echarts.registerRectangleMap
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import kotlin.test.Test
@@ -139,6 +140,61 @@ class MatrixAndGraphicOptionTest {
 
         assertEquals("matrix", grid.coordinateSystem)
         assertEquals(2, grid.coord!!.unsafeCast<Array<Any>>().size)
+    }
+
+    /**
+     * Upstream `GeoOption` mixes `ComponentOption` (which carries the generic `coordinateSystem`,
+     * `coordinateSystemUsage` and `coord`), `ComponentOnMatrixOptionMixin`,
+     * `BoxLayoutOptionMixin` and `AnimationOptionMixin` in, so a geo can occupy a matrix cell and
+     * take the component animation options; this is how `matrix-mini-bar-geo` draws a map per row.
+     */
+    @Test
+    fun geoCanBeLaidOutOnMatrixCells() {
+        registerRectangleMap("geo-matrix-cell", 0.0, 0.0, 10.0, 10.0)
+
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(
+                unsafeJso<EChartsOption> {
+                    matrix =
+                        one(
+                            unsafeJso<MatrixOption> {
+                                x =
+                                    unsafeJso<MatrixDimensionOption> {
+                                        data = arrayOf(MatrixDimensionCellLooseOption("a"))
+                                    }
+                                y =
+                                    unsafeJso<MatrixDimensionOption> {
+                                        data = arrayOf(MatrixDimensionCellLooseOption("u"))
+                                    }
+                            },
+                        )
+                    geo =
+                        one(
+                            unsafeJso<GeoOption> {
+                                map = "geo-matrix-cell"
+                                coordinateSystem = "matrix"
+                                coordinateSystemUsage = CoordinateSystemUsages.box
+                                coord =
+                                    CoordinateSystemDataCoord(
+                                        arrayOf(OptionDataValue("a"), OptionDataValue("u")),
+                                    )
+                                animation = false
+                                animationDuration = AnimationDuration(0.0)
+                            },
+                        )
+                },
+            )
+
+            val geo = assertNotNull(chart.getOption().geo).first()
+            assertEquals("matrix", geo.coordinateSystem)
+            assertEquals("box", geo.coordinateSystemUsage!!.unsafeCast<String>())
+            assertEquals(2, geo.coord!!.unsafeCast<Array<Any>>().size)
+            assertEquals(false, geo.animation)
+            assertTrue(chart.renderToCanvas().width > 0, "the geo renders inside the matrix cell")
+        } finally {
+            destroyChart(chart, container)
+        }
     }
 
     /**

@@ -25,6 +25,11 @@
   ECharts 按 `dimensions` 的行宽切分扁平表；漏写会按每个数一个点读，画出来是一条斜线。
 - **`geo` 的区域标签默认不显示**：`geo.regions[].label` 只配 `formatter` 时仍然只有 hover 才出现，
   截图里没有标签是正常的（SVG 教程原话「将鼠标 hover 到元素上能显示标签」）。
+- **饼图落在 `geo` 上时，`center` 可以只给区名**：上游 `center` 是 `(string | number)[] | string | number`，
+  写 `center = arrayOf("Vestfirðir")` 会被当成 `[x]`，饼静默不画；标量要写
+  `typedCenter = StringOrDouble("Vestfirðir")`。
+- **`geo` 也能钉进矩阵格子**：`coordinateSystem = "matrix"` + `coord = [列, 行]`（`CoordinateSystemDataCoord`），
+  再配 `animation = false`；`matrix-mini-bar-geo` 用它给每行放一张小地图。
 - **定时器与外部监听**：定时器一律交给 `ChartHolder.setInterval` / `setTimeout`；挂在 `window` /
   `document` 上的监听在 `onUnmount` 里移除，否则换页后还会触到已销毁的实例。
 - **改源码用 UTF-8 工具**：PowerShell 的 `Set-Content` 会按 ANSI 落盘、写坏中文，批量改写用 Node / Python。

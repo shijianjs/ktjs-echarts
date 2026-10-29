@@ -28,8 +28,11 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `stack-trace.json` | `data/` | `flame-graph` |
 | `world.json` | `geo/` | `lines-airline`, `custom-wind`, `scatter-world-population` |
 | `winds.json` | `data-gl/asset/data/` | `custom-wind` |
-| `iceland.geo.json` | `geo/` | `geo-choropleth-scatter` |
-| `ch.geo.json` | `geo/` | `geo-graph` |
+| `iceland.geo.json` | `geo/` | `geo-choropleth-scatter`, `map-iceland-pie` |
+| `ch.geo.json` | `geo/` | `geo-graph`, `matrix-mini-bar-geo` |
+| `HK.json` | `geo/` | `map-HK` |
+| `USA.json` | `geo/` | `map-usa`, `map-bar-morph` |
+| `Sicily_prehellenic_topographic_map.svg` | `geo/` | `geo-svg-map` |
 | `Map_of_Iceland.svg` | `geo/` | `geo-svg-scatter-simple` |
 | `MacOdrum-LV5-floorplan-web.svg` | `geo/` | `geo-svg-lines` |
 | `flight-seats.svg` | `geo/` | `geo-seatmap-flight` |

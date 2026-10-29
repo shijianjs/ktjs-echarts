@@ -651,6 +651,46 @@ class DemoPageTest {
     }
 
     /**
+     * The five pages of `GeoMaps.kt` and the matrix map of `MatrixExtra.kt`.
+     *
+     * Each of them fetches its map (three GeoJSON files and a 3.7 MB SVG) and registers it before
+     * the first `setOption`, so the canvas stays blank until the request resolves: the painted-pixel
+     * wait is what proves the map reached the chart. `map-bar-morph` swaps its map and bar options
+     * from a two-second timer, so a frame sampled after one tick must differ from the first one.
+     */
+    @RetryingTest(maxAttempts = 2)
+    @Timeout(300)
+    fun `the fetched map pages paint`(page: Page) {
+        val consoleErrors = mutableListOf<String>()
+        page.onConsoleMessage { message ->
+            if (message.type() == "error") consoleErrors += message.text()
+        }
+        openPage(page)
+        for (
+            route in
+                listOf(
+                    "geo-svg-map",
+                    "map-HK",
+                    "map-usa",
+                    "map-iceland-pie",
+                    "matrix-mini-bar-geo",
+                )
+        ) {
+            page.evaluate("(value) => { location.hash = '#/' + value }", route)
+            assertChartRendered(page, route)
+            waitForAnyPainted(page, route)
+        }
+        page.evaluate("(value) => { location.hash = '#/' + value }", "map-bar-morph")
+        assertChartRendered(page, "map-bar-morph")
+        waitForAnyPainted(page, "map-bar-morph")
+        val before = paintedFrame(page)
+        page.waitForTimeout(2600.0)
+        val after = paintedFrame(page)
+        assertTrue(before != after, "map-bar-morph did not morph into the other option")
+        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
+    }
+
+    /**
      * The two static pages of `ScatterPunchCard.kt` / `MatrixGridLayout.kt` and the two animated
      * ones of `ScatterTransition.kt`.
      *

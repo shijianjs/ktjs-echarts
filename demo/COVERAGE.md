@@ -19,9 +19,9 @@
 | 官方清单 | 436 |
 | 　· `chart-list-data.js` | 377 |
 | 　· `chart-list-data-gl.js` | 59 |
-| 已移植 | 356 页 / 357 条 |
+| 已移植 | 362 页 / 363 条 |
 | 明确不做 | 51 |
-| 待补 | 28 |
+| 待补 | 22 |
 
 已移植数里的「页」不含总览页（`#/overview`）；「条」把 `bar-large` / `pie-highlight` 同时算作对应 `doc-example/` 条目的移植。
 
@@ -127,7 +127,7 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 | --- |
 | `globe-country-carousel` |
 
-## 待补（28）
+## 待补（22）
 
 ### 只缺静态数据 / 素材（1）
 
@@ -137,7 +137,7 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 | --- |
 | `bar-race-country` |
 
-### 缺地图数据（GeoJSON / SVG / 二进制轨迹）（26）
+### 缺地图数据（GeoJSON / SVG / 二进制轨迹）（20）
 
 先补地图文件并 registerMap；部分数据（USA / Iceland / 瑞士 / world / ch.geo）已经在仓库里。
 
@@ -154,12 +154,6 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 | `geo-map-scatter` |
 | `scatter-map` |
 | `effectScatter-map` |
-| `geo-svg-map` |
-| `map-HK` |
-| `map-usa` |
-| `map-bar-morph` |
-| `map-iceland-pie` |
-| `matrix-mini-bar-geo` |
 | `scatter-weibo` |
 | `scattergl-weibo` |
 | `lines-ny` |

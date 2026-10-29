@@ -45,6 +45,17 @@ external interface PieSeriesOption :
     /** Center of the pie, `[x, y]`. */
     var center: Array<StringOrDouble>?
 
+    /**
+     * Center of the pie as a single value: the name of a geo region when the series sits on a
+     * `geo` coordinate system, or a single coordinate.
+     *
+     * Upstream `CircleLayoutOptionMixin` types `center` as `(string | number)[] | string | number`;
+     * [center] covers the array form, this property the scalar one. Both read and write the same
+     * JavaScript property, see `TYPE-MAPPING.md` §12.
+     */
+    @JsName("center")
+    var typedCenter: StringOrDouble?
+
     /** Whether the sectors are drawn as roses: `"radius"` or `"area"`. */
     var roseType: RoseType?
 

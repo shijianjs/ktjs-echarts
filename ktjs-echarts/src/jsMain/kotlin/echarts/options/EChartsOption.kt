@@ -23,6 +23,7 @@ import echarts.FilterMode
 import echarts.DataZoomType
 import echarts.AxisPointerType
 import echarts.AnimationEasing
+import echarts.CoordinateSystemUsage
 import js.objects.Record
 import kotlin.js.JsAny
 import kotlin.js.JsName
@@ -938,6 +939,45 @@ external interface GeoOption : BoxLayoutOptionMixin {
 
     /** Bounding coordinates of the map, `[[left, top], [right, bottom]]`. */
     var boundingCoords: Array<Array<Double>>?
+
+    /** Coordinate system the geo is laid out on, e.g. `"matrix"`. */
+    var coordinateSystem: String?
+
+    /**
+     * How the box of the geo uses [coordinateSystem]; `"box"` (the default for components) takes only
+     * the bounding rect from it.
+     */
+    var coordinateSystemUsage: CoordinateSystemUsage?
+
+    /** Cells of [coordinateSystem] the geo occupies, e.g. one cell of a matrix. */
+    var coord: CoordinateSystemDataCoord?
+
+    /** Whether the animation is enabled. */
+    var animation: Boolean?
+
+    /** Number of elements above which the animation is turned off. */
+    var animationThreshold: Double?
+
+    /** Duration of the initial animation in milliseconds. */
+    var animationDuration: AnimationDuration?
+
+    /** Easing of the initial animation. */
+    var animationEasing: AnimationEasing?
+
+    /** Delay of the initial animation in milliseconds. */
+    var animationDelay: AnimationDelay?
+
+    /** Duration of the update animation in milliseconds. */
+    var animationDurationUpdate: AnimationDuration?
+
+    /** Easing of the update animation. */
+    var animationEasingUpdate: AnimationEasing?
+
+    /** Delay of the update animation in milliseconds. */
+    var animationDelayUpdate: AnimationDelay?
+
+    /** Animation of the state transitions. */
+    var stateAnimation: StateAnimationOption?
 
     /** z-index of the component. */
     var z: Double?

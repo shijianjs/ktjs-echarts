@@ -222,6 +222,27 @@ class SeriesTypedDataTest {
         }
     }
 
+    /**
+     * Upstream `CircleLayoutOptionMixin` types `center` as `(string | number)[] | string | number`:
+     * a pie on a geo coordinate system may be centered on a region by name. [PieSeriesOption.center]
+     * keeps the array branch, [PieSeriesOption.typedCenter] the scalar one, and both address the
+     * same JavaScript property.
+     */
+    @Test
+    fun pieCenterHasAnArrayAndAScalarBranch() {
+        val pie = pieSeries { typedCenter = StringOrDouble("Vestfirðir") }
+
+        assertEquals("Vestfirðir", pie.typedCenter!!.unsafeCast<String>())
+        assertEquals(
+            "Vestfirðir",
+            pie.center!!.unsafeCast<String>(),
+            "both properties address the same JavaScript property",
+        )
+
+        pie.center = arrayOf(StringOrDouble("50%"), StringOrDouble("50%"))
+        assertEquals(2, pie.typedCenter!!.unsafeCast<Array<*>>().size, "writing the array branch is visible")
+    }
+
     @Test
     fun theCandlestickItemStyleViewSharesTheBaseProperty() {
         // Upstream narrows `CandlestickSeriesOption.itemStyle` to the item style that adds the

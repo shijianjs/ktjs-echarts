@@ -13,15 +13,18 @@
   - `S:\workspace\github\ecomfe\echarts-gl`（GL 的 `defaultOption` 与视图实现）
   - `S:\workspace\github\JetBrains\kotlin-wrappers`（写法参考）
 - 锁定版本：根 `package.json`（`echarts` 6.1.0、`echarts-gl` 2.1.0）；修订号在
-  `wrapper-revisions.properties`（当前 `ktjs-echarts=9`、`ktjs-echarts-gl=8`）。
+  `wrapper-revisions.properties`（当前 `ktjs-echarts=10`、`ktjs-echarts-gl=8`）。
 - 验证：`./gradlew build`（含 detekt）、`:ktjs-echarts:jsBrowserTest`、`:ktjs-echarts-gl:jsBrowserTest`、
   `:demo:e2eTest`；demo 覆盖统计用 `node scripts/demo-coverage.mjs`。
 
 ## 当前状态
 
-### ktjs-echarts（6.1.0-kt.9）
+### ktjs-echarts（6.1.0-kt.10）
 
-`-kt.9` 给 `ScatterSeriesOption` 加了 `typedFlatData`（与 `typedData` 同一 `data` 属性的扁平视图，
+`-kt.10` 补了两处地图批次需要的公开 API：`GeoOption` 混入 `ComponentOption` 的
+`coordinateSystem` / `coordinateSystemUsage` / `coord`、`BoxLayoutOptionMixin` 与
+`AnimationOptionMixin`（`geo` 要能钉进矩阵格子并关掉自身动画），以及 `PieSeriesOption.typedCenter`
+（`center` 的标量分支，饼图落在 `geo` 上时用区名当地心）。`-kt.9` 给 `ScatterSeriesOption` 加了 `typedFlatData`（与 `typedData` 同一 `data` 属性的扁平视图，
 `ArrayLike` 分支，配 `dimensions` 使用），`scatter-nebula` 的 8 MB 浮点表就靠它直接交给 `large` 模式。
 `-kt.8` 只补了 demo 需要的两处公开 API：`ZRenderType.configLayer` / `ZRLayerConfig`（尾迹模糊）和
 `TimelineOption` 的 `width` / `height` / `tooltip` / `emphasis`。类型建模 10 轮收尾（联合类型、字面量、
@@ -54,7 +57,7 @@
 
 ### demo
 
-- 官方清单 436 条：**已移植 356 页 / 357 条，明确不做 51，待补 28**。逐条清单、理由与维护方式见
+- 官方清单 436 条：**已移植 362 页 / 363 条，明确不做 51，待补 22**。逐条清单、理由与维护方式见
   [demo/COVERAGE.md](demo/COVERAGE.md)。
 - 跨页注意事项（含 GL）见 [demo/NOTES.md](demo/NOTES.md)；移植约定、各家族做法与可复用数据见
   [demo/AGENTS.md](demo/AGENTS.md)。
@@ -63,17 +66,19 @@
 
 ## 下一步
 
-按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进，建议顺序：
+按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进（22 条），建议顺序：
 
-1. **补地图数据**（待补里的 26 条）：`china.json` 一次解锁 `map-example`、`heatmap-map`、`geo-lines`、
-   `geo-map-scatter`、`scatter-map`、`effectScatter-map`、`scatter-weibo` / `scattergl-weibo` 与
-   `doc-example/scatter-visualMap-piecewise`；`HK.json` 解锁 `map-HK` 与两页 `map-visualMap-*`；再补 Sicily
-   SVG、`links_ny_*.bin` / `gps_*.bin`。`USA.json`、`ch.geo.json`、`iceland.geo.json`、`world.json` 已在仓库里。
-2. **补静态数据**（待补里的 1 条）：`bar-race-country` 要补 emoji-flags CDN 数据；其余静态页
-   （geo-svg 三页、`scatter-nebula`、`calendar-lunar`）已落地。
-3. **GL 子集可以单独一批**（都在上面两组里）：`map3D` 四页（`alcohol.json` / `buildings.json` + wood /
-   redbricks 贴图）、`scatterGL-gps` / `linesGL-ny`（二进制轨迹）。
-4. **先补 wrapper 再做**（1 条）：`doc-example/scatter-visualMap-categories` 需要按类目索引的 `visualMap`
+1. **补 `china.json`**（一次解锁 13 条）：`doc-example/map-example`、四个 `doc-example/map-visualMap-*`、
+   `doc-example/scatter-visualMap-piecewise`、`heatmap-map`、`geo-lines`、`geo-map-scatter`、`scatter-map`、
+   `effectScatter-map`、`scatter-weibo`、`scattergl-weibo`。本地克隆里没有 `china.json`（上游地图数据早已
+   外置，`echarts/map/js` 也没有），要么从官方站点下载一次并登记到 `data/SOURCE.md`，要么改注册
+   `world.json` / 其他已入库地图的等价页面——先确认数据来源再动手。
+2. **二进制轨迹**（3 条）：`lines-ny` / `linesGL-ny`（`links_ny_*.bin` 合计约 30 MB）、`scatterGL-gps`
+   （`gps_*.bin`），要按需分片加载，单独一批处理。
+3. **GL 地图**（4 条）：`map3d-alcohol-consumption` / `map3d-buildings` / `map3d-wood-city` /
+   `map3d-wood-map`，要 `alcohol.json` / `buildings.json` 与 wood / redbricks 贴图。
+4. **补静态数据**（1 条）：`bar-race-country` 要 emoji-flags CDN 数据。
+5. **先补 wrapper 再做**（1 条）：`doc-example/scatter-visualMap-categories` 需要按类目索引的 `visualMap`
    字典与 `left: null`。
 
 新增/移植页面后跑 `node scripts/demo-coverage.mjs --write` 更新 COVERAGE。

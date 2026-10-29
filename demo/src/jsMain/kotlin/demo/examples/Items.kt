@@ -205,12 +205,14 @@ internal fun toolbox(
     dataZoom: Boolean = false,
     orient: Orient? = null,
     top: StringOrDouble? = null,
+    left: StringOrDouble? = null,
     right: StringOrDouble? = null,
 ): Array<ToolboxOption> =
     one(
         unsafeJso<ToolboxOption> {
             this.orient = orient
             this.top = top
+            this.left = left
             this.right = right
             feature =
                 unsafeJso<ToolboxFeature> {

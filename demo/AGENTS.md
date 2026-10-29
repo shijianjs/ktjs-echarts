@@ -109,8 +109,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后落地 **356 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
-的官方清单统计，共 436 条：已移植 357 条，明确不做 51 条，待补 28 条；逐条清单与理由见
+筛选后落地 **362 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
+的官方清单统计，共 436 条：已移植 363 条，明确不做 51 条，待补 22 条；逐条清单与理由见
 [COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -307,6 +307,24 @@ lambda 里先 `ECharts.registerMap(name, MapInput(SVGMapInput))` 再返回 optio
 标签」），所以截图里没有标签是对的；`geo-svg-layout-basic` 的说明文字由 `graphic` 的 `rect` + `textContent`
 画，`ZRStyleProps` 还没声明 `rich`，本地补了一个子接口。
 
+地图家族的 `examples/GeoMaps.kt` 五页共用 `registerGeojsonMap` / `mapData` 两个小工具，地图文件由
+`loadJson` / `loadText` 读入后在 `Category.interactive` 的 setup 里注册（`chart.showLoading(null)` 挡住
+首帧空白）：
+
+- `geo-svg-map`（西西里岛古地图）要 3.7 MB 的 `Sicily_prehellenic_topographic_map.svg`，五条航线是
+  `lines` 系列画在 SVG 上；上游的 `selectchanged` 处理逻辑用 `dispatchAction` 发 `hideTip` / `geoSelect` /
+  `showTip` 三种 payload，wrapper 侧同样用 `unsafeJso` 拼 payload。
+- `map-HK` 的 18 个区名要 `nameMap` 汉化，`visualMap` 与 toolbox 照抄；`map-usa` 靠 `specialAreas` 把
+  阿拉斯加、夏威夷、波多黎各挪到主图下方，`GeoSpecialAreas` 是 `Record<String, GeoSpecialArea>`，
+  用 demo 的 `recordOf(...)` 拼。
+- `map-bar-morph` 的 map 与 bar 共用 series `id: "population"`，`universalTransition` 负责形变，
+  `ChartHolder.setInterval` 每两秒 `setOption(option, true)`；截图落在 2s / 4s 的切换点会拍到两张图叠加
+  的中间帧，属正常现象。
+- `map-iceland-pie` 的饼图落在 `geo` 坐标系上，四个饼里有一个用**区名**当地心（`center: 'Vestfirðir'`）。
+  上游 `CircleLayoutOptionMixin` 把 `center` 类型写成 `(string | number)[] | string | number`，wrapper 的
+  `center` 只覆盖数组分支，标量分支是 `typedCenter`（`@JsName("center")`，与 `center` 同一属性）。
+  传 `arrayOf("Vestfirðir")` 会被当成 `x = "Vestfirðir"`，饼会静默消失。
+
 dataset 家族的 `dataset-link` 补在 `examples/DatasetExtra.kt`：它监听 `updateAxisPointer` 把饼图的
 `encode.value` 换成指针所在的年份，上游该事件的 payload 类型是 `any`，所以 `axesInfo[0].value` 只能在
 demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首帧之后挂上，这里直接 `chart.on(...)`。
@@ -348,6 +366,15 @@ demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首�
 正好对应上游 `MatrixDim` 里「按 length 填 null 格」的行为。上游页面右上角的矩阵网格开关是自绘控制面板、
 不是图表 API，没有移植。
 
+`matrix-mini-bar-geo` 追加在 `examples/MatrixExtra.kt`：10 个瑞士州 × 2 年（2020 / 2021）的小条形图，
+最后一列每行放一张 `ch.geo.json` 的小地图。关键是 `geo` 也能当矩阵格子用——`GeoOption` 混入了
+`ComponentOption`（带通用的 `coordinateSystem` / `coordinateSystemUsage` / `coord`）、
+`ComponentOnMatrixOptionMixin`、`BoxLayoutOptionMixin` 与 `AnimationOptionMixin`，所以每行
+`geo { coordinateSystem = "matrix"; coord = [列, 行]; animation = false }` 就能钉进格子；wrapper 的
+`GeoOption` 之前缺这四组成员，这一批补上了（`-kt.10`）。小地图的 `aspectScale` 用 `cos(47°)`，
+`regions[].selected = true` + `select.itemStyle` 把本行对应的州涂成深蓝，`selectedMode = false` 关掉点选。
+条形用 `barGap: '40%'` / `barWidth: '40%'` 让两年的柱子贴在一起，`encode.label = 0` 把数值标在柱子内侧。
+
 `data-transform-filter` 追加在 `examples/DatasetExtra.kt`：三份 dataset，`dataset_raw` 是
 `life-expectancy-table.json`，另两份用内置 `filter` transform 从它派生（`and` 条件：`Year >= 1950`
 且 `Country` 等于某个国家）。`config` 里的字段名 `=` 在 Kotlin 侧要写成 `@JsName("=")`。
@@ -379,7 +406,7 @@ icon 数摆进日历格子，`renderItem` 用 `api.font()` 取字号、`linearMa
 - 两个 dataZoom（inside + 底部 slider）的 `minSpan = 5` 让视口最多缩到 5 个读数宽。
 
 `doc-example/` 里还没有移植的（上游 80 个文件 = 79 个 `.js` + 1 个 `.ts`、已按 `doc-example/` id 落地
-58 个、`bar-large` / `pie-highlight` 按家族 id 落地，剩 20 条）。按原因分类：
+65 个、`bar-large` / `pie-highlight` 按家族 id 落地，剩 13 条）。按原因分类：
 
 - 图标是官方站的 PNG / base64 素材，按排除策略不做：`pictorialBar-graphicType`、
   `pictorialBar-patternSize`、`pictorialBar-repeatDirection`、`pictorialBar-repeatLayout`、
@@ -387,8 +414,7 @@ icon 数摆进日历格子，`renderItem` 用 `api.font()` 取字号、`linearMa
 - 运行期远端脚本：`bar-media-timeline`（`$.getScript` 拉 `timelineGDP.js` 与 `draggable.js`）；
 - 地图与 `geo`：`map-example`、`map-visualMap-continuous`、`map-visualMap-continuous-text`、
   `map-visualMap-pieces`、`map-visualMap-piecewise-text`、`scatter-visualMap-piecewise`（系列用
-  `coordinateSystem: 'geo'`）、`geo-svg-label-basic`、`geo-svg-layout-basic`、`geo-svg-named-basic`、
-  `geo-roam-indicator`；
+  `coordinateSystem: 'geo'`）、`geo-roam-indicator`，都等 `china.json`；
 - 真实指针漫游 + 官方站的 `app.config`：`graph-roam-indicator`；
 - 下一批的可移植项：`scatter-visualMap-categories`（内联 dataset + 两个 `visualMap`，但
   `inRange.symbol` / `outOfRange.symbolSize` 是按类目索引的字典、`left: null`，要先放宽 wrapper）、
@@ -526,6 +552,14 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   `CustomShapeTransitionOption` / `CustomStyleTransitionOption`；`CustomElementProps.style` 与
   `shape` 仍是 `ZRStyleProps` / `ZRShapeProps`，需要过渡时用窄类型建值，见 KDoc。
   `CustomElementOptionsTest.shapeAndStyleCanCarryTheirOwnTransitions` 覆盖。
+- `GeoOption`：上游混入 `ComponentOption`（`coordinateSystem` / `coordinateSystemUsage` / `coord`）、
+  `BoxLayoutOptionMixin` 与 `AnimationOptionMixin`，wrapper 之前只有几何与样式字段，`geo` 没法当矩阵
+  格子、也关不掉自身的动画。三组字段已补齐，`matrix-mini-bar-geo` 与
+  `MatrixAndGraphicOptionTest.geoCanBeLaidOutOnMatrixCells` 覆盖。
+- `PieSeriesOption.typedCenter`：上游 `CircleLayoutOptionMixin` 把 `center` 写成
+  `(string | number)[] | string | number`——饼图落在 `geo` 上时可以只给区名。`center` 保留数组分支，
+  标量分支是同名 `@JsName("center")` 的 `typedCenter`；`map-iceland-pie` 的第四个饼靠它，
+  `SeriesTypedDataTest.pieCenterHasAnArrayAndAScalarBranch` 断言两个字段是同一个 JS 属性。
 
 ## 3D 示例（echarts-gl）
 

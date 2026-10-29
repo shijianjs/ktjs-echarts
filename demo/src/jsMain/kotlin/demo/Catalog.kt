@@ -28,6 +28,7 @@ import demo.examples.extraPagesEntries
 import demo.examples.financeTimelineEntries
 import demo.examples.gaugeEntries
 import demo.examples.geoExtraEntries
+import demo.examples.geoMapsEntries
 import demo.examples.gaugeExtraEntries
 import demo.examples.gaugeLongTailEntries
 import demo.examples.glBarGeoEntries
@@ -213,6 +214,7 @@ val catalog: List<CatalogEntry> =
         heatmapLongTailEntries,
         gaugeEntries,
         geoExtraEntries,
+        geoMapsEntries,
         gaugeExtraEntries,
         gaugeLongTailEntries,
         funnelEntries,

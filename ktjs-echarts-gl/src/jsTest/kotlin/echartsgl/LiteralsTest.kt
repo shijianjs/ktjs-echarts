@@ -1,7 +1,9 @@
 package echartsgl
 
+import echarts.options.CallbackDataParams
 import echartsgl.options.GlobeSunTime
 import kotlin.js.Date
+import kotlin.js.js
 import kotlin.js.unsafeCast
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -102,6 +104,24 @@ class LiteralsTest {
         assertEquals(0.5, NumberOrTexture(0.5).unsafeCast<Double>())
 
         assertEquals("red", GlColor(ZRColor("red")).unsafeCast<String>())
+    }
+
+    @Test
+    fun glColorWrapsAnHdrArrayAndACallback() {
+        val rgba = GlColor(arrayOf(0.5, 0.25, 2.0, 1.0)).unsafeCast<Array<Double>>()
+        assertEquals(4, rgba.size)
+        assertEquals(2.0, rgba[2])
+
+        var dataIndex = -1
+        val color =
+            GlColor { params ->
+                dataIndex = params.dataIndex
+                arrayOf(0.0, 0.5, 1.0, 1.0)
+            }
+        val callback = color.unsafeCast<(CallbackDataParams) -> Array<Double>>()
+        val channels = callback(js("({ dataIndex: 7 })") as CallbackDataParams)
+        assertEquals(7, dataIndex)
+        assertEquals(1.0, channels[2])
     }
 
     @Test

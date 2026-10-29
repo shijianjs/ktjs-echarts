@@ -91,7 +91,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **310 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **313 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -447,13 +447,20 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   `itemStyle.color`（`visualStyleAccessPath`），橙色被 11 色带顶掉——与官方页一致，别把它「修」回来。
   `geo3D` 页的取景（`distance: 50`，默认 `alpha` / `beta`）本身就很低、地图上缘被裁掉，上游渲染同样
   如此，不是移植错误。
-- **两条航线线在 `GlLines.kt`**：`lines3d-airline-on-globe` 与 `lines3d-flights-on-geo3d` 读
-  `data/gl/flights.json`（`data-gl` 那份 1.7 万条航线；2D 的 `lines-airline` 用 6.5 万条的
+- **四条航线线在 `GlLines.kt`**：`lines3d-airline-on-globe` 与 `lines3d-flights-on-geo3d` 是
+  `data-gl` 那份 1.7 万条航线画在地球/geo3D 上的版本（2D 的 `lines-airline` 用 6.5 万条的
   `data/flights.json`，两份表结构相同、内容不同），把每个航班的两个机场坐标拼成
-  `Lines3DDataItem([[...], [...]])`。地球页只有 `lineStyle` 一层淡色；geo3D 页给 `effect` 开拖尾，并在
-  `window` 上挂一个 `keydown` 监听，用 `dispatchAction(lines3DToggleEffect)` 暂停/继续——监听器交给
-  `ChartHolder.onUnmount` 释放，换页后不会再触到已销毁的实例。上游的 `geo3D.silent` 不在文档里，但
-  `echarts-gl` 核心会读它来关掉拾取，wrapper 已建模。
+  `Lines3DDataItem([[...], [...]])`；`lines3d-flights` 把同一份表**按航空公司拆成系列**，每个系列一层
+  拖尾色，再补一个 `scatter3D` 把每条航线的两个端点钉在地球上；`lines3d-flights-gl` 用近乎水平视角
+  （`viewControl.alpha: 89`）看 `geo3D`，拖尾设 `constantSpeed: 5`。地球页只有 `lineStyle` 一层淡色；
+  geo3D 两页给 `effect` 开拖尾，并在 `window` 上挂一个 `keydown` 监听，用
+  `dispatchAction(lines3DToggleEffect)` 暂停/继续——监听器交给 `ChartHolder.onUnmount` 释放，换页后不会
+  再触到已销毁的实例。上游的 `geo3D.silent` 不在文档里，但 `echarts-gl` 核心会读它来关掉拾取，wrapper
+  已建模。
+- **`lines3d-flights` 的图例顺序不是系列顺序**：上游按航司分组后拿分组对象的 key 当 `legend.data`，顺序
+  是航司在航线表里**首次出现**的顺序，而系列本身按 `airlines` 表的顺序建；`selectedMode: "single"` 下
+  首个图例项就是初始选中的那一项，顺序照搬系列会让页面默认停在另一家航司上。`GlLines.kt` 因此单独记
+  分组顺序，别把它「理顺」。
 - **`world.json` 的地名是缩写**：本站注册的 `geo/world.json` 写 `Czech Rep.` / `Korea` / `Dem. Rep. Congo`
   等，而 `world-population.json`（以及官方站点注册的 ECharts 4.9 世界地图）写全称，`GlGeo.kt` 的
   `worldRegionNames` 表把数据名翻回地图名，`geo3D` 的区域高度与地图系列都走它。`Kosovo` /
@@ -470,6 +477,10 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   `[列, 高 - 行, 亮度]`，颜色用 `itemStyle.color` 的回调按 `params.dataIndex` 取像素 RGB
   （`GlColor(ZRColor { params -> ... })`）。原例把照片以 base64 内联在源码里，这里解码成
   `data/img/gl/sushuang.jpg` 走静态资源。
+- **`bar3d-myth` 的颜色回调返回 HDR 数组**：每个像素一根 `bar3D`，颜色回调返回
+  `[r, g, b, 1]`（各通道再乘 `亮度 * 2`，会超过 1，所以是 HDR）。`ZRColor` 的回调只能返回字符串，
+  wrapper 因此给 `GlColor` 补了返回 `Array<Double>` 的回调重载。四万多根柱子配上 `enable: true` +
+  `depthOfField`，单页要几秒才稳定，截图与 e2e 都要留足时间。
 - **WebGL 层是另一张画布**：GL 系列只画在 `echarts-gl` 插进来的 canvas 上，zrender 自己的画布层不会创
   建；没有 WebGL 时 echarts-gl 用 `.ecgl-nowebgl` 占位，页面上连 canvas 都没有。e2e 因此对 GL 页只做
   `assertChartRendered`（画布有尺寸）+ `the 3d pages paint through the webgl layer`（这张画布能取到
@@ -491,6 +502,11 @@ ECharts 实例在**页面可见时才创建**（`ChartHolder.mount()`），换�
 并**逐页**打开目录里的每个示例，断言画布有实际尺寸且控制台无报错。早先按 1/6 抽样，结果漏掉了
 `themeRiver-lastfm`（表比专辑名长，构造 option 时越界）这类只在个别页出现的问题。`jvmTest` 本身被
 禁用，以免 `build` / `check` 依赖浏览器。
+
+逐页遍历的用例（`every example of the catalog renders without errors` 与
+`the 3d pages paint through the webgl layer`）各自用 `@Timeout(300)` 放宽到 5 分钟：目录每加一页，这两个
+用例就多一次「切路由 + 等画布」，WebGL 页还要先编译着色器；上限写死在单个用例上，别把整个套件的默认预算
+一起抬上去。
 
 `page(meta)` 会给页面根节点写上 `data-route`，`assertChartRendered` / `waitForPainted` 都按
 `.page[data-route='<id>'] .chart canvas` 找画布。原因是 `location.hash` 改完，`hashchange` 处理器还要

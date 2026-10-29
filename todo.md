@@ -13,7 +13,7 @@
   - `S:\workspace\github\ecomfe\echarts-gl`（GL 的 `defaultOption` 与视图实现）
   - `S:\workspace\github\JetBrains\kotlin-wrappers`（写法参考）
 - 锁定版本：根 `package.json`（`echarts` 6.1.0、`echarts-gl` 2.1.0）；修订号在
-  `wrapper-revisions.properties`（当前 `ktjs-echarts=4`、`ktjs-echarts-gl=6`）。
+  `wrapper-revisions.properties`（当前 `ktjs-echarts=4`、`ktjs-echarts-gl=7`）。
 - 验证：`./gradlew build`（含 detekt）、`:ktjs-echarts:jsBrowserTest`、`:ktjs-echarts-gl:jsBrowserTest`、
   `:demo:e2eTest`。
 
@@ -35,30 +35,31 @@
   是基类型的子接口，调用方 `unsafeJso<精确类型> { }` 即可写，读回来按需 `unsafeCast`。
 - `coordinateSystem` 等关键字收窄、继承来的 `var` 收窄沿用 `@JsName` 同名字段（`TYPE-MAPPING.md` §12）。
 
-### ktjs-echarts-gl（2.1.0-kt.6）
+### ktjs-echarts-gl（2.1.0-kt.7）
 
 - 已建模：`grid3D` / `xAxis3D|yAxis3D|zAxis3D`、`geo3D`、`globe`、`viewControl`、`light`、`postEffect`、
   shading 与材质，`bar3D` / `line3D` / `scatter3D` / `surface` / `lines3D` 五个系列的选项、数据项联合与工厂
   （`*Series { }`），字面量（坐标系统、shading、投影、blendMode、`onGridPlane`、鼠标键、画质、globe 图层
   类型与混合目标、`lines3D` 的 pause/resume/toggle 动作名）。`geo3D` / `globe` 补了核心会读但文档没写的
-  `silent`，`bar3D` 补了同样只有源码会读的 `barSize`。
+  `silent`，`bar3D` 补了同样只有源码会读的 `barSize`；`GlColor` 补了返回 HDR 数组
+  `[r, g, b, a]` 的回调重载（字符串回调由 `ZRColor` 提供，表达不了随 data item 变的 HDR 颜色）。
 - 安装器齐全（`Bar3DChart`、`Line3DChart`、`Scatter3DChart`、`SurfaceChart`、`GlobeComponent`…）；
   `echarts-gl` 的 `sideEffects` 列不全，安装器 getter 里读取 `echarts-gl/lib/echarts-gl.js` 来加载核心模块。
 - 缺：`mapbox3D`、`maptalks3D`、`polygons3D`、`map3D`、`scatterGL`、`graphGL`、`flowGL`、`linesGL`
   的选项类型（这些页面本身也多半需要地图数据或外部 JS）。
 
-### demo（310 个示例 / 27 个家族）
+### demo（313 个示例 / 27 个家族）
 
 - 各家族基本铺满；剩下的候选要么需要真实键鼠序列，要么需要外部 JS / GeoJSON / 图片素材
   （原因见 `demo/AGENTS.md`）。
-- `gl` 分组共 31 页：`examples/Gl.kt`（`bar3d-punch-card`、`transparent-bar3d`、`bar3d-dataset`、
-  `line3d-orthographic`、`simple-surface`、`sphere-parametric-surface`、`surface-wave`、
-  `image-surface-sushuang`）、`examples/GlScatter.kt`（`scatter3d`、`scatter3d-scatter`、
+- `gl` 分组共 34 页：`examples/Gl.kt`（`bar3d-punch-card`、`transparent-bar3d`、`bar3d-dataset`、
+  `image-surface-sushuang`、`bar3d-myth`、`line3d-orthographic`、`simple-surface`、
+  `sphere-parametric-surface`、`surface-wave`）、`examples/GlScatter.kt`（`scatter3d`、`scatter3d-scatter`、
   `scatter3D-dataset`）、`examples/GlSurfaceMaterial.kt`（`metal-surface`、`surface-breather`、
   `surface-mollusc-shell`、`surface-golden-rose`、`surface-theme-roses`、`parametric-surface-rose`、
   `surface-leather`）、`examples/GlGeo.kt`（`geo3d`、`geo3d-with-different-height`、六页 `globe-*`、
   `scatter3d-globe-population`）、`examples/GlLines.kt`（`lines3d-airline-on-globe`、
-  `lines3d-flights-on-geo3d`）与 `examples/GlBarGeo.kt`（`bar3d-global-population`、
+  `lines3d-flights-on-geo3d`、`lines3d-flights`、`lines3d-flights-gl`）与 `examples/GlBarGeo.kt`（`bar3d-global-population`、
   `global-population-bar3d-on-globe`）；`main()` 的 `useEChartsGl()` 注册 `Bar3DChart` / `Line3DChart` /
   `Lines3DChart` / `Scatter3DChart` / `SurfaceChart` / `Grid3DComponent` / `Geo3DComponent` /
   `GlobeComponent`。
@@ -67,16 +68,17 @@
   `resources/data/gl/flights.json`；
   11 色 `visualMap` 色带在 `Gl.kt` 的 `glPalette` / `glVisualMap()` 与 `GlSurfaceMaterial.kt` 的
   `surfaceRamp()`。
-- 素材：`resources/data/img/gl/` 下是 HDR 环境图、皮革贴图与地球/月球/星空纹理，来源记在
+- 素材：`resources/data/img/gl/` 下是 HDR 环境图、皮革贴图、地球/月球/星空纹理与 `sample.jpg`（星云
+  柱的像素来源），来源记在
   `data/SOURCE.md`；`resources/data/world.json` 与 `world-population.json` 供 `geo3D` 与 globe 页面使用，
   `world.json` 的缩写地名由 `GlGeo.kt` 的 `worldRegionNames` 表翻译。
 
 ## 下一步（GL 横向铺开）
 
-1. **把 `lines3D` / `bar3D` 的剩余数据页铺开**：先看 `lines3d-flights` / `lines3d-flights-gl`（同一份
-   `flights.json`，只是效果不同）、`lines3d-taxi-routes-of-cape-town`、`scatter3d-orthographic`、
-   `bar3d-shanghai` / `scatter3d-shanghai`，按「现有数据 + 现有系列类型」优先；需要新 GeoJSON 或二进制
-   数据的先确认体积再决定。
+1. **把 `bar3D` / `globe` 的剩余素材页铺开**：`bar3d-voxelize-image`、`image-to-bar3d`、
+   `bar3d-music-visualization`（读音频或视频，体积先看）、`globe-country-carousel`（国家高亮轮播）。
+   `lines3d-taxi-routes-of-cape-town` / `bar3d-shanghai` / `scatter3d-shanghai` 需要 mapbox 或 shapefile，
+   归入不做。
 2. **暂不做**：`animating-contour-on-globe`（d3-array/contour/geo/timer）、`*-simplex-noise` 与
    `stacked-bar3d` / `metal-bar3d`（都从 CDN 取 `simplex-noise` 生成数据，`metal-bar3d` 还要 `pisa.hdr`）、
    `*-mapbox*` / `*-maptalks*`（页面要额外加载地图 JS）、`iron-globe` 一类依赖官方站点 `/asset/get/s/`

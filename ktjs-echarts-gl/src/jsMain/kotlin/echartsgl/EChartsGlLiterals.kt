@@ -2,6 +2,7 @@ package echartsgl
 
 import echarts.EChartsInstance
 import echarts.SeriesType
+import echarts.options.CallbackDataParams
 import kotlin.js.unsafeCast
 import web.html.HTMLCanvasElement
 import web.html.HTMLImageElement
@@ -325,8 +326,8 @@ object GlEnvironments {
  * Color of a GL graphic: a regular color, an RGB(A) array whose channels may exceed `1` for HDR
  * values, or a callback.
  *
- * Use [GlColor] with a [CallbackDataParams] callback through `ZRColor` to compute the color per
- * data item.
+ * Use [GlColor] with a [CallbackDataParams] callback to compute the color per data item; the
+ * callback returns either a string, through `ZRColor`, or an array.
  */
 external interface GlColor
 
@@ -335,6 +336,16 @@ fun GlColor(value: ZRColor): GlColor = value.unsafeCast<GlColor>()
 
 /** Wraps an `[r, g, b]` or `[r, g, b, a]` array; channels above `1` are HDR. */
 fun GlColor(rgba: Array<Double>): GlColor = rgba.unsafeCast<GlColor>()
+
+/**
+ * Wraps a callback that computes an `[r, g, b]` or `[r, g, b, a]` array per data item.
+ *
+ * `echarts-gl` parses colors with its own `parseColor`, which accepts the array form too, so this is
+ * the only way to make an HDR color depend on the data; the string-returning [ZRColor] callback
+ * cannot express it.
+ */
+fun GlColor(callback: (params: CallbackDataParams) -> Array<Double>): GlColor =
+    callback.unsafeCast<GlColor>()
 
 /**
  * Series types added by `echarts-gl`.

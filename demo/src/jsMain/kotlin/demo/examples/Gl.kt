@@ -11,6 +11,7 @@ import echarts.options.*
 import echartsgl.Bar3DChart
 import echartsgl.Geo3DComponent
 import echartsgl.GlColor
+import echartsgl.GlEnvironment
 import echartsgl.GlobeComponent
 import echartsgl.Grid3DComponent
 import echartsgl.Line3DChart
@@ -248,6 +249,109 @@ private fun sushuangOption(image: HTMLImageElement): EChartsGlOption {
                             color = GlColor(ZRColor { params -> colors[params.dataIndex] })
                         }
                     typedData = vertices
+                },
+            )
+    }
+}
+
+/**
+ * The `bar3D` items and the per-bar colours of `bar3d-myth`.
+ *
+ * Every pixel of the picture becomes one bar `[column, height - row, luminance]`, where the
+ * luminance `0.2125 r + 0.7154 g + 0.0721 b` is shifted into `0..100`, and the bar keeps the RGB of
+ * its pixel scaled by that luminance, so the bright parts of the picture glow. The colour callback
+ * returns the channels as an `[r, g, b, a]` array, which only `echarts-gl`'s own `parseColor`
+ * accepts.
+ *
+ * The original inlines the picture; it is shipped as `data/img/gl/sample.jpg` instead (see
+ * `data/SOURCE.md`).
+ */
+private fun mythOption(image: HTMLImageElement): EChartsGlOption {
+    val width = image.width
+    val height = image.height
+    val canvas =
+        document.createElement(HtmlTagName.canvas).apply {
+            this.width = width
+            this.height = height
+        }
+    val context =
+        checkNotNull(canvas.getContext(CanvasRenderingContext2D.ID)) {
+            "the myth bars need a 2d context"
+        }
+    context.drawImage(image.unsafeCast<CanvasImageSource>(), 0.0, 0.0, width.toDouble(), height.toDouble())
+    val pixels = context.getImageData(0, 0, width, height).data
+    val count = width * height
+    val bars = arrayOfNulls<Bar3DDataItem>(count)
+    val colors = Array(count) { arrayOf(0.0, 0.0, 0.0, 1.0) }
+    for (index in 0 until count) {
+        val red = pixels[index * 4].toInt() and 0xff
+        val green = pixels[index * 4 + 1].toInt() and 0xff
+        val blue = pixels[index * 4 + 2].toInt() and 0xff
+        val luminance = 0.2125 * red + 0.7154 * green + 0.0721 * blue
+        bars[index] =
+            Bar3DDataItem(
+                doubleRow((index % width).toDouble(), (height - index / width).toDouble(), (luminance - 125) / 4 + 50),
+            )
+        val glow = luminance / 255 * 2
+        colors[index] = arrayOf(red / 255.0 * glow, green / 255.0 * glow, blue / 255.0 * glow, 1.0)
+    }
+    return unsafeJso {
+        tooltip = one(unsafeJso<TooltipOption> {})
+        backgroundColor = ZRColor("#fff")
+        xAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
+        yAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
+        zAxis3D =
+            one(
+                unsafeJso<Axis3DOption> {
+                    type = AxisTypes.value
+                    min = AxisMinMax(0.0)
+                    max = AxisMinMax(100.0)
+                },
+            )
+        grid3D =
+            one(
+                unsafeJso<Grid3DOption> {
+                    show = false
+                    boxDepth = 100.0
+                    boxHeight = 20.0
+                    environment = GlEnvironment("data/img/gl/starfield.jpg")
+                    viewControl = unsafeJso { alpha = 70.0; beta = 0.0 }
+                    postEffect =
+                        unsafeJso<PostEffectOption> {
+                            enable = true
+                            depthOfField =
+                                unsafeJso {
+                                    enable = true
+                                    blurRadius = 4.0
+                                    fstop = 10.0
+                                }
+                        }
+                    light =
+                        unsafeJso<LightOption> {
+                            main = unsafeJso { shadow = true; intensity = 2.0 }
+                            ambientCubemap =
+                                unsafeJso<AmbientCubemapLightOption> {
+                                    texture = "data/img/gl/canyon.hdr"
+                                    exposure = 2.0
+                                    diffuseIntensity = 0.2
+                                }
+                        }
+                },
+            )
+        series =
+            one(
+                bar3DSeries {
+                    shading = ShadingTypes.lambert
+                    barSize = DoubleOrDoubleArray(0.8)
+                    silent = true
+                    dimensions =
+                        arrayOf(
+                            DimensionDefinitionLoose("x"),
+                            DimensionDefinitionLoose("y"),
+                            DimensionDefinitionLoose("z"),
+                        )
+                    typedItemStyle = unsafeJso { color = GlColor { params -> colors[params.dataIndex] } }
+                    typedData = bars
                 },
             )
     }
@@ -588,5 +692,17 @@ val glEntries: List<CatalogEntry> =
             val picture = document.createElement(HtmlTagName.img)
             picture.listen(LOAD) { chart.setOption(sushuangOption(picture)) }
             picture.src = "data/img/gl/sushuang.jpg"
+        },
+        gl.interactive(
+            "bar3d-myth",
+            "Bar3D - 星云",
+            "Bar3D - Myth",
+            "把一张星云照片的每个像素变成一根细柱：高度取亮度并把视野压扁，柱子保留像素颜色，亮处像在发光。",
+            "Every pixel of a nebula photograph becomes a thin bar: the luminance sets the height in a " +
+                "squashed box, and the bars keep the colour of their pixel, so the bright parts glow.",
+        ) { chart ->
+            val picture = document.createElement(HtmlTagName.img)
+            picture.listen(LOAD) { chart.setOption(mythOption(picture)) }
+            picture.src = "data/img/gl/sample.jpg"
         },
     )

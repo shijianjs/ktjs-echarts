@@ -21,10 +21,12 @@ import zrender.ZRColor
 private val linesExtra = Category(Groups.LINES, "examples/LinesExtra.kt")
 
 /**
- * Shape of `flights.json`: airports as `[name, city, country, lng, lat]` rows and routes as
- * `[airline, from, to]`. The GL pages read the smaller `data-gl` copy of the same table.
+ * Shape of `flights.json`: airports as `[name, city, country, lng, lat]` rows, airlines as
+ * `[name, country]` rows and routes as `[airline, from, to]` indices into the first two. The GL
+ * pages read the smaller `data-gl` copy of the same table, whose `airlines` has 11 entries.
  */
 internal external interface FlightsData {
+    val airlines: Array<Array<JsAny>>
     val airports: Array<Array<JsAny>>
     val routes: Array<Array<Double>>
 }

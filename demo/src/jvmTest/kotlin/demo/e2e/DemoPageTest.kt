@@ -7,6 +7,7 @@ import com.microsoft.playwright.options.WaitUntilState
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Timeout
 import org.junitpioneer.jupiter.RetryingTest
 
 /**
@@ -170,8 +171,13 @@ class DemoPageTest {
      * Walks the whole catalog and asserts that each route renders a sized canvas, which catches a
      * page that throws while building its option. Every route is visited: a sample missed a page
      * whose option builder indexed past the end of a table.
+     *
+     * The timeout goes past the suite default (90 s) because this test visits every route of the
+     * catalog: each visit costs a route switch plus a scoped wait, and the WebGL pages compile their
+     * shaders first.
      */
     @Test
+    @Timeout(300)
     fun `every example of the catalog renders without errors`(page: Page) {
         val consoleErrors = mutableListOf<String>()
         page.onConsoleMessage { message ->
@@ -241,8 +247,12 @@ class DemoPageTest {
      * installers, so a bundler may drop the module that registers the post-update hook) leaves the
      * option accepted and the page blank; a browser without WebGL replaces the layer with an
      * `.ecgl-nowebgl` placeholder. Both are asserted against here.
+     *
+     * Every page here is a WebGL one, so the sweep exceeds the suite default (90 s) as the list
+     * grows; the timeout is raised rather than trimmed so the coverage stays complete.
      */
     @RetryingTest(maxAttempts = 2)
+    @Timeout(300)
     fun `the 3d pages paint through the webgl layer`(page: Page) {
         val consoleErrors = mutableListOf<String>()
         page.onConsoleMessage { message ->
@@ -283,6 +293,9 @@ class DemoPageTest {
                 "lines3d-flights-on-geo3d",
                 "bar3d-global-population",
                 "global-population-bar3d-on-globe",
+                "lines3d-flights",
+                "lines3d-flights-gl",
+                "bar3d-myth",
             )
         for (route in routes) {
             assertChartRendered(page, route)

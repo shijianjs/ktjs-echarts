@@ -299,6 +299,9 @@ class DemoPageTest {
                 "bar3d-myth",
                 "image-to-bar3d",
                 "bar3d-voxelize-image",
+                "graphgl-gpu-layout",
+                "graphgl-large-internet",
+                "graphgl-npm-dep",
             )
         for (route in routes) {
             assertChartRendered(page, route)
@@ -598,15 +601,18 @@ class DemoPageTest {
     }
 
     /**
-     * The four pages of `ScatterAqi.kt`, `ScatterNutrients.kt` and `ParallelNutrients.kt` plus the
-     * timeline of `ScatterLifeTimeline.kt`.
+     * The four pages of `ScatterAqi.kt`, `ScatterNutrients.kt` and `ParallelNutrients.kt`, the
+     * timeline of `ScatterLifeTimeline.kt`, and the two table-driven pages of `ScatterStreamVisual.kt`
+     * and `WindBarb.kt`.
      *
      * All of them build their rows from a fetched table (the AQI page keeps its three tables inline),
      * so an option that never reached the chart leaves an empty canvas that only the painted-pixel
      * wait catches. The two nutrient scatters draw on `zlevel = 1` with a motion-blur trail, which
      * puts their content on a second canvas layer: the layer-aware wait is what makes those two
      * pass at all. The timeline plays by itself, so a frame sampled after one point must differ from
-     * the first one.
+     * the first one. The arrow and forecast icons of the wind page are custom series elements, so a
+     * `renderItem` that throws would leave only the two lines painted; the console assertion covers
+     * that.
      */
     @RetryingTest(maxAttempts = 2)
     @Timeout(300)
@@ -622,7 +628,9 @@ class DemoPageTest {
                     "scatter-aqi-color",
                     "scatter-nutrients",
                     "scatter-nutrients-matrix",
+                    "scatter-stream-visual",
                     "parallel-nutrients",
+                    "wind-barb",
                 )
         ) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)

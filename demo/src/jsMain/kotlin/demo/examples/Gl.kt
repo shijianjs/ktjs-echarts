@@ -10,6 +10,7 @@ import echarts.EChartsExtensionInstaller
 import echarts.options.*
 import echartsgl.Bar3DChart
 import echartsgl.Geo3DComponent
+import echartsgl.GraphGLChart
 import echartsgl.GlColor
 import echartsgl.GlEnvironment
 import echartsgl.GlobeComponent
@@ -67,6 +68,7 @@ internal fun useEChartsGl() {
             Lines3DChart,
             Scatter3DChart,
             SurfaceChart,
+            GraphGLChart,
             Grid3DComponent,
             Geo3DComponent,
             GlobeComponent,

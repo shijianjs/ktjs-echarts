@@ -109,8 +109,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后落地 **346 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
-的官方清单统计，共 436 条：已移植 347 条，明确不做 51 条，待补 38 条；逐条清单与理由见
+筛选后落地 **351 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
+的官方清单统计，共 436 条：已移植 352 条，明确不做 51 条，待补 33 条；逐条清单与理由见
 [COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -128,9 +128,9 @@ demo/src/jvmTest/kotlin/demo/e2e/
 | --- | --- |
 | `bmap` | 需要百度地图 JS SDK，wrapper 没有覆盖，整个家族不做 |
 | `graphic` | 关键帧动画那一档已落地（`examples/GraphicAnimations.kt`，见下），剩余示例都配合真实交互或外部素材 |
-| `visualMap` / `dataZoom` | 清单里没有独立家族，这几条随所属系列落地或列入待补（`wind-barb`、`line-tooltip-touch`）；能力已由具体示例覆盖 |
+| `visualMap` / `dataZoom` | 清单里没有独立家族，这几条随所属系列落地或列入待补（`line-tooltip-touch`）；能力已由具体示例（`wind-barb` 等）覆盖 |
 
-`gl` 家族已经接入（`examples/Gl*.kt` 七个文件，见下文「3D 示例」），剩余页面按
+`gl` 家族已经接入（`examples/Gl*.kt` 八个文件，见下文「3D 示例」），剩余页面按
 [COVERAGE.md](COVERAGE.md) 的待补清单推进。
 
 `lines` / `map` / `geo` 已经能用静态数据集（`lines-airline`、`custom-hexbin` 就是先例）：只要再拷
@@ -206,6 +206,11 @@ option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
 `xAxis` 是 24 小时、`yAxis` 是 7 天，所以写进 `ScatterDataItem` 时必须换成 `doubleRow(hour, day, count)`。
 照抄上游顺序时 `symbolSize` 读的仍是第三列、图例也正常，e2e 照样通过，只有截图能看出 168 个气泡全堆在
 同一列（`animationDelay` 还是按 `index * 5` 排，看不出异常）。
+
+`scatter-stream-visual` 在 `examples/ScatterStreamVisual.kt`：`loadJson("data/house-price-area2.json")`
+后把两列直接写进 `ScatterDataItem`（`[面积, 价格]`），`visualMap.dimension = 1` 映射的是价格那列，
+`inRange.color` 要写成 `StringOrStringArray`，不能塞 `ZRColor` 数组；tooltip 与其余样式都照上游的默认值，
+不用自造 formatter。
 
 `scatter-symbol-morph` 与 `scatter-aggregate-bar` 收在 `examples/ScatterTransition.kt`：
 
@@ -341,6 +346,21 @@ icon 数摆进日历格子，`renderItem` 用 `api.font()` 取字号、`linearMa
 后者读 `resources/data/stack-trace.json`（`SOURCE.md` 里有登记），把堆栈按深度铺成矩形火焰图，
 点击某帧时深拷贝后只保留该帧以下的子树再 `setOption`。两者的 `textContent.style` 用到 zrender 的文本
 偏移字段 `x` / `y`，这次一并补进 `ZRStyleProps`。
+
+`wind-barb` 在 `examples/WindBarb.kt`，是最大的一页自定义系列：四层系列（风速面积线、`renderItem` 画的
+风向箭头、海波高度虚线、`renderItem` 画的天气图标行）叠在同一张 time 轴上。
+
+- 上游把读数的时间字段直接当字符串塞进数据项，再用 `+ 86400000` 加一天；Kotlin 侧先
+  `Date(time).getTime()` 转时间戳，`maxInterval = ONE_DAY` 与 `formatTime` 都按数值工作。
+- 箭头的旋转角度是风来的方向，`rotation = PI / 8 * 16 方位索引`；`shape` 里的 `x` / `y` 是**中心**而非
+  左上角（`CustomPathOption` 的 `shape` 是 `ZRShapeProps`，没有 `position`），所以要给 ±9 的偏移。
+- 天气图标行是 `CustomGroupOption` 里的 image + text 两个子元素，子元素各自带 `style.image` /
+  `style.text`；图标的 `verticalAlign` / `align` 用的是 `VerticalAlign` / `TextAlign`，不是
+  `textAlign`。
+- 三段风速的 piecewise `visualMap` 只对第二个系列生效（`seriesIndex = IndexOrIndexArray(1.0)`），
+  箭头颜色因此按 `api.style()` 上一层的 visualStyle 决定；`yAxis.max = AxisMinMax(6.0)` 是包装类型，
+  `splitLine.show` / `axisLabel.show` 是裸 `Boolean`，只有 `axisLine.show` 是 `BooleanOrString`。
+- 两个 dataZoom（inside + 底部 slider）的 `minSpan = 5` 让视口最多缩到 5 个读数宽。
 
 `doc-example/` 里还没有移植的（上游 80 个文件 = 79 个 `.js` + 1 个 `.ts`、已按 `doc-example/` id 落地
 58 个、`bar-large` / `pie-highlight` 按家族 id 落地，剩 20 条）。按原因分类：
@@ -494,10 +514,10 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
 ## 3D 示例（echarts-gl）
 
 3D 家族在 `examples/Gl.kt`、`examples/GlScatter.kt`、`examples/GlSurfaceMaterial.kt`、
-`examples/GlGeo.kt`、`examples/GlLines.kt`、`examples/GlBarGeo.kt` 与 `examples/GlImageBars.kt`，用的是
-`ktjs-echarts-gl` 模块，写法与其它家族一样走 `Category.chart`；要先取数据文件的（`bar3d-dataset` 与三页
-`scatter3D`）走 `Category.interactive` + `loadJson`，要等图片加载的（`surface-leather`）走
-`Category.interactive` + `listen(LOAD)`：
+`examples/GlGeo.kt`、`examples/GlLines.kt`、`examples/GlBarGeo.kt`、`examples/GlImageBars.kt` 与
+`examples/GlGraph.kt`，用的是 `ktjs-echarts-gl` 模块，写法与其它家族一样走 `Category.chart`；要先取数据
+文件的（`bar3d-dataset`、三页 `scatter3D` 与两页图谱）走 `Category.interactive` + `loadJson`，要等图片
+加载的（`surface-leather`、`bar3d-myth` 一类）走 `Category.interactive` + `listen(LOAD)`：
 
 - **安装是全局的一次性动作**：`echarts` 的入口不带 GL 图表，`ECharts.use(...)` 注册的扩展对所有实例生
   效，所以调用点在 `main()` 里的 `useEChartsGl()`，必须在第一个 `ECharts.init` 之前。新页面需要另一种
@@ -578,6 +598,15 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   是航司在航线表里**首次出现**的顺序，而系列本身按 `airlines` 表的顺序建；`selectedMode: "single"` 下
   首个图例项就是初始选中的那一项，顺序照搬系列会让页面默认停在另一家航司上。`GlLines.kt` 因此单独记
   分组顺序，别把它「理顺」。
+- **三张 `graphGL` 页在 `GlGraph.kt`**：`GraphGLChart` 也要进 `useEChartsGl()` 的 installer 数组，漏了
+  只会得到一张空白画布。`graphgl-gpu-layout` 用 `Lcg` 在固定 1280×720 的盒子里撒点后交给 ForceAtlas2
+  （上游撒点用 `Math.random()` / `window.innerWidth`，布局本来就会覆盖初始位置，固定盒子只为可复现）；
+  它和上游一样画白网格，但白网格要靠 `theme: dark` 的背景才看得见，本站主题由自己的开关决定，所以
+  显式写 `backgroundColor = '#000'`（另两页上游本来就写了），不写就是白底白线。
+  `graphgl-large-internet` 的边表是每行 `[source, target]` 一组，上游却按扁平端点列表 `edges[i++]` 读，
+  照抄时所有边都落不到节点上，移植时按行配对；它的 31 个类别取节点第四列。`graphgl-npm-dep` 的
+  `modularity` 来自官方站单独加载的 CDN 插件 `echarts-graph-modularity`，本站没有，去掉后所有节点都是
+  调色板第一色（上游不加载插件时也一样），`stopThreshold` 则是 echarts-gl 声明但不读的死字段。
 - **`world.json` 的地名是缩写**：本站注册的 `geo/world.json` 写 `Czech Rep.` / `Korea` / `Dem. Rep. Congo`
   等，而 `world-population.json`（以及官方站点注册的 ECharts 4.9 世界地图）写全称，`GlGeo.kt` 的
   `worldRegionNames` 表把数据名翻回地图名，`geo3D` 的区域高度与地图系列都走它。`Kosovo` /

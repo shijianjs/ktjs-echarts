@@ -39,7 +39,7 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `obama_budget_proposal_2012.json` | `data/` | `treemap-obama` |
 | `obama_budget_proposal_2012.list.json` | `data/` | `doc-example/bar-dataZoom-filterMode` |
 | `stock-DJI.json` | `data/` | `doc-example/candlestick-axisPointer` |
-| `wind-barb-hobart.json` | `data/` | (not ported yet, `custom-wind`) |
+| `wind-barb-hobart.json` | `data/` | `wind-barb` |
 | `aqi-beijing.json` | `data/` | `line-aqi` |
 | `energy.json` | `data/` | `sankey-energy`, `sankey-nodeAlign-left`, `sankey-nodeAlign-right` |
 | `product.json` | `data/` | `sankey-levels` |
@@ -73,6 +73,9 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `img/gl/bathymetry_bw_composite_4k.jpg` | `data-gl/asset/` | `globe-displacement`, `globe-layers` (displacement / height texture) |
 | `world-population.json` | `data-gl/asset/data/` | `geo3d-with-different-height` (region heights), `globe-with-echarts-surface` (map values) |
 | `population.json` | `data-gl/asset/data/` | `scatter3d-globe-population`, `bar3d-global-population`, `global-population-bar3d-on-globe` (`[lng, lat, population]` cells) |
+| `gl/internet.graph.json` | `data-gl/asset/data/` | `graphgl-large-internet` (23k nodes, `[source, target]` edge rows) |
+| `gl/npmdep.json` | `data-gl/asset/data/` | `graphgl-npm-dep` (10k packages, flat endpoint list) |
+| `house-price-area2.json` | `data/` | `scatter-stream-visual` (`[area, price]` pairs) |
 
 The two `rainfall-*.json` files are **derived**, not copied: upstream keeps these 3079-point series
 inline in `examples/ts/grid-multiple.ts` and `examples/ts/area-rainfall.ts`, so a one-off script split

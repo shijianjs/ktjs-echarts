@@ -62,4 +62,8 @@
 - **空的 `viewControl` / `grid3D` 不要写**：不要为了「对齐上游」写空对象，只在真的设了字段时写。
 - **SSR 在 Chrome 下会黑帧**：`echarts-gl` 2.1.0 的 SSR pass 会画出整幅黑帧（bloom / SSAO / DOF 单独开
   都正常），`bar3d-voxelize-image` 因此关掉了 `screenSpaceReflection`。
+- **画白线的 GL 页要自带背景**：`graphgl-gpu-layout` 上游画白网格、靠 `theme: dark` 出黑底；本站主题由
+  自己的开关决定，页面必须显式写 `backgroundColor`，否则白底白线看起来像空页（截图和 e2e 都看不出错）。
+- **`graphGL` 的 `modularity` 不是核心选项**：它来自官方站单独加载的 CDN 插件 `echarts-graph-modularity`，
+  本站没有，去掉后所有节点取调色板第一色；`stopThreshold` 是声明但不读的死字段。
 - **上游没有 TypeScript 声明**：选项按 `echarts-doc` 的 `option-gl/` 与源码 `defaultOption` 建模。

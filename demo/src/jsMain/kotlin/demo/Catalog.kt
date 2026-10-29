@@ -16,6 +16,7 @@ import demo.examples.customExtraEntries
 import demo.examples.customGaugeEntries
 import demo.examples.customLongTailEntries
 import demo.examples.customMoreEntries
+import demo.examples.windBarbEntries
 import demo.examples.customTransitionEntries
 import demo.examples.datasetEntries
 import demo.examples.datasetExtraEntries
@@ -30,6 +31,7 @@ import demo.examples.geoExtraEntries
 import demo.examples.gaugeExtraEntries
 import demo.examples.gaugeLongTailEntries
 import demo.examples.glBarGeoEntries
+import demo.examples.glGraphEntries
 import demo.examples.glEntries
 import demo.examples.glGeoEntries
 import demo.examples.glImageBarsEntries
@@ -73,6 +75,7 @@ import demo.examples.scatterMatrixEntries
 import demo.examples.scatterTransitionEntries
 import demo.examples.scatterNutrientsEntries
 import demo.examples.scatterPunchCardEntries
+import demo.examples.scatterStreamVisualEntries
 import demo.examples.scatterWeightEntries
 import demo.examples.scatterWorldEntries
 import demo.examples.sunburstEntries
@@ -190,6 +193,7 @@ val catalog: List<CatalogEntry> =
         scatterLifeTimelineEntries,
         scatterNutrientsEntries,
         scatterPunchCardEntries,
+        scatterStreamVisualEntries,
         scatterTransitionEntries,
         scatterLongTailEntries,
         scatterMatrixEntries,
@@ -230,6 +234,7 @@ val catalog: List<CatalogEntry> =
         customGaugeEntries,
         customLongTailEntries,
         customMoreEntries,
+        windBarbEntries,
         customTransitionEntries,
         graphicAnimationEntries,
         canvasGraphicsEntries,
@@ -240,6 +245,7 @@ val catalog: List<CatalogEntry> =
         sankeyEntries,
         themeRiverEntries,
         glEntries,
+        glGraphEntries,
         glBarGeoEntries,
         glGeoEntries,
         glImageBarsEntries,

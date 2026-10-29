@@ -76,6 +76,8 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `gl/internet.graph.json` | `data-gl/asset/data/` | `graphgl-large-internet` (23k nodes, `[source, target]` edge rows) |
 | `gl/npmdep.json` | `data-gl/asset/data/` | `graphgl-npm-dep` (10k packages, flat endpoint list) |
 | `house-price-area2.json` | `data/` | `scatter-stream-visual` (`[area, price]` pairs) |
+| `fake-nebula.bin` | `data/asset/data/` | `scatter-nebula` (8 MB of 32-bit floats, a flat `[x0, y0, x1, y1, ...]` table) |
+| `calendar-lunar.json` | derived | `calendar-lunar` (the 365-row `dateList` of `examples/ts/calendar-lunar.ts`, each row `[date, lunarDay]` or `[date, lunarDay, solarTerm]`) |
 
 The two `rainfall-*.json` files are **derived**, not copied: upstream keeps these 3079-point series
 inline in `examples/ts/grid-multiple.ts` and `examples/ts/area-rainfall.ts`, so a one-off script split

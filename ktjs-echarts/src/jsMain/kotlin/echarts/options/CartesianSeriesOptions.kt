@@ -9,6 +9,7 @@ import echarts.CartesianPolarCoordinateSystem
 import echarts.CartesianCoordinateSystem
 import echarts.HeatmapCoordinateSystem
 import echarts.AnimationEasing
+import js.array.ArrayLike
 import js.objects.Record
 import kotlin.js.JsAny
 import kotlin.js.JsName
@@ -376,6 +377,17 @@ external interface ScatterSeriesOption :
      */
     @JsName("data")
     var typedData: Array<ScatterDataItem?>?
+
+    /**
+     * Flat numeric view of the data: `[x0, y0, x1, y1, ...]`.
+     *
+     * Upstream declares `data` as `(...)[] | ArrayLike<number>`, and a flat array is what the
+     * large-data pages pass — usually a `Float32Array` read from a binary file. ECharts reads such an
+     * array as consecutive rows of [dimensions], which are therefore required. Same JavaScript
+     * property as [typedData], so assign exactly one of them.
+     */
+    @JsName("data")
+    var typedFlatData: ArrayLike<JsAny>?
 }
 
 /**

@@ -1,5 +1,7 @@
 package demo.ui
 
+import js.buffer.ArrayBuffer
+import js.typedarrays.Float32Array
 import kotlin.js.JsAny
 import kotlin.js.Promise
 import kotlin.js.js
@@ -24,3 +26,16 @@ fun loadJson(path: String): Promise<JsAny> =
 fun loadText(path: String): Promise<String> =
     js("function (path) { return fetch(path).then(function (response) { return response.text(); }); }")(path)
         as Promise<String>
+
+/**
+ * Loads a binary file of 32-bit floats, e.g. the `[x0, y0, x1, y1, ...]` point table of a large
+ * scatter page.
+ *
+ * The typed array is passed to ECharts as it is: passing it as `data` is what makes large-data
+ * pages cheap, because no per-point JavaScript object is created.
+ */
+fun loadFloat32(path: String): Promise<Float32Array<ArrayBuffer>> =
+    js(
+        "function (path) { return fetch(path).then(function (response) { return response.arrayBuffer(); })" +
+            ".then(function (buffer) { return new Float32Array(buffer); }); }",
+    )(path) as Promise<Float32Array<ArrayBuffer>>

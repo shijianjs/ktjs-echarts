@@ -9,8 +9,11 @@ import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import web.cssom.TextAlign
 import web.cssom.VerticalAlign
+import zrender.ElementTextConfig
 import zrender.ZRColor
 import zrender.ZRLineTypes
+import zrender.ZRShapeProps
+import zrender.ZRStyleProps
 
 /*
  * The small examples of the official documentation, ported from
@@ -24,9 +27,10 @@ import zrender.ZRLineTypes
  * scatter pages, the text / label pages, the animation pages and the sunburst / treemap
  * introductions; the pages that drive the chart themselves live in `DocInteractive.kt`.
  *
- * Still not ported: the pages that read a JSONP file at run time or `getScript` a renderer, the map /
- * `geo` combinations, the ones whose only content is an official-site image, and `canvas-vs-svg`,
- * which switches between two renderers.
+ * Still not ported: the pages that read a JSONP file at run time or `getScript` a renderer, the
+ * `geo` / `map` combinations that need a GeoJSON file (the three inline-SVG ones are ported below),
+ * the ones whose only content is an official-site image, and `canvas-vs-svg`, which switches
+ * between two renderers.
  *
  * `matrix-graph-box` keeps the node coordinates of the original; they are local to the cell box, so
  * they land inside it whatever the container size is.
@@ -1511,7 +1515,222 @@ val docExampleEntries: List<CatalogEntry> =
                     )
             }
         },
+        docExample.chart("doc-example/geo-svg-named-basic", "SVG 地图的命名区域", "Geo SVG named regions") {
+            registerSvgMap("simple_svg", NAMED_SVG)
+            unsafeJso<EChartsOption> {
+                geo = one(unsafeJso<GeoOption> { map = "simple_svg" })
+            }
+        },
+        docExample.chart("doc-example/geo-svg-label-basic", "SVG 地图的区域标签", "Geo SVG region labels") {
+            registerSvgMap("simple_svg", LABELLED_SVG)
+            unsafeJso<EChartsOption> {
+                geo =
+                    one(
+                        unsafeJso<GeoOption> {
+                            map = "simple_svg"
+                            regions =
+                                arrayOf(
+                                    svgRegion(
+                                        "name_a",
+                                        "This two rects are wrapped in a <g name=\"...\">",
+                                        "So a single label is displayed in the center",
+                                        "of the bounding rect of the <g>",
+                                    ),
+                                    svgRegion(
+                                        "name_b",
+                                        "This two rects are named",
+                                        "with the same name.",
+                                        "So each of them has a label.",
+                                    ),
+                                )
+                        },
+                    )
+            }
+        },
+        docExample.chart("doc-example/geo-svg-layout-basic", "SVG 地图的布局", "Geo SVG layout") {
+            svgLayoutCells.groupBy { it.map }.forEach { (name, cells) -> registerSvgMap(name, cells.first().svg) }
+            svgLayoutOption()
+        },
     )
+
+/** Registers an inline SVG as the map [name]; every `geo-svg-*` page does this before its option. */
+private fun registerSvgMap(name: String, svg: String) {
+    ECharts.registerMap(name, MapInput(unsafeJso<SVGMapInput> { this.svg = GeoSVGSourceInput(svg) }))
+}
+
+/** One labelled region of `doc-example/geo-svg-label-basic`. */
+private fun svgRegion(name: String, vararg lines: String): RegionOption =
+    unsafeJso {
+        this.name = name
+        label =
+            unsafeJso<LabelOption> {
+                formatter = LabelFormatter(lines.joinToString("\n"))
+                backgroundColor = ZRColor("rgba(0,0,0,0.2)")
+                padding = DoubleOrDoubleArray(5.0)
+            }
+    }
+
+/** The two-rectangle map of `doc-example/geo-svg-named-basic`: one named path, one unnamed. */
+private const val NAMED_SVG =
+    """<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" fill-rule="evenodd" xml:space="preserve">
+    <path name="named_rect" d="M 0,0 L 0,100 100,100 100,0 Z" fill="#765" />
+    <path d="M 150,0 L 150,100 250,100 250,0 Z" fill="#567" />
+</svg>
+"""
+
+/** The map of `doc-example/geo-svg-label-basic`: a named `<g>` and two paths that share a name. */
+private const val LABELLED_SVG =
+    """<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" fill-rule="evenodd" xml:space="preserve"
+        viewBox="-180 0 610 300">
+    <g name="name_a">
+        <path d="M 0,0 L 0,100 100,100 100,0 Z" fill="#765" />
+        <path d="M 150,0 L 150,100 250,100 250,0 Z" fill="#765" />
+    </g>
+    <path name="name_b" d="M -80,200 L -80,300 20,300 20,200 Z" fill="#567" />
+    <path name="name_b" d="M 230,200 L 230,300 330,300 330,200 Z" fill="#567" />
+</svg>
+"""
+
+/** One `geo` of `doc-example/geo-svg-layout-basic`: the map, whether it pins its coordinates, and the caption. */
+private class SvgLayoutCell(val map: String, val svg: String, val pinned: Boolean, val caption: List<String>)
+
+/** Caption lines the pinned cells of `doc-example/geo-svg-layout-basic` add. */
+private val PINNED_CAPTION = listOf("geo.boundingCoords: ", "    [[-50, -50], [150, 150]]")
+
+private val svgLayoutCells =
+    listOf(
+        SvgLayoutCell(
+            "svg_noWidthHeight_noViewBox",
+            """<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" fill-rule="evenodd" xml:space="preserve">
+    <circle cx="0" cy="0" r="100" fill="#765" />
+</svg>
+""",
+            pinned = false,
+            caption = listOf("<svg>", "<circle cx=\"0\" cy=\"0\" r=\"100\"/>", "</svg>"),
+        ),
+        SvgLayoutCell(
+            "svg_noWidthHeight_hasViewBox",
+            """<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" fill-rule="evenodd" xml:space="preserve"
+    viewBox="0 0 200 200"
+>
+    <circle cx="0" cy="0" r="100" fill="#765" />
+</svg>
+""",
+            pinned = false,
+            caption = listOf("<svg viewBox=\"0 0 200 200\">", "<circle cx=\"0\" cy=\"0\" r=\"100\"/>", "</svg>"),
+        ),
+        SvgLayoutCell(
+            "svg_hasWidthHeight_hasViewBox",
+            """<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.2" fill-rule="evenodd" xml:space="preserve"
+    width="100"
+    height="200"
+    viewBox="0 0 200 200"
+>
+    <circle cx="0" cy="0" r="100" fill="#765" />
+</svg>
+""",
+            pinned = false,
+            caption =
+                listOf(
+                    "<svg viewBox=\"0 0 200 200\"",
+                    "     width=\"100\" height=\"200\">",
+                    "<circle cx=\"0\" cy=\"0\" r=\"100\"/>",
+                    "</svg>",
+                ),
+        ),
+    ).let { cells ->
+        // The second row repeats the three maps with `boundingCoords` pinned to the same box.
+        cells + cells.map { cell -> SvgLayoutCell(cell.map, cell.svg, true, cell.caption + PINNED_CAPTION) }
+    }
+
+/**
+ * The option of `doc-example/geo-svg-layout-basic`: six squares, three maps each drawn twice — once
+ * with the size the SVG itself declares and once pinned to `boundingCoords` — each with a red-headed
+ * caption drawn by a `graphic` rect.
+ */
+private fun svgLayoutOption(): EChartsOption {
+    val width = 100.0
+    val height = 100.0
+    val xStart = 40.0
+    var left = xStart
+    var top = 40.0
+    val geos = mutableListOf<GeoOption>()
+    val graphics = mutableListOf<GraphicComponentLooseOption>()
+    svgLayoutCells.forEachIndexed { index, cell ->
+        geos +=
+            unsafeJso<GeoOption> {
+                map = cell.map
+                this.left = StringOrDouble(left)
+                this.top = StringOrDouble(top)
+                this.width = StringOrDouble(width)
+                this.height = StringOrDouble(height)
+                if (cell.pinned) boundingCoords = arrayOf(arrayOf(-50.0, -50.0), arrayOf(150.0, 150.0))
+            }
+        graphics +=
+            GraphicComponentLooseOption(
+                unsafeJso<GraphicElement> {
+                    type = "rect"
+                    shape =
+                        unsafeJso<ZRShapeProps> {
+                            x = left
+                            y = top
+                            this.width = width
+                            this.height = height
+                        }
+                    style =
+                        unsafeJso<ZRStyleProps> {
+                            // A graphic rect is filled black unless `fill` is cleared explicitly.
+                            fill = null
+                            stroke = ZRColor("#000")
+                            lineWidth = 2.0
+                        }
+                    textContent =
+                        unsafeJso<GraphicElement> {
+                            type = "text"
+                            style =
+                                unsafeJso<SvgLayoutTextStyle> {
+                                    text = (listOf("{head|geo $index:}") + cell.caption).joinToString("\n")
+                                    fontFamily = "Arial"
+                                    fontSize = StringOrDouble(12.0)
+                                    align = TextAlign.left
+                                    rich = svgLayoutRich
+                                }
+                        }
+                    textConfig =
+                        unsafeJso<ElementTextConfig> {
+                            position =
+                                StringOrDoubleOrArray(
+                                    arrayOf(StringOrDouble(0.0), StringOrDouble(height + 10)),
+                                )
+                        }
+                },
+            )
+        left += width + 120
+        if ((index + 1) % 3 == 0) {
+            left = xStart
+            top += height + 120
+        }
+    }
+    return unsafeJso {
+        geo = geos.toTypedArray()
+        graphic = graphics.toTypedArray()
+    }
+}
+
+/** Text style of the graphic captions; [ZRStyleProps] does not declare `rich` yet. */
+private external interface SvgLayoutTextStyle : ZRStyleProps {
+    var rich: Record<String, ZRStyleProps>?
+}
+
+/** The `{head|…}` style of the captions: red, one 20px line high. */
+private val svgLayoutRich: Record<String, ZRStyleProps> =
+    recordOf("head" to unsafeJso<ZRStyleProps> { fill = ZRColor("red"); lineHeight = 20.0 })
+        .unsafeCast<Record<String, ZRStyleProps>>()
 
 /** One node of `doc-example/matrix-graph-box`, placed by the local coordinates of the cell box. */
 private fun matrixNode(name: String, x: Double, y: Double, value: Double): GraphDataItem =

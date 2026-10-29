@@ -109,13 +109,13 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后落地 **351 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
-的官方清单统计，共 436 条：已移植 352 条，明确不做 51 条，待补 33 条；逐条清单与理由见
+筛选后落地 **356 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
+的官方清单统计，共 436 条：已移植 357 条，明确不做 51 条，待补 28 条；逐条清单与理由见
 [COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
 一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。这批页面按依赖分三个文件：
-`examples/DocExamples.kt`（静态页，30 个）、`examples/DocMore.kt`（象形柱图教程、dataZoom 散点、
+`examples/DocExamples.kt`（静态页，33 个）、`examples/DocMore.kt`（象形柱图教程、dataZoom 散点、
 文本 / 标签、动画、旭日图 / 矩形树图入门与 `baseOption` + `media` 教程，16 个）与
 `examples/DocInteractive.kt`（首次绘制后还要 `setOption` / `dispatchAction` / 起定时器，或使用 timeline
 组件的 12 个）。
@@ -212,6 +212,11 @@ option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
 `inRange.color` 要写成 `StringOrStringArray`，不能塞 `ZRColor` 数组；tooltip 与其余样式都照上游的默认值，
 不用自造 formatter。
 
+`scatter-nebula` 在 `examples/ScatterNebula.kt`：一百万点来自 `data/fake-nebula.bin`（8 MB 的 32 位浮点表），
+`loadFloat32` 读成 `Float32Array` 后直接赋给 `typedFlatData` —— 上游 `data?: ... | ArrayLike<number>` 的扁平
+分支，必须同时给 `dimensions: ['x', 'y']`，ECharts 才按行读；换成一个一个的 `ScatterDataItem` 会白造一百万个
+对象。标题里的点数用 `ECharts.format.addCommas`，四个 `dataZoom`（内外 × 横纵）与 `largeThreshold` 照抄。
+
 `scatter-symbol-morph` 与 `scatter-aggregate-bar` 收在 `examples/ScatterTransition.kt`：
 
 - 两页都靠 `universalTransition` 做形变：morph 页在 10 个符号间循环，每帧只换一次 `series`（`symbol` +
@@ -290,6 +295,17 @@ option。`renderItem` 的排座算法（环半径、按座位宽度对齐的起�
 成交额，Top 12 再叠一层 `effectScatter` 涟漪。日历的 `splitLine.lineStyle.color` 在 wrapper 里叫
 `typedColor`（`ZRColorOrArray`，`@JsName("color")`），`type` 用 `ZRLineType`；标题与图例的
 `textStyle` 是 `LabelOption`，它的 `color` 是 `String` 而不是 `ZRColor`，写 `ZRColor("#fff")` 编译不过。
+
+`calendar-lunar` 同样在 `examples/Calendar.kt`：365 行农历表是从上游 `dateList` 字面量摊出来的
+`data/calendar-lunar.json`，行内第三列「节气」可有可无。两个 `scatter` 只负责上标签（`symbolSize` 为 0）：
+第一行是「日期 + 农历日」，第二行是节气（上游写 `value[3] || ''`，Kotlin 侧用 `js()` 取，`textAt` 会把
+`undefined` 拼成字符串）；热力图那层才是降雨量，`visualMap.seriesIndex = [2]` 指向它。
+
+三个 `doc-example/geo-svg-*` 页面在 `examples/DocExamples.kt`：SVG 直接内联成常量，`chart(...)` 的 option
+lambda 里先 `ECharts.registerMap(name, MapInput(SVGMapInput))` 再返回 option（lambda 每挂载一次跑一次，重进
+页面会重新注册）。`geo-svg-label-basic` 的区域标签只在 hover 时出现（文档原话「将鼠标 hover 到元素上能显示
+标签」），所以截图里没有标签是对的；`geo-svg-layout-basic` 的说明文字由 `graphic` 的 `rect` + `textContent`
+画，`ZRStyleProps` 还没声明 `rich`，本地补了一个子接口。
 
 dataset 家族的 `dataset-link` 补在 `examples/DatasetExtra.kt`：它监听 `updateAxisPointer` 把饼图的
 `encode.value` 换成指针所在的年份，上游该事件的 payload 类型是 `any`，所以 `axesInfo[0].value` 只能在

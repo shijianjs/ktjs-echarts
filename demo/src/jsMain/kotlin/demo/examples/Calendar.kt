@@ -2,6 +2,7 @@ package demo.examples
 
 import demo.CatalogEntry
 import demo.Groups
+import demo.ui.loadJson
 import echarts.ECharts
 import echarts.Orients
 import echarts.TooltipTriggers
@@ -11,6 +12,7 @@ import echarts.options.CalendarMonthLabelOption
 import echarts.options.CalendarOption
 import echarts.options.CalendarRange
 import echarts.options.CalendarYearLabelOption
+import echarts.options.CallbackDataParams
 import echarts.options.DataZoomValue
 import echarts.options.DoubleOrDoubleArray
 import echarts.options.EChartsOption
@@ -25,6 +27,7 @@ import echarts.options.LabelOption
 import echarts.options.LabelPosition
 import echarts.options.LegendOption
 import echarts.options.LineStyleOption
+import echarts.options.OptionDataValue
 import echarts.options.PieSeriesOption
 import echarts.options.RippleEffectOption
 import echarts.options.ScatterDataItem
@@ -37,6 +40,7 @@ import echarts.options.StringOrDoubleOrArray
 import echarts.options.StringOrStringArray
 import echarts.options.SymbolSize
 import echarts.options.TitleOption
+import echarts.options.TooltipContent
 import echarts.options.TooltipFormatter
 import echarts.options.TooltipFormatterCallback
 import echarts.options.TooltipOption
@@ -53,8 +57,10 @@ import echarts.options.pieSeries
 import echarts.options.scatterSeries
 import js.objects.unsafeJso
 import kotlin.js.Date
+import kotlin.js.JsAny
 import kotlin.js.js
 import zrender.ZRColor
+import zrender.ZRFontWeight
 import zrender.ZRLineType
 
 /*
@@ -63,9 +69,6 @@ import zrender.ZRLineType
  * The day data of the official examples comes from a `getVirtualData` helper that walks the days of
  * a range and fills each one with `Math.random()`; see [dailyValues] for the reproducible
  * replacement.
- *
- * `calendar-lunar` is not ported: its 366-row lunar calendar table is data rather than an example
- * of the API.
  */
 
 private val calendar = Category(Groups.CALENDAR, "examples/Calendar.kt")
@@ -584,6 +587,11 @@ val calendarEntries: List<CatalogEntry> =
                     )
             }
         },
+        calendar.interactive("calendar-lunar", "农历日历图", "Calendar Lunar") { chart ->
+            loadJson("data/calendar-lunar.json").then { json ->
+                chart.setOption(lunarOption(json.unsafeCast<Array<Array<String?>>>()))
+            }
+        },
     )
 
 /** One half-year calendar of `calendar-effectscatter`, [ordinal] labels the year. */
@@ -659,6 +667,114 @@ private fun calendarGraphLinks(count: Int): Array<echarts.options.GraphEdgeItemO
 /** The `[date, value]` points of the graph series of the calendar examples. */
 private fun calendarGraphNodes(days: List<Pair<String, Double>>): Array<GraphDataItem?> =
     dataItems(*days.map { (date, value) -> GraphDataItem(row(date, value)) }.toTypedArray())
+
+/** `value[3] || ''` of a lunar row: the solar term, or an empty string when the day has none. */
+private fun solarTerm(value: JsAny?): String = js("(value) => value[3] || ''")(value) as String
+
+/**
+ * The option of `calendar-lunar`.
+ *
+ * The 365-row lunar table is data rather than an example of the API, so it lives in
+ * `data/calendar-lunar.json` (the `dateList` literal of the original; the solar term is an optional
+ * third column). Both scatter series draw no symbol at all: they put the day of the month, the
+ * lunar day, the lunar month and the solar term on the cells of March 2017, while the heatmap
+ * behind them carries the rainfall column.
+ */
+private fun lunarOption(table: Array<Array<String?>>): EChartsOption {
+    val rain = Lcg(20170301)
+    fun lunarRow(day: Array<String?>): Array<OptionDataValue?> {
+        val date = day[0] ?: ""
+        val name = day[1] ?: ""
+        val term = day.getOrNull(2)
+        return if (term == null) row(date, 1.0, name) else row(date, 1.0, name, term)
+    }
+    val lunarData = dataItems(*table.map { ScatterDataItem(lunarRow(it)) }.toTypedArray())
+    val heatmapData =
+        dataItems(
+            *table.map { HeatmapDataItem(row(it[0] ?: "", rain.next() * 300)) }.toTypedArray(),
+        )
+    return unsafeJso {
+        tooltip =
+            one(
+                unsafeJso<TooltipOption> {
+                    formatter =
+                        TooltipFormatter { params ->
+                            val item = params.unsafeCast<CallbackDataParams>()
+                            TooltipContent("降雨量: " + fixed(numberAt(item.value, 1), 2))
+                        }
+                },
+            )
+        visualMap =
+            one(
+                unsafeJso<VisualMapOption> {
+                    show = false
+                    min = 0.0
+                    max = 300.0
+                    calculable = true
+                    seriesIndex = echarts.options.IndexOrIndexArray(2.0)
+                    orient = Orients.horizontal
+                    left = StringOrDouble("center")
+                    bottom = StringOrDouble(20.0)
+                    inRange =
+                        unsafeJso<VisualOptionUnit> {
+                            color = StringOrStringArray(arrayOf("#e0ffff", "#006edd"))
+                            opacity = DoubleOrDoubleArray(0.3)
+                        }
+                    controller = unsafeJso { inRange = unsafeJso<VisualOptionUnit> { opacity = DoubleOrDoubleArray(0.5) } }
+                },
+            )
+        calendar =
+            one(
+                calendarOption("2017-03") {
+                    left = StringOrDouble("center")
+                    top = StringOrDouble("middle")
+                    cellSize = cellSize(StringOrDouble(70.0), StringOrDouble(70.0))
+                    yearLabel = unsafeJso<CalendarYearLabelOption> { show = false }
+                    orient = Orients.vertical
+                    dayLabel = chineseDayLabel()
+                    monthLabel = unsafeJso<CalendarMonthLabelOption> { show = false }
+                },
+            )
+        series =
+            arrayOf<SeriesOption>(
+                scatterSeries {
+                    coordinateSystem = "calendar"
+                    symbolSize = SymbolSize(0.0)
+                    label =
+                        unsafeJso<LabelOption> {
+                            show = true
+                            formatter =
+                                LabelFormatter { params ->
+                                    ECharts.number.parseDate(textAt(params.value, 0)).getDate().toString() +
+                                        "\n\n" + textAt(params.value, 2) + "\n\n"
+                                }
+                            color = "#000"
+                        }
+                    typedData = lunarData
+                    silent = true
+                },
+                scatterSeries {
+                    coordinateSystem = "calendar"
+                    symbolSize = SymbolSize(0.0)
+                    label =
+                        unsafeJso<LabelOption> {
+                            show = true
+                            formatter = LabelFormatter { params -> "\n\n\n" + solarTerm(params.value) }
+                            fontSize = StringOrDouble(14.0)
+                            fontWeight = ZRFontWeight(700.0)
+                            color = "#a00"
+                        }
+                    typedData = lunarData
+                    silent = true
+                },
+                heatmapSeries {
+                    name = "降雨量"
+                    coordinateSystem = "calendar"
+                    typedData = heatmapData
+                },
+            )
+    }
+}
 
 /** One day pie of `calendar-pie`: the three categories of that day. */
 private fun dayPie(index: Int, date: String): PieSeriesOption {

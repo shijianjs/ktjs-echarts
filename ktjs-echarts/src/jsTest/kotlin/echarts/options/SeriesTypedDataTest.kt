@@ -4,7 +4,11 @@ import echarts.AxisTypes
 import echarts.SeriesTypes
 import echarts.createChart
 import echarts.destroyChart
+import js.buffer.ArrayBuffer
 import js.objects.unsafeJso
+import js.typedarrays.Float32Array
+import kotlin.js.JsAny
+import kotlin.js.js
 import kotlin.js.unsafeCast
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -156,6 +160,38 @@ class SeriesTypedDataTest {
             "radial",
             sunburst.typedLabel!!.typedRotate!!.unsafeCast<String>(),
         )
+    }
+
+    @Test
+    fun scatterDataCanBeAFlatTypedArray() {
+        // Upstream types scatter data as `(...)[] | ArrayLike<number>`; the flat branch is a typed
+        // array of consecutive `[x, y]` rows and needs `dimensions`.
+        val flat = js("new Float32Array([1, 2, 3, 4])").unsafeCast<Float32Array<ArrayBuffer>>()
+        val series = scatterSeries {
+            dimensions = arrayOf(DimensionDefinitionLoose("x"), DimensionDefinitionLoose("y"))
+            typedFlatData = flat
+            large = true
+            largeThreshold = 500.0
+        }
+
+        assertSame(flat.unsafeCast<JsAny>(), series.typedFlatData!!.unsafeCast<JsAny>())
+
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(
+                unsafeJso<EChartsOption> {
+                    xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.value })
+                    yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
+                    this.series = one<SeriesOption>(series)
+                },
+            )
+
+            val stored = assertNotNull(chart.getOption().series)
+            assertEquals(4, stored[0].data?.size, "the flat array is the data of the series")
+            assertTrue(chart.renderToCanvas().width > 0, "the chart renders the flat data")
+        } finally {
+            destroyChart(chart, container)
+        }
     }
 
     @Test

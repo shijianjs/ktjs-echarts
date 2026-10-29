@@ -13,14 +13,16 @@
   - `S:\workspace\github\ecomfe\echarts-gl`（GL 的 `defaultOption` 与视图实现）
   - `S:\workspace\github\JetBrains\kotlin-wrappers`（写法参考）
 - 锁定版本：根 `package.json`（`echarts` 6.1.0、`echarts-gl` 2.1.0）；修订号在
-  `wrapper-revisions.properties`（当前 `ktjs-echarts=8`、`ktjs-echarts-gl=8`）。
+  `wrapper-revisions.properties`（当前 `ktjs-echarts=9`、`ktjs-echarts-gl=8`）。
 - 验证：`./gradlew build`（含 detekt）、`:ktjs-echarts:jsBrowserTest`、`:ktjs-echarts-gl:jsBrowserTest`、
   `:demo:e2eTest`；demo 覆盖统计用 `node scripts/demo-coverage.mjs`。
 
 ## 当前状态
 
-### ktjs-echarts（6.1.0-kt.8）
+### ktjs-echarts（6.1.0-kt.9）
 
+`-kt.9` 给 `ScatterSeriesOption` 加了 `typedFlatData`（与 `typedData` 同一 `data` 属性的扁平视图，
+`ArrayLike` 分支，配 `dimensions` 使用），`scatter-nebula` 的 8 MB 浮点表就靠它直接交给 `large` 模式。
 `-kt.8` 只补了 demo 需要的两处公开 API：`ZRenderType.configLayer` / `ZRLayerConfig`（尾迹模糊）和
 `TimelineOption` 的 `width` / `height` / `tooltip` / `emphasis`。类型建模 10 轮收尾（联合类型、字面量、
 数据项类型、`typedData` 视图、回调与事件 payload 等）已完成，**没有未完成项**。以下是已确认「保持现状」
@@ -52,7 +54,7 @@
 
 ### demo
 
-- 官方清单 436 条：**已移植 351 页 / 352 条，明确不做 51，待补 33**。逐条清单、理由与维护方式见
+- 官方清单 436 条：**已移植 356 页 / 357 条，明确不做 51，待补 28**。逐条清单、理由与维护方式见
   [demo/COVERAGE.md](demo/COVERAGE.md)。
 - 跨页注意事项（含 GL）见 [demo/NOTES.md](demo/NOTES.md)；移植约定、各家族做法与可复用数据见
   [demo/AGENTS.md](demo/AGENTS.md)。
@@ -67,8 +69,8 @@
    `geo-map-scatter`、`scatter-map`、`effectScatter-map`、`scatter-weibo` / `scattergl-weibo` 与
    `doc-example/scatter-visualMap-piecewise`；`HK.json` 解锁 `map-HK` 与两页 `map-visualMap-*`；再补 Sicily
    SVG、`links_ny_*.bin` / `gps_*.bin`。`USA.json`、`ch.geo.json`、`iceland.geo.json`、`world.json` 已在仓库里。
-2. **补静态数据**（待补里的 5 条）：geo-svg 的三页 `doc-example`、`scatter-nebula`、`calendar-lunar`；
-   `bar-race-country` 还要补 emoji-flags CDN 数据。数据多能从 `public/data/asset/data` 直接拷。
+2. **补静态数据**（待补里的 1 条）：`bar-race-country` 要补 emoji-flags CDN 数据；其余静态页
+   （geo-svg 三页、`scatter-nebula`、`calendar-lunar`）已落地。
 3. **GL 子集可以单独一批**（都在上面两组里）：`map3D` 四页（`alcohol.json` / `buildings.json` + wood /
    redbricks 贴图）、`scatterGL-gps` / `linesGL-ny`（二进制轨迹）。
 4. **先补 wrapper 再做**（1 条）：`doc-example/scatter-visualMap-categories` 需要按类目索引的 `visualMap`

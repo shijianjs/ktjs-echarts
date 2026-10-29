@@ -602,8 +602,8 @@ class DemoPageTest {
 
     /**
      * The four pages of `ScatterAqi.kt`, `ScatterNutrients.kt` and `ParallelNutrients.kt`, the
-     * timeline of `ScatterLifeTimeline.kt`, and the two table-driven pages of `ScatterStreamVisual.kt`
-     * and `WindBarb.kt`.
+     * timeline of `ScatterLifeTimeline.kt`, and the table-driven pages of `ScatterStreamVisual.kt`,
+     * `WindBarb.kt`, `ScatterNebula.kt` and `Calendar.kt` (the lunar table).
      *
      * All of them build their rows from a fetched table (the AQI page keeps its three tables inline),
      * so an option that never reached the chart leaves an empty canvas that only the painted-pixel
@@ -631,6 +631,8 @@ class DemoPageTest {
                     "scatter-stream-visual",
                     "parallel-nutrients",
                     "wind-barb",
+                    "scatter-nebula",
+                    "calendar-lunar",
                 )
         ) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)

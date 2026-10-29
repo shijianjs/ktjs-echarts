@@ -70,6 +70,7 @@ import demo.examples.scatterEntries
 import demo.examples.scatterAqiEntries
 import demo.examples.scatterExtraEntries
 import demo.examples.scatterLongTailEntries
+import demo.examples.scatterNebulaEntries
 import demo.examples.scatterLifeTimelineEntries
 import demo.examples.scatterMatrixEntries
 import demo.examples.scatterTransitionEntries
@@ -194,6 +195,7 @@ val catalog: List<CatalogEntry> =
         scatterNutrientsEntries,
         scatterPunchCardEntries,
         scatterStreamVisualEntries,
+        scatterNebulaEntries,
         scatterTransitionEntries,
         scatterLongTailEntries,
         scatterMatrixEntries,

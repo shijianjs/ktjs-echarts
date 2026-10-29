@@ -67,6 +67,12 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `img/gl/woods.jpg` | `data-gl/asset/` | `geo3d-with-different-height` (detail texture) |
 | `img/gl/starfield.jpg` | `data-gl/asset/` | the globe pages (environment) |
 | `img/gl/lake.hdr` | `data-gl/asset/` | `scatter3d-globe-population` (ambient cubemap) |
+| `img/gl/wood/diffuse.jpg` | `data-gl/asset/wood/` | `map3d-wood-map` (detail texture of the map material) |
+| `img/gl/wood/normal.jpg` | `data-gl/asset/wood/` | `map3d-wood-map` (normal map) |
+| `img/gl/wood/roughness.png` | `data-gl/asset/wood/` | `map3d-wood-map` (roughness map) |
+| `img/gl/redbricks/diffuse.jpg` | `data-gl/asset/redbricks/` | `map3d-wood-map` (detail texture of the ground plane) |
+| `img/gl/redbricks/normal.jpg` | `data-gl/asset/redbricks/` | `map3d-wood-map` (normal map of the ground plane) |
+| `img/gl/redbricks/roughness.jpg` | `data-gl/asset/redbricks/` | `map3d-wood-map` (roughness map of the ground plane) |
 | `img/gl/earth.jpg` | `data-gl/asset/` | `globe-atmosphere`, `globe-layers` (base texture) |
 | `img/gl/moon-base.jpg` | `data-gl/asset/` | `globe-moon` (base texture) |
 | `img/gl/moon-bump.jpg` | `data-gl/asset/` | `globe-moon` (height texture) |
@@ -78,6 +84,8 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `population.json` | `data-gl/asset/data/` | `scatter3d-globe-population`, `bar3d-global-population`, `global-population-bar3d-on-globe` (`[lng, lat, population]` cells) |
 | `gl/internet.graph.json` | `data-gl/asset/data/` | `graphgl-large-internet` (23k nodes, `[source, target]` edge rows) |
 | `gl/npmdep.json` | `data-gl/asset/data/` | `graphgl-npm-dep` (10k packages, flat endpoint list) |
+| `gl/alcohol.json` | `data-gl/asset/data/` | `map3d-alcohol-consumption`, `map3d-wood-map` (`[country, litres]` rows) |
+| `gl/buildings.json` | `data-gl/asset/data/` | `map3d-buildings`, `map3d-wood-city` (one extruded region per building) |
 | `house-price-area2.json` | `data/` | `scatter-stream-visual` (`[area, price]` pairs) |
 | `fake-nebula.bin` | `data/asset/data/` | `scatter-nebula` (8 MB of 32-bit floats, a flat `[x0, y0, x1, y1, ...]` table) |
 | `calendar-lunar.json` | derived | `calendar-lunar` (the 365-row `dateList` of `examples/ts/calendar-lunar.ts`, each row `[date, lunarDay]` or `[date, lunarDay, solarTerm]`) |

@@ -302,6 +302,10 @@ class DemoPageTest {
                 "graphgl-gpu-layout",
                 "graphgl-large-internet",
                 "graphgl-npm-dep",
+                "map3d-alcohol-consumption",
+                "map3d-buildings",
+                "map3d-wood-city",
+                "map3d-wood-map",
             )
         for (route in routes) {
             assertChartRendered(page, route)

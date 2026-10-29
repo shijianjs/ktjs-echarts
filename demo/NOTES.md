@@ -74,6 +74,13 @@
   都正常），`bar3d-voxelize-image` 因此关掉了 `screenSpaceReflection`。
 - **画白线的 GL 页要自带背景**：`graphgl-gpu-layout` 上游画白网格、靠 `theme: dark` 出黑底；本站主题由
   自己的开关决定，页面必须显式写 `backgroundColor`，否则白底白线看起来像空页（截图和 e2e 都看不出错）。
+- **`map3D` 自己注册 `geo3D`**：系列带 `map` 时会调 `registerMap` 同款流程建一个内置 `geo3D`，所以页面
+  只 `registerMap` 后设 `series`，不要再配 `geo3D` 组件（配了是两套坐标系）。它的死字段同样是
+  `itemStyle.areaColor`（2D `map` 专有）与 `instancing`（2.1.0 的 `map3D` 不读）；区域 `label` 要开
+  `show` 才有意义。`silent` 会被 `echarts-gl.js` 的 `setSilent` 读取。世界地图的数据名要走
+  `regionName` 翻译（`alcohol.json` 写全称、本站 `world.json` 写缩写）；`alcohol.json` 末尾那行
+  `[""]` 只有一个元素，按 `getOrNull` 取值，否则 `toDoubleOrNull` 会在 `undefined` 上抛
+  `toLowerCase` 的 TypeError，整页连画布都不建。
 - **`graphGL` 的 `modularity` 不是核心选项**：它来自官方站单独加载的 CDN 插件 `echarts-graph-modularity`，
   本站没有，去掉后所有节点取调色板第一色；`stopThreshold` 是声明但不读的死字段。
 - **上游没有 TypeScript 声明**：选项按 `echarts-doc` 的 `option-gl/` 与源码 `defaultOption` 建模。

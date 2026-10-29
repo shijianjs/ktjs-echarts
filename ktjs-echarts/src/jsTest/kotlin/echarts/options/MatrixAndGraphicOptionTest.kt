@@ -1,5 +1,6 @@
 package echarts.options
 
+import echarts.AnimationEasings
 import echarts.CoordinateSystemUsages
 import echarts.ECharts
 import echarts.GraphicActions
@@ -180,7 +181,19 @@ class MatrixAndGraphicOptionTest {
                                         arrayOf(OptionDataValue("a"), OptionDataValue("u")),
                                     )
                                 animation = false
+                                animationThreshold = 1.0
                                 animationDuration = AnimationDuration(0.0)
+                                animationEasing = AnimationEasings.cubicOut
+                                animationDelay = AnimationDelay(0.0)
+                                animationDurationUpdate = AnimationDuration(10.0)
+                                animationEasingUpdate = AnimationEasings.linear
+                                animationDelayUpdate = AnimationDelay(10.0)
+                                stateAnimation =
+                                    unsafeJso<StateAnimationOption> {
+                                        duration = 100.0
+                                        easing = "cubicOut"
+                                        delay = 0.0
+                                    }
                             },
                         )
                 },
@@ -191,6 +204,9 @@ class MatrixAndGraphicOptionTest {
             assertEquals("box", geo.coordinateSystemUsage!!.unsafeCast<String>())
             assertEquals(2, geo.coord!!.unsafeCast<Array<Any>>().size)
             assertEquals(false, geo.animation)
+            assertEquals(1.0, geo.animationThreshold)
+            assertEquals("linear", geo.animationEasingUpdate!!.unsafeCast<String>())
+            assertEquals(100.0, geo.stateAnimation!!.duration)
             assertTrue(chart.renderToCanvas().width > 0, "the geo renders inside the matrix cell")
         } finally {
             destroyChart(chart, container)

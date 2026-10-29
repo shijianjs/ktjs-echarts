@@ -100,7 +100,7 @@ private val worldRegionNames: Map<String, String> =
     )
 
 /** Name of the region of `world.json` that [name] of `world-population.json` refers to. */
-private fun regionName(name: String): String = worldRegionNames[name] ?: name
+internal fun regionName(name: String): String = worldRegionNames[name] ?: name
 
 /**
  * Registers `data/world.json` as the `world` map; resolves to the loaded GeoJSON.

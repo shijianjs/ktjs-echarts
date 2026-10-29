@@ -57,7 +57,7 @@
 
 ### demo
 
-- 官方清单 436 条：**已移植 362 页 / 363 条，明确不做 51，待补 22**。逐条清单、理由与维护方式见
+- 官方清单 436 条：**已移植 366 页 / 367 条，明确不做 51，待补 18**。逐条清单、理由与维护方式见
   [demo/COVERAGE.md](demo/COVERAGE.md)。
 - 跨页注意事项（含 GL）见 [demo/NOTES.md](demo/NOTES.md)；移植约定、各家族做法与可复用数据见
   [demo/AGENTS.md](demo/AGENTS.md)。
@@ -66,7 +66,7 @@
 
 ## 下一步
 
-按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进（22 条），建议顺序：
+按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进（18 条），建议顺序：
 
 1. **补 `china.json`**（一次解锁 13 条）：`doc-example/map-example`、四个 `doc-example/map-visualMap-*`、
    `doc-example/scatter-visualMap-piecewise`、`heatmap-map`、`geo-lines`、`geo-map-scatter`、`scatter-map`、
@@ -75,10 +75,8 @@
    `world.json` / 其他已入库地图的等价页面——先确认数据来源再动手。
 2. **二进制轨迹**（3 条）：`lines-ny` / `linesGL-ny`（`links_ny_*.bin` 合计约 30 MB）、`scatterGL-gps`
    （`gps_*.bin`），要按需分片加载，单独一批处理。
-3. **GL 地图**（4 条）：`map3d-alcohol-consumption` / `map3d-buildings` / `map3d-wood-city` /
-   `map3d-wood-map`，要 `alcohol.json` / `buildings.json` 与 wood / redbricks 贴图。
-4. **补静态数据**（1 条）：`bar-race-country` 要 emoji-flags CDN 数据。
-5. **先补 wrapper 再做**（1 条）：`doc-example/scatter-visualMap-categories` 需要按类目索引的 `visualMap`
+3. **补静态数据**（1 条）：`bar-race-country` 要 emoji-flags CDN 数据。
+4. **先补 wrapper 再做**（1 条）：`doc-example/scatter-visualMap-categories` 需要按类目索引的 `visualMap`
    字典与 `left: null`。
 
 新增/移植页面后跑 `node scripts/demo-coverage.mjs --write` 更新 COVERAGE。

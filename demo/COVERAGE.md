@@ -19,9 +19,9 @@
 | 官方清单 | 436 |
 | 　· `chart-list-data.js` | 377 |
 | 　· `chart-list-data-gl.js` | 59 |
-| 已移植 | 362 页 / 363 条 |
+| 已移植 | 366 页 / 367 条 |
 | 明确不做 | 51 |
-| 待补 | 22 |
+| 待补 | 18 |
 
 已移植数里的「页」不含总览页（`#/overview`）；「条」把 `bar-large` / `pie-highlight` 同时算作对应 `doc-example/` 条目的移植。
 
@@ -127,7 +127,7 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 | --- |
 | `globe-country-carousel` |
 
-## 待补（22）
+## 待补（18）
 
 ### 只缺静态数据 / 素材（1）
 
@@ -137,7 +137,7 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 | --- |
 | `bar-race-country` |
 
-### 缺地图数据（GeoJSON / SVG / 二进制轨迹）（20）
+### 缺地图数据（GeoJSON / SVG / 二进制轨迹）（16）
 
 先补地图文件并 registerMap；部分数据（USA / Iceland / 瑞士 / world / ch.geo）已经在仓库里。
 
@@ -159,10 +159,6 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 | `lines-ny` |
 | `linesGL-ny` |
 | `scatterGL-gps` |
-| `map3d-alcohol-consumption` |
-| `map3d-buildings` |
-| `map3d-wood-city` |
-| `map3d-wood-map` |
 
 ### 需要先补 wrapper（1）
 

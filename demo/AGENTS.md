@@ -109,8 +109,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后落地 **362 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
-的官方清单统计，共 436 条：已移植 363 条，明确不做 51 条，待补 22 条；逐条清单与理由见
+筛选后落地 **366 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
+的官方清单统计，共 436 条：已移植 367 条，明确不做 51 条，待补 18 条；逐条清单与理由见
 [COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -564,14 +564,15 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
 ## 3D 示例（echarts-gl）
 
 3D 家族在 `examples/Gl.kt`、`examples/GlScatter.kt`、`examples/GlSurfaceMaterial.kt`、
-`examples/GlGeo.kt`、`examples/GlLines.kt`、`examples/GlBarGeo.kt`、`examples/GlImageBars.kt` 与
-`examples/GlGraph.kt`，用的是 `ktjs-echarts-gl` 模块，写法与其它家族一样走 `Category.chart`；要先取数据
-文件的（`bar3d-dataset`、三页 `scatter3D` 与两页图谱）走 `Category.interactive` + `loadJson`，要等图片
-加载的（`surface-leather`、`bar3d-myth` 一类）走 `Category.interactive` + `listen(LOAD)`：
+`examples/GlGeo.kt`、`examples/GlLines.kt`、`examples/GlBarGeo.kt`、`examples/GlImageBars.kt`、
+`examples/GlGraph.kt` 与 `examples/GlMap.kt`，用的是 `ktjs-echarts-gl` 模块，写法与其它家族一样走
+`Category.chart`；要先取数据文件的（`bar3d-dataset`、三页 `scatter3D`、两页图谱与四页 `map3D`）走
+`Category.interactive` + `loadJson`，要等图片加载的（`surface-leather`、`bar3d-myth` 一类）走
+`Category.interactive` + `listen(LOAD)`：
 
 - **安装是全局的一次性动作**：`echarts` 的入口不带 GL 图表，`ECharts.use(...)` 注册的扩展对所有实例生
   效，所以调用点在 `main()` 里的 `useEChartsGl()`，必须在第一个 `ECharts.init` 之前。新页面需要另一种
-  图表或坐标系（`scatter3D`、`geo3D`、`globe`…）时，把对应 installer 加进那个数组；`ECharts.use` 自己
+  图表或坐标系（`scatter3D`、`map3D`、`geo3D`、`globe`…）时，把对应 installer 加进那个数组；`ECharts.use` 自己
   会去重，重复调用无副作用。`Mapbox3DComponent` / `Maptalks3DComponent` 不注册：它们要求页面自己先加载
   Mapbox GL / maptalks。
 - **option 类型用 `EChartsGlOption`**：它继承 `EChartsOption`，`tooltip` / `visualMap` / `dataset` 这些
@@ -688,6 +689,23 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   2.1.0 的 SSR pass 会画出整幅黑帧（bloom / SSAO / DOF 单独开都正常），所以这页保留其余特效、去掉反射。
   同一页上游的 `wireframe: { show: false }`（在 `image-to-bar3d` 里）是死字段：`bar3D` 根本不读
   `wireframe`，只有 surface / line3D / geo3D / globe 有。
+- **四页 `map3D` 在 `GlMap.kt`**：`map3d-alcohol-consumption` 用 `alcohol.json`（每行
+  `[国家, 升数]`，名字是字符串，`OptionDataValue(String)` 照收）、`map3d-buildings` 用
+  `buildings.json`（一份 `properties` 带 `name` / `height` 的 GeoJSON）、`map3d-wood-city` 与
+  `map3d-wood-map` 是木材贴图与程序化建筑。`map3D` 不接 `geo3D` 组件，而是**自己按 `map` 注册一个
+  内置的 `geo3D`**，所以这四页只 `registerMap` 后设 `series`，不要再配 `geo3D`；同页的
+  `viewControl` / `light` / `postEffect` / `groundPlane` 都写在系列上。四页都直接 `Category.interactive`
+  + `loadJson`，`buildings` 页在回调里注册地图并把 `features` 取出来复用。`Map3DChart` 忘了加进
+  `useEChartsGl()` 时不会报错：页面只画出 `visualMap`、地图一片空白，一眼看上去像数据或相机的问题。
+  `alcohol.json` 末尾有一行单元素的 `[""]`，取值要 `getOrNull(1)`，否则 `toDoubleOrNull` 会在
+  `undefined` 上崩（wood-map 整页不出画布就是这个原因）。
+- **`map3D` 的死字段不要搬**：`itemStyle.areaColor` 是 2D `map` 的键，`echarts-gl` 源码里根本没有；
+  `instancing` 在 2.1.0 的 `map3D` 里从不读取；区域 `label` 只有 `show` 打开才有意义，只写
+  `label.color` 是空操作，三处都略去并在头注释里写明。`silent` 相反是真字段（`echarts-gl.js` 的
+  `setSilent` 会读），`buildings` 页照用。`map3d-buildings` 保留了与 `shading: "lambert"` 同时存在的
+  `realisticMaterial`：上游就这么写，它不会被用到但照搬。
+- **撒点用 `Lcg` 而不是 `Math.random()`**：`map3d-wood-city` 的程序化建筑原本随机生成高度与位置，
+  本站按项目约定换成固定种子的 `Lcg(20261030)`，同一页每次截图一致。
 - **WebGL 层是另一张画布**：GL 系列只画在 `echarts-gl` 插进来的 canvas 上，zrender 自己的画布层不会创
   建；没有 WebGL 时 echarts-gl 用 `.ecgl-nowebgl` 占位，页面上连 canvas 都没有。e2e 因此对 GL 页只做
   `assertChartRendered`（画布有尺寸）+ `the 3d pages paint through the webgl layer`（这张画布能取到

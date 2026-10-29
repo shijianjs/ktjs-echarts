@@ -35,6 +35,7 @@ import demo.examples.glBarGeoEntries
 import demo.examples.glGraphEntries
 import demo.examples.glEntries
 import demo.examples.glGeoEntries
+import demo.examples.glMapEntries
 import demo.examples.glImageBarsEntries
 import demo.examples.glLinesEntries
 import demo.examples.glScatterEntries
@@ -252,6 +253,7 @@ val catalog: List<CatalogEntry> =
         glGraphEntries,
         glBarGeoEntries,
         glGeoEntries,
+        glMapEntries,
         glImageBarsEntries,
         glLinesEntries,
         glScatterEntries,

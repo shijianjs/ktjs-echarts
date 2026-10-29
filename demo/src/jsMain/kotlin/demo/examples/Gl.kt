@@ -17,6 +17,7 @@ import echartsgl.GlobeComponent
 import echartsgl.Grid3DComponent
 import echartsgl.Line3DChart
 import echartsgl.Lines3DChart
+import echartsgl.Map3DChart
 import echartsgl.ProjectionTypes
 import echartsgl.Scatter3DChart
 import echartsgl.ShadingTypes
@@ -68,6 +69,7 @@ internal fun useEChartsGl() {
             Lines3DChart,
             Scatter3DChart,
             SurfaceChart,
+            Map3DChart,
             GraphGLChart,
             Grid3DComponent,
             Geo3DComponent,

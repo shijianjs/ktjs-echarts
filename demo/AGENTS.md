@@ -91,7 +91,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **280 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **286 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -375,23 +375,30 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
 
 ## 3D 示例（echarts-gl）
 
-3D 家族在 `examples/Gl.kt`，用的是 `ktjs-echarts-gl` 模块，写法与其它家族一样走 `Category.chart`：
+3D 家族在 `examples/Gl.kt`，用的是 `ktjs-echarts-gl` 模块，写法与其它家族一样走 `Category.chart`（需要
+先取数据文件的 `bar3d-dataset` 走 `Category.interactive` + `loadJson`）：
 
 - **安装是全局的一次性动作**：`echarts` 的入口不带 GL 图表，`ECharts.use(...)` 注册的扩展对所有实例生
   效，所以调用点在 `main()` 里的 `useEChartsGl()`，必须在第一个 `ECharts.init` 之前。新页面需要另一种
   图表或坐标系（`scatter3D`、`geo3D`、`globe`…）时，把对应 installer 加进那个数组；`ECharts.use` 自己
   会去重，重复调用无副作用。`Mapbox3DComponent` / `Maptalks3DComponent` 不注册：它们要求页面自己先加载
   Mapbox GL / maptalks。
-- **option 类型用 `EChartsGlOption`**：它继承 `EChartsOption`，`tooltip` / `visualMap` 这些 2D 组件照常
-  写，`grid3D` / `xAxis3D` / `yAxis3D` / `zAxis3D` 与 `bar3DSeries { }` 来自 `echartsgl.options`。
-- **标签样式嵌在 `textStyle` 里**：echarts-gl 2.1.0 的系列 label 读 `label.textStyle`，而官方示例是 1.x
-  写法（`label: { fontSize, borderWidth }`，`emphasis.label` 同理），移植时要把这些属性搬进 `textStyle`，
-  否则字号与颜色被静默忽略。上游的 `backwardCompat` 预处理器只做 `normal` / `emphasis` 拆包与轴标签展
-  平，不管这层嵌套。
-- **没作用的空组件不要写**：`bar3d-punch-card` 的 `viewControl` 上游就是空对象（只有一行注释掉的
-  `projection`），写成空 `unsafeJso` 只会让人以为投影生效了，直接省略。
-- **数据能复用就复用**：`bar3d-punch-card` 的打卡表就是 `examples/CustomExtra.kt` 里的
-  `punchCardValues` / `punchCardHours` / `punchCardDays`，只是把前两个坐标换成 `[hour, day, value]`。
+- **option 类型用 `EChartsGlOption`**：它继承 `EChartsOption`，`tooltip` / `visualMap` / `dataset` 这些
+  2D 组件照常写，`grid3D` / `xAxis3D` / `yAxis3D` / `zAxis3D` 与 `bar3DSeries { }` / `line3DSeries { }` /
+  `surfaceSeries { }` 来自 `echartsgl.options`。三个工厂都只设 `type`，其余字段一律走 `typed*` 视图
+  （`typedData` / `typedLabel` / `typedItemStyle` / `typedEmphasis` / `typedCoordinateSystem`）。
+- **标签照 2D 的扁平写法**：echarts-gl 2.1.0 用 ECharts 6 的 `createTextStyle` 排版，读的是
+  `label.fontSize` / `label.color` 这些扁平属性（`GlLabelOption` 就是 `LabelOption` 的别名）。上游
+  `backwardCompat` 只把 `axisLabel.textStyle` 展平，系列 label 不展平，所以不要再加一层 `textStyle`。
+- **没作用的空组件不要写**：`bar3d-punch-card` / `simple-surface` / `surface-wave` / `sphere-parametric-surface`
+  的 `viewControl` 上游就是空对象（只有一行注释掉的 `projection`），写成空 `unsafeJso` 只会让人以为投影
+  生效了，直接省略；`line3d-orthographic` 才真的设了 `projection = orthographic`。
+- **曲面用函数而不是数组**：`simple-surface` / `surface-wave` / `sphere-parametric-surface` 只给
+  `equation` / `parametricEquation`，由 `SurfaceFunction { x, y -> ... }` 采样。原例在原点附近返回 `'-'`
+  挖洞，Kotlin 侧用 `Double.NaN`：`SurfaceView` 只要有一个顶点不是数就整片四边形不画。
+- **数据能复用就复用**：`bar3d-punch-card` 与 `transparent-bar3d` 的打卡表就是 `examples/CustomExtra.kt`
+  里的 `punchCardValues` / `punchCardHours` / `punchCardDays`，只是把前两个坐标换成 `[hour, day, value]`；
+  `bar3d-dataset` 直接用 `dataset` 的列名当三个坐标轴（`encode.z` 走 `Life Expectancy`）。
 - **WebGL 层是另一张画布**：GL 系列只画在 `echarts-gl` 插进来的 canvas 上，zrender 自己的画布层不会创
   建；没有 WebGL 时 echarts-gl 用 `.ecgl-nowebgl` 占位，页面上连 canvas 都没有。e2e 因此对 GL 页只做
   `assertChartRendered`（画布有尺寸）+ `the 3d page paints through the webgl layer`（这张画布能取到

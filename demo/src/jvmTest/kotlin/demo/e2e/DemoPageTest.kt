@@ -226,8 +226,9 @@ class DemoPageTest {
     }
 
     /**
-     * The `echarts-gl` page of `Gl.kt` paints into a WebGL layer, which is a canvas of its own next
-     * to the (empty) zrender canvas layer.
+     * The `echarts-gl` pages of `Gl.kt` paint into a WebGL layer, which is a canvas of its own next
+     * to the (empty) zrender canvas layer. A surface with a broken equation or a missing `visualMap`
+     * dimension only logs an error and stays blank, which is what the console assertion catches.
      *
      * A missing core module of `echarts-gl` (its `sideEffects` list does not cover the nested
      * installers, so a bundler may drop the module that registers the post-update hook) leaves the
@@ -235,26 +236,39 @@ class DemoPageTest {
      * `.ecgl-nowebgl` placeholder. Both are asserted against here.
      */
     @RetryingTest(maxAttempts = 2)
-    fun `the 3d page paints through the webgl layer`(page: Page) {
+    fun `the 3d pages paint through the webgl layer`(page: Page) {
         val consoleErrors = mutableListOf<String>()
         page.onConsoleMessage { message ->
             if (message.type() == "error") consoleErrors += message.text()
         }
-        openPage(page, "#/bar3d-punch-card")
-        assertChartRendered(page, "bar3d-punch-card")
+        openPage(page)
 
-        page.waitForFunction(
-            """
-            () => {
-                const canvas = document.querySelector(".page[data-route='bar3d-punch-card'] .chart canvas");
-                if (canvas === null) {
-                    return false;
+        val routes =
+            listOf(
+                "bar3d-punch-card",
+                "transparent-bar3d",
+                "bar3d-dataset",
+                "line3d-orthographic",
+                "simple-surface",
+                "sphere-parametric-surface",
+                "surface-wave",
+            )
+        for (route in routes) {
+            assertChartRendered(page, route)
+            page.waitForFunction(
+                """
+                (value) => {
+                    const canvas = document.querySelector('.page[data-route="' + value + '"] .chart canvas');
+                    if (canvas === null) {
+                        return false;
+                    }
+                    return canvas.getContext('webgl2') !== null || canvas.getContext('webgl') !== null;
                 }
-                return canvas.getContext('webgl2') !== null || canvas.getContext('webgl') !== null;
-            }
-            """,
-        )
-        assertEquals(0, page.locator(".ecgl-nowebgl").count(), "WebGL is not available")
+                """,
+                route,
+            )
+            assertEquals(0, page.locator(".ecgl-nowebgl").count(), "WebGL is not available on $route")
+        }
         assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
     }
 

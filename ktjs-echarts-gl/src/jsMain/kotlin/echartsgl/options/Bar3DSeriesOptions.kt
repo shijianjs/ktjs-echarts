@@ -1,14 +1,11 @@
 package echartsgl.options
 
-import echarts.options.LabelFormatter
 import echarts.options.OptionDataItemObject
 import echarts.options.OptionDataValue
 import echarts.options.OptionDataValueOrArray
 import echarts.options.SeriesOption
-import echarts.options.TextStyleOption
 import echartsgl.CoordinateSystem3D
 import echartsgl.GlBlendMode
-import echartsgl.GlColor
 import echartsgl.GridPlaneType
 import kotlin.js.JsName
 import kotlin.js.unsafeCast
@@ -18,54 +15,9 @@ import kotlin.js.unsafeCast
  *
  * `echarts-gl` ships no TypeScript declarations, so the option and data item interfaces are written
  * from the `option-gl` documentation and from the `defaultOption` of `Bar3DSeries.js`. Where the
- * GL option differs from the 2D series options in the core module (labels carry a nested
- * `textStyle`, item colors may be HDR arrays) the GL types are declared here rather than reused.
+ * GL option differs from the 2D series options in the core module (item colors may be HDR arrays)
+ * the GL types are declared in this package rather than reused.
  */
-
-/**
- * Label of a GL series or data item.
- *
- * Unlike the 2D [echarts.options.LabelOption] it has no `position`; the label is always drawn next
- * to its graphic and its text style is nested in [textStyle] instead of being flattened.
- */
-external interface GlLabelOption {
-    /** Whether the label is shown. */
-    var show: Boolean?
-
-    /** Distance to the graphic, in pixels in screen space and in scene units for surfaces. */
-    var distance: Double?
-
-    /** Formatter: a template string such as `"{b}: {c}"` or a callback. */
-    var formatter: LabelFormatter?
-
-    /** Text style of the label. */
-    var textStyle: TextStyleOption?
-}
-
-/**
- * Style of a GL graphic, such as a bar or a symbol.
- */
-external interface GlItemStyleOption {
-    /** Fill color. See [GlColor] for the HDR array form. */
-    var color: GlColor?
-
-    /** Opacity, `0..1`. */
-    var opacity: Double?
-}
-
-/**
- * Emphasis (hover) state of a GL series or data item.
- */
-external interface GlEmphasisOption {
-    /** Whether the emphasis state is disabled. */
-    var disabled: Boolean?
-
-    /** Label style in the emphasis state. */
-    var label: GlLabelOption?
-
-    /** Style of the graphic in the emphasis state. */
-    var itemStyle: GlItemStyleOption?
-}
 
 /**
  * One data item of a [Bar3DSeriesOption].

@@ -283,4 +283,13 @@ fun GlColor(rgba: Array<Double>): GlColor = rgba.unsafeCast<GlColor>()
 object EChartsGlSeriesTypes {
     /** 3D bar, installed by [Bar3DChart]. */
     inline val bar3D: SeriesType get() = SeriesType("bar3D")
+
+    /** 3D line, installed by [Line3DChart]. */
+    inline val line3D: SeriesType get() = SeriesType("line3D")
+
+    /** 3D scatter, installed by [Scatter3DChart]. */
+    inline val scatter3D: SeriesType get() = SeriesType("scatter3D")
+
+    /** Surface, installed by [SurfaceChart]. */
+    inline val surface: SeriesType get() = SeriesType("surface")
 }

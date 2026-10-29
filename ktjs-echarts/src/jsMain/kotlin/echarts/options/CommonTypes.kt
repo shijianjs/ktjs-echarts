@@ -307,6 +307,9 @@ external interface OptionEncode {
 
     /** Dimension used as the angle, e.g. by polar series. */
     var angle: OptionEncodeValue?
+
+    /** Dimension used as the z coordinate, e.g. by the 3D series of `echarts-gl`. */
+    var z: OptionEncodeValue?
 }
 
 /**

@@ -807,8 +807,17 @@ external interface VisualMapOption {
     /** Series targets with specific dimensions. */
     var seriesTargets: Array<VisualMapSeriesTarget>?
 
-    /** Dimension of the data used for the mapping. */
+    /** Index of the data dimension used for the mapping. */
     var dimension: Double?
+
+    /**
+     * Typed view of [dimension].
+     *
+     * Upstream `number | string`: a dimension appears either by index or by name, which is what a
+     * `dataset` column is addressed by.
+     */
+    @JsName("dimension")
+    var typedDimension: DimensionLoose?
 
     /** Whether hovering a value highlights the related data. */
     var hoverLink: Boolean?

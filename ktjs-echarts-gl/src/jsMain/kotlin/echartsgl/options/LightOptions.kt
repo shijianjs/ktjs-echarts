@@ -41,6 +41,12 @@ external interface MainLightOption {
 
     /** Horizontal direction of the light in degrees. */
     var beta: Double?
+
+    /**
+     * Time of the sun; a `globe` only, where the light is the sun and its position follows the
+     * time of day. The system time is used when it is not set.
+     */
+    var time: GlobeSunTime?
 }
 
 /**

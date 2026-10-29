@@ -67,6 +67,13 @@ external interface ViewControlOption {
     /** Point the camera looks at and rotates around, `[x, y, z]`. */
     var center: Array<Double>?
 
+    /**
+     * Longitude and latitude the camera looks at, `[longitude, latitude]`; a `globe` only.
+     *
+     * Setting it overrides [alpha] and [beta].
+     */
+    var targetCoord: Array<Double>?
+
     /** Vertical rotation angle in degrees; positive looks down from above. */
     var alpha: Double?
 

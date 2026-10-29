@@ -24,7 +24,7 @@ val Grid3DComponent: EChartsExtensionInstaller get() = withEChartsGl(grid3DCompo
  * Use it together with any series whose `coordinateSystem` is `"geo3D"`; the map has to be
  * registered with `ECharts.registerMap` first, exactly like the 2D `geo` component.
  */
-val Geo3DComponent: EChartsExtensionInstaller get() = withEChartsGl(geo3DComponentInstaller)
+val Geo3DComponent: EChartsExtensionInstaller get() = withEChartsGl(withGeo3DShadowShader(geo3DComponentInstaller))
 
 /**
  * Installs the globe component, `globe`.

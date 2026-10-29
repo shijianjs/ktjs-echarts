@@ -1,5 +1,7 @@
 package echartsgl
 
+import echartsgl.options.GlobeSunTime
+import kotlin.js.Date
 import kotlin.js.unsafeCast
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -58,6 +60,15 @@ class LiteralsTest {
     }
 
     @Test
+    fun globeLiteralsMatchTheUpstreamNames() {
+        assertEquals("overlay", GlobeLayerTypes.overlay.unsafeCast<String>())
+        assertEquals("blend", GlobeLayerTypes.blend.unsafeCast<String>())
+
+        assertEquals("albedo", GlobeBlendTargets.albedo.unsafeCast<String>())
+        assertEquals("emission", GlobeBlendTargets.emission.unsafeCast<String>())
+    }
+
+    @Test
     fun seriesTypesMatchTheUpstreamNames() {
         assertEquals("bar3D", EChartsGlSeriesTypes.bar3D.unsafeCast<String>())
     }
@@ -72,10 +83,21 @@ class LiteralsTest {
         assertEquals("auto", BooleanOrAutos.auto.unsafeCast<String>())
         assertEquals(true, BooleanOrAuto(true).unsafeCast<Boolean>())
 
+        assertEquals("auto", DoubleOrAutos.auto.unsafeCast<String>())
+        assertEquals(10.0, DoubleOrAuto(10.0).unsafeCast<Double>())
+
         assertEquals("texture.jpg", TextureSource("texture.jpg").unsafeCast<String>())
         assertEquals("normal.jpg", NumberOrTexture("normal.jpg").unsafeCast<String>())
         assertEquals(0.5, NumberOrTexture(0.5).unsafeCast<Double>())
 
         assertEquals("red", GlColor(ZRColor("red")).unsafeCast<String>())
+    }
+
+    @Test
+    fun globeSunTimeWrapsEveryAcceptedForm() {
+        val date = Date(0.0)
+        assertEquals(date, GlobeSunTime(date).unsafeCast<Date>())
+        assertEquals(0.0, GlobeSunTime(0.0).unsafeCast<Double>())
+        assertEquals("2026-01-01", GlobeSunTime("2026-01-01").unsafeCast<String>())
     }
 }

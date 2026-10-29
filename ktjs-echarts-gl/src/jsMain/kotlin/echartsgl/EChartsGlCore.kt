@@ -21,3 +21,21 @@ internal fun <T : JsAny> withEChartsGl(installer: T): T {
     if (loadedCore == null) loadedCore = eChartsGlCoreExport
     return installer
 }
+
+private var shadowShaderRegistered = false
+
+/**
+ * Returns [installer] after registering the shadow shader chunks of `echarts-gl`.
+ *
+ * `Geo3DBuilder` creates a `groundPlane` material for every shading model on construction, including
+ * `"shadow"`, which maps to the `ecgl.displayShadow` chunks. Upstream registers those chunks only
+ * from the mapbox3D and maptalks3D views, so a bundle without them logs four missing-shader errors
+ * per `geo3D` page even though nothing uses that material.
+ */
+internal fun <T : JsAny> withGeo3DShadowShader(installer: T): T {
+    if (!shadowShaderRegistered) {
+        graphicGlNamespace.shader.`import`(displayShadowShaderSource)
+        shadowShaderRegistered = true
+    }
+    return installer
+}

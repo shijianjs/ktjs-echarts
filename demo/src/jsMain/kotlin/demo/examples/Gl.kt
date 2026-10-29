@@ -9,7 +9,9 @@ import echarts.ECharts
 import echarts.EChartsExtensionInstaller
 import echarts.options.*
 import echartsgl.Bar3DChart
+import echartsgl.Geo3DComponent
 import echartsgl.GlColor
+import echartsgl.GlobeComponent
 import echartsgl.Grid3DComponent
 import echartsgl.Line3DChart
 import echartsgl.ProjectionTypes
@@ -57,7 +59,15 @@ import zrender.ZRColor
  */
 internal fun useEChartsGl() {
     ECharts.use(
-        arrayOf<EChartsExtensionInstaller>(Bar3DChart, Line3DChart, Scatter3DChart, SurfaceChart, Grid3DComponent),
+        arrayOf<EChartsExtensionInstaller>(
+            Bar3DChart,
+            Line3DChart,
+            Scatter3DChart,
+            SurfaceChart,
+            Grid3DComponent,
+            Geo3DComponent,
+            GlobeComponent,
+        ),
     )
 }
 

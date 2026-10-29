@@ -50,6 +50,16 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `img/gl/leather/leather_roughness.jpg` | `data-gl/asset/leather/` | `surface-leather` (roughness map) |
 | `img/gl/leather/leather_normal.jpg` | `data-gl/asset/leather/` | `surface-leather` (normal map) |
 | `img/gl/sushuang.jpg` | derived | `image-surface-sushuang` (per-pixel surface) |
+| `img/gl/woods.jpg` | `data-gl/asset/` | `geo3d-with-different-height` (detail texture) |
+| `img/gl/starfield.jpg` | `data-gl/asset/` | the globe pages (environment) |
+| `img/gl/earth.jpg` | `data-gl/asset/` | `globe-atmosphere`, `globe-layers` (base texture) |
+| `img/gl/moon-base.jpg` | `data-gl/asset/` | `globe-moon` (base texture) |
+| `img/gl/moon-bump.jpg` | `data-gl/asset/` | `globe-moon` (height texture) |
+| `img/gl/night.jpg` | `data-gl/asset/` | `globe-layers` (emission layer) |
+| `img/gl/clouds.png` | `data-gl/asset/` | `globe-layers` (overlay layer) |
+| `img/gl/world.topo.bathy.200401.jpg` | `data-gl/asset/` | `globe-echarts-gl-hello-world` (base and height texture) |
+| `img/gl/bathymetry_bw_composite_4k.jpg` | `data-gl/asset/` | `globe-displacement`, `globe-layers` (displacement / height texture) |
+| `world-population.json` | `data-gl/asset/data/` | `geo3d-with-different-height` (region heights) |
 
 The two `rainfall-*.json` files are **derived**, not copied: upstream keeps these 3079-point series
 inline in `examples/ts/grid-multiple.ts` and `examples/ts/area-rainfall.ts`, so a one-off script split

@@ -1,5 +1,6 @@
 package echartsgl
 
+import echarts.EChartsInstance
 import echarts.SeriesType
 import kotlin.js.unsafeCast
 import web.html.HTMLCanvasElement
@@ -211,7 +212,62 @@ object BooleanOrAutos {
 }
 
 /**
- * Texture of a material: a URL, an image element or a canvas element.
+ * A number that also accepts `"auto"`, such as `geo3D.boxDepth`.
+ */
+external interface DoubleOrAuto
+
+/** Wraps a number. */
+fun DoubleOrAuto(value: Double): DoubleOrAuto = value.unsafeCast<DoubleOrAuto>()
+
+/** Wraps the keyword `"auto"`. */
+fun DoubleOrAuto(value: String): DoubleOrAuto = value.unsafeCast<DoubleOrAuto>()
+
+/** The keyword accepted by [DoubleOrAuto]. */
+object DoubleOrAutos {
+    /** Derive the value from the rest of the scene, e.g. keep the aspect ratio of the map. */
+    inline val auto: DoubleOrAuto get() = DoubleOrAuto("auto")
+}
+
+/**
+ * Kind of a [GlobeLayerOption][echartsgl.options.GlobeLayerOption].
+ */
+sealed external interface GlobeLayerType
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [GlobeLayerTypes]. */
+inline fun GlobeLayerType(value: String): GlobeLayerType = value.unsafeCast<GlobeLayerType>()
+
+/**
+ * The values of [GlobeLayerType].
+ */
+object GlobeLayerTypes {
+    /** Texture floating above the surface, such as clouds. The default. */
+    inline val overlay: GlobeLayerType get() = GlobeLayerType("overlay")
+
+    /** Texture mixed into the material of the globe itself. */
+    inline val blend: GlobeLayerType get() = GlobeLayerType("blend")
+}
+
+/**
+ * Material channel a `"blend"` globe layer is mixed into.
+ */
+sealed external interface GlobeBlendTarget
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [GlobeBlendTargets]. */
+inline fun GlobeBlendTarget(value: String): GlobeBlendTarget = value.unsafeCast<GlobeBlendTarget>()
+
+/**
+ * The values of [GlobeBlendTarget].
+ */
+object GlobeBlendTargets {
+    /** Diffuse color of the globe; it is affected by the light. The default. */
+    inline val albedo: GlobeBlendTarget get() = GlobeBlendTarget("albedo")
+
+    /** Self-illumination of the globe, unaffected by the light, e.g. the city lights at night. */
+    inline val emission: GlobeBlendTarget get() = GlobeBlendTarget("emission")
+}
+
+/**
+ * Texture of a material: a URL, an image element, a canvas element or an ECharts instance.
  */
 external interface TextureSource
 
@@ -223,6 +279,12 @@ fun TextureSource(image: HTMLImageElement): TextureSource = image.unsafeCast<Tex
 
 /** Wraps a canvas element used as the texture. */
 fun TextureSource(canvas: HTMLCanvasElement): TextureSource = canvas.unsafeCast<TextureSource>()
+
+/**
+ * Wraps an ECharts instance whose canvas is used as the texture; mouse actions on the 3D graphic
+ * are then linked to that instance.
+ */
+fun TextureSource(chart: EChartsInstance): TextureSource = chart.unsafeCast<TextureSource>()
 
 /**
  * A material channel that is either a constant or a texture, such as `roughness` / `metalness`.

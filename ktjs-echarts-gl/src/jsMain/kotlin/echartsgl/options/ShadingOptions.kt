@@ -6,6 +6,20 @@ import echartsgl.ShadingType
 import echartsgl.TextureSource
 
 /**
+ * One material per shading model; the model itself selects which of them is used.
+ */
+external interface GlMaterialSetOption {
+    /** Material used while the shading is `"realistic"`. */
+    var realisticMaterial: RealisticMaterialOption?
+
+    /** Material used while the shading is `"lambert"`. */
+    var lambertMaterial: LambertMaterialOption?
+
+    /** Material used while the shading is `"color"`. */
+    var colorMaterial: ColorMaterialOption?
+}
+
+/**
  * Shading of the 3D graphics of a series or component.
  *
  * `"color"` draws the flat colors only, `"lambert"` adds classic lighting, and `"realistic"` uses
@@ -14,18 +28,9 @@ import echartsgl.TextureSource
  * The interface is mixed into the GL series and into the geographic components, so the same
  * material options apply wherever a surface is shaded.
  */
-external interface ShadingOption {
+external interface ShadingOption : GlMaterialSetOption {
     /** Shading model: `"color"`, `"lambert"` or `"realistic"`. */
     var shading: ShadingType?
-
-    /** Material used while [shading] is `"realistic"`. */
-    var realisticMaterial: RealisticMaterialOption?
-
-    /** Material used while [shading] is `"lambert"`. */
-    var lambertMaterial: LambertMaterialOption?
-
-    /** Material used while [shading] is `"color"`. */
-    var colorMaterial: ColorMaterialOption?
 }
 
 /**

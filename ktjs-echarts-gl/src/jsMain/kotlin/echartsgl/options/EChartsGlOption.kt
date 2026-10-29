@@ -39,4 +39,10 @@ external interface EChartsGlOption : EChartsOption {
 
     /** z axis of a [grid3D][grid3D]. */
     var zAxis3D: Array<Axis3DOption>?
+
+    /** 3D geographic coordinate systems, created by [Geo3DComponent][echartsgl.Geo3DComponent]. */
+    var geo3D: Array<Geo3DOption>?
+
+    /** Globes, created by [GlobeComponent][echartsgl.GlobeComponent]. */
+    var globe: Array<GlobeOption>?
 }

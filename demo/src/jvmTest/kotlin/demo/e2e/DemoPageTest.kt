@@ -226,14 +226,16 @@ class DemoPageTest {
     }
 
     /**
-     * The `echarts-gl` pages of `Gl.kt`, `GlScatter.kt` and `GlSurfaceMaterial.kt` paint into a WebGL
-     * layer, which is a canvas of its own next to the (empty) zrender canvas layer. A surface with a
-     * broken equation or a missing `visualMap` dimension only logs an error and stays blank, which is
-     * what the console assertion catches; the `scatter3D` pages fetch their rows first, so a `dataset`
-     * whose `encode.z` never arrived would leave the layer empty without an error of its own.
+     * The `echarts-gl` pages of `Gl.kt`, `GlScatter.kt`, `GlSurfaceMaterial.kt` and `GlGeo.kt` paint
+     * into a WebGL layer, which is a canvas of its own next to the (empty) zrender canvas layer. A
+     * surface with a broken equation or a missing `visualMap` dimension only logs an error and stays
+     * blank, which is what the console assertion catches; the `scatter3D` pages fetch their rows
+     * first, so a `dataset` whose `encode.z` never arrived would leave the layer empty without an
+     * error of its own.
      *
      * The leather and image surfaces wait for an image before they set any option, so those layers
-     * are only expected to be there once the `load` handler ran.
+     * are only expected to be there once the `load` handler ran. The `geo3D` pages wait for
+     * `data/world.json` and the globe pages for their textures, which the same wait covers.
      *
      * A missing core module of `echarts-gl` (its `sideEffects` list does not cover the nested
      * installers, so a bundler may drop the module that registers the post-update hook) leaves the
@@ -268,6 +270,13 @@ class DemoPageTest {
                 "parametric-surface-rose",
                 "surface-leather",
                 "image-surface-sushuang",
+                "geo3d",
+                "geo3d-with-different-height",
+                "globe-echarts-gl-hello-world",
+                "globe-atmosphere",
+                "globe-displacement",
+                "globe-moon",
+                "globe-layers",
             )
         for (route in routes) {
             assertChartRendered(page, route)

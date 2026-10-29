@@ -91,7 +91,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **297 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **304 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -109,8 +109,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 | `graphic` | 关键帧动画那一档已落地（`examples/GraphicAnimations.kt`，见下），多数剩余示例还配合真实交互或外部素材 |
 | `visualMap` / `dataZoom` 单列家族 | 官方清单里这几条恰好都属其它被排除的类别；能力已由别的示例覆盖 |
 
-`gl` 家族已经接入（`examples/Gl.kt` / `examples/GlScatter.kt` / `examples/GlSurfaceMaterial.kt`，见下文
-「3D 示例」），按批继续补。
+`gl` 家族已经接入（`examples/Gl.kt` / `examples/GlScatter.kt` / `examples/GlSurfaceMaterial.kt` /
+`examples/GlGeo.kt`，见下文「3D 示例」），按批继续补。
 
 `lines` / `map` / `geo` 已经能用静态数据集（`lines-airline`、`custom-hexbin` 就是先例）：只要再拷
 `public/data/asset/geo/` 下的 GeoJSON 或 SVG，就能继续补这两个家族。
@@ -376,7 +376,8 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
 
 ## 3D 示例（echarts-gl）
 
-3D 家族在 `examples/Gl.kt`、`examples/GlScatter.kt` 与 `examples/GlSurfaceMaterial.kt`，用的是
+3D 家族在 `examples/Gl.kt`、`examples/GlScatter.kt`、`examples/GlSurfaceMaterial.kt` 与
+`examples/GlGeo.kt`，用的是
 `ktjs-echarts-gl` 模块，写法与其它家族一样走 `Category.chart`；要先取数据文件的（`bar3d-dataset` 与三页
 `scatter3D`）走 `Category.interactive` + `loadJson`，要等图片加载的（`surface-leather`）走
 `Category.interactive` + `listen(LOAD)`：
@@ -421,6 +422,16 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   `.hdr` 走 `textureUtil.loadTexture(url, {fileType:'hdr'})`（XHR + arraybuffer），静态服务器给的 MIME
   不影响加载。`surface-leather` 先把 `leather_height.jpg` 画进 2D canvas 读红通道，再把顶点按像素值膨
   胀，所以这一页必须等图片 `load` 之后才 `setOption`。
+- **地理与地球七页在 `GlGeo.kt`**：`geo3d` / `geo3d-with-different-height` 用 `geo3D` 组件，
+  `globe-echarts-gl-hello-world` / `globe-atmosphere` / `globe-displacement` / `globe-moon` /
+  `globe-layers` 用 `globe` 组件，两个 installer 已加进 `useEChartsGl()`。`geo3D` 必须先有地图：两页都在
+  `Category.interactive` 里 `loadJson("data/world.json")` 后 `ECharts.registerMap("world", ...)`，
+  `geo3d-with-different-height` 再取 `world-population.json`，把人口的对数线性映射到 `0..3` 当成
+  `regions[].height`（文档写的 `regionHeight` 是整幅地图的基准高度，两者不同）。`geo3d` 原例的
+  `lambertMaterial.baseTexture`（`woods.jpg`）在 2.1.0 里没有任何材质读（`setMaterialFromModel` 只看
+  `detailTexture`），照官方缩略图那样留白。五页 globe 的 `series: []` 是空操作，省略；
+  `globe-displacement` 的 `debug.wireframe` 上游没写进文档但会被读取，wrapper 照样建模。球面纹理可以是
+  图片 URL，也可以是一个 ECharts 实例（必须建在 canvas 上，否则控制台警告并取不到内容）。
 - **上游的死字段不要搬**：`surface-breather` 的「Export OBJ」按钮调 `echarts.exportGL2PLY`，该模块在
   `echarts-gl` 2.1.0 里已经删掉；`parametric-surface-rose` 的 `realisticMaterial.baseTexture` 没有任何
   材质读它（只有 `globe.baseTexture` 有用）；玫瑰三页的 `toolbox.iconStyle.normal.borderColor` 是 ECharts

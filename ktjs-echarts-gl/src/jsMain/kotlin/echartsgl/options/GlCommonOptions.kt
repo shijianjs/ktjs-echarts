@@ -1,6 +1,7 @@
 package echartsgl.options
 
 import echarts.options.LabelOption
+import echarts.options.LineStyleOption
 import echartsgl.GlColor
 
 /*
@@ -20,7 +21,7 @@ import echartsgl.GlColor
 typealias GlLabelOption = LabelOption
 
 /**
- * Style of a GL graphic, such as a bar, a symbol or a surface patch.
+ * Style of a GL graphic, such as a bar, a symbol, a surface patch or a map region.
  */
 external interface GlItemStyleOption {
     /** Fill color. See [GlColor][echartsgl.GlColor] for the HDR array form. */
@@ -48,4 +49,25 @@ external interface GlEmphasisOption {
 
     /** Style of the graphic in the emphasis state. */
     var itemStyle: GlItemStyleOption?
+}
+
+/**
+ * Debug helpers of a 3D component.
+ *
+ * Upstream reads this option but does not document it.
+ */
+external interface GlDebugOption {
+    /** Wireframe overlay of the geometry. */
+    var wireframe: GlDebugWireframeOption?
+}
+
+/**
+ * Wireframe overlay of a [GlDebugOption].
+ */
+external interface GlDebugWireframeOption {
+    /** Whether the wireframe is drawn over the geometry. */
+    var show: Boolean?
+
+    /** Color and width of the wireframe lines. */
+    var lineStyle: LineStyleOption?
 }

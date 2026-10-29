@@ -91,7 +91,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **313 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **315 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -377,7 +377,7 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
 ## 3D 示例（echarts-gl）
 
 3D 家族在 `examples/Gl.kt`、`examples/GlScatter.kt`、`examples/GlSurfaceMaterial.kt`、
-`examples/GlGeo.kt`、`examples/GlLines.kt` 与 `examples/GlBarGeo.kt`，用的是
+`examples/GlGeo.kt`、`examples/GlLines.kt`、`examples/GlBarGeo.kt` 与 `examples/GlImageBars.kt`，用的是
 `ktjs-echarts-gl` 模块，写法与其它家族一样走 `Category.chart`；要先取数据文件的（`bar3d-dataset` 与三页
 `scatter3D`）走 `Category.interactive` + `loadJson`，要等图片加载的（`surface-leather`）走
 `Category.interactive` + `listen(LOAD)`：
@@ -468,7 +468,10 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   没有对应区域，只影响这几块不上色。
 - **不做的 GL 页**：`animating-contour-on-globe` 依赖 `d3-array` / `d3-contour` / `d3-geo` / `d3-timer`
   在页面里生成等高线，等价实现要先把 d3 的结果算出来；`*-simplex-noise`、`*-mapbox*`、`*-maptalks*`、
-  `iron-globe` 分别需要外部库、地图 JS 或官方站点 `/asset/get/s/` 的纹理。
+  `iron-globe` 分别需要外部库、地图 JS 或官方站点 `/asset/get/s/` 的纹理。`bar3d-music-visualization`
+  要先播音频再取 `AnalyserNode` 的频谱，浏览器禁止无手势的自动播放；`globe-country-carousel` 靠
+  `getModel().getComponent('geo').coordinateSystem.regions` 取各国中心点，而本站的 `world.json` 里
+  只有 6 个国家带 `cp`，实例上的 `getModel` 也没有建模。
 - **上游的死字段不要搬**：`surface-breather` 的「Export OBJ」按钮调 `echarts.exportGL2PLY`，该模块在
   `echarts-gl` 2.1.0 里已经删掉；`parametric-surface-rose` 的 `realisticMaterial.baseTexture` 没有任何
   材质读它（只有 `globe.baseTexture` 有用）；玫瑰三页的 `toolbox.iconStyle.normal.borderColor` 是 ECharts
@@ -481,6 +484,14 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   `[r, g, b, 1]`（各通道再乘 `亮度 * 2`，会超过 1，所以是 HDR）。`ZRColor` 的回调只能返回字符串，
   wrapper 因此给 `GlColor` 补了返回 `Array<Double>` 的回调重载。四万多根柱子配上 `enable: true` +
   `depthOfField`，单页要几秒才稳定，截图与 e2e 都要留足时间。
+- **`GlImageBars.kt` 的两页同样是「一个像素一根柱」**：`image-to-bar3d` 把肖像的亮度取反当柱高、按像素
+  RGB 上色（一万多根柱子），`bar3d-voxelize-image` 把硬币压到 80 行、柱高按 `(亮度 - 125) * 0.3 + 50`
+  取、颜色返回 HDR 数组（亮度乘 1.2 会溢出 1）。两页都先把图片画进离屏 canvas 再读
+  `getImageData`，像素数据在回调里通过闭包复用。
+- **`bar3d-voxelize-image` 关掉了 `screenSpaceReflection`**：上游开了它，但在 Chrome 下 `echarts-gl`
+  2.1.0 的 SSR pass 会画出整幅黑帧（bloom / SSAO / DOF 单独开都正常），所以这页保留其余特效、去掉反射。
+  同一页上游的 `wireframe: { show: false }`（在 `image-to-bar3d` 里）是死字段：`bar3D` 根本不读
+  `wireframe`，只有 surface / line3D / geo3D / globe 有。
 - **WebGL 层是另一张画布**：GL 系列只画在 `echarts-gl` 插进来的 canvas 上，zrender 自己的画布层不会创
   建；没有 WebGL 时 echarts-gl 用 `.ecgl-nowebgl` 占位，页面上连 canvas 都没有。e2e 因此对 GL 页只做
   `assertChartRendered`（画布有尺寸）+ `the 3d pages paint through the webgl layer`（这张画布能取到

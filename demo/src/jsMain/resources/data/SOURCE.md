@@ -52,6 +52,8 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `img/gl/leather/leather_normal.jpg` | `data-gl/asset/leather/` | `surface-leather` (normal map) |
 | `img/gl/sushuang.jpg` | derived | `image-surface-sushuang` (per-pixel surface) |
 | `img/gl/sample.jpg` | `data-gl/asset/` | `bar3d-myth` (one bar per pixel, colored from the image) |
+| `img/gl/portrait.jpg` | derived (was a base64 data URL) | `image-to-bar3d` (one bar per pixel, inverted luminance) |
+| `img/gl/bitcoin.png` | `data-gl/asset/` | `bar3d-voxelize-image` (one bar per pixel, HDR colors) |
 | `img/gl/woods.jpg` | `data-gl/asset/` | `geo3d-with-different-height` (detail texture) |
 | `img/gl/starfield.jpg` | `data-gl/asset/` | the globe pages (environment) |
 | `img/gl/lake.hdr` | `data-gl/asset/` | `scatter3d-globe-population` (ambient cubemap) |

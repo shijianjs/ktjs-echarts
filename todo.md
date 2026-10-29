@@ -48,19 +48,20 @@
 - 缺：`mapbox3D`、`maptalks3D`、`polygons3D`、`map3D`、`scatterGL`、`graphGL`、`flowGL`、`linesGL`
   的选项类型（这些页面本身也多半需要地图数据或外部 JS）。
 
-### demo（313 个示例 / 27 个家族）
+### demo（315 个示例 / 27 个家族）
 
 - 各家族基本铺满；剩下的候选要么需要真实键鼠序列，要么需要外部 JS / GeoJSON / 图片素材
   （原因见 `demo/AGENTS.md`）。
-- `gl` 分组共 34 页：`examples/Gl.kt`（`bar3d-punch-card`、`transparent-bar3d`、`bar3d-dataset`、
+- `gl` 分组共 36 页：`examples/Gl.kt`（`bar3d-punch-card`、`transparent-bar3d`、`bar3d-dataset`、
   `image-surface-sushuang`、`bar3d-myth`、`line3d-orthographic`、`simple-surface`、
   `sphere-parametric-surface`、`surface-wave`）、`examples/GlScatter.kt`（`scatter3d`、`scatter3d-scatter`、
   `scatter3D-dataset`）、`examples/GlSurfaceMaterial.kt`（`metal-surface`、`surface-breather`、
   `surface-mollusc-shell`、`surface-golden-rose`、`surface-theme-roses`、`parametric-surface-rose`、
   `surface-leather`）、`examples/GlGeo.kt`（`geo3d`、`geo3d-with-different-height`、六页 `globe-*`、
   `scatter3d-globe-population`）、`examples/GlLines.kt`（`lines3d-airline-on-globe`、
-  `lines3d-flights-on-geo3d`、`lines3d-flights`、`lines3d-flights-gl`）与 `examples/GlBarGeo.kt`（`bar3d-global-population`、
-  `global-population-bar3d-on-globe`）；`main()` 的 `useEChartsGl()` 注册 `Bar3DChart` / `Line3DChart` /
+  `lines3d-flights-on-geo3d`、`lines3d-flights`、`lines3d-flights-gl`）、`examples/GlBarGeo.kt`（`bar3d-global-population`、
+  `global-population-bar3d-on-globe`）与 `examples/GlImageBars.kt`（`image-to-bar3d`、`bar3d-voxelize-image`）；
+  `main()` 的 `useEChartsGl()` 注册 `Bar3DChart` / `Line3DChart` /
   `Lines3DChart` / `Scatter3DChart` / `SurfaceChart` / `Grid3DComponent` / `Geo3DComponent` /
   `GlobeComponent`。
 - 可复用数据：`punchCardValues` / `punchCardHours` / `punchCardDays`（`CustomExtra.kt`）、
@@ -68,21 +69,24 @@
   `resources/data/gl/flights.json`；
   11 色 `visualMap` 色带在 `Gl.kt` 的 `glPalette` / `glVisualMap()` 与 `GlSurfaceMaterial.kt` 的
   `surfaceRamp()`。
-- 素材：`resources/data/img/gl/` 下是 HDR 环境图、皮革贴图、地球/月球/星空纹理与 `sample.jpg`（星云
-  柱的像素来源），来源记在
+- 素材：`resources/data/img/gl/` 下是 HDR 环境图、皮革贴图、地球/月球/星空纹理、`sample.jpg` /
+  `portrait.jpg` / `bitcoin.png`（星云柱与两页像素柱的像素来源），来源记在
   `data/SOURCE.md`；`resources/data/world.json` 与 `world-population.json` 供 `geo3D` 与 globe 页面使用，
   `world.json` 的缩写地名由 `GlGeo.kt` 的 `worldRegionNames` 表翻译。
 
-## 下一步（GL 横向铺开）
+## 下一步（补齐 GL 剩余公开类型）
 
-1. **把 `bar3D` / `globe` 的剩余素材页铺开**：`bar3d-voxelize-image`、`image-to-bar3d`、
-   `bar3d-music-visualization`（读音频或视频，体积先看）、`globe-country-carousel`（国家高亮轮播）。
-   `lines3d-taxi-routes-of-cape-town` / `bar3d-shanghai` / `scatter3d-shanghai` 需要 mapbox 或 shapefile，
-   归入不做。
-2. **暂不做**：`animating-contour-on-globe`（d3-array/contour/geo/timer）、`*-simplex-noise` 与
+1. **补 `scatterGL` / `graphGL` / `flowGL` / `linesGL` / `polygons3D` / `map3D` 的选项类型**与安装器，
+   按 `echarts-gl/src/chart/*` 的 `defaultOption` 与 `echarts-doc/option-gl/` 建模；这些页面上游大多依赖
+   地图数据或外部 JS，先补类型、再看能否找到不依赖地图的示例。
+2. **`mapbox3D` / `maptalks3D` 坐标系**：选项类型可以照文档补齐（需要 accessToken 字段等），但示例页要
+   额外加载地图 JS 与瓦片，页面仍不做。
+3. **暂不做**：`animating-contour-on-globe`（d3-array/contour/geo/timer）、`*-simplex-noise` 与
    `stacked-bar3d` / `metal-bar3d`（都从 CDN 取 `simplex-noise` 生成数据，`metal-bar3d` 还要 `pisa.hdr`）、
-   `*-mapbox*` / `*-maptalks*`（页面要额外加载地图 JS）、`iron-globe` 一类依赖官方站点 `/asset/get/s/`
-   纹理的示例。
+   `*-mapbox*` / `*-maptalks*` 页面（要地图 JS）、`bar3d-music-visualization`（Web Audio 需要用户手势）、
+   `globe-country-carousel`（要读实例 `getModel()` 的区域中心，`world.json` 里也只有 6 个国家带 `cp`）、
+   `lines3d-taxi-routes-of-cape-town` / `bar3d-shanghai` / `scatter3d-shanghai`（mapbox / shapefile）、
+   `iron-globe` 一类依赖官方站点 `/asset/get/s/` 纹理的示例。
 
 ## 仍然生效的坑
 

@@ -29,6 +29,7 @@ import demo.examples.gaugeLongTailEntries
 import demo.examples.glBarGeoEntries
 import demo.examples.glEntries
 import demo.examples.glGeoEntries
+import demo.examples.glImageBarsEntries
 import demo.examples.glLinesEntries
 import demo.examples.glScatterEntries
 import demo.examples.glSurfaceMaterialEntries
@@ -217,6 +218,7 @@ val catalog: List<CatalogEntry> =
         glEntries,
         glBarGeoEntries,
         glGeoEntries,
+        glImageBarsEntries,
         glLinesEntries,
         glScatterEntries,
         glSurfaceMaterialEntries,

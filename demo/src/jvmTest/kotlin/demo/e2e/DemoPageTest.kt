@@ -239,9 +239,10 @@ class DemoPageTest {
      * first, so a `dataset` whose `encode.z` never arrived would leave the layer empty without an
      * error of its own.
      *
-     * The leather and image surfaces wait for an image before they set any option, so those layers
-     * are only expected to be there once the `load` handler ran. The `geo3D` pages wait for
-     * `data/world.json` and the globe pages for their textures, which the same wait covers.
+     * The leather and image surfaces and the pixel-bar pages wait for an image before they set any
+     * option, so those layers are only expected to be there once the `load` handler ran. The `geo3D`
+     * pages wait for `data/world.json` and the globe pages for their textures, which the same wait
+     * covers.
      *
      * A missing core module of `echarts-gl` (its `sideEffects` list does not cover the nested
      * installers, so a bundler may drop the module that registers the post-update hook) leaves the
@@ -296,6 +297,8 @@ class DemoPageTest {
                 "lines3d-flights",
                 "lines3d-flights-gl",
                 "bar3d-myth",
+                "image-to-bar3d",
+                "bar3d-voxelize-image",
             )
         for (route in routes) {
             assertChartRendered(page, route)

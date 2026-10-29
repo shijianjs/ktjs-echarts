@@ -109,8 +109,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后落地 **366 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
-的官方清单统计，共 436 条：已移植 367 条，明确不做 51 条，待补 18 条；逐条清单与理由见
+筛选后落地 **369 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
+的官方清单统计，共 436 条：已移植 370 条，明确不做 51 条，待补 15 条；逐条清单与理由见
 [COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -130,11 +130,17 @@ demo/src/jvmTest/kotlin/demo/e2e/
 | `graphic` | 关键帧动画那一档已落地（`examples/GraphicAnimations.kt`，见下），剩余示例都配合真实交互或外部素材 |
 | `visualMap` / `dataZoom` | 清单里没有独立家族，这几条随所属系列落地或列入待补（`line-tooltip-touch`）；能力已由具体示例（`wind-barb` 等）覆盖 |
 
-`gl` 家族已经接入（`examples/Gl*.kt` 八个文件，见下文「3D 示例」），剩余页面按
+`gl` 家族已经接入（`examples/Gl*.kt` 十个文件，见下文「3D 示例」），剩余页面按
 [COVERAGE.md](COVERAGE.md) 的待补清单推进。
 
 `lines` / `map` / `geo` 已经能用静态数据集（`lines-airline`、`custom-hexbin` 就是先例）：只要再拷
 `public/data/asset/geo/` 下的 GeoJSON 或 SVG，就能继续补这两个家族。
+
+百万级轨迹那一档已经落地：`lines-ny` 在 `examples/LinesNy.kt`，两页 WebGL 版在
+`examples/GlBigData.kt`。上游把数据切成 `.bin` 分片（32 片 `links_ny_*.bin`、230 片 `gps_*.bin`），
+站内只入库 8 片与 20 片（各 7.7 MB，取舍见 `data/SOURCE.md`），页面用 `loadFloat32` / `loadInt32`
+一片一片读、转成扁平数组后 `chart.appendData(...)` 追加，读完或图表已销毁就停下递归。转换函数
+`nyChunk` / `gpsChunk` 是 `internal`，两页街道图共用同一份分片，不各写一遍。
 
 竞速、下钻那一档已经落地：`bar-race`（每 3 秒加一截，定时器交给 `ChartHolder`）与
 `bar-drilldown`（点击柱体换层，`universalTransition` 做形变，Back 是带 `onclick` 的 graphic
@@ -565,7 +571,8 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
 
 3D 家族在 `examples/Gl.kt`、`examples/GlScatter.kt`、`examples/GlSurfaceMaterial.kt`、
 `examples/GlGeo.kt`、`examples/GlLines.kt`、`examples/GlBarGeo.kt`、`examples/GlImageBars.kt`、
-`examples/GlGraph.kt` 与 `examples/GlMap.kt`，用的是 `ktjs-echarts-gl` 模块，写法与其它家族一样走
+`examples/GlGraph.kt`、`examples/GlMap.kt` 与 `examples/GlBigData.kt`，用的是 `ktjs-echarts-gl` 模块，
+写法与其它家族一样走
 `Category.chart`；要先取数据文件的（`bar3d-dataset`、三页 `scatter3D`、两页图谱与四页 `map3D`）走
 `Category.interactive` + `loadJson`，要等图片加载的（`surface-leather`、`bar3d-myth` 一类）走
 `Category.interactive` + `listen(LOAD)`：
@@ -704,13 +711,21 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   `label.color` 是空操作，三处都略去并在头注释里写明。`silent` 相反是真字段（`echarts-gl.js` 的
   `setSilent` 会读），`buildings` 页照用。`map3d-buildings` 保留了与 `shading: "lambert"` 同时存在的
   `realisticMaterial`：上游就这么写，它不会被用到但照搬。
+- **两页 WebGL 大数据在 `GlBigData.kt`**：`linesGL-ny` 是 `lines-ny` 的 GPU 版（同一批 `nyChunk`
+  分片、同样 `polyline` + `dimensions: ['value']`），`scatterGL-gps` 把 `gps_*.bin` 的
+  `[lat, lng]` 整型对调并除 1e7 后喂给 `scatterGL`。两页都靠 `typedFlatData`（`data` 的
+  `ArrayLike<number>` 分支）+ `appendData` 增量追加，`linesGL` 没有 `large` 字段（源码不读），
+  照搬会编译不过。`LinesGLChart` / `ScatterGLChart` 已加进 `useEChartsGl()`：漏掉时 option 照样
+  被接受、页面只剩 2D 的 `geo`，与 `Map3DChart` 同类症状。`scatterGL-gps` 的 `title.text` 按站内
+  实际点数（100 万）写，不照抄上游的 1000 万。
 - **撒点用 `Lcg` 而不是 `Math.random()`**：`map3d-wood-city` 的程序化建筑原本随机生成高度与位置，
   本站按项目约定换成固定种子的 `Lcg(20261030)`，同一页每次截图一致。
 - **WebGL 层是另一张画布**：GL 系列只画在 `echarts-gl` 插进来的 canvas 上，zrender 自己的画布层不会创
   建；没有 WebGL 时 echarts-gl 用 `.ecgl-nowebgl` 占位，页面上连 canvas 都没有。e2e 因此对 GL 页只做
-  `assertChartRendered`（画布有尺寸）+ `the 3d pages paint through the webgl layer`（这张画布能取到
-  WebGL 上下文、且没有占位元素）。`paintedFrame` / `paintedPixels` 走 `getContext('2d')`，对 GL 画布取
-  到的是 `null`，不要把 GL 路由加进那些用例。
+  `assertChartRendered`（画布有尺寸）+ `the 3d pages paint through the webgl layer`（`.chart` 下**任意**
+  一张画布能取到 WebGL 上下文、且没有占位元素）——`scatterGL` / `linesGL` 这类 2D 坐标系的系列会同时留
+  着 zrender 的画布，它可能排在前面，只查第一张会误判。`paintedFrame` / `paintedPixels` 走
+  `getContext('2d')`，对 GL 画布取到的是 `null`，不要把 GL 路由加进那些用例。
 
 ## 兜底说明：图表与主题
 

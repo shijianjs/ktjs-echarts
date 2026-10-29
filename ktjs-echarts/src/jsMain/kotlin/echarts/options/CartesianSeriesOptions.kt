@@ -617,6 +617,17 @@ external interface LinesSeriesOption :
      */
     @JsName("data")
     var typedData: Array<LinesDataItemOption?>?
+
+    /**
+     * Flat view of the data, one row per line.
+     *
+     * Upstream declares `data` as `LinesDataItemOption[] | ArrayLike<number>`; with
+     * [polyline] every row is `[count, x0, y0, x1, y1, ...]`, otherwise `[x0, y0, x1, y1]`.
+     * This is the branch the million-street pages append chunk by chunk from a binary file, and it
+     * needs [dimensions]. Same JavaScript property as [typedData].
+     */
+    @JsName("data")
+    var typedFlatData: ArrayLike<JsAny>?
 }
 
 /**

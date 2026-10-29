@@ -7,6 +7,7 @@ import echarts.destroyChart
 import js.buffer.ArrayBuffer
 import js.objects.unsafeJso
 import js.typedarrays.Float32Array
+import js.typedarrays.Float64Array
 import kotlin.js.JsAny
 import kotlin.js.js
 import kotlin.js.unsafeCast
@@ -189,6 +190,39 @@ class SeriesTypedDataTest {
             val stored = assertNotNull(chart.getOption().series)
             assertEquals(4, stored[0].data?.size, "the flat array is the data of the series")
             assertTrue(chart.renderToCanvas().width > 0, "the chart renders the flat data")
+        } finally {
+            destroyChart(chart, container)
+        }
+    }
+
+    @Test
+    fun linesDataCanBeAFlatTypedArray() {
+        // Upstream types lines data as `LinesDataItemOption[] | ArrayLike<number>`; a polylines row
+        // is `[count, x0, y0, x1, y1, ...]`, which is what the million-street page appends from a
+        // binary file.
+        val flat = js("new Float64Array([3, 0, 0, 1, 2, 2, 0, 2, 1, 1, 3, 4])").unsafeCast<Float64Array<ArrayBuffer>>()
+        val series = linesSeries {
+            polyline = true
+            dimensions = arrayOf(DimensionDefinitionLoose("value"))
+            typedFlatData = flat
+            large = true
+        }
+
+        assertSame(flat.unsafeCast<JsAny>(), series.typedFlatData!!.unsafeCast<JsAny>())
+
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(
+                unsafeJso<EChartsOption> {
+                    xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.value })
+                    yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
+                    this.series = one<SeriesOption>(series)
+                },
+            )
+
+            val stored = assertNotNull(chart.getOption().series)
+            assertEquals(2, stored[0].data?.size, "the flat array is read as two polylines")
+            assertTrue(chart.renderToCanvas().width > 0, "the chart renders the flat polylines")
         } finally {
             destroyChart(chart, container)
         }

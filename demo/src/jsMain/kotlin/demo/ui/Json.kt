@@ -2,6 +2,7 @@ package demo.ui
 
 import js.buffer.ArrayBuffer
 import js.typedarrays.Float32Array
+import js.typedarrays.Int32Array
 import kotlin.js.JsAny
 import kotlin.js.Promise
 import kotlin.js.js
@@ -39,3 +40,10 @@ fun loadFloat32(path: String): Promise<Float32Array<ArrayBuffer>> =
         "function (path) { return fetch(path).then(function (response) { return response.arrayBuffer(); })" +
             ".then(function (buffer) { return new Float32Array(buffer); }); }",
     )(path) as Promise<Float32Array<ArrayBuffer>>
+
+/** Loads a binary file of 32-bit integers, e.g. the coordinate pairs of the bulk GPS page. */
+fun loadInt32(path: String): Promise<Int32Array<ArrayBuffer>> =
+    js(
+        "function (path) { return fetch(path).then(function (response) { return response.arrayBuffer(); })" +
+            ".then(function (buffer) { return new Int32Array(buffer); }); }",
+    )(path) as Promise<Int32Array<ArrayBuffer>>

@@ -7,6 +7,7 @@ import echarts.options.ModelFinderIndexQuery
 import echarts.options.OptionDataItem
 import echarts.options.StringOrDouble
 import echarts.options.StringOrStringArray
+import js.array.ArrayLike
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.JsName
@@ -537,8 +538,18 @@ external interface AppendDataParams {
     /** Index of the target series. */
     var seriesIndex: Double?
 
-    /** Data appended to the series. */
+    /** Data appended to the series, one item per entry. */
     var data: Array<OptionDataItem?>?
+
+    /**
+     * Flat view of [data] for the large-data series.
+     *
+     * Upstream declares the appended data as `any`; a `Float32Array` / `Float64Array` of consecutive
+     * rows is what the large-data examples append chunk by chunk, and the series has to set
+     * `dimensions` for it. Same JavaScript property as [data], so assign exactly one of them.
+     */
+    @JsName("data")
+    var typedFlatData: ArrayLike<JsAny>?
 }
 
 /**

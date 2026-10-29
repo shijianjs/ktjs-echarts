@@ -16,8 +16,11 @@ import echarts.options.lineSeries
 import echarts.options.numbers
 import echarts.options.one
 import echarts.options.pieSeries
+import js.buffer.ArrayBuffer
 import js.objects.unsafeJso
+import js.typedarrays.Float32Array
 import kotlin.js.JsAny
+import kotlin.js.js
 import kotlin.js.jsTypeOf
 import kotlin.js.json
 import kotlin.js.unsafeCast
@@ -27,6 +30,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 import web.dom.document
 import web.html.HtmlTagName
@@ -464,6 +468,14 @@ class EChartsTest {
         try {
             chart.setOption(cartesianLineOption(1.0, 2.0))
             chart.appendData(unsafeJso { seriesIndex = 0.0; data = numbers(3.0, 4.0) })
+
+            // Upstream declares the appended data as `any`; the large-data pages append a typed
+            // array chunk by chunk, so the flat view has to share the same JavaScript property.
+            val flat = js("new Float32Array([5, 6])").unsafeCast<Float32Array<ArrayBuffer>>()
+            val params = unsafeJso<AppendDataParams> { seriesIndex = 0.0; typedFlatData = flat }
+            assertSame(flat.unsafeCast<JsAny>(), params.data?.unsafeCast<JsAny>())
+            chart.appendData(params)
+
             chart.updateLabelLayout()
         } finally {
             destroyChart(chart, container)

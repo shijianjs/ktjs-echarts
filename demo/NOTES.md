@@ -23,6 +23,14 @@
 - **`graphic` 的 `rect` 默认填黑**：只想画框时要显式写 `fill = null`，否则整块盖成黑色（上游示例就是这么写的）。
 - **typed array 当 `data` 必须配 `dimensions`**：`typedFlatData` 走的是上游 `ArrayLike<number>` 分支，
   ECharts 按 `dimensions` 的行宽切分扁平表；漏写会按每个数一个点读，画出来是一条斜线。
+- **百万级数据用 `appendData` 分片追加**：`AppendDataParams` 的 `typedFlatData` 与系列上的同一个 JS
+  `data` 属性，`seriesIndex` 指定追加到哪条系列；每片读完立刻递归下一片，入口先判
+  `index >= CHUNK_COUNT || chart.isDisposed()`，否则换页后的回调会打在已销毁的实例上。
+  `getOption()` 读回来的是解析后的行，不是原数组，断言要按这个写。
+- **`js.typedarrays` 的构造与元素类型**：构造要显式给缓冲类型参数
+  `Float64Array<ArrayBuffer>(length)`（不写会报「Cannot infer type parameter 'B'」）；下标读回的元素
+  类型按数组分别是 `Float` / `Int` / `Double`，写回必须同类型，跨数组换算要 `.toDouble()` /
+  `.toFloat()`。
 - **`geo` 的区域标签默认不显示**：`geo.regions[].label` 只配 `formatter` 时仍然只有 hover 才出现，
   截图里没有标签是正常的（SVG 教程原话「将鼠标 hover 到元素上能显示标签」）。
 - **饼图落在 `geo` 上时，`center` 可以只给区名**：上游 `center` 是 `(string | number)[] | string | number`，
@@ -83,4 +91,8 @@
   `toLowerCase` 的 TypeError，整页连画布都不建。
 - **`graphGL` 的 `modularity` 不是核心选项**：它来自官方站单独加载的 CDN 插件 `echarts-graph-modularity`，
   本站没有，去掉后所有节点取调色板第一色；`stopThreshold` 是声明但不读的死字段。
+- **两页 WebGL 大数据**：`linesGL-ny` 与 `scatterGL-gps` 直接把 `.bin` 分片转成扁平 typed array 交给
+  `appendData`。`linesGL` 没有 `large` 字段（`echarts-gl` 源码不读，写了编译不过），`scatterGL` 才有；
+  `geo` 在这两页只当坐标系用，`silent = true` 后 hover 分支（`label.emphasis` / `emphasis.areaColor`）
+  永远不会触发，就不必搬。`scatterGL-gps` 的 `title.text` 按站内实际点数写，不照抄上游的 1000 万。
 - **上游没有 TypeScript 声明**：选项按 `echarts-doc` 的 `option-gl/` 与源码 `defaultOption` 建模。

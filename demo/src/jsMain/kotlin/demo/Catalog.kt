@@ -32,6 +32,7 @@ import demo.examples.geoMapsEntries
 import demo.examples.gaugeExtraEntries
 import demo.examples.gaugeLongTailEntries
 import demo.examples.glBarGeoEntries
+import demo.examples.glBigDataEntries
 import demo.examples.glGraphEntries
 import demo.examples.glEntries
 import demo.examples.glGeoEntries
@@ -50,6 +51,7 @@ import demo.examples.generatedSeriesEntries
 import demo.examples.intradayBreaksEntries
 import demo.examples.lineEntries
 import demo.examples.linesExtraEntries
+import demo.examples.linesNyEntries
 import demo.examples.lineExtraEntries
 import demo.examples.lineLongTailEntries
 import demo.examples.matrixEntries
@@ -185,6 +187,7 @@ val catalog: List<CatalogEntry> =
         lineEntries,
         rainfallLineEntries,
         linesExtraEntries,
+        linesNyEntries,
         lineExtraEntries,
         lineLongTailEntries,
         intradayBreaksEntries,
@@ -257,6 +260,7 @@ val catalog: List<CatalogEntry> =
         glImageBarsEntries,
         glLinesEntries,
         glScatterEntries,
+        glBigDataEntries,
         glSurfaceMaterialEntries,
         docExampleEntries,
         docMoreEntries,

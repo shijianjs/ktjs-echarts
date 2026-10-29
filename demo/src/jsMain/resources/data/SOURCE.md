@@ -88,6 +88,8 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `gl/buildings.json` | `data-gl/asset/data/` | `map3d-buildings`, `map3d-wood-city` (one extruded region per building) |
 | `house-price-area2.json` | `data/` | `scatter-stream-visual` (`[area, price]` pairs) |
 | `fake-nebula.bin` | `data/asset/data/` | `scatter-nebula` (8 MB of 32-bit floats, a flat `[x0, y0, x1, y1, ...]` table) |
+| `ny/links_ny_{0..7}.bin` | `data/asset/data/links-ny/` | `lines-ny`, `linesGL-ny` (street polylines as `[offsetX, offsetY, count, x0, y0, ...]` rows of 32-bit floats; 8 of the 32 upstream chunks) |
+| `gps/gps_{0..19}.bin` | `data/asset/data/gps/` | `scatterGL-gps` (`[lat, lng]` pairs as 32-bit integers scaled by 1e7; 20 of the 230 upstream chunks) |
 | `calendar-lunar.json` | derived | `calendar-lunar` (the 365-row `dateList` of `examples/ts/calendar-lunar.ts`, each row `[date, lunarDay]` or `[date, lunarDay, solarTerm]`) |
 
 The two `rainfall-*.json` files are **derived**, not copied: upstream keeps these 3079-point series
@@ -104,6 +106,13 @@ other region names, so `GlGeo.kt` translates the names of the data back to the n
 `img/gl/sushuang.jpg` is **derived** as well: upstream keeps the picture inline in
 `examples/ts/gl/image-surface-sushuang.js` as a base64 data URL, so it was decoded into a file and is
 served from `/data/img/gl/sushuang.jpg`.
+
+The two chunk tables are **subsets**. Upstream streams 32 `links_ny_*.bin` files (23 MB, close to a
+million polylines) and 230 `gps_*.bin` files (89 MB, 10 million points), which is more than a demo
+site should carry, so the repository ships 8 and 20 chunks of 7.7 MB each: 922,916 street segments
+and 1,000,000 GPS points. Neither split is a spatial tiling — the street chunks share one bounding
+box and the GPS chunks are one random sample of the world — so the pages show the same geography as
+upstream, only sparser, and `scatterGL-gps` titles itself after the points it actually draws.
 
 Files added here must keep the upstream name so the example source stays traceable to
 `public/data/asset/{data,geo}/<name>`.

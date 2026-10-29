@@ -13,14 +13,17 @@
   - `S:\workspace\github\ecomfe\echarts-gl`（GL 的 `defaultOption` 与视图实现）
   - `S:\workspace\github\JetBrains\kotlin-wrappers`（写法参考）
 - 锁定版本：根 `package.json`（`echarts` 6.1.0、`echarts-gl` 2.1.0）；修订号在
-  `wrapper-revisions.properties`（当前 `ktjs-echarts=10`、`ktjs-echarts-gl=8`）。
+  `wrapper-revisions.properties`（当前 `ktjs-echarts=11`、`ktjs-echarts-gl=9`）。
 - 验证：`./gradlew build`（含 detekt）、`:ktjs-echarts:jsBrowserTest`、`:ktjs-echarts-gl:jsBrowserTest`、
   `:demo:e2eTest`；demo 覆盖统计用 `node scripts/demo-coverage.mjs`。
 
 ## 当前状态
 
-### ktjs-echarts（6.1.0-kt.10）
+### ktjs-echarts（6.1.0-kt.11）
 
+`-kt.11` 补了二进制轨迹页需要的两处扁平数据视图：`LinesSeriesOption.typedFlatData`（`data` 的
+`ArrayLike<number>` 分支，`polyline` 时每行 `[count, x0, y0, ...]`，配 `dimensions`）与
+`AppendDataParams.typedFlatData`（同一分支的 `appendData` 入口，分片追加百万级轨迹就靠它）。
 `-kt.10` 补了两处地图批次需要的公开 API：`GeoOption` 混入 `ComponentOption` 的
 `coordinateSystem` / `coordinateSystemUsage` / `coord`、`BoxLayoutOptionMixin` 与
 `AnimationOptionMixin`（`geo` 要能钉进矩阵格子并关掉自身动画），以及 `PieSeriesOption.typedCenter`
@@ -42,7 +45,11 @@
   是基类型的子接口，调用方 `unsafeJso<精确类型> { }` 即可写，读回来按需 `unsafeCast`。
 - `coordinateSystem` 等关键字收窄、继承来的 `var` 收窄沿用 `@JsName` 同名字段（`TYPE-MAPPING.md` §12）。
 
-### ktjs-echarts-gl（2.1.0-kt.8）
+### ktjs-echarts-gl（2.1.0-kt.9）
+
+`-kt.9` 给 `LinesGLSeriesOption` 与 `ScatterGLSeriesOption` 各加了 `typedFlatData`（与 `typedData`
+同一 `data` 属性的 `ArrayLike<number>` 视图），`linesGL-ny` / `scatterGL-gps` 据此把百万级点与折线
+按分片交给 `appendData`。
 
 - 已建模：`grid3D` / `xAxis3D|yAxis3D|zAxis3D`、`geo3D`、`globe`、`viewControl`、`light`、`postEffect`、
   shading 与材质，全部 11 个系列的选项、数据项联合与工厂，以及 `mapbox3D` / `maptalks3D` 组件选项和
@@ -57,7 +64,7 @@
 
 ### demo
 
-- 官方清单 436 条：**已移植 366 页 / 367 条，明确不做 51，待补 18**。逐条清单、理由与维护方式见
+- 官方清单 436 条：**已移植 369 页 / 370 条，明确不做 51，待补 15**。逐条清单、理由与维护方式见
   [demo/COVERAGE.md](demo/COVERAGE.md)。
 - 跨页注意事项（含 GL）见 [demo/NOTES.md](demo/NOTES.md)；移植约定、各家族做法与可复用数据见
   [demo/AGENTS.md](demo/AGENTS.md)。
@@ -66,17 +73,15 @@
 
 ## 下一步
 
-按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进（18 条），建议顺序：
+按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进（15 条），建议顺序：
 
 1. **补 `china.json`**（一次解锁 13 条）：`doc-example/map-example`、四个 `doc-example/map-visualMap-*`、
    `doc-example/scatter-visualMap-piecewise`、`heatmap-map`、`geo-lines`、`geo-map-scatter`、`scatter-map`、
    `effectScatter-map`、`scatter-weibo`、`scattergl-weibo`。本地克隆里没有 `china.json`（上游地图数据早已
    外置，`echarts/map/js` 也没有），要么从官方站点下载一次并登记到 `data/SOURCE.md`，要么改注册
    `world.json` / 其他已入库地图的等价页面——先确认数据来源再动手。
-2. **二进制轨迹**（3 条）：`lines-ny` / `linesGL-ny`（`links_ny_*.bin` 合计约 30 MB）、`scatterGL-gps`
-   （`gps_*.bin`），要按需分片加载，单独一批处理。
-3. **补静态数据**（1 条）：`bar-race-country` 要 emoji-flags CDN 数据。
-4. **先补 wrapper 再做**（1 条）：`doc-example/scatter-visualMap-categories` 需要按类目索引的 `visualMap`
+2. **补静态数据**（1 条）：`bar-race-country` 要 emoji-flags CDN 数据。
+3. **先补 wrapper 再做**（1 条）：`doc-example/scatter-visualMap-categories` 需要按类目索引的 `visualMap`
    字典与 `left: null`。
 
 新增/移植页面后跑 `node scripts/demo-coverage.mjs --write` 更新 COVERAGE。

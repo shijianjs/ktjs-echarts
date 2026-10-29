@@ -2,9 +2,11 @@ package echartsgl
 
 import echarts.AxisTypes
 import echarts.ECharts
+import echarts.options.DimensionDefinitionLoose
 import echarts.options.OptionDataValue
 import echarts.options.OptionDataValueOrArray
 import echarts.options.OptionId
+import echarts.options.SeriesOption
 import echarts.options.StringOrDouble
 import echarts.options.SymbolShape
 import echarts.options.SymbolSize
@@ -25,12 +27,19 @@ import echartsgl.options.flowGLSeries
 import echartsgl.options.graphGLSeries
 import echartsgl.options.linesGLSeries
 import echartsgl.options.scatterGLSeries
+import js.buffer.ArrayBuffer
 import js.objects.unsafeJso
+import js.typedarrays.Float32Array
+import js.typedarrays.Float64Array
+import kotlin.js.JsAny
 import kotlin.js.Promise
+import kotlin.js.js
 import kotlin.js.unsafeCast
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 import web.dom.document
 import web.gl.ID
@@ -164,6 +173,82 @@ class GlSeries2DTest {
                 val item = series.typedData!![1]!!.unsafeCast<LinesGLDataItemOption>()
                 assertEquals(2, item.coords!!.size)
                 assertEquals(1.0, item.lineStyle!!.width)
+                assertWebGlCanvas(container)
+            } finally {
+                destroyChart(chart, container)
+            }
+        }
+    }
+
+    /**
+     * The multi-million-point pages hand the data to a `scatterGL` series as a typed array, not as
+     * one object per point; `dimensions` says how the flat rows are read.
+     */
+    @Test
+    fun scatterGLDataCanBeAFlatTypedArray(): Promise<Unit> {
+        ECharts.use(arrayOf(ScatterGLChart))
+        val (chart, container) = createChart()
+        val flat = js("new Float32Array([1, 2, 3, 4, 5, 6])").unsafeCast<Float32Array<ArrayBuffer>>()
+        val series = scatterGLSeries {
+            typedCoordinateSystem = CoordinateSystems2D.cartesian2d
+            dimensions =
+                arrayOf(DimensionDefinitionLoose("lng"), DimensionDefinitionLoose("lat"))
+            typedFlatData = flat
+            zoomScale = 0.002
+            large = true
+        }
+        assertSame(flat.unsafeCast<JsAny>(), series.typedFlatData!!.unsafeCast<JsAny>())
+
+        chart.setOption(
+            unsafeJso<EChartsGlOption> {
+                axes()
+                this.series = one<SeriesOption>(series)
+            },
+        )
+        return nextFrames(2).then {
+            try {
+                val stored = chart.getOption()
+                    .unsafeCast<EChartsGlOption>()
+                    .series!![0]
+                    .unsafeCast<echartsgl.options.ScatterGLSeriesOption>()
+                assertSame(flat.unsafeCast<JsAny>(), stored.typedFlatData!!.unsafeCast<JsAny>())
+                assertWebGlCanvas(container)
+            } finally {
+                destroyChart(chart, container)
+            }
+        }
+    }
+
+    /**
+     * Same branch for `linesGL`: a polyline row is `[count, x0, y0, x1, y1, ...]`.
+     */
+    @Test
+    fun linesGLDataCanBeAFlatTypedArray(): Promise<Unit> {
+        ECharts.use(arrayOf(LinesGLChart))
+        val (chart, container) = createChart()
+        val flat = js("new Float64Array([3, 0, 0, 1, 2, 2, 0])").unsafeCast<Float64Array<ArrayBuffer>>()
+        val series = linesGLSeries {
+            typedCoordinateSystem = CoordinateSystems2D.cartesian2d
+            polyline = true
+            dimensions = arrayOf(DimensionDefinitionLoose("value"))
+            typedFlatData = flat
+        }
+        assertSame(flat.unsafeCast<JsAny>(), series.typedFlatData!!.unsafeCast<JsAny>())
+
+        chart.setOption(
+            unsafeJso<EChartsGlOption> {
+                axes()
+                this.series = one<SeriesOption>(series)
+            },
+        )
+        return nextFrames(2).then {
+            try {
+                val stored = chart.getOption()
+                    .unsafeCast<EChartsGlOption>()
+                    .series!![0]
+                    .unsafeCast<echartsgl.options.LinesGLSeriesOption>()
+                // The stored option holds the parsed polylines, not the flat array that was set.
+                assertNotNull(stored.typedFlatData)
                 assertWebGlCanvas(container)
             } finally {
                 destroyChart(chart, container)

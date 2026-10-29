@@ -174,6 +174,7 @@ class MatrixAndGraphicOptionTest {
                         one(
                             unsafeJso<GeoOption> {
                                 map = "geo-matrix-cell"
+                                silent = true
                                 coordinateSystem = "matrix"
                                 coordinateSystemUsage = CoordinateSystemUsages.box
                                 coord =
@@ -203,6 +204,7 @@ class MatrixAndGraphicOptionTest {
             assertEquals("matrix", geo.coordinateSystem)
             assertEquals("box", geo.coordinateSystemUsage!!.unsafeCast<String>())
             assertEquals(2, geo.coord!!.unsafeCast<Array<Any>>().size)
+            assertEquals(true, geo.silent)
             assertEquals(false, geo.animation)
             assertEquals(1.0, geo.animationThreshold)
             assertEquals("linear", geo.animationEasingUpdate!!.unsafeCast<String>())

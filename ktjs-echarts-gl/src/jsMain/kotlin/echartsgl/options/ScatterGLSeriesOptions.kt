@@ -11,6 +11,8 @@ import echarts.options.SeriesOption
 import echarts.options.SymbolOptionMixin
 import echartsgl.CoordinateSystem2D
 import echartsgl.GlBlendMode
+import js.array.ArrayLike
+import kotlin.js.JsAny
 import kotlin.js.JsName
 import kotlin.js.unsafeCast
 
@@ -120,4 +122,14 @@ external interface ScatterGLSeriesOption :
     /** Typed view of [SeriesOption.data] with the item type of a WebGL scatter series. */
     @JsName("data")
     var typedData: Array<ScatterGLDataItem?>?
+
+    /**
+     * Flat view of the data: consecutive `[x0, y0, x1, y1, ...]` rows, or `[lng, lat]` pairs on a
+     * `geo` coordinate system.
+     *
+     * This is the branch the multi-million-point pages pass as a typed array read from a binary
+     * file, and it needs `dimensions`. Same JavaScript property as [typedData].
+     */
+    @JsName("data")
+    var typedFlatData: ArrayLike<JsAny>?
 }

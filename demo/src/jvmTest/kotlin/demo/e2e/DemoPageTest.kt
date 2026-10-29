@@ -306,17 +306,26 @@ class DemoPageTest {
                 "map3d-buildings",
                 "map3d-wood-city",
                 "map3d-wood-map",
+                "linesGL-ny",
+                "scatterGL-gps",
             )
         for (route in routes) {
             assertChartRendered(page, route)
             page.waitForFunction(
                 """
                 (value) => {
-                    const canvas = document.querySelector('.page[data-route="' + value + '"] .chart canvas');
-                    if (canvas === null) {
+                    const canvases = document.querySelectorAll('.page[data-route="' + value + '"] .chart canvas');
+                    if (canvases.length === 0) {
                         return false;
                     }
-                    return canvas.getContext('webgl2') !== null || canvas.getContext('webgl') !== null;
+                    // A 2D-coordinate GL series keeps the zrender canvas next to its own, so the
+                    // WebGL layer is any canvas with a GL context rather than the first one.
+                    for (const canvas of canvases) {
+                        if (canvas.getContext('webgl2') !== null || canvas.getContext('webgl') !== null) {
+                            return true;
+                        }
+                    }
+                    return false;
                 }
                 """,
                 route,

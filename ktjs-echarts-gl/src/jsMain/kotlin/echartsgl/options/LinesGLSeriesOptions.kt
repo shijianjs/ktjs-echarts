@@ -8,6 +8,8 @@ import echarts.options.SeriesOption
 import echartsgl.CoordinateSystem2D
 import echartsgl.GlBlendMode
 import echartsgl.GlColor
+import js.array.ArrayLike
+import kotlin.js.JsAny
 import kotlin.js.JsName
 import kotlin.js.unsafeCast
 
@@ -111,4 +113,14 @@ external interface LinesGLSeriesOption :
     /** Typed view of [SeriesOption.data] with the item type of a WebGL lines series. */
     @JsName("data")
     var typedData: Array<LinesGLDataItem?>?
+
+    /**
+     * Flat view of the data, one row per line.
+     *
+     * With [polyline] every row is `[count, x0, y0, x1, y1, ...]`, otherwise `[x0, y0, x1, y1]`;
+     * this is the branch the million-street pages append chunk by chunk from a binary file, and it
+     * needs `dimensions`. Same JavaScript property as [typedData].
+     */
+    @JsName("data")
+    var typedFlatData: ArrayLike<JsAny>?
 }

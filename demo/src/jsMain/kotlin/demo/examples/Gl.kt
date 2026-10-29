@@ -17,9 +17,11 @@ import echartsgl.GlobeComponent
 import echartsgl.Grid3DComponent
 import echartsgl.Line3DChart
 import echartsgl.Lines3DChart
+import echartsgl.LinesGLChart
 import echartsgl.Map3DChart
 import echartsgl.ProjectionTypes
 import echartsgl.Scatter3DChart
+import echartsgl.ScatterGLChart
 import echartsgl.ShadingTypes
 import echartsgl.SurfaceChart
 import echartsgl.options.*
@@ -71,6 +73,8 @@ internal fun useEChartsGl() {
             SurfaceChart,
             Map3DChart,
             GraphGLChart,
+            LinesGLChart,
+            ScatterGLChart,
             Grid3DComponent,
             Geo3DComponent,
             GlobeComponent,

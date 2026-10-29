@@ -5,6 +5,7 @@ import echarts.SortOrder
 import js.objects.Record
 import kotlin.js.Date
 import kotlin.js.JsAny
+import kotlin.js.JsName
 import kotlin.js.unsafeCast
 import zrender.LinearGradientObject
 import zrender.PatternObject
@@ -823,18 +824,44 @@ fun DataZoomValue(value: Date): DataZoomValue = value.unsafeCast<DataZoomValue>(
  * Visual style applied by a visual map.
  *
  * Upstream declares every numeric field as `number | number[]` and `color` as
- * `string | string[] | Dictionary<string>`; the array form maps one value per piece. The dictionary
- * form of `color` (used together with `categories`) is not modelled — cast it at the call site.
+ * `string | string[] | Dictionary<string>`; the array form maps one value per piece. When the visual
+ * map has `categories`, [VisualMapOption.categories] instead, the same fields take a dictionary
+ * keyed by category name — the `category*` views below.
  */
 external interface VisualOptionUnit {
     /** Symbol shape. */
     var symbol: String?
 
+    /**
+     * Typed view of [symbol] keyed by category name.
+     *
+     * Upstream `Dictionary<string>`, supported when the visual map maps categories (see
+     * [VisualMapOption.categories]).
+     */
+    @JsName("symbol")
+    var categorySymbol: Record<String, String>?
+
     /** Symbol size. */
     var symbolSize: DoubleOrDoubleArray?
 
+    /**
+     * Typed view of [symbolSize] keyed by category name.
+     *
+     * Upstream `Dictionary<number>`, supported when the visual map maps categories.
+     */
+    @JsName("symbolSize")
+    var categorySymbolSize: Record<String, Double>?
+
     /** Color. */
     var color: StringOrStringArray?
+
+    /**
+     * Typed view of [color] keyed by category name.
+     *
+     * Upstream `Dictionary<string>`, supported when the visual map maps categories.
+     */
+    @JsName("color")
+    var categoryColor: Record<String, String>?
 
     /** Alpha of the color, `0..1`. */
     var colorAlpha: DoubleOrDoubleArray?

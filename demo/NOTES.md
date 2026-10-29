@@ -45,6 +45,13 @@
 - **坐标轴 label 的 `formatter` 收到的是刻度值本身**：类目轴给类目字符串、数值轴给数字，不是
   `CallbackDataParams`。wrapper 按上游的泛型签名统一成后者，所以回调里要把参数直接当值用
   （`textOf(params)` / `numeric(params)`），写 `params.value` 会拿到 `undefined`。
+- **类目 visualMap 的字典用空串当默认值**：`inRange.symbol` 的字典形态（上游
+  `Dictionaryable<VisualOptionUnit>`）由 `categorySymbol` / `categorySymbolSize` / `categoryColor` 视图建模。
+  `preprocessForSpecifiedCategory` 会把不在 `categories` 里的键落到 `-1` 槽，所以官方示例用 `''` 表示
+  「其余类目」；`selected` 关掉的类目走 `outOfRange` 的视觉。黑色点看着比同尺寸的彩色点大，是
+  `shadowBlur` 的黑影融进了填充色，不是映射错了。
+- **`visualMap.left = null` 是有意的**：上游用它清掉 `BoxLayoutOptionMixin` 的默认 `left`，只留 `right`
+  定位；Kotlin 侧 `left` 是可空的 `StringOrDouble?`，直接赋 `null` 即可，不要改成 `0`。
 - **emoji 国旗在 Windows 上不渲染**：系统字体不带国旗字形，`{flag|<国旗>}` 画出来是 `NZ` 这样两个
   大写字母。截图与肉眼检查看到这种结果是平台限制，不是移植错误（`bar-race-country`）。
 

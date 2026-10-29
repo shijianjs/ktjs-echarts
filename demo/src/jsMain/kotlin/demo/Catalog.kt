@@ -82,6 +82,7 @@ import demo.examples.scatterTransitionEntries
 import demo.examples.scatterNutrientsEntries
 import demo.examples.scatterPunchCardEntries
 import demo.examples.scatterStreamVisualEntries
+import demo.examples.scatterVisualMapCategoriesEntries
 import demo.examples.scatterWeightEntries
 import demo.examples.scatterWorldEntries
 import demo.examples.sunburstEntries
@@ -267,6 +268,7 @@ val catalog: List<CatalogEntry> =
         docExampleEntries,
         docMoreEntries,
         docInteractiveEntries,
+        scatterVisualMapCategoriesEntries,
     ).flatten()
 
 private val catalogById: Map<String, CatalogEntry> = catalog.associateBy { it.id }

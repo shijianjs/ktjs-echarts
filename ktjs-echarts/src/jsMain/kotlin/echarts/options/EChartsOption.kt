@@ -836,6 +836,14 @@ external interface VisualMapOption {
     /** How to select the piece style: `"auto"` or `"all"`. */
     var selectedMode: SelectionMode?
 
+    /**
+     * Which pieces or categories are selected.
+     *
+     * Keyed by piece value or category name; a missing key means selected. Upstream
+     * `Dictionary<boolean>`.
+     */
+    var selected: Record<String, Boolean>?
+
     /** Items per row or column. */
     var itemGap: Double?
 

@@ -13,14 +13,20 @@
   - `S:\workspace\github\ecomfe\echarts-gl`（GL 的 `defaultOption` 与视图实现）
   - `S:\workspace\github\JetBrains\kotlin-wrappers`（写法参考）
 - 锁定版本：根 `package.json`（`echarts` 6.1.0、`echarts-gl` 2.1.0）；修订号在
-  `wrapper-revisions.properties`（当前 `ktjs-echarts=11`、`ktjs-echarts-gl=9`）。
+  `wrapper-revisions.properties`（当前 `ktjs-echarts=12`、`ktjs-echarts-gl=9`）。
 - 验证：`./gradlew build`（含 detekt）、`:ktjs-echarts:jsBrowserTest`、`:ktjs-echarts-gl:jsBrowserTest`、
   `:demo:e2eTest`；demo 覆盖统计用 `node scripts/demo-coverage.mjs`。
 
 ## 当前状态
 
-### ktjs-echarts（6.1.0-kt.11）
+### ktjs-echarts（6.1.0-kt.12）
 
+`-kt.12` 补了类目型视觉映射缺的三处声明：`VisualMapOption.selected`（`Dictionary<boolean>`，按类目名
+或分段值记录选中状态），以及 `VisualOptionUnit` 的 `categorySymbol` / `categorySymbolSize` /
+`categoryColor`（`symbol` / `symbolSize` / `color` 的 `@JsName` 同类视图，对应上游
+`Dictionaryable<VisualOptionUnit>` 的字典形态）。上游把 `inRange` 声明成
+`{ [key in BuiltinVisualProperty]?: any }`，字典只在实现里看得见：`preprocessForSpecifiedCategory`
+会把没在字典里出现的类目落到 `-1` 槽，这就是官方示例用空串 `''` 当默认值的原因。
 `-kt.11` 补了二进制轨迹页需要的两处扁平数据视图：`LinesSeriesOption.typedFlatData`（`data` 的
 `ArrayLike<number>` 分支，`polyline` 时每行 `[count, x0, y0, ...]`，配 `dimensions`）与
 `AppendDataParams.typedFlatData`（同一分支的 `appendData` 入口，分片追加百万级轨迹就靠它）。
@@ -64,7 +70,7 @@
 
 ### demo
 
-- 官方清单 436 条：**已移植 370 页 / 371 条，明确不做 51，待补 14**。逐条清单、理由与维护方式见
+- 官方清单 436 条：**已移植 371 页 / 372 条，明确不做 51，待补 13**。逐条清单、理由与维护方式见
   [demo/COVERAGE.md](demo/COVERAGE.md)。
 - 跨页注意事项（含 GL）见 [demo/NOTES.md](demo/NOTES.md)；移植约定、各家族做法与可复用数据见
   [demo/AGENTS.md](demo/AGENTS.md)。
@@ -73,15 +79,13 @@
 
 ## 下一步
 
-按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进（14 条），建议顺序：
+按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进（13 条），建议顺序：
 
 1. **补 `china.json`**（一次解锁 13 条）：`doc-example/map-example`、四个 `doc-example/map-visualMap-*`、
    `doc-example/scatter-visualMap-piecewise`、`heatmap-map`、`geo-lines`、`geo-map-scatter`、`scatter-map`、
    `effectScatter-map`、`scatter-weibo`、`scattergl-weibo`。本地克隆里没有 `china.json`（上游地图数据早已
    外置，`echarts/map/js` 也没有），要么从官方站点下载一次并登记到 `data/SOURCE.md`，要么改注册
    `world.json` / 其他已入库地图的等价页面——先确认数据来源再动手。
-2. **先补 wrapper 再做**（1 条）：`doc-example/scatter-visualMap-categories` 需要按类目索引的 `visualMap`
-   字典与 `left: null`。
 
 新增/移植页面后跑 `node scripts/demo-coverage.mjs --write` 更新 COVERAGE。
 

@@ -109,8 +109,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后落地 **370 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
-的官方清单统计，共 436 条：已移植 371 条，明确不做 51 条，待补 14 条；逐条清单与理由见
+筛选后落地 **371 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
+的官方清单统计，共 436 条：已移植 372 条，明确不做 51 条，待补 13 条；逐条清单与理由见
 [COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -118,7 +118,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `examples/DocExamples.kt`（静态页，33 个）、`examples/DocMore.kt`（象形柱图教程、dataZoom 散点、
 文本 / 标签、动画、旭日图 / 矩形树图入门与 `baseOption` + `media` 教程，16 个）与
 `examples/DocInteractive.kt`（首次绘制后还要 `setOption` / `dispatchAction` / 起定时器，或使用 timeline
-组件的 12 个）。
+组件的 12 个）。数据量大到值得单独成页的 doc 例子放自己的文件，仍用 `Groups.DOC` 建 `Category`，
+`examples/ScatterVisualMapCategories.kt` 就是第一个。
 
 ### 家族的剩余情况
 
@@ -203,6 +204,11 @@ option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
   要显式给类型参数才能赋进去。
 - `scatter-aqi-color` 的三张 31 行表上游就内联在示例里，移植后放在 `ScatterAqiData.kt`；tooltip 回调要把
   `params` 先 `unsafeCast<CallbackDataParams>()` 才能读 `seriesName`。
+- `doc-example/scatter-visualMap-categories`（`examples/ScatterVisualMapCategories.kt`）复用这三张表，
+  只把北京第 9 天的 CO 换回该页上游的 `'-'`（`scatter-aqi-color.ts` 同一格是 `4.8`）：改的是 `copyOf()`
+  出来的副本，共享表保持原样。按类目取形状/大小用 `VisualOptionUnit` 的 `categorySymbol` /
+  `categorySymbolSize` 字典视图，空串 `''` 键是没被点名类目的默认值，`selected` 关掉的类目落到
+  `outOfRange`。
 - `scatter-life-expectancy-timeline` 是 `baseOption` + 每年一份 `options`；`visualMap` 有 `categories` 就会
   被 ECharts 判成 piecewise（`src/component/visualMap/typeDefaulter.ts`），不用写 `type`。
 - `numbers()` 的 vararg 是 `Double`，所以展开实参必须是 `DoubleArray`；`Array<Double>` 能编译到 vararg

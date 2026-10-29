@@ -8,6 +8,9 @@ import echarts.options.OptionDataValue
  * Row layout: `[日, AQI指数, PM2.5, PM10, 一氧化碳（CO）, 二氧化氮（NO2）, 二氧化硫（SO2）, 等级]`.
  * The upstream file carries the tables itself instead of fetching them, so there is no data
  * file to copy.
+ *
+ * `doc-example/scatter-visualMap-categories` reuses them; its own copy of the upstream file differs
+ * in one cell, which that page replaces on a copy of [SCATTER_AQI_BEIJING].
  */
 
 /** The 31 rows of `dataBJ` (Beijing). */

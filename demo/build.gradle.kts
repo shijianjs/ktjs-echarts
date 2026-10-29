@@ -20,6 +20,7 @@ kotlin {
             implementation("org.jetbrains.kotlin-wrappers:kotlin-browser:2026.10.1")
             // Wrapper modules used by the demo.
             implementation(project(":ktjs-echarts"))
+            implementation(project(":ktjs-echarts-gl"))
         }
 
         jvmTest.dependencies {

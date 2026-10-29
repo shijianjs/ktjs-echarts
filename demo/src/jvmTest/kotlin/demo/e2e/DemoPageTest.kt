@@ -226,6 +226,39 @@ class DemoPageTest {
     }
 
     /**
+     * The `echarts-gl` page of `Gl.kt` paints into a WebGL layer, which is a canvas of its own next
+     * to the (empty) zrender canvas layer.
+     *
+     * A missing core module of `echarts-gl` (its `sideEffects` list does not cover the nested
+     * installers, so a bundler may drop the module that registers the post-update hook) leaves the
+     * option accepted and the page blank; a browser without WebGL replaces the layer with an
+     * `.ecgl-nowebgl` placeholder. Both are asserted against here.
+     */
+    @RetryingTest(maxAttempts = 2)
+    fun `the 3d page paints through the webgl layer`(page: Page) {
+        val consoleErrors = mutableListOf<String>()
+        page.onConsoleMessage { message ->
+            if (message.type() == "error") consoleErrors += message.text()
+        }
+        openPage(page, "#/bar3d-punch-card")
+        assertChartRendered(page, "bar3d-punch-card")
+
+        page.waitForFunction(
+            """
+            () => {
+                const canvas = document.querySelector(".page[data-route='bar3d-punch-card'] .chart canvas");
+                if (canvas === null) {
+                    return false;
+                }
+                return canvas.getContext('webgl2') !== null || canvas.getContext('webgl') !== null;
+            }
+            """,
+        )
+        assertEquals(0, page.locator(".ecgl-nowebgl").count(), "WebGL is not available")
+        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
+    }
+
+    /**
      * The `doc-example` pages of `DocInteractive.kt` paint on their own: a timer replaces the data,
      * `showLoading` covers the canvas for three seconds, the sunburst pages dispatch an action after
      * the first frame, and `bar-dataZoom-filterMode` / `candlestick-axisPointer` set the option only

@@ -26,6 +26,7 @@ import demo.examples.gaugeEntries
 import demo.examples.geoExtraEntries
 import demo.examples.gaugeExtraEntries
 import demo.examples.gaugeLongTailEntries
+import demo.examples.glEntries
 import demo.examples.graphicAnimationEntries
 import demo.examples.graphEntries
 import demo.examples.graphExtraEntries
@@ -119,6 +120,9 @@ object Groups {
     /** Charts drawn on a registered map, the `map` / `geo` family of the manifest. */
     val GEO = Group("geo", "地图", "Geo")
 
+    /** WebGL charts and scenes of `echarts-gl`, the `gl/` directory of the manifest. */
+    val GL = Group("gl", "3D 图表", "3D charts")
+
     /** The short examples of the official documentation, `doc-example/` entries of the manifest. */
     val DOC = Group("doc-example", "文档示例", "Doc examples")
 }
@@ -205,6 +209,7 @@ val catalog: List<CatalogEntry> =
         chordEntries,
         sankeyEntries,
         themeRiverEntries,
+        glEntries,
         docExampleEntries,
         docMoreEntries,
         docInteractiveEntries,

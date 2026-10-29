@@ -1,0 +1,23 @@
+package echartsgl
+
+import kotlin.js.JsAny
+
+/*
+ * Loading of the `echarts-gl` core module.
+ *
+ * The module registers the post update hook that inserts the WebGL layer into the zrender painter
+ * and mounts `echarts.graphicGL`. The chart and component installers `import '../../echarts-gl'`
+ * for the same reason, but upstream's `sideEffects` globs only match the files directly under
+ * `lib/chart` and `lib/component`, not the nested installer files, so a bundler with `sideEffects`
+ * optimization (webpack's default) drops that import and the chart renders nothing.
+ */
+
+private var loadedCore: JsAny? = null
+
+/**
+ * Returns [installer] after reading the core module, so that a bundler keeps its side effects.
+ */
+internal fun <T : JsAny> withEChartsGl(installer: T): T {
+    if (loadedCore == null) loadedCore = eChartsGlCoreExport
+    return installer
+}

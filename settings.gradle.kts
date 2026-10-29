@@ -26,3 +26,4 @@ include(":demo")
 
 // One Gradle project per published wrapper module.
 include(":ktjs-echarts")
+include(":ktjs-echarts-gl")

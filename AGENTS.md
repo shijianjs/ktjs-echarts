@@ -14,9 +14,11 @@
 
 ## 项目概况与模块结构
 
-`ktjs-echarts` 为 [`echarts`](https://www.npmjs.com/package/echarts) 提供 Kotlin/JS wrapper。
+`ktjs-echarts` 为 [`echarts`](https://www.npmjs.com/package/echarts) 提供 Kotlin/JS wrapper，
+`ktjs-echarts-gl` 覆盖配套的 WebGL 扩展 [`echarts-gl`](https://www.npmjs.com/package/echarts-gl)。
 
 - `ktjs-echarts`：发布模块，`version = {上游 npm 版本}-kt.{修订号}`。
+- `ktjs-echarts-gl`：`echarts-gl` 的发布模块，版本规则同上；依赖 `ktjs-echarts` 的选项类型。
 - `demo`：GitHub Pages 演示站点，不发布、也不进入 Dokka。
 - `scaffold/module`：新增模块时复制的骨架，不参与构建。
 
@@ -131,6 +133,14 @@ Gradle 9 / JDK 25。升级时注意 2.0 的插件 ID 是 `dev.detekt`，规则�
   `external object` + 具名属性。
 - ESM-only 的 Node 包（`exports` 里没有 `require`/`default` 条件）要导入具体子路径，例如
   `@scope/package/lib/index.js`，不要写包名；子路径对 CommonJS 与 ESM 链接都可用。
+- 上游包的 `sideEffects` 列表不全时，打包器的 `sideEffects` 优化会丢掉上游自己的副作用 import，而
+  Kotlin 侧没有任何报错。`echarts-gl` 就是这种情况：安装器 `import '../../echarts-gl'` 注册
+  post-update 钩子，但它列出的 glob 只覆盖 `lib/chart`、`lib/component` 下一层文件，所以 webpack
+  会把这条 import 丢掉、3D 图表静默不渲染。wrapper 因此自己 `@JsModule` 引入
+  `echarts-gl/lib/echarts-gl.js`，并在公开的安装器 getter 里读取它（见
+  `ktjs-echarts-gl/src/jsMain/kotlin/echartsgl/EChartsGlCore.kt`）。新增这类「副作用决定功能是否
+  可用」的上游包时先按同样方式验证：构建出的 bundle 里搜上游核心模块的特征字符串，而不是只看
+  `use()` 有没有报错。
 - 浏览器测试使用新版测试 DSL：`@OptIn(ExperimentalJsTestDsl::class) browser { test { chromium() } }`，
   由 Playwright 驱动并按需安装浏览器。Karma 已废弃，不要新增 `testTask { useKarma { ... } }`。
 - Playwright 默认从官方 CDN（`cdn.playwright.dev`）下载 Chrome / FFmpeg，国内经常 0 速度。本机可把下载源

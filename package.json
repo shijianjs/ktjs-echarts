@@ -3,6 +3,7 @@
   "private": true,
   "description": "Source of truth for npm package versions used by the Kotlin/JS build. Read by build.gradle.kts and updated by Dependabot.",
   "dependencies": {
-    "echarts": "6.1.0"
+    "echarts": "6.1.0",
+    "echarts-gl": "2.1.0"
   }
 }

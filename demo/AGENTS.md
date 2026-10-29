@@ -83,7 +83,6 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `chart-list-data.js` 逐条判断，排除：
 
 - 需要百度地图的（清单里 `tags: ["bmap"]`），
-- 需要 `echarts-gl` 的（`public/examples/ts/gl`，wrapper 没有覆盖），
 - 需要另一个 npm 包的（`bar-histogram` 一类要先 `echarts.registerTransform(ecStat.transform.histogram)`，
   数据在 `echarts-stat` 里，wrapper 与 demo 都还没有引这个包），
 - 依赖官方站点图片素材的（`image://` 图标、纹理贴图、`data:image/...` 大块 base64），
@@ -92,7 +91,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **279 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **280 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -106,9 +105,11 @@ demo/src/jvmTest/kotlin/demo/e2e/
 
 | 家族 | 情况 |
 | --- | --- |
-| `bmap` / `echarts-gl` | 需要百度地图或 WebGL 渲染器，wrapper 没有覆盖 |
+| `bmap` | 需要百度地图 JS SDK，wrapper 没有覆盖 |
 | `graphic` | 关键帧动画那一档已落地（`examples/GraphicAnimations.kt`，见下），多数剩余示例还配合真实交互或外部素材 |
 | `visualMap` / `dataZoom` 单列家族 | 官方清单里这几条恰好都属其它被排除的类别；能力已由别的示例覆盖 |
+
+`gl` 家族已经接入（`examples/Gl.kt`，见下文「3D 示例」），按批继续补。
 
 `lines` / `map` / `geo` 已经能用静态数据集（`lines-airline`、`custom-hexbin` 就是先例）：只要再拷
 `public/data/asset/geo/` 下的 GeoJSON 或 SVG，就能继续补这两个家族。
@@ -371,6 +372,31 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   `StatesOptionMixin`，`MarkPointOption` 等也带自己的状态样式，wrapper 之前一个都没声明。新增
   `MarkStatesOption` 并混入三组 mark 数据项与三个 mark 组件，
   `SeriesDataItemTest.marksCarryTheGenericStates` 断言回读。
+
+## 3D 示例（echarts-gl）
+
+3D 家族在 `examples/Gl.kt`，用的是 `ktjs-echarts-gl` 模块，写法与其它家族一样走 `Category.chart`：
+
+- **安装是全局的一次性动作**：`echarts` 的入口不带 GL 图表，`ECharts.use(...)` 注册的扩展对所有实例生
+  效，所以调用点在 `main()` 里的 `useEChartsGl()`，必须在第一个 `ECharts.init` 之前。新页面需要另一种
+  图表或坐标系（`scatter3D`、`geo3D`、`globe`…）时，把对应 installer 加进那个数组；`ECharts.use` 自己
+  会去重，重复调用无副作用。`Mapbox3DComponent` / `Maptalks3DComponent` 不注册：它们要求页面自己先加载
+  Mapbox GL / maptalks。
+- **option 类型用 `EChartsGlOption`**：它继承 `EChartsOption`，`tooltip` / `visualMap` 这些 2D 组件照常
+  写，`grid3D` / `xAxis3D` / `yAxis3D` / `zAxis3D` 与 `bar3DSeries { }` 来自 `echartsgl.options`。
+- **标签样式嵌在 `textStyle` 里**：echarts-gl 2.1.0 的系列 label 读 `label.textStyle`，而官方示例是 1.x
+  写法（`label: { fontSize, borderWidth }`，`emphasis.label` 同理），移植时要把这些属性搬进 `textStyle`，
+  否则字号与颜色被静默忽略。上游的 `backwardCompat` 预处理器只做 `normal` / `emphasis` 拆包与轴标签展
+  平，不管这层嵌套。
+- **没作用的空组件不要写**：`bar3d-punch-card` 的 `viewControl` 上游就是空对象（只有一行注释掉的
+  `projection`），写成空 `unsafeJso` 只会让人以为投影生效了，直接省略。
+- **数据能复用就复用**：`bar3d-punch-card` 的打卡表就是 `examples/CustomExtra.kt` 里的
+  `punchCardValues` / `punchCardHours` / `punchCardDays`，只是把前两个坐标换成 `[hour, day, value]`。
+- **WebGL 层是另一张画布**：GL 系列只画在 `echarts-gl` 插进来的 canvas 上，zrender 自己的画布层不会创
+  建；没有 WebGL 时 echarts-gl 用 `.ecgl-nowebgl` 占位，页面上连 canvas 都没有。e2e 因此对 GL 页只做
+  `assertChartRendered`（画布有尺寸）+ `the 3d page paints through the webgl layer`（这张画布能取到
+  WebGL 上下文、且没有占位元素）。`paintedFrame` / `paintedPixels` 走 `getContext('2d')`，对 GL 画布取
+  到的是 `null`，不要把 GL 路由加进那些用例。
 
 ## 兜底说明：图表与主题
 

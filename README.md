@@ -18,6 +18,7 @@ cheaper than one module per package.
 | Module | npm package | Wrapper version | Maven Central |
 | --- | --- | --- | --- |
 | [ktjs-echarts](ktjs-echarts/README.md) | `echarts` | `6.1.0-kt.1` | [![Maven Central](https://img.shields.io/maven-central/v/io.github.shijianjs/ktjs-echarts?label=Maven%20Central&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/io.github.shijianjs/ktjs-echarts) |
+| [ktjs-echarts-gl](ktjs-echarts-gl/README.md) | `echarts-gl` | `2.1.0-kt.1` | [![Maven Central](https://img.shields.io/maven-central/v/io.github.shijianjs/ktjs-echarts-gl?label=Maven%20Central&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/io.github.shijianjs/ktjs-echarts-gl) |
 
 ## Versioning
 

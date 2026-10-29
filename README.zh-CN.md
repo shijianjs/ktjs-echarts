@@ -16,6 +16,7 @@
 | 模块 | npm 包 | wrapper 版本 | Maven Central |
 | --- | --- | --- | --- |
 | [ktjs-echarts](ktjs-echarts/README.zh-CN.md) | `echarts` | `6.1.0-kt.1` | [![Maven Central](https://img.shields.io/maven-central/v/io.github.shijianjs/ktjs-echarts?label=Maven%20Central&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/io.github.shijianjs/ktjs-echarts) |
+| [ktjs-echarts-gl](ktjs-echarts-gl/README.zh-CN.md) | `echarts-gl` | `2.1.0-kt.1` | [![Maven Central](https://img.shields.io/maven-central/v/io.github.shijianjs/ktjs-echarts-gl?label=Maven%20Central&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/io.github.shijianjs/ktjs-echarts-gl) |
 
 ## 版本约定
 

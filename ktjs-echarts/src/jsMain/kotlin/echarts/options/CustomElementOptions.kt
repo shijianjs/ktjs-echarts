@@ -60,10 +60,18 @@ external interface CustomElementProps {
     /** Vertical skew. */
     var skewY: Double?
 
-    /** Style of the element. */
+    /**
+     * Style of the element.
+     *
+     * Build the value as [CustomElementStyleOption] when the style itself is transitioned.
+     */
     var style: ZRStyleProps?
 
-    /** Shape of a path element. */
+    /**
+     * Shape of a path element.
+     *
+     * Build the value as [CustomElementShapeOption] when the shape itself is transitioned.
+     */
     var shape: ZRShapeProps?
 }
 
@@ -152,6 +160,76 @@ external interface TransitionOptionMixin {
     /** Animation used when the element leaves. */
     var leaveAnimation: ElementAnimationOption?
 }
+
+/**
+ * Transition members of a custom path shape.
+ *
+ * Upstream types a shape as `T & TransitionOptionMixin<T>`, so [enterFrom] and [leaveTo] hold shape
+ * objects instead of element properties. Kotlin cannot instantiate the generic mixin with the
+ * concrete shape type, so the members are declared separately and the state uses [ZRShapeProps].
+ */
+external interface CustomShapeTransitionOption {
+    /** Properties that are transitioned, one name or a list of names; `"all"` transitions everything. */
+    var transition: StringOrStringArray?
+
+    /** Shape the element enters from. */
+    var enterFrom: ZRShapeProps?
+
+    /** Shape the element leaves to. */
+    var leaveTo: ZRShapeProps?
+
+    /** Animation used when the element enters. */
+    var enterAnimation: ElementAnimationOption?
+
+    /** Animation used when the element is updated. */
+    var updateAnimation: ElementAnimationOption?
+
+    /** Animation used when the element leaves. */
+    var leaveAnimation: ElementAnimationOption?
+}
+
+/**
+ * Transition members of a custom element style.
+ *
+ * Upstream types a style as `PathStyleProps & TransitionOptionMixin<PathStyleProps>` (or the text /
+ * image counterpart), so [enterFrom] and [leaveTo] hold style objects. See
+ * [CustomShapeTransitionOption] for why the mixin is declared separately.
+ */
+external interface CustomStyleTransitionOption {
+    /** Properties that are transitioned, one name or a list of names; `"all"` transitions everything. */
+    var transition: StringOrStringArray?
+
+    /** Style the element enters from. */
+    var enterFrom: ZRStyleProps?
+
+    /** Style the element leaves to. */
+    var leaveTo: ZRStyleProps?
+
+    /** Animation used when the element enters. */
+    var enterAnimation: ElementAnimationOption?
+
+    /** Animation used when the element is updated. */
+    var updateAnimation: ElementAnimationOption?
+
+    /** Animation used when the element leaves. */
+    var leaveAnimation: ElementAnimationOption?
+}
+
+/**
+ * Shape of a custom path element: the shape members of [ZRShapeProps] plus the transition members.
+ *
+ * Upstream `T & TransitionOptionMixin<T>`; the members of the concrete shape are all part of
+ * [ZRShapeProps].
+ */
+external interface CustomElementShapeOption : ZRShapeProps, CustomShapeTransitionOption
+
+/**
+ * Style of a custom element: the style members of [ZRStyleProps] plus the transition members.
+ *
+ * Upstream `PathStyleProps & TransitionOptionMixin<PathStyleProps>` (text and image styles use
+ * their own style types, whose members are also part of [ZRStyleProps]).
+ */
+external interface CustomElementStyleOption : ZRStyleProps, CustomStyleTransitionOption
 
 /**
  * Transform and extra-data access passed to the `during` callback of every custom element.
@@ -459,7 +537,11 @@ external interface CustomDisplayableOption : CustomBaseElementOption {
     /** Whether the element is invisible. */
     var invisible: Boolean?
 
-    /** Style of the element. */
+    /**
+     * Style of the element.
+     *
+     * Build the value as [CustomElementStyleOption] when the style itself is transitioned.
+     */
     var style: ZRStyleProps?
 
     /** Callback invoked on every animation frame with the displayable transition API. */
@@ -545,7 +627,11 @@ external interface CustomPathOption : CustomDisplayableOption, TransitionOptionM
     /** Whether the shape morphs when the element type changes. */
     var morph: Boolean?
 
-    /** Shape of the path. */
+    /**
+     * Shape of the path.
+     *
+     * Build the value as [CustomElementShapeOption] when the shape itself is transitioned.
+     */
     var shape: ZRShapeProps?
 
     /** Keyframe animation, one per property group. */
@@ -578,7 +664,11 @@ external interface CustomTextOption : CustomDisplayableOption, TransitionOptionM
  * Upstream `CustomCompoundPathOption`.
  */
 external interface CustomCompoundPathOption : CustomDisplayableOption, TransitionOptionMixin {
-    /** Shape of the compound path. */
+    /**
+     * Shape of the compound path.
+     *
+     * Build the value as [CustomElementShapeOption] when the shape itself is transitioned.
+     */
     var shape: ZRShapeProps?
 
     /** Keyframe animation, one per property group. */

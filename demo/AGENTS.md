@@ -141,8 +141,12 @@ option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
 `line-pen` / `line-draggable` 要指针序列）仍不做。
 
 `path://` 素材不是障碍：上游的 path 字符串原样内联即可，gauge 家族的五个面板图就是这么落地的
-（`examples/GaugeLongTail.kt`，同时把 `Math.random()` 换成 `Lcg`、定时器交给 `ChartHolder`），
-`custom-gauge` 照这个先例做。象形柱图的四页 `pictorialBar-vehicle` / `-body-fill` / `-velocity` /
+（`examples/GaugeLongTail.kt`，同时把 `Math.random()` 换成 `Lcg`、定时器交给 `ChartHolder`）。
+`custom-gauge` 在 `examples/CustomGauge.kt`：面板 PNG 拷到 `resources/data/img/`，整只表盘由
+`renderItem` 返回的一个 group 里的四张元素拼出（两张同款面板图分别用 sector / polygon 裁剪成刻度弧与
+指针，再加白色圆盘和数值文本），三种过渡各挂在不同对象上——弧的 `endAngle` 在 shape 上、文本的
+`opacity` 在 style 上、指针角度在 `extra` 上，`during` 里用 `getExtra` + `setShape` / `setStyle`
+重算。象形柱图的四页 `pictorialBar-vehicle` / `-body-fill` / `-velocity` /
 `-bar-transition` 也照此落地（`examples/PictorialBarLongTail.kt`，path 常量与身高体重表分别由
 一次性脚本生成到 `PictorialBarPaths.kt` / `ScatterWeightData.kt`）；上游 `pictorialBar-body-fill`
 在根级写的 `markLine: { z: -100 }` 没有移植，因为 wrapper 的 `EChartsOption` 不建模根级 mark 组件，
@@ -300,7 +304,8 @@ icon 数摆进日历格子，`renderItem` 用 `api.font()` 取字号、`linearMa
 `confidence-band.json`，`scatter-painter-choice` 用 `masterPainterColorChoice.json`。后者有两个坑：`x` 列
 是 plotly 导出的**字符串**（照上游的一元 `+` 用 `Number(...)` 转换），`itemStyle.color` 是按 `dataIndex`
 取色的回调（wrapper 的 `ZRColor(callback)` 就是为它加的）。`sankey-itemstyle` 的数据整份内联在上游
-源码里，属待补的静态数据页，见 [COVERAGE.md](COVERAGE.md)。
+源码里（99 个节点各带一种颜色 + 109 条边），已按 `arrayOf("Werne" to "#f18bbf", …)` /
+`Triple(source, target, value)` 两张表写进 `examples/Sankey.kt`。
 
 `scatter-large` 的两条 50 万点序列用 `Lcg` 生成、`dynamic-data` 的两条滚动序列同样换成 `Lcg`，
 定时器交给 `ChartHolder`，所以两页每次刷新都是同一张（能稳定断言）的动画。
@@ -413,6 +418,15 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   `StatesOptionMixin`，`MarkPointOption` 等也带自己的状态样式，wrapper 之前一个都没声明。新增
   `MarkStatesOption` 并混入三组 mark 数据项与三个 mark 组件，
   `SeriesDataItemTest.marksCarryTheGenericStates` 断言回读。
+- treemap 的层级与节点：上游 `TreemapSeriesLevelOption` / `TreemapSeriesNodeItemOption` 混入
+  `StatesOptionMixin`，wrapper 之前没有 `emphasis` / `blur` / `select`，`treemap-visual` 与
+  `treemap-show-parent` 的层级样式写不出来；两者都补了 `DataItemStateOption`。
+- 自定义系列的 shape / style 过渡：上游把 shape 与 style 写成 `T & TransitionOptionMixin<T>`，
+  `transition` / `enterFrom` / `leaveTo` 挂在 shape、style 自身而不是元素上。新增
+  `CustomElementShapeOption` / `CustomElementStyleOption`（各自带一套过渡字段）与
+  `CustomShapeTransitionOption` / `CustomStyleTransitionOption`；`CustomElementProps.style` 与
+  `shape` 仍是 `ZRStyleProps` / `ZRShapeProps`，需要过渡时用窄类型建值，见 KDoc。
+  `CustomElementOptionsTest.shapeAndStyleCanCarryTheirOwnTransitions` 覆盖。
 
 ## 3D 示例（echarts-gl）
 

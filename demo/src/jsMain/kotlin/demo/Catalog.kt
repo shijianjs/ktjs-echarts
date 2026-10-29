@@ -13,6 +13,7 @@ import demo.examples.chordEntries
 import demo.examples.customEntries
 import demo.examples.customHexbinEntries
 import demo.examples.customExtraEntries
+import demo.examples.customGaugeEntries
 import demo.examples.customLongTailEntries
 import demo.examples.customMoreEntries
 import demo.examples.customTransitionEntries
@@ -69,6 +70,7 @@ import demo.examples.scatterWorldEntries
 import demo.examples.sunburstEntries
 import demo.examples.themeRiverEntries
 import demo.examples.treeEntries
+import demo.examples.treemapDataEntries
 import demo.examples.treemapEntries
 import demo.examples.treemapExtraEntries
 import demo.ui.PageMeta
@@ -196,6 +198,7 @@ val catalog: List<CatalogEntry> =
         radarEntries,
         treeEntries,
         treemapEntries,
+        treemapDataEntries,
         treemapExtraEntries,
         sunburstEntries,
         datasetEntries,
@@ -208,6 +211,7 @@ val catalog: List<CatalogEntry> =
         customEntries,
         customHexbinEntries,
         customExtraEntries,
+        customGaugeEntries,
         customLongTailEntries,
         customMoreEntries,
         customTransitionEntries,

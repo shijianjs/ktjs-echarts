@@ -139,6 +139,9 @@ external interface TreeSeriesOption :
 /**
  * Label of a treemap node; the upstream interface only narrows `formatter`, which [LabelOption]
  * already accepts.
+ *
+ * `upperLabel.height`, read by `treemapLayout.ts` to reserve the strip above a parent node, is the
+ * text-box height that [LabelOption] already carries.
  */
 typealias TreemapSeriesLabelOption = LabelOption
 
@@ -204,8 +207,14 @@ external interface TreemapStateOption {
 
 /**
  * Per-level configuration of a treemap.
+ *
+ * Upstream mixes `StatesOptionMixin` in, so a level also carries the `emphasis` / `blur` / `select`
+ * states of [DataItemStateOption].
  */
-external interface TreemapSeriesLevelOption : TreemapSeriesVisualOption, TreemapStateOption {
+external interface TreemapSeriesLevelOption :
+    TreemapSeriesVisualOption,
+    TreemapStateOption,
+    DataItemStateOption {
     /** Color palette of the level, or `"none"` to keep the color of the item. */
     var color: ColorArrayOrNone?
 
@@ -223,7 +232,11 @@ external interface TreemapSeriesLevelOption : TreemapSeriesVisualOption, Treemap
  * [value] is inherited from [OptionDataItemObject], i.e. it is the generic data value rather than
  * the upstream `number | number[]`.
  */
-external interface TreemapSeriesNodeItemOption : TreemapSeriesVisualOption, TreemapStateOption, OptionDataItemObject {
+external interface TreemapSeriesNodeItemOption :
+    TreemapSeriesVisualOption,
+    TreemapStateOption,
+    DataItemStateOption,
+    OptionDataItemObject {
     /** Child nodes. */
     var children: Array<TreemapSeriesNodeItemOption>?
 

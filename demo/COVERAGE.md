@@ -19,9 +19,9 @@
 | 官方清单 | 436 |
 | 　· `chart-list-data.js` | 377 |
 | 　· `chart-list-data-gl.js` | 59 |
-| 已移植 | 326 页 / 327 条 |
+| 已移植 | 333 页 / 334 条 |
 | 明确不做 | 51 |
-| 待补 | 58 |
+| 待补 | 51 |
 
 已移植数里的「页」不含总览页（`#/overview`）；「条」把 `bar-large` / `pie-highlight` 同时算作对应 `doc-example/` 条目的移植。
 
@@ -127,9 +127,9 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 | --- |
 | `globe-country-carousel` |
 
-## 待补（58）
+## 待补（51）
 
-### 只缺静态数据 / 素材（31）
+### 只缺静态数据 / 素材（24）
 
 数据是静态文件或示例内联的数组，素材大多已在 `demo/src/jsMain/resources/data/` 里，补齐后即可移植。
 
@@ -140,8 +140,6 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 | `mix-zoom-on-value` |
 | `calendar-lunar` |
 | `candlestick-touch` |
-| `custom-ohlc` |
-| `custom-gauge` |
 | `wind-barb` |
 | `graphgl-gpu-layout` |
 | `graphgl-large-internet` |
@@ -157,11 +155,6 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 | `scatter-stream-visual` |
 | `scatter-symbol-morph` |
 | `scatter-aggregate-bar` |
-| `sankey-itemstyle` |
-| `treemap-drill-down` |
-| `treemap-show-parent` |
-| `treemap-sunburst-transition` |
-| `treemap-visual` |
 | `matrix-grid-layout` |
 | `doc-example/geo-svg-label-basic` |
 | `doc-example/geo-svg-layout-basic` |

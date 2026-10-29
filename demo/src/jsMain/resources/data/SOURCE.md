@@ -14,6 +14,8 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | File | Upstream folder | Used by |
 | --- | --- | --- |
 | `disk.tree.json` | `data/` | `treemap-disk` |
+| `ec-option-doc-statistics-201604.json` | `data/` | `treemap-drill-down` |
+| `echarts-package-size.json` | `data/` | `treemap-sunburst-transition` |
 | `life-expectancy.json` | `data/` | `graph-life-expectancy` |
 | `life-expectancy-table.json` | `data/` | `dataset-encode1` |
 | `les-miserables.json` | `data/` | `graph`, `graph-circular-layout`, `graph-force`, `graph-label-overlap` |
@@ -46,6 +48,7 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `nutrients.json` | `data/` | `scatter3d` |
 | `rainfall-evaporation.json` | derived | `grid-multiple` |
 | `rainfall-flow.json` | derived | `area-rainfall` |
+| `img/custom-gauge-panel.png` | `img/` | `custom-gauge` (dial picture clipped into the scale arc and the pointer) |
 | `img/weather/sunny_128.png` | `img/weather/` | `bar-rich-text`, `pie-rich-text` (rich-text label icons) |
 | `img/weather/cloudy_128.png` | `img/weather/` | see `sunny_128.png` |
 | `img/weather/showers_128.png` | `img/weather/` | see `sunny_128.png` |

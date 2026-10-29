@@ -2,14 +2,24 @@ package demo.examples
 
 import demo.CatalogEntry
 import demo.Groups
+import demo.ui.loadJson
+import echarts.AxisPointerTypes
+import echarts.AxisTypes
+import echarts.BrushToolboxIconTypes
+import echarts.CustomSeriesRenderItemAPI
+import echarts.CustomSeriesRenderItemReturn
 import echarts.DataZoomTypes
 import echarts.ECharts
 import echarts.FilterModes
 import echarts.TooltipTriggers
 import echarts.VisualProps
+import echarts.options.AxisLineOption
 import echarts.options.AxisMinMax
+import echarts.options.AxisPointerLink
+import echarts.options.AxisPointerOption
 import echarts.options.BarGridLayoutOptionForCustomSeries
 import echarts.options.BooleanOrString
+import echarts.options.BooleanOrStringArray
 import echarts.options.CoordinateSystemDataCoord
 import echarts.options.CustomBaseElementOption
 import echarts.options.CustomElementOption
@@ -25,6 +35,7 @@ import echarts.options.LabelFormatter
 import echarts.options.LabelOption
 import echarts.options.LabelPosition
 import echarts.options.LegendOption
+import echarts.options.ModelFinderIndexQuery
 import echarts.options.OptionDataItem
 import echarts.options.OptionDataValue
 import echarts.options.OptionDataValueOrArray
@@ -32,11 +43,19 @@ import echarts.options.OptionEncode
 import echarts.options.OptionEncodeValue
 import echarts.options.ScatterDataItem
 import echarts.options.SeriesOption
+import echarts.options.SplitAreaOption
+import echarts.options.SplitLineOption
 import echarts.options.StringOrDouble
 import echarts.options.TitleOption
+import echarts.options.ToolboxBrushFeatureOption
+import echarts.options.ToolboxDataZoomFeatureOption
+import echarts.options.ToolboxFeature
+import echarts.options.ToolboxOption
+import echarts.options.TooltipBoxLayoutOption
 import echarts.options.TooltipFormatter
 import echarts.options.TooltipFormatterCallback
 import echarts.options.TooltipOption
+import echarts.options.TooltipPosition
 import echarts.options.XAxisOption
 import echarts.options.YAxisOption
 import echarts.options.barSeries
@@ -46,6 +65,7 @@ import echarts.options.one
 import echarts.options.scatterSeries
 import echarts.options.strings
 import js.objects.unsafeJso
+import kotlin.js.JsAny
 import kotlin.js.js
 import zrender.RectLike
 import zrender.ZRColor
@@ -64,9 +84,7 @@ import zrender.ZRStyleProps
  *
  * Not ported:
  *
- * - `custom-ohlc` and `custom-wind` read their data from the example server (`$.get` / `$.getJSON`);
- * - `custom-gauge` and `custom-polar-heatmap` need the polar centre `params.coordSys.cx` / `cy`,
- *   which the wrapper does not model yet;
+ * - `custom-wind` reads its data from the example server (`$.getJSON`);
  * - `custom-spiral-race` / `custom-gantt-flight` / `custom-calendar-icon` / `custom-hexbin` are
  *   long animation or icon demos left for a later batch.
  */
@@ -126,6 +144,193 @@ private val errorDimensions =
         DimensionDefinitionLoose("Price min"),
         DimensionDefinitionLoose("Price max"),
     )
+
+/**
+ * Columns of one row of `stock-DJI.json`: date, open, close, lowest, highest, volume.
+ */
+private const val OHLC_DATE = 0
+private const val OHLC_OPEN = 1
+private const val OHLC_CLOSE = 2
+private const val OHLC_LOWEST = 3
+private const val OHLC_HIGHEST = 4
+
+/** The two arrays `splitData()` of `custom-ohlc` produces out of the quote table. */
+private class OhlcSplit(
+    val dates: Array<OptionDataItem?>,
+    val values: Array<OptionDataItem?>,
+)
+
+/**
+ * Splits `stock-DJI.json` into the category labels and the `[index, open, close, lowest, highest]`
+ * rows; the original overwrites the date column with the index in place, the copy here keeps both.
+ */
+private fun splitOhlc(rows: Array<Array<JsAny>>): OhlcSplit =
+    OhlcSplit(
+        dates = Array<OptionDataItem?>(rows.size) { index -> OptionDataItem(OptionDataValue(textOf(rows[index][OHLC_DATE]))) },
+        values =
+            Array<OptionDataItem?>(rows.size) { index ->
+                val row = rows[index]
+                OptionDataItem(
+                    arrayOf<OptionDataValue?>(
+                        OptionDataValue(index.toDouble()),
+                        OptionDataValue(numeric(row[OHLC_OPEN])),
+                        OptionDataValue(numeric(row[OHLC_CLOSE])),
+                        OptionDataValue(numeric(row[OHLC_LOWEST])),
+                        OptionDataValue(numeric(row[OHLC_HIGHEST])),
+                    ),
+                )
+            },
+    )
+
+/** `renderItem` of `custom-ohlc`: the high-low line plus the open and close ticks. */
+private fun ohlcRenderItem(api: CustomSeriesRenderItemAPI): CustomSeriesRenderItemReturn {
+    val xValue = api.value(dim(0)) ?: return null
+    fun point(column: Int): Array<Double> = api.coord(coord(xValue, api.value(dim(column))))
+    val open = point(OHLC_OPEN)
+    val close = point(OHLC_CLOSE)
+    val low = point(OHLC_LOWEST)
+    val high = point(OHLC_HIGHEST)
+    val halfWidth = numberArray(api.size(extent(OptionDataValue(1.0), OptionDataValue(0.0))))[0] * 0.35
+    val style = api.style(unsafeJso<ZRStyleProps> { stroke = ZRColor(textOf(api.visual(VisualProps.color))) })
+    return groupElement(
+        lineElement(style) {
+            x1 = low[0]
+            y1 = low[1]
+            x2 = high[0]
+            y2 = high[1]
+        },
+        lineElement(style) {
+            x1 = open[0]
+            y1 = open[1]
+            x2 = open[0] - halfWidth
+            y2 = open[1]
+        },
+        lineElement(style) {
+            x1 = close[0]
+            y1 = close[1]
+            x2 = close[0] + halfWidth
+            y2 = close[1]
+        },
+    )
+}
+
+/** Option of `custom-ohlc`, built once `stock-DJI.json` has loaded. */
+private fun ohlcOption(split: OhlcSplit): EChartsOption =
+    unsafeJso {
+        animation = false
+        legend =
+            one(
+                unsafeJso<LegendOption> {
+                    bottom = StringOrDouble(10.0)
+                    left = StringOrDouble("center")
+                    data = legendNames("Dow-Jones index")
+                },
+            )
+        tooltip =
+            one(
+                unsafeJso<TooltipOption> {
+                    trigger = TooltipTriggers.axis
+                    axisPointer = unsafeJso<AxisPointerOption> { type = AxisPointerTypes.cross }
+                    position =
+                        TooltipPosition(
+                            { point, _, _, _, size ->
+                                val box =
+                                    unsafeJso<TooltipBoxLayoutOption> {
+                                        top = StringOrDouble(10.0)
+                                        if (point[0] < size.viewSize[0] / 2.0) {
+                                            right = StringOrDouble(30.0)
+                                        } else {
+                                            left = StringOrDouble(30.0)
+                                        }
+                                    }
+                                TooltipPosition(box)
+                            },
+                        )
+                },
+            )
+        axisPointer =
+            one(
+                unsafeJso<AxisPointerOption> {
+                    link = one(unsafeJso<AxisPointerLink> { xAxisIndex = ModelFinderIndexQuery("all") })
+                },
+            )
+        toolbox =
+            one(
+                unsafeJso<ToolboxOption> {
+                    feature =
+                        unsafeJso<ToolboxFeature> {
+                            dataZoom =
+                                unsafeJso<ToolboxDataZoomFeatureOption> {
+                                    yAxisIndex = ModelFinderIndexQuery(false)
+                                }
+                            brush =
+                                unsafeJso<ToolboxBrushFeatureOption> {
+                                    type = arrayOf(BrushToolboxIconTypes.lineX, BrushToolboxIconTypes.clear)
+                                }
+                        }
+                },
+            )
+        grid = one(unsafeJso<GridOption> { left = StringOrDouble("10%"); right = StringOrDouble("8%"); bottom = StringOrDouble(150.0) })
+        xAxis =
+            one(
+                unsafeJso<XAxisOption> {
+                    type = AxisTypes.category
+                    data = split.dates
+                    boundaryGap = BooleanOrStringArray(false)
+                    axisLine = unsafeJso<AxisLineOption> { onZero = BooleanOrString(false) }
+                    splitLine = unsafeJso<SplitLineOption> { show = false }
+                    min = AxisMinMax("dataMin")
+                    max = AxisMinMax("dataMax")
+                    axisPointer = unsafeJso<AxisPointerOption> { z = 100.0 }
+                },
+            )
+        yAxis =
+            one(
+                unsafeJso<YAxisOption> {
+                    scale = true
+                    splitArea = unsafeJso<SplitAreaOption> { show = true }
+                },
+            )
+        dataZoom =
+            arrayOf(
+                unsafeJso<DataZoomOption> {
+                    type = DataZoomTypes.inside
+                    start = 98.0
+                    end = 100.0
+                    minValueSpan = 10.0
+                },
+                unsafeJso<DataZoomOption> {
+                    show = true
+                    type = DataZoomTypes.slider
+                    bottom = StringOrDouble(60.0)
+                    start = 98.0
+                    end = 100.0
+                    minValueSpan = 10.0
+                },
+            )
+        series =
+            arrayOf<SeriesOption>(
+                customSeries {
+                    name = "Dow-Jones index"
+                    dimensions =
+                        arrayOf(
+                            DimensionDefinitionLoose("-"),
+                            DimensionDefinitionLoose("open"),
+                            DimensionDefinitionLoose("close"),
+                            DimensionDefinitionLoose("lowest"),
+                            DimensionDefinitionLoose("highest"),
+                        )
+                    encode =
+                        unsafeJso<OptionEncode> {
+                            x = OptionEncodeValue(dim(0))
+                            y = OptionEncodeValue(arrayOf(dim(1), dim(2), dim(3), dim(4)))
+                            tooltip = OptionEncodeValue(arrayOf(dim(1), dim(2), dim(3), dim(4)))
+                        }
+                    typedData = split.values
+                    renderItem = { _, api -> ohlcRenderItem(api) }
+                },
+            )
+    }
 
 val customEntries: List<CatalogEntry> =
     listOf(
@@ -586,6 +791,12 @@ val customEntries: List<CatalogEntry> =
                             }
                             .toTypedArray(),
                     )
+            }
+        },
+        custom.interactive("custom-ohlc", "OHLC 图（使用自定义系列）", "OHLC Chart") { chart ->
+            loadJson("data/stock-DJI.json").then { json ->
+                chart.setOption(ohlcOption(splitOhlc(json.unsafeCast<Array<Array<JsAny>>>())), true)
+                null
             }
         },
     )

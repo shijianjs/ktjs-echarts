@@ -150,6 +150,41 @@ class CustomElementOptionsTest {
     }
 
     @Test
+    fun shapeAndStyleCanCarryTheirOwnTransitions() {
+        val path = unsafeJso<CustomPathOption> {
+            type = "sector"
+            shape =
+                unsafeJso<CustomElementShapeOption> {
+                    cx = 10.0
+                    cy = 20.0
+                    r = 30.0
+                    r0 = 10.0
+                    startAngle = 0.0
+                    endAngle = -1.5
+                    transition = StringOrStringArray("endAngle")
+                    enterFrom = unsafeJso<ZRShapeProps> { endAngle = 0.0 }
+                    enterAnimation = unsafeJso<ElementAnimationOption> { duration = 300.0 }
+                }
+            style =
+                unsafeJso<CustomElementStyleOption> {
+                    fill = ZRColor("#5470c6")
+                    transition = StringOrStringArray("opacity")
+                    enterFrom = unsafeJso<ZRStyleProps> { opacity = 0.0 }
+                }
+        }
+
+        val shape = path.shape!!.unsafeCast<CustomElementShapeOption>()
+        assertEquals(-1.5, shape.endAngle)
+        assertEquals("endAngle", shape.transition.unsafeCast<String>())
+        assertEquals(0.0, shape.enterFrom!!.endAngle)
+        assertEquals(300.0, shape.enterAnimation!!.duration)
+
+        val style = path.style!!.unsafeCast<CustomElementStyleOption>()
+        assertEquals("opacity", style.transition.unsafeCast<String>())
+        assertEquals(0.0, style.enterFrom!!.opacity)
+    }
+
+    @Test
     fun keyframeAnimationKeepsTheFramesAndStates() {
         val animation = unsafeJso<ElementKeyframeAnimationOption> {
             duration = 500.0

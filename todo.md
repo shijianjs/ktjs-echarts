@@ -13,13 +13,13 @@
   - `S:\workspace\github\ecomfe\echarts-gl`（GL 的 `defaultOption` 与视图实现）
   - `S:\workspace\github\JetBrains\kotlin-wrappers`（写法参考）
 - 锁定版本：根 `package.json`（`echarts` 6.1.0、`echarts-gl` 2.1.0）；修订号在
-  `wrapper-revisions.properties`（当前 `ktjs-echarts=6`、`ktjs-echarts-gl=8`）。
+  `wrapper-revisions.properties`（当前 `ktjs-echarts=7`、`ktjs-echarts-gl=8`）。
 - 验证：`./gradlew build`（含 detekt）、`:ktjs-echarts:jsBrowserTest`、`:ktjs-echarts-gl:jsBrowserTest`、
   `:demo:e2eTest`；demo 覆盖统计用 `node scripts/demo-coverage.mjs`。
 
 ## 当前状态
 
-### ktjs-echarts（6.1.0-kt.6）
+### ktjs-echarts（6.1.0-kt.7）
 
 类型建模 10 轮收尾（联合类型、字面量、数据项类型、`typedData` 视图、回调与事件 payload 等）已完成，
 **没有未完成项**。以下是已确认「保持现状」的决定，不要重复修：
@@ -50,7 +50,7 @@
 
 ### demo
 
-- 官方清单 436 条：**已移植 326 页 / 327 条，明确不做 51，待补 58**。逐条清单、理由与维护方式见
+- 官方清单 436 条：**已移植 333 页 / 334 条，明确不做 51，待补 51**。逐条清单、理由与维护方式见
   [demo/COVERAGE.md](demo/COVERAGE.md)。
 - 跨页注意事项（含 GL）见 [demo/NOTES.md](demo/NOTES.md)；移植约定、各家族做法与可复用数据见
   [demo/AGENTS.md](demo/AGENTS.md)。
@@ -65,9 +65,9 @@
    `geo-map-scatter`、`scatter-map`、`effectScatter-map`、`scatter-weibo` / `scattergl-weibo` 与
    `doc-example/scatter-visualMap-piecewise`；`HK.json` 解锁 `map-HK` 与两页 `map-visualMap-*`；再补 Sicily
    SVG、`links_ny_*.bin` / `gps_*.bin`。`USA.json`、`ch.geo.json`、`iceland.geo.json`、`world.json` 已在仓库里。
-2. **补静态数据**（待补里的 31 条）：treemap 4 页、`scatter`/`line` 里不依赖 ecStat 的回归
-   与时间轴页面、`custom-gauge` 的面板图、`sankey-itemstyle`（整份内联表）、`custom-ohlc`、
-   `candlestick-touch`（option 自带 handle，交互只是锦上添花）。数据多能从 `public/data/asset/data` 直接拷。
+2. **补静态数据**（待补里的 24 条）：`scatter`/`line` 里不依赖 ecStat 的回归与时间轴页面、
+   `candlestick-touch`（option 自带 handle，交互只是锦上添花）、`graphgl-*` 三页与 geo-svg 的三页
+   `doc-example`。数据多能从 `public/data/asset/data` 直接拷。
 3. **GL 子集可以单独一批**（都在上面两组里）：`map3D` 四页（`alcohol.json` / `buildings.json` + wood /
    redbricks 贴图）、`graphgl` 三页、`scatterGL-gps` / `linesGL-ny`（二进制轨迹）。
 4. **先补 wrapper 再做**（1 条）：`doc-example/scatter-visualMap-categories` 需要按类目索引的 `visualMap`

@@ -36,6 +36,7 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `china.json` | `apache/echarts` `test/data/map/js/china.js` | `doc-example/map-example`, `scatter-map`, `effectScatter-map`, `heatmap-map`, `geo-map-scatter`, `doc-example/scatter-visualMap-piecewise` |
 | `geo-coord-map.json` | derived from the example sources | the five China air-quality pages above (city name → `[lng, lat]`) |
 | `pm25-cities.json` | derived from the example sources | the same five pages (city name → pm2.5) |
+| `weibo.json` | `data/` | `scatter-weibo`, `scattergl-weibo` (three delta-encoded lon/lat check-in series) |
 | `Sicily_prehellenic_topographic_map.svg` | `geo/` | `geo-svg-map` |
 | `Map_of_Iceland.svg` | `geo/` | `geo-svg-scatter-simple` |
 | `MacOdrum-LV5-floorplan-web.svg` | `geo/` | `geo-svg-lines` |
@@ -143,6 +144,14 @@ object of `scatter-map.js` with its keys sorted and `pm25-cities.json` is its 19
 upstream order. `geo-map-scatter.js` inlines the same coordinate table but only 27 of its cities; those 27
 values are written in `ChinaAqi.kt` instead of becoming a third file. `geo-lines.js`, which is not ported
 yet, has a 114-city table of its own whose coordinates differ, so it will need a separate file.
+
+`weibo.json` is the check-in table of `scatter-weibo.ts` and `scattergl-weibo.js`, and the only file here
+whose bytes are load-bearing for the port. It is three flat arrays of 181,626 / 38,424 / 16,958 numbers —
+one per legend entry (`强`, `中`, `弱`) — and each is delta-encoded: the first two numbers are the absolute
+`[lng, lat]` of the first point multiplied by 1000, and every following pair is the offset to add to the
+running position. So 118,501 points are stored in 773 kB instead of as 118,501 coordinate arrays, and
+`WeiboCheckin.kt` decodes them straight into a `Float64Array` fed to the flat `data` branch rather than
+building one array per point.
 
 Files added here must keep the upstream name so the example source stays traceable to
 `public/data/asset/{data,geo}/<name>`.

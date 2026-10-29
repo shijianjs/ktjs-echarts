@@ -50,8 +50,12 @@ private class ChinaAqiData(
     val rows: Array<Pm25Row>,
 )
 
-/** Loads `china.json` and registers it as the `china` map. */
-private fun registerChinaMap(): Promise<JsAny> =
+/**
+ * Loads `china.json` and registers it as the `china` map.
+ *
+ * `internal` because the two weibo check-in pages of `WeiboCheckin.kt` draw on the same map.
+ */
+internal fun registerChinaMap(): Promise<JsAny> =
     loadJson("data/china.json").then { china ->
         registerGeojsonMap("china", china)
         china
@@ -127,12 +131,13 @@ private fun darkLegend(name: String): LegendOption =
     }
 
 /**
- * The China geo of the air-quality pages: a flat dark fill with a thin border.
+ * The dark China geo of the air-quality pages: a flat dark fill with a thin border.
  *
  * The four upstream pages differ only in `roam` and in whether the hidden label is written at the top
- * level or under `emphasis` — both are the default, so this is their union.
+ * level or under `emphasis` — both are the default, so this is their union. `internal` because the two
+ * weibo check-in pages of `WeiboCheckin.kt` style their geo the same way.
  */
-private fun aqiGeo(roam: Boolean): GeoOption =
+internal fun darkChinaGeo(roam: Boolean): GeoOption =
     unsafeJso {
         map = "china"
         if (roam) this.roam = BooleanOrString(true)
@@ -182,7 +187,7 @@ private fun scatterMapOption(data: ChinaAqiData): EChartsOption =
                     textStyle = unsafeJso<LabelOption> { color = "#fff" }
                 },
             )
-        geo = one(aqiGeo(roam = false))
+        geo = one(darkChinaGeo(roam = false))
         series =
             one(
                 scatterSeries {
@@ -219,7 +224,7 @@ private fun effectScatterMapOption(data: ChinaAqiData): EChartsOption {
         title = aqiTitle("全国主要城市空气质量")
         tooltip = one(unsafeJso<TooltipOption> { trigger = TooltipTriggers.item })
         legend = one(darkLegend("pm2.5"))
-        geo = one(aqiGeo(roam = true))
+        geo = one(darkChinaGeo(roam = true))
         series =
             arrayOf<SeriesOption>(
                 scatterSeries {
@@ -297,7 +302,7 @@ private fun heatmapMapOption(data: ChinaAqiData): EChartsOption =
                     textStyle = unsafeJso<LabelOption> { color = "#fff" }
                 },
             )
-        geo = one(aqiGeo(roam = true))
+        geo = one(darkChinaGeo(roam = true))
         series =
             one(
                 heatmapSeries {
@@ -329,7 +334,7 @@ private fun docScatterPiecewiseOption(data: ChinaAqiData): EChartsOption =
                     textStyle = unsafeJso<LabelOption> { color = "#fff" }
                 },
             )
-        geo = one(aqiGeo(roam = false))
+        geo = one(darkChinaGeo(roam = false))
         series =
             one(
                 scatterSeries {

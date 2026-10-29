@@ -676,13 +676,14 @@ class DemoPageTest {
 
     /**
      * The five pages of `GeoMaps.kt`, the five map tutorials of `DocMaps.kt`, the five air-quality
-     * pages of `ChinaAqi.kt` and the matrix map of `MatrixExtra.kt`.
+     * pages of `ChinaAqi.kt`, the two check-in pages of `WeiboCheckin.kt` and the matrix map of
+     * `MatrixExtra.kt`.
      *
      * Each of them fetches its map (four GeoJSON files, the 1.7 MB China boundary, and a 3.7 MB SVG);
-     * the China pages add the two city tables on top, and the canvas stays blank until the requests
-     * resolve, so the painted-pixel
-     * wait is what proves the map reached the chart. `map-bar-morph` swaps its map and bar options
-     * from a two-second timer, so a frame sampled after one tick must differ from the first one.
+     * the China pages add the city tables or the 773 kB check-in file on top, and the canvas stays
+     * blank until those requests resolve, so the painted-pixel wait is what proves the map reached the
+     * chart. `map-bar-morph` swaps its map and bar options from a two-second timer, so a frame sampled
+     * after one tick must differ from the first one.
      */
     @RetryingTest(maxAttempts = 2)
     @Timeout(300)
@@ -710,6 +711,8 @@ class DemoPageTest {
                     "heatmap-map",
                     "geo-map-scatter",
                     "doc-example/scatter-visualMap-piecewise",
+                    "scatter-weibo",
+                    "scattergl-weibo",
                 )
         ) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)

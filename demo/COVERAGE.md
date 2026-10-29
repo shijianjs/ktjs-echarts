@@ -19,9 +19,9 @@
 | 官方清单 | 436 |
 | 　· `chart-list-data.js` | 377 |
 | 　· `chart-list-data-gl.js` | 59 |
-| 已移植 | 381 页 / 382 条 |
+| 已移植 | 383 页 / 384 条 |
 | 明确不做 | 51 |
-| 待补 | 3 |
+| 待补 | 1 |
 
 已移植数里的「页」不含总览页（`#/overview`）；「条」把 `bar-large` / `pie-highlight` 同时算作对应 `doc-example/` 条目的移植。
 
@@ -127,17 +127,15 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 | --- |
 | `globe-country-carousel` |
 
-## 待补（3）
+## 待补（1）
 
-### 缺示例自带的数据（3）
+### 缺示例自带的数据（1）
 
-地图本身（china / world / USA / Iceland / 瑞士 / HK / SVG）都已入库；剩下的缺示例自带的数据：`geo-lines` 要它自己那份 114 城市坐标表（与空气质量五页共用的 190 城表不同），两页要 `weibo.json`（本地克隆里有）。
+地图本身（china / world / USA / Iceland / 瑞士 / HK / SVG）都已入库；剩下的缺示例自带的数据：`geo-lines` 要它自己那份 114 城市坐标表（与空气质量五页共用的 190 城表不同）。
 
 | id |
 | --- |
 | `geo-lines` |
-| `scatter-weibo` |
-| `scattergl-weibo` |
 
 <!-- coverage:end -->
 

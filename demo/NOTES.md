@@ -72,7 +72,8 @@
   成对平铺必须写 `[u, v]`。
 - **别照抄死字段**：`exportGL2PLY` 已从 2.1.0 删除；`realisticMaterial.baseTexture` /
   `lambertMaterial.baseTexture` 无人读取（材质只认 `detailTexture`）；`toolbox.iconStyle.normal` 是废弃的
-  状态写法；`bar3D` 不读 `wireframe`。
+  状态写法；`bar3D` 不读 `wireframe`；`scatterGL` 的 `itemStyle.shadowBlur` / `shadowColor` 也不生效——
+  `PointsBuilder` 画精灵图时把 `shadowColor` 写死成 `transparent`，只读 `lineWidth`。
 - **`geo3D` 的高度**：`regions[].height` 才是单个区域的高度，文档里的 `regionHeight` 是整幅地图的默认高度；
   `aspectScale` 与 `debug.wireframe` 没写进文档但会被读取。
 - **`bar3D.barSize`**：文档没写（只在 `bar3DLayout` 里读），`geo3D` / `globe` 下还会再除以

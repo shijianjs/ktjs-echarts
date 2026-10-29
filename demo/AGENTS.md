@@ -92,7 +92,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
   `gl/flights.json`；地图：`world.json`（缩写地名，`GlGeo.kt` 的 `worldRegionNames` 负责翻译）、
   `world-population.json`、`USA.json`、`ch.geo.json`、`iceland.geo.json`、`china.json`（地名是官方
   全称，`DocMaps.kt` 的 `chinaRegionNames` 负责把上游的简称翻过来）；空气质量：`geo-coord-map.json`
-  + `pm25-cities.json`（上游四页各抄一遍的同一份表，`ChinaAqi.kt` 共用）。
+  + `pm25-cities.json`（上游四页各抄一遍的同一份表，`ChinaAqi.kt` 共用）；微博签到：`weibo.json`
+  （三份增量编码的经纬度数组，`WeiboCheckin.kt` 共用）。
 - GL：11 色 `visualMap` 色带在 `Gl.kt` 的 `glPalette` / `glVisualMap()` 与 `GlSurfaceMaterial.kt` 的
   `surfaceRamp()`；HDR 环境图、皮革贴图、地球 / 月球 / 星空纹理在 `resources/data/img/gl/`，来源见
   `resources/data/SOURCE.md`。
@@ -367,6 +368,18 @@ pm2.5 列，逐行比对完全一致，所以抽成 `data/geo-coord-map.json` + 
 - `china.json` 除 34 个省外还带 8 条名为 **`境界线`** 的线要素。ECharts 4 的老边界没有它们，所以凡是
   `geo.label.show = true` 的页面（`geo-map-scatter`）都要在 `regions` 里把 `境界线` 的 label 关掉，
   否则地图上会多出「境界线」几个字。
+
+微博签到两页在 `examples/WeiboCheckin.kt`（`scatter-weibo` / `scattergl-weibo`），共用
+`data/weibo.json`：三个图例系列各是一个扁平的**增量编码**数组，头两个数是首点经纬度乘 1000，之后每两个
+数是相对上一点的偏移。上游把它直接交给 `geo` 坐标系，这里解码成 `[lng, lat, 1]` 的连续行、写进
+`typedFlatData` + `dimensions`，11.8 万点因此只分配一块 `Float64Array`，不再逐点建数组。三点要注意：
+
+- 解码按「行长固定」写：末点也带一个尾随的 `1`，与上游每行宽度一致，`large` 模式按 `dimensions` 的
+  长度成组读取才会对齐。
+- GL 页显式写 `backgroundColor`：上游靠 `theme: 'dark'` 得到深色底，本站不引这个主题。
+- GL 页丢掉了上游 `itemStyle` 里的 `shadowBlur` / `shadowColor`：echarts-gl 的
+  `src/chart/common/PointsBuilder.js` 生成精灵图时把 `shadowColor` 强制写成 `transparent`，只读
+  `lineWidth`，这两个键在 2D GL 散点上本来就不生效。
 
 dataset 家族的 `dataset-link` 补在 `examples/DatasetExtra.kt`：它监听 `updateAxisPointer` 把饼图的
 `encode.value` 换成指针所在的年份，上游该事件的 payload 类型是 `any`，所以 `axesInfo[0].value` 只能在

@@ -56,7 +56,7 @@ private fun grouped(value: Double): String {
  * features carried the short names. ECharts matches data to region by exact name, so the port keeps
  * the names of the original and translates them here.
  *
- * `internal` because `geo-map-scatter` of [ChinaAqi] lists the same 34 provinces.
+ * `internal` because `geo-map-scatter` of `ChinaAqi.kt` lists the same 34 provinces.
  */
 internal val chinaRegionNames =
     mapOf(

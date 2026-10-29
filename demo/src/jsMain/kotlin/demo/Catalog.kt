@@ -93,6 +93,7 @@ import demo.examples.treeEntries
 import demo.examples.treemapDataEntries
 import demo.examples.treemapEntries
 import demo.examples.treemapExtraEntries
+import demo.examples.weiboCheckinEntries
 import demo.ui.PageMeta
 import demo.ui.PageView
 import demo.ui.officialExampleUrl
@@ -273,6 +274,7 @@ val catalog: List<CatalogEntry> =
         scatterVisualMapCategoriesEntries,
         docMapsEntries,
         chinaAqiEntries,
+        weiboCheckinEntries,
     ).flatten()
 
 private val catalogById: Map<String, CatalogEntry> = catalog.associateBy { it.id }

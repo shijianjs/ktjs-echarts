@@ -226,9 +226,11 @@ class DemoPageTest {
     }
 
     /**
-     * The `echarts-gl` pages of `Gl.kt` paint into a WebGL layer, which is a canvas of its own next
-     * to the (empty) zrender canvas layer. A surface with a broken equation or a missing `visualMap`
-     * dimension only logs an error and stays blank, which is what the console assertion catches.
+     * The `echarts-gl` pages of `Gl.kt` and `GlScatter.kt` paint into a WebGL layer, which is a canvas
+     * of its own next to the (empty) zrender canvas layer. A surface with a broken equation or a
+     * missing `visualMap` dimension only logs an error and stays blank, which is what the console
+     * assertion catches; the `scatter3D` pages fetch their rows first, so a `dataset` whose `encode.z`
+     * never arrived would leave the layer empty without an error of its own.
      *
      * A missing core module of `echarts-gl` (its `sideEffects` list does not cover the nested
      * installers, so a bundler may drop the module that registers the post-update hook) leaves the
@@ -249,6 +251,9 @@ class DemoPageTest {
                 "transparent-bar3d",
                 "bar3d-dataset",
                 "line3d-orthographic",
+                "scatter3d",
+                "scatter3d-scatter",
+                "scatter3D-dataset",
                 "simple-surface",
                 "sphere-parametric-surface",
                 "surface-wave",

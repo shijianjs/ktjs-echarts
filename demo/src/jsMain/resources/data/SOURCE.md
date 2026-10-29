@@ -38,6 +38,7 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `product.json` | `data/` | `sankey-levels` |
 | `confidence-band.json` | `data/` | `confidence-band` |
 | `masterPainterColorChoice.json` | `data/` | `scatter-painter-choice` |
+| `nutrients.json` | `data/` | `scatter3d` |
 | `rainfall-evaporation.json` | derived | `grid-multiple` |
 | `rainfall-flow.json` | derived | `area-rainfall` |
 | `img/weather/sunny_128.png` | `img/weather/` | `bar-rich-text`, `pie-rich-text` (rich-text label icons) |

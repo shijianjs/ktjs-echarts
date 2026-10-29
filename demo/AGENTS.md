@@ -91,7 +91,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **286 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **289 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -109,7 +109,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 | `graphic` | 关键帧动画那一档已落地（`examples/GraphicAnimations.kt`，见下），多数剩余示例还配合真实交互或外部素材 |
 | `visualMap` / `dataZoom` 单列家族 | 官方清单里这几条恰好都属其它被排除的类别；能力已由别的示例覆盖 |
 
-`gl` 家族已经接入（`examples/Gl.kt`，见下文「3D 示例」），按批继续补。
+`gl` 家族已经接入（`examples/Gl.kt` / `examples/GlScatter.kt`，见下文「3D 示例」），按批继续补。
 
 `lines` / `map` / `geo` 已经能用静态数据集（`lines-airline`、`custom-hexbin` 就是先例）：只要再拷
 `public/data/asset/geo/` 下的 GeoJSON 或 SVG，就能继续补这两个家族。
@@ -375,8 +375,9 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
 
 ## 3D 示例（echarts-gl）
 
-3D 家族在 `examples/Gl.kt`，用的是 `ktjs-echarts-gl` 模块，写法与其它家族一样走 `Category.chart`（需要
-先取数据文件的 `bar3d-dataset` 走 `Category.interactive` + `loadJson`）：
+3D 家族在 `examples/Gl.kt` 与 `examples/GlScatter.kt`，用的是 `ktjs-echarts-gl` 模块，写法与其它家族一样走
+`Category.chart`；要先取数据文件的（`bar3d-dataset` 与三页 `scatter3D`）走 `Category.interactive` +
+`loadJson`：
 
 - **安装是全局的一次性动作**：`echarts` 的入口不带 GL 图表，`ECharts.use(...)` 注册的扩展对所有实例生
   效，所以调用点在 `main()` 里的 `useEChartsGl()`，必须在第一个 `ECharts.init` 之前。新页面需要另一种
@@ -385,8 +386,8 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   Mapbox GL / maptalks。
 - **option 类型用 `EChartsGlOption`**：它继承 `EChartsOption`，`tooltip` / `visualMap` / `dataset` 这些
   2D 组件照常写，`grid3D` / `xAxis3D` / `yAxis3D` / `zAxis3D` 与 `bar3DSeries { }` / `line3DSeries { }` /
-  `surfaceSeries { }` 来自 `echartsgl.options`。三个工厂都只设 `type`，其余字段一律走 `typed*` 视图
-  （`typedData` / `typedLabel` / `typedItemStyle` / `typedEmphasis` / `typedCoordinateSystem`）。
+  `scatter3DSeries { }` / `surfaceSeries { }` 来自 `echartsgl.options`。四个工厂都只设 `type`，其余字段一律走
+  `typed*` 视图（`typedData` / `typedLabel` / `typedItemStyle` / `typedEmphasis` / `typedCoordinateSystem`）。
 - **标签照 2D 的扁平写法**：echarts-gl 2.1.0 用 ECharts 6 的 `createTextStyle` 排版，读的是
   `label.fontSize` / `label.color` 这些扁平属性（`GlLabelOption` 就是 `LabelOption` 的别名）。上游
   `backwardCompat` 只把 `axisLabel.textStyle` 展平，系列 label 不展平，所以不要再加一层 `textStyle`。
@@ -399,9 +400,16 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
 - **数据能复用就复用**：`bar3d-punch-card` 与 `transparent-bar3d` 的打卡表就是 `examples/CustomExtra.kt`
   里的 `punchCardValues` / `punchCardHours` / `punchCardDays`，只是把前两个坐标换成 `[hour, day, value]`；
   `bar3d-dataset` 直接用 `dataset` 的列名当三个坐标轴（`encode.z` 走 `Life Expectancy`）。
+  `resources/data/life-expectancy-table.json` 同时喂给 `bar3d-dataset`、`scatter3d-scatter` 和
+  `scatter3D-dataset`。
+- **`scatter3D` 三页在 `GlScatter.kt`**：`scatter3d` 读 `nutrients.json`，六列数据项的前三个是坐标，后两个
+  分别由 dimension 3 / 4 的两个 `visualMap` 映射成颜色和点大小；`scatter3d-scatter` 是左边 3D、右边 2×2
+  二维面板（`grid3D.width = '50%'` + 四个百分比定位的 `grid` 和 `scatter` 系列）；`scatter3D-dataset` 用
+  分类 x 轴 + `encode` 把三列钉到坐标轴上。上游 `scatter3d` 声明 `theme: dark` 并把坐标轴、`axisPointer`
+  与 visual map 文字刷白，本站主题由自己的开关决定，这些颜色不搬（浅色下白字不可见）。
 - **WebGL 层是另一张画布**：GL 系列只画在 `echarts-gl` 插进来的 canvas 上，zrender 自己的画布层不会创
   建；没有 WebGL 时 echarts-gl 用 `.ecgl-nowebgl` 占位，页面上连 canvas 都没有。e2e 因此对 GL 页只做
-  `assertChartRendered`（画布有尺寸）+ `the 3d page paints through the webgl layer`（这张画布能取到
+  `assertChartRendered`（画布有尺寸）+ `the 3d pages paint through the webgl layer`（这张画布能取到
   WebGL 上下文、且没有占位元素）。`paintedFrame` / `paintedPixels` 走 `getContext('2d')`，对 GL 画布取
   到的是 `null`，不要把 GL 路由加进那些用例。
 

@@ -12,6 +12,7 @@ import echartsgl.GlColor
 import echartsgl.Grid3DComponent
 import echartsgl.Line3DChart
 import echartsgl.ProjectionTypes
+import echartsgl.Scatter3DChart
 import echartsgl.ShadingTypes
 import echartsgl.SurfaceChart
 import echartsgl.options.*
@@ -46,7 +47,9 @@ import zrender.ZRColor
  * blank. `ECharts.use` deduplicates, so calling this once at startup is enough.
  */
 internal fun useEChartsGl() {
-    ECharts.use(arrayOf<EChartsExtensionInstaller>(Bar3DChart, Line3DChart, SurfaceChart, Grid3DComponent))
+    ECharts.use(
+        arrayOf<EChartsExtensionInstaller>(Bar3DChart, Line3DChart, Scatter3DChart, SurfaceChart, Grid3DComponent),
+    )
 }
 
 private val gl = Category(Groups.GL, "examples/Gl.kt")

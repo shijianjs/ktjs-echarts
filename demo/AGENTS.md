@@ -109,8 +109,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后落地 **337 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
-的官方清单统计，共 436 条：已移植 338 条，明确不做 51 条，待补 47 条；逐条清单与理由见
+筛选后落地 **346 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
+的官方清单统计，共 436 条：已移植 347 条，明确不做 51 条，待补 38 条；逐条清单与理由见
 [COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -201,6 +201,21 @@ option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
   被 ECharts 判成 piecewise（`src/component/visualMap/typeDefaulter.ts`），不用写 `type`。
 - `numbers()` 的 vararg 是 `Double`，所以展开实参必须是 `DoubleArray`；`Array<Double>` 能编译到 vararg
   之外，但 `*` 展开会报类型不匹配。
+
+`scatter-punchCard` 在 `examples/ScatterPunchCard.kt`：上游的数据是 `[day, hour, count]` 顺序，而
+`xAxis` 是 24 小时、`yAxis` 是 7 天，所以写进 `ScatterDataItem` 时必须换成 `doubleRow(hour, day, count)`。
+照抄上游顺序时 `symbolSize` 读的仍是第三列、图例也正常，e2e 照样通过，只有截图能看出 168 个气泡全堆在
+同一列（`animationDelay` 还是按 `index * 5` 排，看不出异常）。
+
+`scatter-symbol-morph` 与 `scatter-aggregate-bar` 收在 `examples/ScatterTransition.kt`：
+
+- 两页都靠 `universalTransition` 做形变：morph 页在 10 个符号间循环，每帧只换一次 `series`（`symbol` +
+  `symbolSize`）并靠 `BooleanOrUniversalTransitionOption(true)` 让 ECharts 自己配对同 `dataGroupId` 的点；
+  aggregate 页要显式写 `seriesKey = StringOrStringArray(arrayOf("female", "male"))`，散点用
+  `dataGroupId`、柱状图用 `id = "total"`，聚合延迟是 `UniversalTransitionOption.delay` 回调。
+- 两页都在 `Category.interactive` 里用 `holder.setInterval` 推进，回调开头 `if (chart.isDisposed()) return@setInterval`。
+- 散点 / 柱状图互切是两套完全不同的 option，必须 `chart.setOption(option, true)` 整体替换；只传 option 会让
+  旧系列残留。
 
 ## 轴标签的多参回调
 
@@ -304,6 +319,13 @@ demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首�
 `relativeTo: 'coordinate'`**：缺了它百分比按整个容器算，六个标签会散到整张图的高度上（这个坑一开始就
 踩到了）。格线是 6 个 `graphic` line（水平 3 + 垂直 3），位置取 `chart.getWidth()`，所以页面走
 `interactive`；成交量与 MACD 的时间轴柱走 `BarDataItemOption.typedValue` 传 `[time, value]`。
+
+`matrix-grid-layout` 在 `examples/MatrixGridLayout.kt`：五个板块（标题、页眉、侧栏、主区、页脚）各占一组
+`grid` + `title`，用 `coordinateSystem: 'matrix'` + `coord`（`section_xxx_1` 这类 id）钉进格子。响应式靠
+`media`：基座 `matrix.x` / `matrix.y` 都**不写 `data`**，两个 media 分支用 `MatrixDimensionOption.length`
+给出列数 / 行数，再按 section id 打 `coord` 补丁——`length` 只在没有 `data` 时生效，写了 `data` 就被忽略，
+正好对应上游 `MatrixDim` 里「按 length 填 null 格」的行为。上游页面右上角的矩阵网格开关是自绘控制面板、
+不是图表 API，没有移植。
 
 `data-transform-filter` 追加在 `examples/DatasetExtra.kt`：三份 dataset，`dataset_raw` 是
 `life-expectancy-table.json`，另两份用内置 `filter` transform 从它派生（`and` 条件：`Year >= 1950`

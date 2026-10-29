@@ -641,6 +641,41 @@ class DemoPageTest {
     }
 
     /**
+     * The two static pages of `ScatterPunchCard.kt` / `MatrixGridLayout.kt` and the two animated
+     * ones of `ScatterTransition.kt`.
+     *
+     * The morph page swaps its `symbol` every 700 ms and the aggregate page folds the cloud into
+     * bars every two seconds, so a frame sampled later has to differ from the first one. The punch
+     * card and the responsive layout draw once; the layout only shows its five titles when the
+     * `coord` patches of the media units reach the matrix, so painting is the signal that the
+     * media options were applied.
+     */
+    @RetryingTest(maxAttempts = 2)
+    @Timeout(300)
+    fun `the animated scatter and matrix layout pages paint`(page: Page) {
+        val consoleErrors = mutableListOf<String>()
+        page.onConsoleMessage { message ->
+            if (message.type() == "error") consoleErrors += message.text()
+        }
+        openPage(page)
+        for (route in listOf("scatter-punchCard", "matrix-grid-layout")) {
+            page.evaluate("(value) => { location.hash = '#/' + value }", route)
+            assertChartRendered(page, route)
+            waitForPainted(page, route)
+        }
+        for ((route, millis) in listOf("scatter-symbol-morph" to 1600.0, "scatter-aggregate-bar" to 2400.0)) {
+            page.evaluate("(value) => { location.hash = '#/' + value }", route)
+            assertChartRendered(page, route)
+            waitForPainted(page, route)
+            val before = paintedFrame(page)
+            page.waitForTimeout(millis)
+            val after = paintedFrame(page)
+            assertTrue(before != after, "$route did not change its shapes")
+        }
+        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
+    }
+
+    /**
      * Waits until any canvas layer of [route] holds a painted pixel.
      *
      * ECharts puts every `zlevel` on its own canvas, and the pages that fan a scatter out on

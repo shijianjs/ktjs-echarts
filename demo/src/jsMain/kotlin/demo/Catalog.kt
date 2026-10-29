@@ -50,6 +50,7 @@ import demo.examples.lineExtraEntries
 import demo.examples.lineLongTailEntries
 import demo.examples.matrixEntries
 import demo.examples.matrixExtraEntries
+import demo.examples.matrixGridLayoutEntries
 import demo.examples.matrixLongTailEntries
 import demo.examples.matrixStockEntries
 import demo.examples.overviewEntries
@@ -69,7 +70,9 @@ import demo.examples.scatterExtraEntries
 import demo.examples.scatterLongTailEntries
 import demo.examples.scatterLifeTimelineEntries
 import demo.examples.scatterMatrixEntries
+import demo.examples.scatterTransitionEntries
 import demo.examples.scatterNutrientsEntries
+import demo.examples.scatterPunchCardEntries
 import demo.examples.scatterWeightEntries
 import demo.examples.scatterWorldEntries
 import demo.examples.sunburstEntries
@@ -186,6 +189,8 @@ val catalog: List<CatalogEntry> =
         scatterAqiEntries,
         scatterLifeTimelineEntries,
         scatterNutrientsEntries,
+        scatterPunchCardEntries,
+        scatterTransitionEntries,
         scatterLongTailEntries,
         scatterMatrixEntries,
         scatterWeightEntries,
@@ -216,6 +221,7 @@ val catalog: List<CatalogEntry> =
         calendarEntries,
         matrixEntries,
         matrixExtraEntries,
+        matrixGridLayoutEntries,
         matrixLongTailEntries,
         matrixStockEntries,
         customEntries,

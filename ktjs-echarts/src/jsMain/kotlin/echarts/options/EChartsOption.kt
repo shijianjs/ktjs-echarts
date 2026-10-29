@@ -1980,7 +1980,11 @@ external interface MatrixDimensionOption : MatrixCellStyleOption {
     /** Cells of the dimension; a plain string is a leaf cell. */
     var data: Array<MatrixDimensionCellLooseOption>?
 
-    /** Length of the dimension, in pixels. */
+    /**
+     * Number of columns (x) or rows (y) to generate, for the cases where no `data` is composed.
+     *
+     * The generated cells carry no value. Like upstream, the field is ignored when [data] is set.
+     */
     var length: Double?
 
     /** Size of the outermost level of the dimension; same as `levels[0].levelSize`. */

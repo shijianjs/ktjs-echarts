@@ -78,10 +78,11 @@ import zrender.ZRStyleProps
  *   captions here sit at a percentage position instead;
  * - `matrix-sparkline` lays ~25 grids out on the matrix, which needs `grid.coord` and a
  *   `dataZoom` over all x axes — left for a later batch;
- * - `matrix-grid-layout` is a responsive layout demo built with `media` and per-cell grids;
  * - `matrix-mbti` / `matrix-periodic-table` / `matrix-stock` / `matrix-mini-bar-*` combine the
  *   matrix with `body.data`, custom `renderItem` bars and `graphic` captions; the periodic table
  *   additionally needs a 118-row element table.
+ *
+ * `matrix-grid-layout` is ported in `MatrixGridLayout.kt`.
  */
 
 private val matrix = Category(Groups.MATRIX, "examples/Matrix.kt")

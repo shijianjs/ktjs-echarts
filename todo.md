@@ -52,7 +52,7 @@
 
 ### demo
 
-- 官方清单 436 条：**已移植 342 页 / 343 条，明确不做 51，待补 42**。逐条清单、理由与维护方式见
+- 官方清单 436 条：**已移植 346 页 / 347 条，明确不做 51，待补 38**。逐条清单、理由与维护方式见
   [demo/COVERAGE.md](demo/COVERAGE.md)。
 - 跨页注意事项（含 GL）见 [demo/NOTES.md](demo/NOTES.md)；移植约定、各家族做法与可复用数据见
   [demo/AGENTS.md](demo/AGENTS.md)。
@@ -67,9 +67,8 @@
    `geo-map-scatter`、`scatter-map`、`effectScatter-map`、`scatter-weibo` / `scattergl-weibo` 与
    `doc-example/scatter-visualMap-piecewise`；`HK.json` 解锁 `map-HK` 与两页 `map-visualMap-*`；再补 Sicily
    SVG、`links_ny_*.bin` / `gps_*.bin`。`USA.json`、`ch.geo.json`、`iceland.geo.json`、`world.json` 已在仓库里。
-2. **补静态数据**（待补里的 15 条）：`graphgl-*` 三页、`matrix-grid-layout` 与 geo-svg 的三页
-   `doc-example`、`scatter-nebula` / `scatter-punchCard` / `scatter-stream-visual` /
-   `scatter-symbol-morph` / `scatter-aggregate-bar`、`calendar-lunar`、`wind-barb`；
+2. **补静态数据**（待补里的 11 条）：`graphgl-*` 三页、geo-svg 的三页 `doc-example`、
+   `scatter-nebula` / `scatter-stream-visual`、`calendar-lunar`、`wind-barb`；
    `bar-race-country` 还要补 emoji-flags CDN 数据。数据多能从 `public/data/asset/data` 直接拷。
 3. **GL 子集可以单独一批**（都在上面两组里）：`map3D` 四页（`alcohol.json` / `buildings.json` + wood /
    redbricks 贴图）、`graphgl` 三页、`scatterGL-gps` / `linesGL-ny`（二进制轨迹）。

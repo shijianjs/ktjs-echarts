@@ -306,6 +306,13 @@ body {
 
 .chart {
     width: 100%;
+    /* Same shape as the official gallery: a 3:2 canvas that takes most of the window height,
+       never growing past the bottom of the viewport (the top bar, the page heading and the links
+       above the chart are about 14rem). Examples that pass a height keep their own inline size. */
+    aspect-ratio: 3 / 2;
+    min-height: 20rem;
+    max-height: calc(100vh - 14rem);
+    max-height: calc(100dvh - 14rem);
     background: var(--page-bg);
     border: 1px solid var(--page-border);
     border-radius: 0.6rem;

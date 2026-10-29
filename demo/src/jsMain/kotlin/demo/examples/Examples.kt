@@ -3,7 +3,6 @@ package demo.examples
 import demo.CatalogEntry
 import demo.Group
 import demo.bi
-import demo.ui.DEFAULT_CHART_HEIGHT
 import demo.ui.PageMeta
 import demo.ui.PageView
 import demo.ui.ChartHolder
@@ -30,7 +29,7 @@ class Category(private val group: Group, private val sourcePath: String) {
         titleEn: String,
         summaryZh: String = "",
         summaryEn: String = "",
-        height: String = DEFAULT_CHART_HEIGHT,
+        height: String? = null,
         option: () -> EChartsOption,
     ): CatalogEntry =
         entry(id, titleZh, titleEn, summaryZh, summaryEn) { view ->
@@ -44,7 +43,7 @@ class Category(private val group: Group, private val sourcePath: String) {
         titleEn: String,
         summaryZh: String = "",
         summaryEn: String = "",
-        height: String = DEFAULT_CHART_HEIGHT,
+        height: String? = null,
         setup: (EChartsInstance) -> Unit,
     ): CatalogEntry =
         entry(id, titleZh, titleEn, summaryZh, summaryEn) { view ->
@@ -61,7 +60,7 @@ class Category(private val group: Group, private val sourcePath: String) {
         titleEn: String,
         summaryZh: String = "",
         summaryEn: String = "",
-        height: String = DEFAULT_CHART_HEIGHT,
+        height: String? = null,
         setup: (EChartsInstance, ChartHolder) -> Unit,
     ): CatalogEntry =
         entry(id, titleZh, titleEn, summaryZh, summaryEn) { view ->

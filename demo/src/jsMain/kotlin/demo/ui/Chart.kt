@@ -9,9 +9,6 @@ import web.html.HtmlTagName
 /** Dark theme registered by ECharts itself; used when the showcase runs in dark mode. */
 private const val DARK_THEME = "dark"
 
-/** Default height of an example chart. */
-const val DEFAULT_CHART_HEIGHT = "32rem"
-
 /**
  * One chart of an example page.
  *
@@ -19,13 +16,18 @@ const val DEFAULT_CHART_HEIGHT = "32rem"
  * page becomes visible and disposed when it is replaced: a chart cannot measure itself while it is
  * detached, and keeping several hundred charts alive after a tour of the gallery would only waste
  * memory. The container node itself is never replaced, so the rest of the page stays untouched.
+ *
+ * [height] overrides the default size of the chart; when it is `null` the stylesheet sizes the
+ * container like the official gallery does, roughly 3:2 and as tall as the window allows.
  */
 class ChartHolder(
-    private val height: String = DEFAULT_CHART_HEIGHT,
+    height: String? = null,
     private val setup: (EChartsInstance, ChartHolder) -> Unit,
 ) {
     /** Container of the chart; created once and never replaced. */
-    val root: HTMLElement = element(HtmlTagName.div, "chart").apply { style.height = height }
+    val root: HTMLElement = element(HtmlTagName.div, "chart").apply {
+        if (height != null) style.height = height
+    }
 
     private var instance: EChartsInstance? = null
 
@@ -89,11 +91,11 @@ class ChartHolder(
  * The option is built lazily, on mount, so data generation happens once per visit and the page can
  * be rebuilt (language or theme switch) without paying for it at build time.
  */
-fun chart(option: () -> echarts.options.EChartsOption, height: String = DEFAULT_CHART_HEIGHT): ChartHolder =
+fun chart(option: () -> echarts.options.EChartsOption, height: String? = null): ChartHolder =
     ChartHolder(height) { chart, _ -> chart.setOption(option()) }
 
 /** Creates a chart holder for an example that drives the chart directly (animation, timeline, ...). */
 fun interactiveChart(
-    height: String = DEFAULT_CHART_HEIGHT,
+    height: String? = null,
     setup: (EChartsInstance, ChartHolder) -> Unit,
 ): ChartHolder = ChartHolder(height, setup)

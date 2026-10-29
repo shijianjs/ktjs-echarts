@@ -102,6 +102,64 @@ internal fun hiddenYAxis(): Array<YAxisOption> =
         },
     )
 
+/** An icon cell of the `titleBlockRich` table; the block is empty, so it needs an explicit width. */
+private fun titleBlockIcon(name: String): TextStyleOption =
+    unsafeJso {
+        height = 30.0
+        align = TextAlign.left
+        backgroundColor = ZRColor(iconBackground(name))
+        width = StringOrDouble(30.0)
+    }
+
+/** The `rich` table of `doc-example/title-block`, shared by the three blocks. */
+private fun titleBlockRich(): Record<String, TextStyleOption> =
+    richOf(
+        "titleBg" to
+            unsafeJso<TextStyleOption> {
+                backgroundColor = ZRColor("#000")
+                height = 30.0
+                borderRadius = DoubleOrDoubleArray(arrayOf(5.0, 5.0, 0.0, 0.0))
+                padding = DoubleOrDoubleArray(arrayOf(0.0, 10.0, 0.0, 10.0))
+                width = StringOrDouble("100%")
+                color = "#eee"
+            },
+        "tc" to
+            unsafeJso<TextStyleOption> {
+                align = TextAlign.center
+                color = "#eee"
+            },
+        "hr" to
+            unsafeJso<TextStyleOption> {
+                borderColor = "#777"
+                width = StringOrDouble("100%")
+                borderWidth = 0.5
+                height = 0.0
+            },
+        "sunny" to titleBlockIcon("Sunny"),
+        "cloudy" to titleBlockIcon("Cloudy"),
+        "showers" to titleBlockIcon("Showers"),
+    )
+
+/**
+ * One text block of `doc-example/title-block`.
+ *
+ * The per-item label only overrides the formatter and, for the center and right titles, the `titleBg`
+ * alignment; the rest of the table comes from the series-level `rich`.
+ */
+private fun titleBlockItem(y: Double, formatter: String, alignTitle: Boolean): ScatterDataItem =
+    ScatterDataItem(
+        unsafeJso<ScatterDataItemOption> {
+            typedValue = OptionDataValueOrArray(arrayOf(OptionDataValue(0.0), OptionDataValue(y)))
+            label =
+                unsafeJso<LabelOption> {
+                    this.formatter = LabelFormatter(formatter)
+                    if (alignTitle) {
+                        rich = richOf("titleBg" to unsafeJso<TextStyleOption> { align = TextAlign.right })
+                    }
+                }
+        },
+    )
+
 /** The seven slices of the `pie-label-*` pages; the `distanceToLabelLine` / `bleedMargin` pages use longer names. */
 private fun pieLabelSlices(longNames: Boolean): Array<PieDataItem?> {
     val names =
@@ -875,6 +933,67 @@ val docExampleEntries: List<CatalogEntry> =
                                                     padding = DoubleOrDoubleArray(5.0)
                                                 },
                                         ).unsafeCast<Record<String, TextStyleOption>>()
+                                }
+                        },
+                    )
+            }
+        },
+        docExample.chart("doc-example/title-block", "富文本标题块", "Title Block") {
+            unsafeJso<EChartsOption> {
+                xAxis = hiddenXAxis()
+                yAxis =
+                    one(
+                        unsafeJso<YAxisOption> {
+                            axisLabel = unsafeJso<AxisLabelOption> { show = false }
+                            axisLine = unsafeJso<AxisLineOption> { show = BooleanOrString(false) }
+                            splitLine = unsafeJso<SplitLineOption> { show = false }
+                            axisTick = unsafeJso<AxisTickOption> { show = BooleanOrString(false) }
+                            min = AxisMinMax(0.0)
+                            max = AxisMinMax(2.0)
+                            inverse = true
+                        },
+                    )
+                series =
+                    arrayOf<SeriesOption>(
+                        scatterSeries {
+                            symbolSize = SymbolSize(1.0)
+                            typedData =
+                                dataItems(
+                                    titleBlockItem(
+                                        0.0,
+                                        "{tc|Center Title}{titleBg|}\n" +
+                                            "  Content text xxxxxxxx {sunny|} xxxxxxxx {cloudy|}  \n" +
+                                            "{hr|}\n" +
+                                            "  xxxxx {showers|} xxxxxxxx  xxxxxxxxx  ",
+                                        alignTitle = true,
+                                    ),
+                                    titleBlockItem(
+                                        1.0,
+                                        "{titleBg|Left Title}\n" +
+                                            "  Content text xxxxxxxx {sunny|} xxxxxxxx {cloudy|}  \n" +
+                                            "{hr|}\n" +
+                                            "  xxxxx {showers|} xxxxxxxx  xxxxxxxxx  ",
+                                        alignTitle = false,
+                                    ),
+                                    titleBlockItem(
+                                        2.0,
+                                        "{titleBg|Right Title}\n" +
+                                            "  Content text xxxxxxxx {sunny|} xxxxxxxx {cloudy|}  \n" +
+                                            "{hr|}\n" +
+                                            "  xxxxx {showers|} xxxxxxxx  xxxxxxxxx  ",
+                                        alignTitle = true,
+                                    ),
+                                )
+                            label =
+                                unsafeJso<LabelOption> {
+                                    show = true
+                                    backgroundColor = ZRColor("#ddd")
+                                    borderColor = "#555"
+                                    borderWidth = 1.0
+                                    borderRadius = DoubleOrDoubleArray(5.0)
+                                    color = "#000"
+                                    fontSize = StringOrDouble(14.0)
+                                    rich = titleBlockRich()
                                 }
                         },
                     )

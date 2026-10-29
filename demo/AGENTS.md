@@ -104,13 +104,13 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后落地 **315 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
-的官方清单统计，共 436 条：已移植 316 条，明确不做 51 条，待补 69 条；逐条清单与理由见
+筛选后落地 **320 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
+的官方清单统计，共 436 条：已移植 321 条，明确不做 51 条，待补 64 条；逐条清单与理由见
 [COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
 一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。这批页面按依赖分三个文件：
-`examples/DocExamples.kt`（静态页，29 个）、`examples/DocMore.kt`（象形柱图教程、dataZoom 散点、
+`examples/DocExamples.kt`（静态页，30 个）、`examples/DocMore.kt`（象形柱图教程、dataZoom 散点、
 文本 / 标签、动画、旭日图 / 矩形树图入门与 `baseOption` + `media` 教程，16 个）与
 `examples/DocInteractive.kt`（首次绘制后还要 `setOption` / `dispatchAction` / 起定时器，或使用 timeline
 组件的 12 个）。
@@ -257,8 +257,23 @@ demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首�
 踩到了）。格线是 6 个 `graphic` line（水平 3 + 垂直 3），位置取 `chart.getWidth()`，所以页面走
 `interactive`；成交量与 MACD 的时间轴柱走 `BarDataItemOption.typedValue` 传 `[time, value]`。
 
+`data-transform-filter` 追加在 `examples/DatasetExtra.kt`：三份 dataset，`dataset_raw` 是
+`life-expectancy-table.json`，另两份用内置 `filter` transform 从它派生（`and` 条件：`Year >= 1950`
+且 `Country` 等于某个国家）。`config` 里的字段名 `=` 在 Kotlin 侧要写成 `@JsName("=")`。
+
+`line-tooltip-touch` 追加在 `examples/LineExtra.kt`：移动端触摸提示，`tooltip.triggerOn = 'none'`、
+`position` 回调把提示框钉在 `y = 130`，`axisPointer.label.formatter` 用 `formatTime` 取日期，
+`dataZoom.inside.throttle = 50` 让拖动时提示框跟手。两天的序列由 `Lcg` 生成，先随机取起始值再随机游走，
+落到非正数时重抽。
+
+`custom-calendar-icon` 与 `flame-graph` 在 `examples/CustomMore.kt`：前者把四段内联 SVG path 按随机
+icon 数摆进日历格子，`renderItem` 用 `api.font()` 取字号、`linearMap` 把 ±0.25 的偏移换算成像素；
+后者读 `resources/data/stack-trace.json`（`SOURCE.md` 里有登记），把堆栈按深度铺成矩形火焰图，
+点击某帧时深拷贝后只保留该帧以下的子树再 `setOption`。两者的 `textContent.style` 用到 zrender 的文本
+偏移字段 `x` / `y`，这次一并补进 `ZRStyleProps`。
+
 `doc-example/` 里还没有移植的（上游 80 个文件 = 79 个 `.js` + 1 个 `.ts`、已按 `doc-example/` id 落地
-57 个、`bar-large` / `pie-highlight` 按家族 id 落地，剩 21 条）。按原因分类：
+58 个、`bar-large` / `pie-highlight` 按家族 id 落地，剩 20 条）。按原因分类：
 
 - 图标是官方站的 PNG / base64 素材，按排除策略不做：`pictorialBar-graphicType`、
   `pictorialBar-patternSize`、`pictorialBar-repeatDirection`、`pictorialBar-repeatLayout`、
@@ -269,8 +284,7 @@ demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首�
   `coordinateSystem: 'geo'`）、`geo-svg-label-basic`、`geo-svg-layout-basic`、`geo-svg-named-basic`、
   `geo-roam-indicator`；
 - 真实指针漫游 + 官方站的 `app.config`：`graph-roam-indicator`；
-- 下一批的可移植项：`title-block`（天气图标已在 `resources/data/img/weather/`）、
-  `scatter-visualMap-categories`（内联 dataset + 两个 `visualMap`，但
+- 下一批的可移植项：`scatter-visualMap-categories`（内联 dataset + 两个 `visualMap`，但
   `inRange.symbol` / `outOfRange.symbolSize` 是按类目索引的字典、`left: null`，要先放宽 wrapper）、
   `canvas-vs-svg`（含 `-en`，只有两张画布分别用 canvas / SVG 渲染器才有意义，要先给站点加渲染器开关）。
 

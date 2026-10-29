@@ -14,6 +14,7 @@ import demo.examples.customEntries
 import demo.examples.customHexbinEntries
 import demo.examples.customExtraEntries
 import demo.examples.customLongTailEntries
+import demo.examples.customMoreEntries
 import demo.examples.customTransitionEntries
 import demo.examples.datasetEntries
 import demo.examples.datasetExtraEntries
@@ -207,6 +208,7 @@ val catalog: List<CatalogEntry> =
         customHexbinEntries,
         customExtraEntries,
         customLongTailEntries,
+        customMoreEntries,
         customTransitionEntries,
         graphicAnimationEntries,
         canvasGraphicsEntries,

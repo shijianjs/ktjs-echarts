@@ -20,6 +20,7 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `gl/flights.json` | `data-gl/asset/data/` | `lines3d-airline-on-globe`, `lines3d-flights-on-geo3d` (17k routes, smaller than the 2D table) |
 | `nba-court.json` | `data/` | `custom-hexbin` |
 | `kawhi-leonard-16-17-regular.json` | `data/` | `custom-hexbin` |
+| `stack-trace.json` | `data/` | `flame-graph` |
 | `world.json` | `geo/` | `lines-airline`, `custom-wind`, `scatter-world-population` |
 | `winds.json` | `data-gl/asset/data/` | `custom-wind` |
 | `iceland.geo.json` | `geo/` | `geo-choropleth-scatter` |

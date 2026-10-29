@@ -42,7 +42,7 @@ private const val ICON_CELL = 44.0
 private fun weatherIcon(name: String): String = "data/img/weather/" + name.lowercase() + "_128.png"
 
 /** `backgroundColor` of a rich-text block: an image pattern of [weatherIcon]. */
-private fun iconBackground(name: String): PatternObject =
+internal fun iconBackground(name: String): PatternObject =
     PatternObject(
         unsafeJso<ImagePatternObject> {
             image =
@@ -252,7 +252,7 @@ private fun iconRow(name: String): TextStyleOption =
     }
 
 /** A `{ name: style }` record, the shape of `rich`. */
-private fun richOf(vararg pairs: Pair<String, TextStyleOption>): Record<String, TextStyleOption> =
+internal fun richOf(vararg pairs: Pair<String, TextStyleOption>): Record<String, TextStyleOption> =
     js("(keys, values) => { const o = {}; for (let i = 0; i < keys.length; i++) { o[keys[i]] = values[i]; } return o; }")(
         Array(pairs.size) { pairs[it].first },
         Array(pairs.size) { pairs[it].second },

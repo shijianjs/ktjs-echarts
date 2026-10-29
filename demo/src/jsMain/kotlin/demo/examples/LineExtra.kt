@@ -8,6 +8,8 @@ import echarts.options.*
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
 import zrender.ZRColor
+import zrender.gradientColorStop
+import zrender.linearGradient
 import js.objects.unsafeJso
 
 /*
@@ -66,6 +68,41 @@ private fun functionPlot(): Array<LineDataItem?> {
         }
     return points(*data.toTypedArray())
 }
+
+/** Nine days of a random walk starting right after 2016-10-03, the data of `line-tooltip-touch`. */
+private fun touchWalk(seed: Int, reset: Double): Array<LineDataItem?> {
+    val random = Lcg(seed)
+    var value = random.next() * reset
+    return Array(9) { index ->
+        value = kotlin.math.round((random.next() - 0.5) * 20 + value)
+        if (value <= 0) value = random.next() * reset
+        // Upstream joins the date parts without padding, so no leading zeros here.
+        LineDataItem(row("2016-10-${index + 4}", value))
+    }
+}
+
+/** One smoothed, stacked area of `line-tooltip-touch`. */
+private fun touchLine(
+    name: String,
+    color: String,
+    from: String,
+    to: String,
+    data: Array<LineDataItem?>,
+): LineSeriesOption =
+    lineSeries {
+        this.name = name
+        smooth = BooleanOrDouble(true)
+        symbol = SymbolShape("circle")
+        symbolSize = SymbolSize(5.0)
+        sampling = "average"
+        stack = "a"
+        itemStyle = unsafeJso<ItemStyleOption> { this.color = ZRColor(color) }
+        areaStyle =
+            unsafeJso<AreaStyleOption> {
+                this.color = linearGradient(0.0, 0.0, 0.0, 1.0, arrayOf(gradientColorStop(0.0, from), gradientColorStop(1.0, to)))
+            }
+        typedData = data
+    }
 
 /** The twelve mark-line label positions of `line-markline`, in the upstream order. */
 private val MARK_LINE_LABEL_POSITIONS =
@@ -333,6 +370,126 @@ val lineExtraEntries: List<CatalogEntry> =
                     },
                 )
                 null
+            }
+        },
+        lineExtra.chart("line-tooltip-touch", "移动端上的 dataZoom 和 tooltip", "Tooltip and DataZoom on Mobile") {
+            unsafeJso<EChartsOption> {
+                title =
+                    one(
+                        unsafeJso<TitleOption> {
+                            left = StringOrDouble("center")
+                            text = "Tootip and dataZoom on Mobile Device"
+                        },
+                    )
+                legend = one(unsafeJso<LegendOption> { top = StringOrDouble("bottom"); data = legendNames("Intention") })
+                tooltip =
+                    one(
+                        unsafeJso<TooltipOption> {
+                            triggerOn = TooltipTriggerOns.none
+                            // `[pt[0], 130]`: the box keeps the pointer's x and sits at a fixed height.
+                            position =
+                                TooltipPosition { point, _, _, _, _ ->
+                                    TooltipPosition(
+                                        arrayOf(StringOrDouble(point[0]), StringOrDouble(130.0)),
+                                    )
+                                }
+                        },
+                    )
+                toolbox =
+                    one(
+                        unsafeJso<ToolboxOption> {
+                            left = StringOrDouble("center")
+                            itemSize = 25.0
+                            top = StringOrDouble(55.0)
+                            feature =
+                                unsafeJso<ToolboxFeature> {
+                                    dataZoom =
+                                        unsafeJso<ToolboxDataZoomFeatureOption> {
+                                            // `yAxisIndex: 'none'` keeps the vertical scale intact.
+                                            yAxisIndex = ModelFinderIndexQuery(false)
+                                        }
+                                    restore = unsafeJso<ToolboxFeatureOption> {}
+                                }
+                        },
+                    )
+                xAxis =
+                    one(
+                        unsafeJso<XAxisOption> {
+                            type = AxisTypes.time
+                            axisPointer =
+                                unsafeJso<AxisPointerOption> {
+                                    value = OptionDataValue("2016-10-7")
+                                    snap = true
+                                    lineStyle =
+                                        unsafeJso<LineStyleOption> {
+                                            color = ZRColor("#7581BD")
+                                            width = 2.0
+                                        }
+                                    label =
+                                        unsafeJso<AxisPointerLabelOption> {
+                                            show = true
+                                            formatter =
+                                                LabelFormatter { params ->
+                                                    ECharts.format.formatTime("yyyy-MM-dd", params.value)
+                                                }
+                                            backgroundColor = ZRColor("#7581BD")
+                                        }
+                                    handle =
+                                        unsafeJso<AxisPointerHandleOption> {
+                                            show = true
+                                            color = "#7581BD"
+                                        }
+                                }
+                            splitLine = unsafeJso<SplitLineOption> { show = false }
+                        },
+                    )
+                yAxis =
+                    one(
+                        unsafeJso<YAxisOption> {
+                            type = AxisTypes.value
+                            axisTick = unsafeJso<AxisTickOption> { inside = true }
+                            splitLine = unsafeJso<SplitLineOption> { show = false }
+                            axisLabel =
+                                unsafeJso<AxisLabelOption> {
+                                    inside = true
+                                    formatter = LabelFormatter("{value}\n")
+                                }
+                            z = 10.0
+                        },
+                    )
+                grid =
+                    one(
+                        unsafeJso<GridOption> {
+                            top = StringOrDouble(110.0)
+                            left = StringOrDouble(15.0)
+                            right = StringOrDouble(15.0)
+                            height = StringOrDouble(160.0)
+                        },
+                    )
+                dataZoom =
+                    arrayOf(
+                        unsafeJso<DataZoomOption> {
+                            type = DataZoomTypes.inside
+                            throttle = 50.0
+                        },
+                    )
+                series =
+                    arrayOf<SeriesOption>(
+                        touchLine(
+                            "Fake Data",
+                            "#0770FF",
+                            "rgba(58,77,233,0.8)",
+                            "rgba(58,77,233,0.3)",
+                            touchWalk(11, 300.0),
+                        ),
+                        touchLine(
+                            "Fake Data",
+                            "#F2597F",
+                            "rgba(213,72,120,0.8)",
+                            "rgba(213,72,120,0.3)",
+                            touchWalk(29, 50.0),
+                        ),
+                    )
             }
         },
         lineExtra.chart("line-markline", "折线图的标记线", "Line with Marklines") {

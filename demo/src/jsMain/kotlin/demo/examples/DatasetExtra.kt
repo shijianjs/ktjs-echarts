@@ -6,6 +6,8 @@ import demo.ui.loadJson
 import echarts.*
 import echarts.options.*
 import js.objects.unsafeJso
+import kotlin.js.JsAny
+import kotlin.js.JsName
 import kotlin.js.unsafeCast
 
 /*
@@ -13,7 +15,9 @@ import kotlin.js.unsafeCast
  *
  * `dataset-encode1` (the official "Encode and Matrix" page) puts four scatters on four grids and
  * encodes a different pair of columns on each of them. The table is
- * `demo/src/jsMain/resources/data/life-expectancy-table.json` (see its `SOURCE.md`).
+ * `demo/src/jsMain/resources/data/life-expectancy-table.json` (see its `SOURCE.md`); the same table
+ * feeds `data-transform-filter`, whose two derived datasets keep only the rows of one country after
+ * 1950.
  *
  * The `thumbnail` component of the original is not ported: it only adds a mini map of the viewport.
  *
@@ -193,6 +197,45 @@ val datasetExtraEntries: List<CatalogEntry> =
             }
         },
         datasetExtra.interactive(
+            "data-transform-filter",
+            "数据过滤",
+            "Data Transform Filter",
+            summaryZh = "两个 filter 变换各自从原始数据集里筛出 1950 年之后的德国、法国收入，两条折线直接读派生数据集。",
+            summaryEn = "Two filter transforms pick the German and French income since 1950 out of the raw table; each line reads its own derived dataset.",
+        ) { chart ->
+            loadJson("data/life-expectancy-table.json").then { json ->
+                chart.setOption(
+                    unsafeJso<EChartsOption> {
+                        dataset =
+                            arrayOf(
+                                unsafeJso<DatasetOption> {
+                                    id = "dataset_raw"
+                                    source = json.unsafeCast<DatasetSource>()
+                                },
+                                filteredSince1950("dataset_since_1950_of_germany", "Germany"),
+                                filteredSince1950("dataset_since_1950_of_france", "France"),
+                            )
+                        title = one(unsafeJso<TitleOption> { text = "Income of Germany and France since 1950" })
+                        tooltip = one(unsafeJso<TooltipOption> { trigger = TooltipTriggers.axis })
+                        xAxis =
+                            one(
+                                unsafeJso<XAxisOption> {
+                                    type = AxisTypes.category
+                                    nameLocation = AxisNameLocations.middle
+                                },
+                            )
+                        yAxis = one(unsafeJso<YAxisOption> { name = "Income" })
+                        series =
+                            arrayOf<SeriesOption>(
+                                incomeLine("dataset_since_1950_of_germany"),
+                                incomeLine("dataset_since_1950_of_france"),
+                            )
+                    },
+                )
+                null
+            }
+        },
+        datasetExtra.interactive(
             "dataset-link",
             "联动和共享数据集",
             "Share Dataset",
@@ -208,6 +251,66 @@ val datasetExtraEntries: List<CatalogEntry> =
             }
         },
     )
+
+/** One condition of the `and` list of a `filter` transform. */
+private external interface FilterCondition {
+    /** Dimension the condition applies to. */
+    var dimension: String
+
+    /** Keep the rows whose value is greater than or equal to this one. */
+    var gte: Double?
+
+    /** Keep the rows whose value equals this one; upstream spells the key `=` in the option. */
+    @JsName("=")
+    var equals: String?
+}
+
+/**
+ * The `filter` dataset of `data-transform-filter`: the rows of [country] from 1950 on.
+ *
+ * The `and` list is an array of condition objects; `transform.config` is typed as a plain record
+ * upstream, so the array is handed over with a cast, exactly like `data-transform-multiple-pie`
+ * passes its single condition.
+ */
+private fun filteredSince1950(id: String, country: String): DatasetOption =
+    unsafeJso {
+        this.id = id
+        fromDatasetId = "dataset_raw"
+        transform =
+            arrayOf(
+                unsafeJso<DataTransformOption> {
+                    type = "filter"
+                    config =
+                        recordOf(
+                            "and" to
+                                arrayOf<FilterCondition>(
+                                    unsafeJso {
+                                        dimension = "Year"
+                                        gte = 1950.0
+                                    },
+                                    unsafeJso {
+                                        dimension = "Country"
+                                        equals = country
+                                    },
+                                ).unsafeCast<JsAny>(),
+                        )
+                },
+            )
+    }
+
+/** One line of `data-transform-filter`, reading the derived dataset [datasetId]. */
+private fun incomeLine(datasetId: String): LineSeriesOption =
+    lineSeries {
+        this.datasetId = datasetId
+        showSymbol = false
+        encode =
+            unsafeJso<OptionEncode> {
+                x = OptionEncodeValue(DimensionLoose("Year"))
+                y = OptionEncodeValue(DimensionLoose("Income"))
+                itemName = OptionEncodeValue(DimensionLoose("Year"))
+                tooltip = OptionEncodeValue(DimensionLoose("Income"))
+            }
+    }
 
 /**
  * The `updateAxisPointer` payload of `dataset-link`.

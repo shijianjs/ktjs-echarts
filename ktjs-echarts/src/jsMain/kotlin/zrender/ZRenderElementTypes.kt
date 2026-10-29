@@ -243,6 +243,12 @@ external interface ZRStyleProps {
     /** Text content of a `"text"` element. */
     var text: String?
 
+    /** Horizontal offset of the text box inside an element. */
+    var x: Double?
+
+    /** Vertical offset of the text box inside an element. */
+    var y: Double?
+
     /** Image source of an `"image"` element. */
     var image: StringOrImageLike?
 
@@ -344,6 +350,9 @@ external interface ZRStyleProps {
 
     /** Ellipsis shown when the text is truncated. */
     var ellipsis: String?
+
+    /** Minimum number of characters kept when the text is truncated. */
+    var truncateMinChar: Double?
 
     /** Color of the text shadow. */
     var textShadowColor: String?

@@ -494,8 +494,9 @@ klibs.io 从 Maven Central 与 GitHub 自动抓取，无需提交元数据文件
 
 ## 演示页面与 GitHub Pages
 
-- `demo` 是官方 ECharts 示例库的移植站点（一页一示例，路由 id 与官方一致）；目录结构、移植约定、
-  选例范围与尚未移植的清单见 [demo/AGENTS.md](demo/AGENTS.md)。
+- `demo` 是官方 ECharts 示例库的移植站点（一页一示例，路由 id 与官方一致）；目录结构、移植约定与各家族
+  做法见 [demo/AGENTS.md](demo/AGENTS.md)，示例覆盖（总数、不做与待补清单）见
+  [demo/COVERAGE.md](demo/COVERAGE.md)，跨页注意事项见 [demo/NOTES.md](demo/NOTES.md)。
 - `demo` 只消费公共 API，不发布、也不进入 Dokka。根 `build.gradle.kts` 的发布与 Dokka 配置按
   `ktjs-echarts` 前缀过滤子模块，新增非发布模块时沿用该约定。
 - 端到端测试是 `demo` 的 JVM 目标里的 Playwright JUnit 5 套件（`demo/src/jvmTest/kotlin/demo/e2e`）：

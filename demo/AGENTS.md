@@ -5,6 +5,9 @@
 `https://echarts.apache.org/examples/zh/editor.html?c=bar-simple`）。这一层只消费 wrapper 的公开 API，
 不导入 `ktjs-echarts` 内部实现。
 
+示例覆盖（官方总数、明确不做与待补的逐条清单）见 [COVERAGE.md](COVERAGE.md)；跨页注意事项见
+[NOTES.md](NOTES.md)。本文只保留目录结构、移植约定与各家族的具体做法。
+
 ## 目录结构
 
 ```
@@ -77,10 +80,20 @@ demo/src/jvmTest/kotlin/demo/e2e/
   （`grid-multiple` / `area-rainfall` 各 3079 点），可以由一次性脚本拆成 `data/<name>.json`，
   在 `SOURCE.md` 里把上游目录一栏标成 derived 并写清是从哪个示例拆出来的。
 
+## 可复用数据与素材
+
+- 打卡表：`examples/CustomExtra.kt` 的 `punchCardValues` / `punchCardHours` / `punchCardDays`。
+- 常用表：`resources/data/life-expectancy-table.json`、`nutrients.json`、`population.json`、
+  `gl/flights.json`；地图：`world.json`（缩写地名，`GlGeo.kt` 的 `worldRegionNames` 负责翻译）、
+  `world-population.json`、`USA.json`、`ch.geo.json`、`iceland.geo.json`。
+- GL：11 色 `visualMap` 色带在 `Gl.kt` 的 `glPalette` / `glVisualMap()` 与 `GlSurfaceMaterial.kt` 的
+  `surfaceRamp()`；HDR 环境图、皮革贴图、地球 / 月球 / 星空纹理在 `resources/data/img/gl/`，来源见
+  `resources/data/SOURCE.md`。
+
 ## 选例范围
 
-目标是「只依赖官方仓库里能拷过来的数据的 option 示例」，数据用静态文件解决（见上一节）。用脚本按
-`chart-list-data.js` 逐条判断，排除：
+目标是「只依赖官方仓库里能拷过来的数据的 option 示例」，数据用静态文件解决（见上一节）。用
+`scripts/demo-coverage.mjs` 按 `chart-list-data.js` 逐条判断，排除：
 
 - 需要百度地图的（清单里 `tags: ["bmap"]`），
 - 需要另一个 npm 包的（`bar-histogram` 一类要先 `echarts.registerTransform(ecStat.transform.histogram)`，
@@ -91,8 +104,9 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **315 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
-其余按批推进。
+筛选后落地 **315 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
+的官方清单统计，共 436 条：已移植 316 条，明确不做 51 条，待补 69 条；逐条清单与理由见
+[COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
 一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。这批页面按依赖分三个文件：
@@ -101,16 +115,18 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `examples/DocInteractive.kt`（首次绘制后还要 `setOption` / `dispatchAction` / 起定时器，或使用 timeline
 组件的 12 个）。
 
-### 尚未移植的家族与原因
+### 家族的剩余情况
+
+逐条清单在 [COVERAGE.md](COVERAGE.md)，这里只记家族层面的判断：
 
 | 家族 | 情况 |
 | --- | --- |
-| `bmap` | 需要百度地图 JS SDK，wrapper 没有覆盖 |
-| `graphic` | 关键帧动画那一档已落地（`examples/GraphicAnimations.kt`，见下），多数剩余示例还配合真实交互或外部素材 |
-| `visualMap` / `dataZoom` 单列家族 | 官方清单里这几条恰好都属其它被排除的类别；能力已由别的示例覆盖 |
+| `bmap` | 需要百度地图 JS SDK，wrapper 没有覆盖，整个家族不做 |
+| `graphic` | 关键帧动画那一档已落地（`examples/GraphicAnimations.kt`，见下），剩余示例都配合真实交互或外部素材 |
+| `visualMap` / `dataZoom` | 清单里没有独立家族，这几条随所属系列落地或列入待补（`wind-barb`、`line-tooltip-touch`）；能力已由具体示例覆盖 |
 
-`gl` 家族已经接入（`examples/Gl.kt` / `examples/GlScatter.kt` / `examples/GlSurfaceMaterial.kt` /
-`examples/GlGeo.kt`，见下文「3D 示例」），按批继续补。
+`gl` 家族已经接入（`examples/Gl*.kt` 七个文件，见下文「3D 示例」），剩余页面按
+[COVERAGE.md](COVERAGE.md) 的待补清单推进。
 
 `lines` / `map` / `geo` 已经能用静态数据集（`lines-airline`、`custom-hexbin` 就是先例）：只要再拷
 `public/data/asset/geo/` 下的 GeoJSON 或 SVG，就能继续补这两个家族。
@@ -122,7 +138,7 @@ text）在 `examples/CanvasGraphics.kt`，多层版 `bar-multi-drilldown` 单独
 option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
 `watermark` 同文件（canvas 画的斜向水印当
 `backgroundColor` 的 pattern）。剩下的长尾里还要真实交互的（`scatter-clustering` 要 ecStat、
-`custom-calendar-icon` 上游只剩缩略图、`line-pen` / `line-draggable` 要指针序列）仍不做。
+`line-pen` / `line-draggable` 要指针序列）仍不做。
 
 `path://` 素材不是障碍：上游的 path 字符串原样内联即可，gauge 家族的五个面板图就是这么落地的
 （`examples/GaugeLongTail.kt`，同时把 `Math.random()` 换成 `Lcg`、定时器交给 `ChartHolder`），
@@ -246,23 +262,24 @@ demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首�
 
 - 图标是官方站的 PNG / base64 素材，按排除策略不做：`pictorialBar-graphicType`、
   `pictorialBar-patternSize`、`pictorialBar-repeatDirection`、`pictorialBar-repeatLayout`、
-  `title-block`、`axisPointer-handle-image`；
+  `axisPointer-handle-image`；
 - 运行期远端脚本：`bar-media-timeline`（`$.getScript` 拉 `timelineGDP.js` 与 `draggable.js`）；
 - 地图与 `geo`：`map-example`、`map-visualMap-continuous`、`map-visualMap-continuous-text`、
   `map-visualMap-pieces`、`map-visualMap-piecewise-text`、`scatter-visualMap-piecewise`（系列用
   `coordinateSystem: 'geo'`）、`geo-svg-label-basic`、`geo-svg-layout-basic`、`geo-svg-named-basic`、
   `geo-roam-indicator`；
 - 真实指针漫游 + 官方站的 `app.config`：`graph-roam-indicator`；
-- 下一批的可移植项：`scatter-visualMap-categories`（内联 dataset + 两个 `visualMap`，但
+- 下一批的可移植项：`title-block`（天气图标已在 `resources/data/img/weather/`）、
+  `scatter-visualMap-categories`（内联 dataset + 两个 `visualMap`，但
   `inRange.symbol` / `outOfRange.symbolSize` 是按类目索引的字典、`left: null`，要先放宽 wrapper）、
   `canvas-vs-svg`（含 `-en`，只有两张画布分别用 canvas / SVG 渲染器才有意义，要先给站点加渲染器开关）。
 
 `doc-example/` 之外的数据页也按「先拷数据再做」推进：`sankey-energy` / `sankey-levels` /
-`sankey-nodeAlign-left` / `-right` 用 `energy.json` 与 `product.json`（`sankey-itemstyle` 的 3000 行表由
-示例服务器现算，本仓库没有那份数据，仍不做），`confidence-band` 用 `confidence-band.json`，
-`scatter-painter-choice` 用 `masterPainterColorChoice.json`。后者有两个坑：`x` 列是 plotly 导出的**字符串**
-（照上游的一元 `+` 用 `Number(...)` 转换），`itemStyle.color` 是按 `dataIndex` 取色的回调（wrapper 的
-`ZRColor(callback)` 就是为它加的）。
+`sankey-nodeAlign-left` / `-right` 用 `energy.json` 与 `product.json`，`confidence-band` 用
+`confidence-band.json`，`scatter-painter-choice` 用 `masterPainterColorChoice.json`。后者有两个坑：`x` 列
+是 plotly 导出的**字符串**（照上游的一元 `+` 用 `Number(...)` 转换），`itemStyle.color` 是按 `dataIndex`
+取色的回调（wrapper 的 `ZRColor(callback)` 就是为它加的）。`sankey-itemstyle` 的数据整份内联在上游
+源码里，属待补的静态数据页，见 [COVERAGE.md](COVERAGE.md)。
 
 `scatter-large` 的两条 50 万点序列用 `Lcg` 生成、`dynamic-data` 的两条滚动序列同样换成 `Lcg`，
 定时器交给 `ChartHolder`，所以两页每次刷新都是同一张（能稳定断言）的动画。

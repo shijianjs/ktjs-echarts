@@ -791,13 +791,13 @@ private fun mixTimelineYearOption(index: Int): EChartsOption =
     }
 
 /** A bar series of the base option: a name, no data. */
-private fun mixTimelineBar(name: String): SeriesOption = barSeries { this.name = name }
+internal fun mixTimelineBar(name: String): SeriesOption = barSeries { this.name = name }
 
 /**
  * A bar series of one year: the values of [values] as named items, which is what upstream's
  * `dataFormatter` produces so a tooltip and the labels know the province.
  */
-private fun mixTimelineBarData(values: DoubleArray): SeriesOption =
+internal fun mixTimelineBarData(values: DoubleArray): SeriesOption =
     unsafeJso<BarSeriesOption> {
         typedData =
             Array(values.size) { index ->
@@ -811,7 +811,7 @@ private fun mixTimelineBarData(values: DoubleArray): SeriesOption =
     }
 
 /** The ten points of the timeline axis; the third and the last are diamonds with their own tooltip. */
-private fun mixTimelinePoints(): Array<OptionDataItem?> =
+internal fun mixTimelinePoints(): Array<OptionDataItem?> =
     Array(mixTimelineYears.size) { index ->
         val value = "${mixTimelineYears[index]}-01-01"
         when (index) {
@@ -832,7 +832,7 @@ private fun mixTimelinePoints(): Array<OptionDataItem?> =
     }
 
 /** One highlighted point of the timeline axis. */
-private fun mixTimelineDiamond(
+internal fun mixTimelineDiamond(
     value: String,
     size: Double,
     tooltip: TooltipFormatter,
@@ -845,7 +845,7 @@ private fun mixTimelineDiamond(
     }
 
 /** The categories of the x axis, with a forced line break in front of every second province. */
-private fun mixTimelineAxisCategories(): Array<String> =
+internal fun mixTimelineAxisCategories(): Array<String> =
     Array(mixTimelineProvinces.size) { index ->
         val name = mixTimelineProvinces[index]
         if (index % 2 == 1) "\n$name" else name
@@ -862,7 +862,7 @@ private fun mixTimelineYearLabel(): LabelFormatterCallback =
     js("(value) => String(new Date(value).getFullYear())") as LabelFormatterCallback
 
 /** Shape of `data/obama_budget_proposal_2012.list.json`. */
-private external interface ObamaBudgetJson {
+internal external interface ObamaBudgetJson {
     val names: Array<String>
     val budget2011List: Array<Double>
     val budget2012List: Array<Double>
@@ -919,7 +919,7 @@ private fun budgetOption(budget: ObamaBudgetJson): EChartsOption =
     }
 
 /** Labels of the budget axis, printed in thousands with the upstream thousands separator. */
-private fun budgetAxisLabel(): AxisLabelOption =
+internal fun budgetAxisLabel(): AxisLabelOption =
     unsafeJso {
         // A value axis hands the formatter the raw scale value, not the item parameters of a series.
         formatter =

@@ -24,6 +24,7 @@ import demo.examples.docInteractiveEntries
 import demo.examples.docMoreEntries
 import demo.examples.funnelEntries
 import demo.examples.extraPagesEntries
+import demo.examples.financeTimelineEntries
 import demo.examples.gaugeEntries
 import demo.examples.geoExtraEntries
 import demo.examples.gaugeExtraEntries
@@ -165,6 +166,7 @@ val catalog: List<CatalogEntry> =
         barExtraEntries,
         barLongTailEntries,
         barDrilldownEntries,
+        financeTimelineEntries,
         richTextEntries,
         extraPagesEntries,
         lineEntries,

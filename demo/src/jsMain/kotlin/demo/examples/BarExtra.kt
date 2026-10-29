@@ -2,6 +2,7 @@ package demo.examples
 
 import demo.CatalogEntry
 import demo.Groups
+import demo.ui.loadJson
 import echarts.*
 import echarts.options.*
 import js.objects.Record
@@ -741,6 +742,18 @@ val barExtraEntries: List<CatalogEntry> =
                     )
             }
         },
+        barExtra.interactive(
+            "mix-zoom-on-value",
+            "多数值轴轴缩放",
+            "Mix Zoom On Value",
+            summaryZh = "两年前的预算对比条形图；横向与纵向三个 dataZoom 同时缩放，纵向滑杆用 `filterMode: 'empty'` 保留类目轴。",
+            summaryEn = "Two budget proposals over 2011 and 2012; three dataZooms zoom both axes, and the vertical one keeps the category axis alive with `filterMode: 'empty'`.",
+        ) { chart ->
+            loadJson("data/obama_budget_proposal_2012.list.json").then { json ->
+                chart.setOption(mixZoomOnValueOption(json.unsafeCast<ObamaBudgetJson>()))
+                null
+            }
+        },
     )
 
 /** Rounds to the two decimals the original reaches through `+(value).toFixed(2)`. */
@@ -873,3 +886,100 @@ private fun brushSelectionTitle(event: BrushSelectedEvent): EChartsOption {
             )
     }
 }
+
+// ---------------------------------------------------------------------------------------------
+// mix-zoom-on-value
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * The option of `mix-zoom-on-value`; [budget] is the shared Obama budget table.
+ *
+ * The upstream `calculable: true` is the pre-DataZoom switch for value-axis zoom and no longer
+ * exists in the ECharts 6 typings, so the port keeps the three data zooms, which is what the
+ * option actually did.
+ */
+private fun mixZoomOnValueOption(budget: ObamaBudgetJson): EChartsOption =
+    unsafeJso {
+        tooltip =
+            one(
+                unsafeJso<TooltipOption> {
+                    trigger = TooltipTriggers.axis
+                    axisPointer =
+                        unsafeJso<AxisPointerOption> {
+                            type = AxisPointerTypes.shadow
+                            label = unsafeJso<AxisPointerLabelOption> { show = true }
+                        }
+                },
+            )
+        toolbox =
+            one(
+                unsafeJso<ToolboxOption> {
+                    show = true
+                    feature =
+                        unsafeJso<ToolboxFeature> {
+                            dataView = unsafeJso<DataViewOption> { readOnly = false }
+                            magicType = unsafeJso<MagicTypeOption> { type = arrayOf("line", "bar") }
+                            restore = unsafeJso<ToolboxFeatureOption> {}
+                            saveAsImage = unsafeJso<SaveAsImageOption> {}
+                        }
+                },
+            )
+        legend =
+            one(
+                unsafeJso<LegendOption> {
+                    data = legendNames("Growth", "Budget 2011", "Budget 2012")
+                    itemGap = 5.0
+                },
+            )
+        grid =
+            one(
+                unsafeJso<GridOption> {
+                    top = StringOrDouble("12%")
+                    left = StringOrDouble("1%")
+                    right = StringOrDouble("10%")
+                    containLabel = true
+                },
+            )
+        xAxis =
+            one(
+                unsafeJso<XAxisOption> {
+                    type = AxisTypes.category
+                    data = strings(*budget.names)
+                },
+            )
+        yAxis =
+            one(
+                unsafeJso<YAxisOption> {
+                    type = AxisTypes.value
+                    name = "Budget (million USD)"
+                    axisLabel = budgetAxisLabel()
+                },
+            )
+        dataZoom =
+            arrayOf(
+                unsafeJso<DataZoomOption> {
+                    show = true
+                    start = 94.0
+                    end = 100.0
+                },
+                unsafeJso<DataZoomOption> {
+                    type = DataZoomTypes.inside
+                    start = 94.0
+                    end = 100.0
+                },
+                unsafeJso<DataZoomOption> {
+                    show = true
+                    yAxisIndex = IndexOrIndexArray(0.0)
+                    filterMode = FilterModes.empty
+                    width = StringOrDouble(30.0)
+                    height = StringOrDouble("80%")
+                    showDataShadow = BooleanOrString(false)
+                    left = StringOrDouble("93%")
+                },
+            )
+        series =
+            arrayOf<SeriesOption>(
+                barSeries { name = "Budget 2011"; typedData = numbers(*budget.budget2011List.toDoubleArray()) },
+                barSeries { name = "Budget 2012"; typedData = numbers(*budget.budget2012List.toDoubleArray()) },
+            )
+    }

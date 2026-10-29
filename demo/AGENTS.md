@@ -83,6 +83,11 @@ demo/src/jvmTest/kotlin/demo/e2e/
 ## 可复用数据与素材
 
 - 打卡表：`examples/CustomExtra.kt` 的 `punchCardValues` / `punchCardHours` / `punchCardDays`。
+- 省级十年表：`examples/MixTimelineData.kt` 的 `mixTimelineProvinces` / `mixTimelineYears` 与六张
+  `mixTimeline*` 数据；`doc-example/mix-timeline-all` 与 `mix-timeline-finance` 共用。timeline 的
+  点位、按年柱与双行省名也复用 `DocInteractive.kt` 里那几个 `internal` 辅助。
+- 预算表：`resources/data/obama_budget_proposal_2012.list.json`，`ObamaBudgetJson` 与
+  `budgetAxisLabel()` 在 `examples/DocInteractive.kt`；`mix-zoom-on-value` 复用它们。
 - 常用表：`resources/data/life-expectancy-table.json`、`nutrients.json`、`population.json`、
   `gl/flights.json`；地图：`world.json`（缩写地名，`GlGeo.kt` 的 `worldRegionNames` 负责翻译）、
   `world-population.json`、`USA.json`、`ch.geo.json`、`iceland.geo.json`。
@@ -104,8 +109,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后落地 **326 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
-的官方清单统计，共 436 条：已移植 327 条，明确不做 51 条，待补 58 条；逐条清单与理由见
+筛选后落地 **337 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
+的官方清单统计，共 436 条：已移植 338 条，明确不做 51 条，待补 47 条；逐条清单与理由见
 [COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -196,6 +201,16 @@ bar 家族的计算长尾在 `examples/BarLongTail.kt`：归一化堆叠（`bar-
 只有真正封住栈顶的柱子才带圆角的 `bar-stack-borderRadius`、透明占位柱顶起的 `bar-waterfall2`，
 以及带 `markPoint` / `markLine` 的 `bar1`。上游根 option 上的 `calculable: true` 是 ECharts 6
 已经不读的老字段，wrapper 里也没有对应声明，移植时直接去掉。
+`mix-zoom-on-value`（`examples/BarExtra.kt`）与文档页 `bar-dataZoom-filterMode` 是同一张预算图的两个
+变体：多出 axis 型 tooltip、`magicType` 的 line/bar 切换与纵向滑杆，三者都靠 dataZoom 完成；上游根级
+`calculable: true` 是 ECharts 6 已不读的老字段，去掉。
+
+`line-race`（`examples/LineExtra.kt`）复用 `DatasetExtra.kt` 的 `filteredSince1950`：八个国家各一个
+filter 数据集，线尾的 `endLabel` 用 `params.value[3] + ': ' + params.value[0]` 拼「国家: 年份」，重叠
+靠 `labelLayout.moveOverlap: 'shiftY'` 挪开。`candlestick-touch`（`examples/Candlestick.kt`）不需要
+指针逻辑：tooltip 的 `triggerOn: 'none'` 与坐标轴 handle 都在 option 里，横轴指示器用
+`axisPointer.link` 联动上下两个网格。
+
 `graph-grid`（笛卡尔坐标系上的 graph）补在 `examples/GraphExtra.kt`，同文件还有 `graph-force-dynamic`：
 节点与边靠 `ChartHolder.setInterval` 每 200ms 长出来，随机源换成种子固定的 `Lcg`，节点 id 从 `"2"`
 开始（上游就是这么漏掉 `"0"` / `"1"` 的，照抄）。

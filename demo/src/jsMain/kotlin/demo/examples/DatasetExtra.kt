@@ -266,13 +266,13 @@ private external interface FilterCondition {
 }
 
 /**
- * The `filter` dataset of `data-transform-filter`: the rows of [country] from 1950 on.
+ * The `filter` dataset of `data-transform-filter` and `line-race`: the rows of [country] from 1950 on.
  *
  * The `and` list is an array of condition objects; `transform.config` is typed as a plain record
  * upstream, so the array is handed over with a cast, exactly like `data-transform-multiple-pie`
  * passes its single condition.
  */
-private fun filteredSince1950(id: String, country: String): DatasetOption =
+internal fun filteredSince1950(id: String, country: String): DatasetOption =
     unsafeJso {
         this.id = id
         fromDatasetId = "dataset_raw"

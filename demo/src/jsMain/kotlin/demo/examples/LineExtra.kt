@@ -731,6 +731,18 @@ val lineExtraEntries: List<CatalogEntry> =
                     )
             }
         },
+        lineExtra.interactive(
+            "line-race",
+            "动态排序折线图",
+            "Line Race",
+            summaryZh = "八个国家的收入折线从 1950 年起同时生长，线尾标签跟着最后一点滑动；悬停任一折线会淡化其余折线。",
+            summaryEn = "Eight countries grow their post-1950 income lines at once, end labels trailing the last point; hovering one line fades the others.",
+        ) { chart ->
+            loadJson("data/life-expectancy-table.json").then { json ->
+                chart.setOption(lineRaceOption(json.unsafeCast<DatasetSource>()))
+                null
+            }
+        },
     )
 
 /** One time-of-day band of `line-sections`; `gt`/`lte` are omitted at the open ends. */
@@ -760,3 +772,72 @@ private fun peakArea(
             unsafeJso<MarkArea2DDataItemDimOption> { xAxis = ScaleDataValue(to) },
         ),
     )
+
+// ---------------------------------------------------------------------------------------------
+// line-race
+// ---------------------------------------------------------------------------------------------
+
+/** The countries of `line-race`, copied from the upstream `countries`. */
+private val LINE_RACE_COUNTRIES =
+    arrayOf("Finland", "France", "Germany", "Iceland", "Norway", "Poland", "Russia", "United Kingdom")
+
+/** One racing line, reading its own filtered dataset. */
+private fun lineRaceSeries(country: String): LineSeriesOption =
+    lineSeries {
+        datasetId = "dataset_$country"
+        name = country
+        showSymbol = false
+        endLabel =
+            unsafeJso<LabelOption> {
+                show = true
+                formatter = LabelFormatter { params -> textAt(params.value, 3) + ": " + textAt(params.value, 0) }
+            }
+        labelLayout = LabelLayout(unsafeJso<LabelLayoutOption> { moveOverlap = MoveOverlaps.shiftY })
+        emphasis = unsafeJso<EmphasisOption> { focus = EmphasisFocuses.series }
+        encode =
+            unsafeJso<OptionEncode> {
+                x = OptionEncodeValue(DimensionLoose("Year"))
+                y = OptionEncodeValue(DimensionLoose("Income"))
+                label =
+                    OptionEncodeValue(
+                        arrayOf<DimensionLoose>(DimensionLoose("Country"), DimensionLoose("Income")),
+                    )
+                itemName = OptionEncodeValue(DimensionLoose("Year"))
+                tooltip = OptionEncodeValue(DimensionLoose("Income"))
+            }
+    }
+
+/** The option of `line-race`; [raw] is the shared life-expectancy table. */
+private fun lineRaceOption(raw: DatasetSource): EChartsOption =
+    unsafeJso {
+        animationDuration = AnimationDuration(10000.0)
+        dataset =
+            arrayOf(
+                unsafeJso<DatasetOption> {
+                    id = "dataset_raw"
+                    source = raw
+                },
+                *Array(LINE_RACE_COUNTRIES.size) { index ->
+                    filteredSince1950("dataset_" + LINE_RACE_COUNTRIES[index], LINE_RACE_COUNTRIES[index])
+                },
+            )
+        title = one(unsafeJso<TitleOption> { text = "Income of Germany and France since 1950" })
+        tooltip =
+            one(
+                unsafeJso<TooltipOption> {
+                    order = TooltipOrders.valueDesc
+                    trigger = TooltipTriggers.axis
+                },
+            )
+        xAxis =
+            one(
+                unsafeJso<XAxisOption> {
+                    type = AxisTypes.category
+                    nameLocation = AxisNameLocations.middle
+                },
+            )
+        yAxis = one(unsafeJso<YAxisOption> { name = "Income" })
+        grid = one(unsafeJso<GridOption> { right = StringOrDouble(140.0) })
+        series =
+            Array<SeriesOption>(LINE_RACE_COUNTRIES.size) { index -> lineRaceSeries(LINE_RACE_COUNTRIES[index]) }
+    }

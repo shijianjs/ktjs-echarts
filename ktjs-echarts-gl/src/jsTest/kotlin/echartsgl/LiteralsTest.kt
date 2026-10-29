@@ -23,6 +23,12 @@ class LiteralsTest {
         assertEquals("globe", CoordinateSystems3D.globe.unsafeCast<String>())
         assertEquals("mapbox3D", CoordinateSystems3D.mapbox3D.unsafeCast<String>())
         assertEquals("maptalks3D", CoordinateSystems3D.maptalks3D.unsafeCast<String>())
+
+        assertEquals("cartesian2d", CoordinateSystems2D.cartesian2d.unsafeCast<String>())
+        assertEquals("polar", CoordinateSystems2D.polar.unsafeCast<String>())
+        assertEquals("geo", CoordinateSystems2D.geo.unsafeCast<String>())
+        assertEquals("singleAxis", CoordinateSystems2D.singleAxis.unsafeCast<String>())
+        assertEquals("bmap", CoordinateSystems2D.bmap.unsafeCast<String>())
     }
 
     @Test
@@ -77,6 +83,21 @@ class LiteralsTest {
         assertEquals("scatter3D", EChartsGlSeriesTypes.scatter3D.unsafeCast<String>())
         assertEquals("lines3D", EChartsGlSeriesTypes.lines3D.unsafeCast<String>())
         assertEquals("surface", EChartsGlSeriesTypes.surface.unsafeCast<String>())
+        assertEquals("polygons3D", EChartsGlSeriesTypes.polygons3D.unsafeCast<String>())
+        assertEquals("map3D", EChartsGlSeriesTypes.map3D.unsafeCast<String>())
+        assertEquals("scatterGL", EChartsGlSeriesTypes.scatterGL.unsafeCast<String>())
+        assertEquals("graphGL", EChartsGlSeriesTypes.graphGL.unsafeCast<String>())
+        assertEquals("flowGL", EChartsGlSeriesTypes.flowGL.unsafeCast<String>())
+        assertEquals("linesGL", EChartsGlSeriesTypes.linesGL.unsafeCast<String>())
+    }
+
+    @Test
+    fun particleAndFocusLiteralsMatchTheUpstreamNames() {
+        assertEquals("point", FlowGLParticleTypes.point.unsafeCast<String>())
+        assertEquals("line", FlowGLParticleTypes.line.unsafeCast<String>())
+
+        assertEquals("mouseover", GraphGLFocusNodeAdjacencyOns.mouseover.unsafeCast<String>())
+        assertEquals("click", GraphGLFocusNodeAdjacencyOns.click.unsafeCast<String>())
     }
 
     @Test

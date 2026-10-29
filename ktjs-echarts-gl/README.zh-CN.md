@@ -121,21 +121,25 @@ GL 专属的 option 类型都在 `echartsgl.options` 里：
 - `LightOption` — 主光源、环境光与环境 cubemap 光。
 - `PostEffectOption` — bloom、景深、SSAO、SSR、FXAA、颜色校正与描边。上游的 `DOF`、`SSAO`、
   `SSR`、`FXAA` 别名以 `dof`、`ssao`、`ssr`、`fxaa` 暴露。
-- `ShadingOption` — `shading` 以及 `realisticMaterial`、`lambertMaterial`、`colorMaterial`，
-  由 `Bar3DSeriesOption` 实现。
+- `ShadingOption` — `shading` 以及 `realisticMaterial`、`lambertMaterial`、`colorMaterial` 与
+  `hatchingMaterial`，由所有会给表面着色的系列与地理组件实现。
 - `Bar3DSeriesOption`，用 `bar3DSeries { }` 工厂创建：柱体几何（`bevelSize`、`bevelSmoothness`、
   `minHeight`、`stack`、`onGridPlane`）、`grid3DIndex` / `geo3DIndex` / `globeIndex`，以及
   `typedData`、`typedItemStyle`、`typedLabel`、`typedEmphasis`、`typedCoordinateSystem`、
   `typedBlendMode` 这些带类型的视图。
 - `Bar3DDataItem` — 一条数据：`[x, y, z]`（或 `[lng, lat, value]`）行、单个值，或带逐项样式、
   标签与 emphasis 的 `Bar3DDataItemOption`。
+- 其余系列形态相同：`scatterGLSeries { }`、`linesGLSeries { }`、`flowGLSeries { }`、
+  `graphGLSeries { }`、`polygons3DSeries { }`、`map3DSeries { }` 分别创建
+  `ScatterGLSeriesOption`、`LinesGLSeriesOption`、`FlowGLSeriesOption`、`GraphGLSeriesOption`、
+  `Polygons3DSeriesOption` 与 `Map3DSeriesOption`，都带类型化的 `data` 视图。
+- `Mapbox3DOption` 与 `Maptalks3DOption` 配置两个地图服务组件。它们要求页面自己加载地图库并设置
+  全局 token，token 不是选项字段。
 
-枚举值都是类型化的常量而不是裸字符串：`CoordinateSystems3D`、`ShadingTypes`、`GridPlaneTypes`、
-`GlBlendModes`、`ProjectionTypes`、`QualityTypes`、`AutoRotateDirections`、`MouseButtons`，系列
-类型用 `EChartsGlSeriesTypes.bar3D`。
-
-目前只有 `bar3D` 与 `grid3D` 有类型化 option；其余系列与组件在补上类型之前，可以通过
-`EChartsGlOption`（或 `SeriesOption`）上的 `unsafeJso` 配置。
+枚举值都是类型化的常量而不是裸字符串：`CoordinateSystems2D`、`CoordinateSystems3D`、
+`ShadingTypes`、`GridPlaneTypes`、`GlBlendModes`、`ProjectionTypes`、`QualityTypes`、
+`AutoRotateDirections`、`MouseButtons`、`FlowGLParticleTypes`、`GraphGLFocusNodeAdjacencyOns`，
+系列类型用 `EChartsGlSeriesTypes`。
 
 ## 为什么 wrapper 要自己引入核心模块
 

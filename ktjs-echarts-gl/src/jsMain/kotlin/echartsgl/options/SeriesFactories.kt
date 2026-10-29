@@ -47,3 +47,57 @@ inline fun surfaceSeries(block: SurfaceSeriesOption.() -> Unit = {}): SurfaceSer
         type = EChartsGlSeriesTypes.surface
         block()
     }
+
+/**
+ * Creates a [Polygons3DSeriesOption] with `type = "polygons3D"`.
+ */
+inline fun polygons3DSeries(block: Polygons3DSeriesOption.() -> Unit = {}): Polygons3DSeriesOption =
+    unsafeJso {
+        type = EChartsGlSeriesTypes.polygons3D
+        block()
+    }
+
+/**
+ * Creates a [Map3DSeriesOption] with `type = "map3D"`.
+ */
+inline fun map3DSeries(block: Map3DSeriesOption.() -> Unit = {}): Map3DSeriesOption =
+    unsafeJso {
+        type = EChartsGlSeriesTypes.map3D
+        block()
+    }
+
+/**
+ * Creates a [ScatterGLSeriesOption] with `type = "scatterGL"`.
+ */
+inline fun scatterGLSeries(block: ScatterGLSeriesOption.() -> Unit = {}): ScatterGLSeriesOption =
+    unsafeJso {
+        type = EChartsGlSeriesTypes.scatterGL
+        block()
+    }
+
+/**
+ * Creates a [GraphGLSeriesOption] with `type = "graphGL"`.
+ */
+inline fun graphGLSeries(block: GraphGLSeriesOption.() -> Unit = {}): GraphGLSeriesOption =
+    unsafeJso {
+        type = EChartsGlSeriesTypes.graphGL
+        block()
+    }
+
+/**
+ * Creates a [FlowGLSeriesOption] with `type = "flowGL"`.
+ */
+inline fun flowGLSeries(block: FlowGLSeriesOption.() -> Unit = {}): FlowGLSeriesOption =
+    unsafeJso {
+        type = EChartsGlSeriesTypes.flowGL
+        block()
+    }
+
+/**
+ * Creates a [LinesGLSeriesOption] with `type = "linesGL"`.
+ */
+inline fun linesGLSeries(block: LinesGLSeriesOption.() -> Unit = {}): LinesGLSeriesOption =
+    unsafeJso {
+        type = EChartsGlSeriesTypes.linesGL
+        block()
+    }

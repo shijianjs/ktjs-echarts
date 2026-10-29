@@ -13,7 +13,7 @@
   - `S:\workspace\github\ecomfe\echarts-gl`（GL 的 `defaultOption` 与视图实现）
   - `S:\workspace\github\JetBrains\kotlin-wrappers`（写法参考）
 - 锁定版本：根 `package.json`（`echarts` 6.1.0、`echarts-gl` 2.1.0）；修订号在
-  `wrapper-revisions.properties`（当前 `ktjs-echarts=4`、`ktjs-echarts-gl=7`）。
+  `wrapper-revisions.properties`（当前 `ktjs-echarts=4`、`ktjs-echarts-gl=8`）。
 - 验证：`./gradlew build`（含 detekt）、`:ktjs-echarts:jsBrowserTest`、`:ktjs-echarts-gl:jsBrowserTest`、
   `:demo:e2eTest`。
 
@@ -35,18 +35,23 @@
   是基类型的子接口，调用方 `unsafeJso<精确类型> { }` 即可写，读回来按需 `unsafeCast`。
 - `coordinateSystem` 等关键字收窄、继承来的 `var` 收窄沿用 `@JsName` 同名字段（`TYPE-MAPPING.md` §12）。
 
-### ktjs-echarts-gl（2.1.0-kt.7）
+### ktjs-echarts-gl（2.1.0-kt.8）
 
 - 已建模：`grid3D` / `xAxis3D|yAxis3D|zAxis3D`、`geo3D`、`globe`、`viewControl`、`light`、`postEffect`、
-  shading 与材质，`bar3D` / `line3D` / `scatter3D` / `surface` / `lines3D` 五个系列的选项、数据项联合与工厂
-  （`*Series { }`），字面量（坐标系统、shading、投影、blendMode、`onGridPlane`、鼠标键、画质、globe 图层
-  类型与混合目标、`lines3D` 的 pause/resume/toggle 动作名）。`geo3D` / `globe` 补了核心会读但文档没写的
-  `silent`，`bar3D` 补了同样只有源码会读的 `barSize`；`GlColor` 补了返回 HDR 数组
-  `[r, g, b, a]` 的回调重载（字符串回调由 `ZRColor` 提供，表达不了随 data item 变的 HDR 颜色）。
-- 安装器齐全（`Bar3DChart`、`Line3DChart`、`Scatter3DChart`、`SurfaceChart`、`GlobeComponent`…）；
-  `echarts-gl` 的 `sideEffects` 列不全，安装器 getter 里读取 `echarts-gl/lib/echarts-gl.js` 来加载核心模块。
-- 缺：`mapbox3D`、`maptalks3D`、`polygons3D`、`map3D`、`scatterGL`、`graphGL`、`flowGL`、`linesGL`
-  的选项类型（这些页面本身也多半需要地图数据或外部 JS）。
+  shading 与材质，全部 11 个系列的选项、数据项联合与工厂（`*Series { }`），以及 `mapbox3D` / `maptalks3D`
+  组件选项，字面量（2D/3D 坐标系统、shading、投影、blendMode、`onGridPlane`、鼠标键、画质、globe 图层
+  类型与混合目标、`particleType`、`focusNodeAdjacencyOn`、`lines3D` 的 pause/resume/toggle 动作名）。
+  `geo3D` / `globe` 补了核心会读但文档没写的 `silent`，`bar3D` 补了同样只有源码会读的 `barSize`；`GlColor`
+  补了返回 HDR 数组 `[r, g, b, a]` 的回调重载（字符串回调由 `ZRColor` 提供，表达不了随 data item 变的 HDR
+  颜色）。
+- 安装器齐全（11 个 chart + 5 个 component）；`echarts-gl` 的 `sideEffects` 列不全，安装器 getter 里读取
+  `echarts-gl/lib/echarts-gl.js` 来加载核心模块。
+- 浏览器测试：`GlSeries2DTest`（`scatterGL` / `linesGL` / `flowGL` / `graphGL`）、`Map3DSeriesTest`
+  （`polygons3D` 与自带 `map` 的 `map3D`）。`mapbox3D` / `maptalks3D` 要加载第三方地图 SDK 并设全局
+  token，只做类型不做渲染用例；token 不是选项字段，上游读全局 `mapboxgl.accessToken`。
+- 已确认的死字段（不建模）：`graphGL` 的 `roam` / `center`、`edgeSymbol` / `edgeSymbolSize`（只写进
+  visual，从不渲染）、`initLayout` / `stopThreshold`；hatching 材质只读 `hatchingTextures`，`paperColor`
+  无人读取；mapbox3D / maptalks3D 文档里的 `shading` 不会被读。
 
 ### demo（315 个示例 / 27 个家族）
 
@@ -74,17 +79,18 @@
   `data/SOURCE.md`；`resources/data/world.json` 与 `world-population.json` 供 `geo3D` 与 globe 页面使用，
   `world.json` 的缩写地名由 `GlGeo.kt` 的 `worldRegionNames` 表翻译。
 
-## 下一步（补齐 GL 剩余公开类型）
+## 下一步（把新系列接进 demo）
 
-1. **补 `scatterGL` / `graphGL` / `flowGL` / `linesGL` / `polygons3D` / `map3D` 的选项类型**与安装器，
-   按 `echarts-gl/src/chart/*` 的 `defaultOption` 与 `echarts-doc/option-gl/` 建模；这些页面上游大多依赖
-   地图数据或外部 JS，先补类型、再看能否找到不依赖地图的示例。
-2. **`mapbox3D` / `maptalks3D` 坐标系**：选项类型可以照文档补齐（需要 accessToken 字段等），但示例页要
-   额外加载地图 JS 与瓦片，页面仍不做。
+1. **`map3D` 页面**：`map3d-alcohol-consumption`、`map3d-wood-map`、`map3d-colorful-cities`、
+   `map3d-buildings`。地图自带的 `map` 即可，不需要 `geo3D` 组件；`canyon.hdr` / `pisa.hdr` 已有，还需补
+   `data-gl/asset/data/alcohol.json`、`buildings.json` 与 wood / redbricks 贴图。
+2. **新系列页面**：`graphgl-gpu-layout`（不读外部数据）、`graphgl-npm-dep` / `graphgl-large-internet`、
+   `scattergl-weibo`、`linesGL-ny`（`links_ny_*.bin`）、`scatterGL-gps`（`gps_*.bin`）。
 3. **暂不做**：`animating-contour-on-globe`（d3-array/contour/geo/timer）、`*-simplex-noise` 与
-   `stacked-bar3d` / `metal-bar3d`（都从 CDN 取 `simplex-noise` 生成数据，`metal-bar3d` 还要 `pisa.hdr`）、
-   `*-mapbox*` / `*-maptalks*` 页面（要地图 JS）、`bar3d-music-visualization`（Web Audio 需要用户手势）、
-   `globe-country-carousel`（要读实例 `getModel()` 的区域中心，`world.json` 里也只有 6 个国家带 `cp`）、
+   `stacked-bar3d` / `metal-bar3d`（从 CDN 取 `simplex-noise` 生成数据，`metal-bar3d` 还要 `pisa.hdr`）、
+   `flowGL-noise` / `scatter3d-orthographic`（同样要 `simplex-noise`）、`*-mapbox*` / `*-maptalks*` 页面
+   （要地图 JS）、`bar3d-music-visualization`（Web Audio 需要用户手势）、`globe-country-carousel`（要读实例
+   `getModel()` 的区域中心，`world.json` 里也只有 6 个国家带 `cp`）、`lines3d-taxi-chengdu` /
    `lines3d-taxi-routes-of-cape-town` / `bar3d-shanghai` / `scatter3d-shanghai`（mapbox / shapefile）、
    `iron-globe` 一类依赖官方站点 `/asset/get/s/` 纹理的示例。
 
@@ -92,9 +98,10 @@
 
 ### GL
 
-- GL 图表只画在 claygl 的 canvas 上，没有 zrender 的 canvas 层；e2e 只能用 `assertChartRendered` +
-  「canvas 有 WebGL 上下文且没有 `.ecgl-nowebgl`」的断言，**不要**把 GL 路由加进 `paintedFrame` /
-  `paintedPixels`。
+- GL 图表画在 claygl 的 canvas 上；`cartesian2d` 的 2D GL 系列（`scatterGL` / `linesGL` / `flowGL`）还会多
+  一张画坐标轴的 zrender canvas，所以断言按「有 WebGL 上下文（`getContext(WebGLRenderingContext.ID)`）的
+  canvas 恰好一个」数，不要按 canvas 总数。e2e 只能用 `assertChartRendered` + 「没有 `.ecgl-nowebgl`」的
+  断言，**不要**把 GL 路由加进 `paintedFrame` / `paintedPixels`。
 - 安装器必须在首个 `ECharts.init` 之前 `use`（demo 在 `main()` 里统一 `useEChartsGl()`），新增图表要加到
   那个数组。
 - 系列 label 用**扁平**文本属性（`GlLabelOption` = `LabelOption` 的别名）：2.1.0 用 ECharts 6 的

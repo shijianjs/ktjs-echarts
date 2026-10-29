@@ -125,22 +125,26 @@ the page loads those libraries itself; `echarts-gl` only renders into their canv
 - `PostEffectOption` — bloom, depth of field, SSAO, SSR, FXAA, color correction and edges. The
   upstream aliases `DOF`, `SSAO`, `SSR` and `FXAA` are available as `dof`, `ssao`, `ssr` and
   `fxaa`.
-- `ShadingOption` — `shading` plus the `realisticMaterial`, `lambertMaterial` and `colorMaterial`
-  options, implemented by `Bar3DSeriesOption`.
+- `ShadingOption` — `shading` plus the `realisticMaterial`, `lambertMaterial`, `colorMaterial` and
+  `hatchingMaterial` options, implemented by every series and geographic component that shades a
+  surface.
 - `Bar3DSeriesOption`, built with the `bar3DSeries { }` factory: bar geometry (`bevelSize`,
   `bevelSmoothness`, `minHeight`, `stack`, `onGridPlane`), `grid3DIndex` / `geo3DIndex` /
   `globeIndex`, and the typed views `typedData`, `typedItemStyle`, `typedLabel`, `typedEmphasis`,
   `typedCoordinateSystem` and `typedBlendMode`.
 - `Bar3DDataItem` — one data entry: a `[x, y, z]` (or `[lng, lat, value]`) row, a single value or a
   `Bar3DDataItemOption` with per-item style, label and emphasis.
+- The other series follow the same shape: `scatterGLSeries { }`, `linesGLSeries { }`,
+  `flowGLSeries { }`, `graphGLSeries { }`, `polygons3DSeries { }` and `map3DSeries { }` create a
+  `ScatterGLSeriesOption`, `LinesGLSeriesOption`, `FlowGLSeriesOption`, `GraphGLSeriesOption`,
+  `Polygons3DSeriesOption` and `Map3DSeriesOption`, each with a typed `data` view.
+- `Mapbox3DOption` and `Maptalks3DOption` configure the two map-service components. They assume the
+  page itself loads the map library and sets its global access token, which is not an option field.
 
-Enumerated values are typed instead of being plain strings: `CoordinateSystems3D`, `ShadingTypes`,
-`GridPlaneTypes`, `GlBlendModes`, `ProjectionTypes`, `QualityTypes`, `AutoRotateDirections`,
-`MouseButtons`, and `EChartsGlSeriesTypes.bar3D` for the series type.
-
-Only `bar3D` and `grid3D` have typed option interfaces so far. The other series and components can
-be configured through `unsafeJso` on `EChartsGlOption` (or `SeriesOption`) until their types are
-added.
+Enumerated values are typed instead of being plain strings: `CoordinateSystems2D`,
+`CoordinateSystems3D`, `ShadingTypes`, `GridPlaneTypes`, `GlBlendModes`, `ProjectionTypes`,
+`QualityTypes`, `AutoRotateDirections`, `MouseButtons`, `FlowGLParticleTypes`,
+`GraphGLFocusNodeAdjacencyOns`, and `EChartsGlSeriesTypes` for the series types.
 
 ## Why the wrapper imports the core module
 

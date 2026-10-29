@@ -17,19 +17,23 @@ external interface GlMaterialSetOption {
 
     /** Material used while the shading is `"color"`. */
     var colorMaterial: ColorMaterialOption?
+
+    /** Material used while the shading is `"hatching"`. */
+    var hatchingMaterial: HatchingMaterialOption?
 }
 
 /**
  * Shading of the 3D graphics of a series or component.
  *
- * `"color"` draws the flat colors only, `"lambert"` adds classic lighting, and `"realistic"` uses
- * physically based rendering driven by [realisticMaterial] and the environment of the scene.
+ * `"color"` draws the flat colors only, `"lambert"` adds classic lighting, `"realistic"` uses
+ * physically based rendering driven by [realisticMaterial] and the environment of the scene, and
+ * `"hatching"` turns the lighting into hand-drawn hatch textures.
  *
  * The interface is mixed into the GL series and into the geographic components, so the same
  * material options apply wherever a surface is shaded.
  */
 external interface ShadingOption : GlMaterialSetOption {
-    /** Shading model: `"color"`, `"lambert"` or `"realistic"`. */
+    /** Shading model: `"color"`, `"lambert"`, `"realistic"` or `"hatching"`. */
     var shading: ShadingType?
 }
 
@@ -80,3 +84,20 @@ external interface LambertMaterialOption : GlMaterialOption
  * Flat material of a [ShadingOption]; used while `shading` is `"color"`.
  */
 external interface ColorMaterialOption : GlMaterialOption
+
+/**
+ * Hand-drawn material of a [ShadingOption]; used while `shading` is `"hatching"`.
+ *
+ * The lambert tone of the surface selects between six hatch textures, which makes the surface look
+ * like it was drawn with a pen. Upstream also declares a `paperColor` in the default option, but
+ * `graphicGL.setMaterialFromModel` never reads it, so it is not modelled here.
+ */
+external interface HatchingMaterialOption : GlMaterialOption {
+    /**
+     * Six hatch textures, from the darkest to the lightest.
+     *
+     * Upstream reads the option but does not document it, and reports an error when fewer than six
+     * textures are given.
+     */
+    var hatchingTextures: Array<TextureSource?>?
+}

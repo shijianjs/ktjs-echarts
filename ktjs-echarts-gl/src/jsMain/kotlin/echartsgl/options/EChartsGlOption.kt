@@ -45,4 +45,10 @@ external interface EChartsGlOption : EChartsOption {
 
     /** Globes, created by [GlobeComponent][echartsgl.GlobeComponent]. */
     var globe: Array<GlobeOption>?
+
+    /** Mapbox GL maps, created by [Mapbox3DComponent][echartsgl.Mapbox3DComponent]. */
+    var mapbox3D: Array<Mapbox3DOption>?
+
+    /** maptalks maps, created by [Maptalks3DComponent][echartsgl.Maptalks3DComponent]. */
+    var maptalks3D: Array<Maptalks3DOption>?
 }

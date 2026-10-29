@@ -45,6 +45,76 @@ object CoordinateSystems3D {
 }
 
 /**
+ * Coordinate system a 2D GL series is drawn in.
+ *
+ * `scatterGL` accepts `"cartesian2d"`, `"polar"`, `"geo"` and `"singleAxis"`; `linesGL` accepts
+ * `"cartesian2d"` and `"geo"`; `flowGL` accepts `"cartesian2d"`, `"geo"` and `"bmap"`.
+ */
+sealed external interface CoordinateSystem2D
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [CoordinateSystems2D]. */
+inline fun CoordinateSystem2D(value: String): CoordinateSystem2D = value.unsafeCast<CoordinateSystem2D>()
+
+/**
+ * The values of [CoordinateSystem2D].
+ */
+object CoordinateSystems2D {
+    /** A cartesian grid. */
+    inline val cartesian2d: CoordinateSystem2D get() = CoordinateSystem2D("cartesian2d")
+
+    /** A polar coordinate system. */
+    inline val polar: CoordinateSystem2D get() = CoordinateSystem2D("polar")
+
+    /** A geographic coordinate system created by the 2D `geo` component. */
+    inline val geo: CoordinateSystem2D get() = CoordinateSystem2D("geo")
+
+    /** A single axis. */
+    inline val singleAxis: CoordinateSystem2D get() = CoordinateSystem2D("singleAxis")
+
+    /** Baidu map; it needs the Baidu map component, the same one the 2D `bmap` series use. */
+    inline val bmap: CoordinateSystem2D get() = CoordinateSystem2D("bmap")
+}
+
+/**
+ * Shape of the particles of a `flowGL` series.
+ */
+sealed external interface FlowGLParticleType
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [FlowGLParticleTypes]. */
+inline fun FlowGLParticleType(value: String): FlowGLParticleType = value.unsafeCast<FlowGLParticleType>()
+
+/**
+ * The values of [FlowGLParticleType].
+ */
+object FlowGLParticleTypes {
+    /** Points that jump along the field. The default. */
+    inline val point: FlowGLParticleType get() = FlowGLParticleType("point")
+
+    /** Lines that connect the previous position of a particle with its current one. */
+    inline val line: FlowGLParticleType get() = FlowGLParticleType("line")
+}
+
+/**
+ * Pointer event that focuses the neighbours of a node of a `graphGL` series.
+ */
+sealed external interface GraphGLFocusNodeAdjacencyOn
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [GraphGLFocusNodeAdjacencyOns]. */
+inline fun GraphGLFocusNodeAdjacencyOn(value: String): GraphGLFocusNodeAdjacencyOn =
+    value.unsafeCast<GraphGLFocusNodeAdjacencyOn>()
+
+/**
+ * The values of [GraphGLFocusNodeAdjacencyOn].
+ */
+object GraphGLFocusNodeAdjacencyOns {
+    /** Focus while the pointer moves over a node. The default. */
+    inline val mouseover: GraphGLFocusNodeAdjacencyOn get() = GraphGLFocusNodeAdjacencyOn("mouseover")
+
+    /** Focus after a node is clicked. */
+    inline val click: GraphGLFocusNodeAdjacencyOn get() = GraphGLFocusNodeAdjacencyOn("click")
+}
+
+/**
  * Shading mode of 3D graphics.
  */
 sealed external interface ShadingType
@@ -368,6 +438,24 @@ object EChartsGlSeriesTypes {
 
     /** Surface, installed by [SurfaceChart]. */
     inline val surface: SeriesType get() = SeriesType("surface")
+
+    /** 3D polygons, installed by [Polygons3DChart]. */
+    inline val polygons3D: SeriesType get() = SeriesType("polygons3D")
+
+    /** 3D map, installed by [Map3DChart]. */
+    inline val map3D: SeriesType get() = SeriesType("map3D")
+
+    /** WebGL 2D scatter, installed by [ScatterGLChart]. */
+    inline val scatterGL: SeriesType get() = SeriesType("scatterGL")
+
+    /** WebGL force-directed graph, installed by [GraphGLChart]. */
+    inline val graphGL: SeriesType get() = SeriesType("graphGL")
+
+    /** Vector field, installed by [FlowGLChart]. */
+    inline val flowGL: SeriesType get() = SeriesType("flowGL")
+
+    /** WebGL 2D lines, installed by [LinesGLChart]. */
+    inline val linesGL: SeriesType get() = SeriesType("linesGL")
 }
 
 /**

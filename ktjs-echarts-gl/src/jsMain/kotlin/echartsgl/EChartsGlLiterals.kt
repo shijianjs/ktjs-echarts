@@ -352,6 +352,24 @@ object EChartsGlSeriesTypes {
     /** 3D scatter, installed by [Scatter3DChart]. */
     inline val scatter3D: SeriesType get() = SeriesType("scatter3D")
 
+    /** 3D lines, installed by [Lines3DChart]. */
+    inline val lines3D: SeriesType get() = SeriesType("lines3D")
+
     /** Surface, installed by [SurfaceChart]. */
     inline val surface: SeriesType get() = SeriesType("surface")
+}
+
+/**
+ * Effects of the animations started by `echarts-gl` that can be controlled with
+ * [EChartsInstance.dispatchAction][echarts.EChartsInstance.dispatchAction].
+ */
+object EChartsGlActions {
+    /** Pauses the trail of a `lines3D` series. */
+    const val Lines3DPauseEffect: String = "lines3DPauseEffect"
+
+    /** Resumes the trail of a `lines3D` series. */
+    const val Lines3DResumeEffect: String = "lines3DResumeEffect"
+
+    /** Pauses the trail of a `lines3D` series when it moves, resumes it when it is paused. */
+    const val Lines3DToggleEffect: String = "lines3DToggleEffect"
 }

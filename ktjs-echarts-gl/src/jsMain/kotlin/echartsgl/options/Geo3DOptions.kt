@@ -19,6 +19,13 @@ external interface Geo3DOption : ShadingOption {
     /** Whether the component is shown; hiding it also hides the series drawn in it. */
     var show: Boolean?
 
+    /**
+     * Whether the regions ignore mouse picking.
+     *
+     * Upstream reads it from the component model to decide picking, but does not document it.
+     */
+    var silent: Boolean?
+
     /** z-level of the WebGL layer; it must not be shared with a canvas component. */
     var zlevel: Double?
 

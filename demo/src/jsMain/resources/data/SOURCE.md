@@ -17,6 +17,7 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `life-expectancy.json` | `data/` | `graph-life-expectancy` |
 | `life-expectancy-table.json` | `data/` | `dataset-encode1` |
 | `flights.json` | `data/` | `lines-airline` |
+| `gl/flights.json` | `data-gl/asset/data/` | `lines3d-airline-on-globe`, `lines3d-flights-on-geo3d` (17k routes, smaller than the 2D table) |
 | `nba-court.json` | `data/` | `custom-hexbin` |
 | `kawhi-leonard-16-17-regular.json` | `data/` | `custom-hexbin` |
 | `world.json` | `geo/` | `lines-airline`, `custom-wind`, `scatter-world-population` |

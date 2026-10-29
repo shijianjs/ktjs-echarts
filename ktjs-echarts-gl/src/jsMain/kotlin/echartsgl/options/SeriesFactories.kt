@@ -31,6 +31,15 @@ inline fun scatter3DSeries(block: Scatter3DSeriesOption.() -> Unit = {}): Scatte
     }
 
 /**
+ * Creates a [Lines3DSeriesOption] with `type = "lines3D"`.
+ */
+inline fun lines3DSeries(block: Lines3DSeriesOption.() -> Unit = {}): Lines3DSeriesOption =
+    unsafeJso {
+        type = EChartsGlSeriesTypes.lines3D
+        block()
+    }
+
+/**
  * Creates a [SurfaceSeriesOption] with `type = "surface"`.
  */
 inline fun surfaceSeries(block: SurfaceSeriesOption.() -> Unit = {}): SurfaceSeriesOption =

@@ -4,21 +4,28 @@ import echarts.AxisTypes
 import echarts.ECharts
 import echarts.options.DoubleOrDoubleArray
 import echarts.options.OptionDataValue
+import echarts.options.OptionDataValueOrArray
+import echarts.options.OptionId
 import echarts.options.SymbolShape
 import echarts.options.SymbolSize
 import echarts.options.StringOrDouble
 import echarts.options.one
 import echartsgl.options.Axis3DOption
 import echartsgl.options.EChartsGlOption
+import echartsgl.options.GlobeOption
 import echartsgl.options.Grid3DOption
 import echartsgl.options.Line3DDataItem
 import echartsgl.options.Line3DSeriesOption
+import echartsgl.options.Lines3DDataItem
+import echartsgl.options.Lines3DDataItemOption
+import echartsgl.options.Lines3DSeriesOption
 import echartsgl.options.RealisticMaterialOption
 import echartsgl.options.Scatter3DDataItem
 import echartsgl.options.Scatter3DSeriesOption
 import echartsgl.options.SurfaceFunction
 import echartsgl.options.SurfaceSeriesOption
 import echartsgl.options.line3DSeries
+import echartsgl.options.lines3DSeries
 import echartsgl.options.scatter3DSeries
 import echartsgl.options.surfaceSeries
 import js.objects.unsafeJso
@@ -33,6 +40,7 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import web.html.HTMLCanvasElement
 import web.html.HTMLElement
+import zrender.ZRColor
 
 /**
  * Tests the `line3D`, `scatter3D` and `surface` series.
@@ -75,6 +83,71 @@ class GlSeriesTest {
                 assertEquals(4.0, series.lineStyle!!.width)
                 assertEquals(CoordinateSystems3D.cartesian3D, series.typedCoordinateSystem)
                 assertEquals(3, series.typedData!!.size)
+                assertWebGlCanvas(container)
+            } finally {
+                destroyChart(chart, container)
+            }
+        }
+    }
+
+    /**
+     * A `lines3D` series is drawn on the globe; the trail effect is enabled and the style is read
+     * back from `getOption`.
+     */
+    @Test
+    fun lines3DSeriesOnGlobeRendersAGlLayer(): Promise<Unit> {
+        ECharts.use(arrayOf(Lines3DChart, GlobeComponent))
+        val (chart, container) = createChart()
+        chart.setOption(
+            unsafeJso<EChartsGlOption> {
+                globe = one(unsafeJso<GlobeOption> {})
+                series =
+                    one(
+                        lines3DSeries {
+                            typedCoordinateSystem = CoordinateSystems3D.globe
+                            typedBlendMode = GlBlendModes.lighter
+                            effect = unsafeJso { show = true; trailWidth = 2.0; trailLength = 0.2 }
+                            typedLineStyle =
+                                unsafeJso {
+                                    width = 0.0
+                                    color = GlColor(ZRColor("rgb(50, 50, 150)"))
+                                    opacity = 0.2
+                                }
+                            typedData =
+                                arrayOf<Lines3DDataItem?>(
+                                    Lines3DDataItem(arrayOf(arrayOf(0.0, 0.0), arrayOf(10.0, 20.0))),
+                                    Lines3DDataItem(
+                                        unsafeJso<Lines3DDataItemOption> {
+                                            name = OptionId("route")
+                                            typedValue = OptionDataValueOrArray(3.0)
+                                            coords = arrayOf(arrayOf(-74.0, 40.0), arrayOf(2.0, 48.0))
+                                            lineStyle = unsafeJso { width = 1.0 }
+                                        },
+                                    ),
+                                )
+                        },
+                    )
+            },
+        )
+        return nextFrames(2).then {
+            try {
+                val series = chart.getOption()
+                    .unsafeCast<EChartsGlOption>()
+                    .series!![0]
+                    .unsafeCast<Lines3DSeriesOption>()
+                assertEquals(EChartsGlSeriesTypes.lines3D, series.type)
+                assertEquals(CoordinateSystems3D.globe, series.typedCoordinateSystem)
+                assertEquals(GlBlendModes.lighter, series.typedBlendMode)
+                assertEquals(true, series.effect!!.show)
+                assertEquals(2.0, series.effect!!.trailWidth)
+                assertEquals(0.0, series.typedLineStyle!!.width)
+                assertEquals(0.2, series.typedLineStyle!!.opacity)
+                assertEquals(2, series.typedData!!.size)
+                val item = series.typedData!![1]!!
+                    .unsafeCast<Lines3DDataItemOption>()
+                assertEquals(OptionId("route"), item.name)
+                assertEquals(2, item.coords!!.size)
+                assertEquals(1.0, item.lineStyle!!.width)
                 assertWebGlCanvas(container)
             } finally {
                 destroyChart(chart, container)

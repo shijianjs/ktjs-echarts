@@ -71,6 +71,17 @@ class LiteralsTest {
     @Test
     fun seriesTypesMatchTheUpstreamNames() {
         assertEquals("bar3D", EChartsGlSeriesTypes.bar3D.unsafeCast<String>())
+        assertEquals("line3D", EChartsGlSeriesTypes.line3D.unsafeCast<String>())
+        assertEquals("scatter3D", EChartsGlSeriesTypes.scatter3D.unsafeCast<String>())
+        assertEquals("lines3D", EChartsGlSeriesTypes.lines3D.unsafeCast<String>())
+        assertEquals("surface", EChartsGlSeriesTypes.surface.unsafeCast<String>())
+    }
+
+    @Test
+    fun effectActionsMatchTheUpstreamNames() {
+        assertEquals("lines3DPauseEffect", EChartsGlActions.Lines3DPauseEffect)
+        assertEquals("lines3DResumeEffect", EChartsGlActions.Lines3DResumeEffect)
+        assertEquals("lines3DToggleEffect", EChartsGlActions.Lines3DToggleEffect)
     }
 
     @Test

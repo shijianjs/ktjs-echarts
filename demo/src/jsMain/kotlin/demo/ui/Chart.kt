@@ -37,6 +37,9 @@ class ChartHolder(
     /** Handlers created by [onResize] for the current instance; dropped on [unmount]. */
     private val resizeHandlers = mutableListOf<() -> Unit>()
 
+    /** Handlers created by [onUnmount], such as listeners on `window`; run by [unmount]. */
+    private val unmountHandlers = mutableListOf<() -> Unit>()
+
     /** Creates the chart instance and applies the example option. Idempotent. */
     fun mount() {
         if (instance != null) return
@@ -68,11 +71,23 @@ class ChartHolder(
         resizeHandlers.add(handler)
     }
 
+    /**
+     * Registers a handler that releases a resource the example owns, such as a listener on `window`.
+     *
+     * The page router replaces whole examples, so an example that subscribes outside its container
+     * has to undo it here; [unmount] runs the handlers before it disposes the instance.
+     */
+    fun onUnmount(handler: () -> Unit) {
+        unmountHandlers.add(handler)
+    }
+
     /** Disposes the chart instance; the container stays in the DOM. */
     fun unmount() {
         timers.forEach { kotlinx.browser.window.clearInterval(it); kotlinx.browser.window.clearTimeout(it) }
         timers.clear()
         resizeHandlers.clear()
+        unmountHandlers.forEach { it() }
+        unmountHandlers.clear()
         instance?.dispose()
         instance = null
     }

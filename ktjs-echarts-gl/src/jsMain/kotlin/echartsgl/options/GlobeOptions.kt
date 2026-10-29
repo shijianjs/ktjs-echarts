@@ -24,6 +24,13 @@ external interface GlobeOption : ShadingOption {
     /** Whether the globe is shown. */
     var show: Boolean?
 
+    /**
+     * Whether the globe ignores mouse picking.
+     *
+     * Upstream reads it from the component model to decide picking, but does not document it.
+     */
+    var silent: Boolean?
+
     /** z-level of the WebGL layer; it must not be shared with a canvas component. */
     var zlevel: Double?
 

@@ -91,7 +91,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **306 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **308 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -376,8 +376,8 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
 
 ## 3D 示例（echarts-gl）
 
-3D 家族在 `examples/Gl.kt`、`examples/GlScatter.kt`、`examples/GlSurfaceMaterial.kt` 与
-`examples/GlGeo.kt`，用的是
+3D 家族在 `examples/Gl.kt`、`examples/GlScatter.kt`、`examples/GlSurfaceMaterial.kt`、
+`examples/GlGeo.kt` 与 `examples/GlLines.kt`，用的是
 `ktjs-echarts-gl` 模块，写法与其它家族一样走 `Category.chart`；要先取数据文件的（`bar3d-dataset` 与三页
 `scatter3D`）走 `Category.interactive` + `loadJson`，要等图片加载的（`surface-leather`）走
 `Category.interactive` + `listen(LOAD)`：
@@ -389,8 +389,9 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   Mapbox GL / maptalks。
 - **option 类型用 `EChartsGlOption`**：它继承 `EChartsOption`，`tooltip` / `visualMap` / `dataset` 这些
   2D 组件照常写，`grid3D` / `xAxis3D` / `yAxis3D` / `zAxis3D` 与 `bar3DSeries { }` / `line3DSeries { }` /
-  `scatter3DSeries { }` / `surfaceSeries { }` 来自 `echartsgl.options`。四个工厂都只设 `type`，其余字段一律走
-  `typed*` 视图（`typedData` / `typedLabel` / `typedItemStyle` / `typedEmphasis` / `typedCoordinateSystem`）。
+  `scatter3DSeries { }` / `surfaceSeries { }` / `lines3DSeries { }` 来自 `echartsgl.options`。这些工厂都只设
+  `type`，其余字段一律走 `typed*` 视图（`typedData` / `typedLabel` / `typedItemStyle` / `typedEmphasis` /
+  `typedCoordinateSystem` / `typedLineStyle`）。
 - **标签照 2D 的扁平写法**：echarts-gl 2.1.0 用 ECharts 6 的 `createTextStyle` 排版，读的是
   `label.fontSize` / `label.color` 这些扁平属性（`GlLabelOption` 就是 `LabelOption` 的别名）。上游
   `backwardCompat` 只把 `axisLabel.textStyle` 展平，系列 label 不展平，所以不要再加一层 `textStyle`。
@@ -438,6 +439,13 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   `visualMap.inRange.symbolSize = [1, 10]` 与 `blendMode: "lighter"`；`globe-with-echarts-surface` 先用
   `ECharts.init(canvas, null, { width: 4096, height: 2048 })` 画一张 `map` 系列，再把**这个实例**作为
   `globe.baseTexture`。上游的 177 个国家值内联在示例里，与 `world-population.json` 相同，所以直接读文件。
+- **两条航线线在 `GlLines.kt`**：`lines3d-airline-on-globe` 与 `lines3d-flights-on-geo3d` 读
+  `data/gl/flights.json`（`data-gl` 那份 1.7 万条航线；2D 的 `lines-airline` 用 6.5 万条的
+  `data/flights.json`，两份表结构相同、内容不同），把每个航班的两个机场坐标拼成
+  `Lines3DDataItem([[...], [...]])`。地球页只有 `lineStyle` 一层淡色；geo3D 页给 `effect` 开拖尾，并在
+  `window` 上挂一个 `keydown` 监听，用 `dispatchAction(lines3DToggleEffect)` 暂停/继续——监听器交给
+  `ChartHolder.onUnmount` 释放，换页后不会再触到已销毁的实例。上游的 `geo3D.silent` 不在文档里，但
+  `echarts-gl` 核心会读它来关掉拾取，wrapper 已建模。
 - **`world.json` 的地名是缩写**：本站注册的 `geo/world.json` 写 `Czech Rep.` / `Korea` / `Dem. Rep. Congo`
   等，而 `world-population.json`（以及官方站点注册的 ECharts 4.9 世界地图）写全称，`GlGeo.kt` 的
   `worldRegionNames` 表把数据名翻回地图名，`geo3D` 的区域高度与地图系列都走它。`Kosovo` /

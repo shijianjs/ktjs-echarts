@@ -105,7 +105,7 @@ private fun regionName(name: String): String = worldRegionNames[name] ?: name
 /**
  * Registers `data/world.json` as the `world` map; resolves to the loaded GeoJSON.
  */
-private fun registerWorldMap(): Promise<JsAny> =
+internal fun registerWorldMap(): Promise<JsAny> =
     loadJson("data/world.json").then { world ->
         ECharts.registerMap(
             "world",

@@ -50,6 +50,7 @@ class Geo3DGlobeTest {
                     one(
                         unsafeJso<Geo3DOption> {
                             map = SQUARE_MAP
+                            silent = true
                             boxHeight = 8.0
                             boxDepth = DoubleOrAutos.auto
                             aspectScale = 0.8
@@ -68,6 +69,7 @@ class Geo3DGlobeTest {
                     .unsafeCast<EChartsGlOption>()
                     .geo3D!![0]
                 assertEquals(SQUARE_MAP, geo3D.map)
+                assertEquals(true, geo3D.silent)
                 assertEquals(8.0, geo3D.boxHeight)
                 assertEquals(DoubleOrAutos.auto, geo3D.boxDepth)
                 assertEquals(0.8, geo3D.aspectScale)
@@ -96,6 +98,7 @@ class Geo3DGlobeTest {
                 globe =
                     one(
                         unsafeJso<GlobeOption> {
+                            silent = true
                             baseColor = ZRColor("#123")
                             displacementScale = 0.05
                             displacementQuality = QualityTypes.medium
@@ -136,6 +139,7 @@ class Geo3DGlobeTest {
                 val globe = chart.getOption()
                     .unsafeCast<EChartsGlOption>()
                     .globe!![0]
+                assertEquals(true, globe.silent)
                 assertEquals(0.05, globe.displacementScale)
                 assertEquals(QualityTypes.medium, globe.displacementQuality)
                 assertEquals(true, globe.atmosphere!!.show)

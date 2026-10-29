@@ -675,12 +675,12 @@ class DemoPageTest {
     }
 
     /**
-     * The five pages of `GeoMaps.kt`, the five map tutorials of `DocMaps.kt` and the matrix map of
-     * `MatrixExtra.kt`.
+     * The five pages of `GeoMaps.kt`, the five map tutorials of `DocMaps.kt`, the five air-quality
+     * pages of `ChinaAqi.kt` and the matrix map of `MatrixExtra.kt`.
      *
-     * Each of them fetches its map (four GeoJSON files, the 1.7 MB China boundary, and a 3.7 MB SVG)
-     * and registers it before
-     * the first `setOption`, so the canvas stays blank until the request resolves: the painted-pixel
+     * Each of them fetches its map (four GeoJSON files, the 1.7 MB China boundary, and a 3.7 MB SVG);
+     * the China pages add the two city tables on top, and the canvas stays blank until the requests
+     * resolve, so the painted-pixel
      * wait is what proves the map reached the chart. `map-bar-morph` swaps its map and bar options
      * from a two-second timer, so a frame sampled after one tick must differ from the first one.
      */
@@ -705,6 +705,11 @@ class DemoPageTest {
                     "doc-example/map-visualMap-continuous-text",
                     "doc-example/map-visualMap-piecewise-text",
                     "doc-example/map-visualMap-pieces",
+                    "scatter-map",
+                    "effectScatter-map",
+                    "heatmap-map",
+                    "geo-map-scatter",
+                    "doc-example/scatter-visualMap-piecewise",
                 )
         ) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)

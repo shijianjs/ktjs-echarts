@@ -70,7 +70,7 @@
 
 ### demo
 
-- 官方清单 436 条：**已移植 376 页 / 377 条，明确不做 51，待补 8**。逐条清单、理由与维护方式见
+- 官方清单 436 条：**已移植 381 页 / 382 条，明确不做 51，待补 3**。逐条清单、理由与维护方式见
   [demo/COVERAGE.md](demo/COVERAGE.md)。
 - 跨页注意事项（含 GL）见 [demo/NOTES.md](demo/NOTES.md)；移植约定、各家族做法与可复用数据见
   [demo/AGENTS.md](demo/AGENTS.md)。
@@ -79,14 +79,12 @@
 
 ## 下一步
 
-按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进（8 条），建议顺序：
+按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进（3 条），建议顺序：
 
-1. **六页空气质量 / 迁徙图**（`doc-example/scatter-visualMap-piecewise`、`heatmap-map`、`geo-lines`、
-   `geo-map-scatter`、`scatter-map`、`effectScatter-map`）：地图侧已就绪（`china.json` 本轮入库），
-   缺的是上游内联在每个示例里的 `geoCoordMap`（364 个城市名 → `[lng, lat]`）。照 `rainfall-*.json` 的
-   先例用一次性脚本抽成 `data/geo-coord-map.json` 并登记 `data/SOURCE.md`，别让六份 Kotlin 各抄一遍。
-2. **两页微博**（`scatter-weibo`、`scattergl-weibo`）：`weibo.json` 在本地克隆
+1. **两页微博**（`scatter-weibo`、`scattergl-weibo`）：`weibo.json` 在本地克隆
    `public/data/asset/data/weibo.json`（773 KB），复制入库即可，无需网络。
+2. **`geo-lines`**：它内联的 `geoCoordMap` 只有 114 个城市，且与本轮入库的 190 城表坐标并不一致，
+   是上游另一份数据，不能复用 `geo-coord-map.json`；照同样的一次性脚本抽成单独一份文件再登记。
 
 新增/移植页面后跑 `node scripts/demo-coverage.mjs --write` 更新 COVERAGE。
 

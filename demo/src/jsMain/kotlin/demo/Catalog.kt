@@ -11,6 +11,7 @@ import demo.examples.canvasGraphicsEntries
 import demo.examples.candlestickEntries
 import demo.examples.candlestickLongTailEntries
 import demo.examples.chordEntries
+import demo.examples.chinaAqiEntries
 import demo.examples.customEntries
 import demo.examples.customHexbinEntries
 import demo.examples.customExtraEntries
@@ -271,6 +272,7 @@ val catalog: List<CatalogEntry> =
         docInteractiveEntries,
         scatterVisualMapCategoriesEntries,
         docMapsEntries,
+        chinaAqiEntries,
     ).flatten()
 
 private val catalogById: Map<String, CatalogEntry> = catalog.associateBy { it.id }

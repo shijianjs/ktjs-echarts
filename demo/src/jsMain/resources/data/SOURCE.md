@@ -33,7 +33,9 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `ch.geo.json` | `geo/` | `geo-graph`, `matrix-mini-bar-geo` |
 | `HK.json` | `geo/` | `map-HK`, `doc-example/map-visualMap-continuous-text`, `doc-example/map-visualMap-piecewise-text` |
 | `USA.json` | `geo/` | `map-usa`, `map-bar-morph`, `doc-example/map-visualMap-pieces` |
-| `china.json` | `apache/echarts` `test/data/map/js/china.js` | `doc-example/map-example` |
+| `china.json` | `apache/echarts` `test/data/map/js/china.js` | `doc-example/map-example`, `scatter-map`, `effectScatter-map`, `heatmap-map`, `geo-map-scatter`, `doc-example/scatter-visualMap-piecewise` |
+| `geo-coord-map.json` | derived from the example sources | the five China air-quality pages above (city name → `[lng, lat]`) |
+| `pm25-cities.json` | derived from the example sources | the same five pages (city name → pm2.5) |
 | `Sicily_prehellenic_topographic_map.svg` | `geo/` | `geo-svg-map` |
 | `Map_of_Iceland.svg` | `geo/` | `geo-svg-scatter-simple` |
 | `MacOdrum-LV5-floorplan-web.svg` | `geo/` | `geo-svg-lines` |
@@ -132,6 +134,15 @@ one-off script strips the `echarts.registerMap(...)` wrapper so the file is plai
 42 features, the 34 provinces plus 8 boundary lines, with `properties.name` carrying the official names
 (`北京市`, `内蒙古自治区`, `台湾省`, …). `DocMaps.kt` translates the short province names of the original
 example into those.
+
+`geo-coord-map.json` and `pm25-cities.json` are the two tables the five China air-quality pages inline.
+`scatter-map.js`, `effectScatter-map.ts`, `heatmap-map.js` and
+`doc-example/scatter-visualMap-piecewise.js` each carry their own copy of both, and a one-off script
+compared the four and found them identical, so `geo-coord-map.json` is the 190-entry `{ city: [lng, lat] }`
+object of `scatter-map.js` with its keys sorted and `pm25-cities.json` is its 190 `{ name, value }` rows in
+upstream order. `geo-map-scatter.js` inlines the same coordinate table but only 27 of its cities; those 27
+values are written in `ChinaAqi.kt` instead of becoming a third file. `geo-lines.js`, which is not ported
+yet, has a 114-city table of its own whose coordinates differ, so it will need a separate file.
 
 Files added here must keep the upstream name so the example source stays traceable to
 `public/data/asset/{data,geo}/<name>`.

@@ -91,7 +91,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 - 常用表：`resources/data/life-expectancy-table.json`、`nutrients.json`、`population.json`、
   `gl/flights.json`；地图：`world.json`（缩写地名，`GlGeo.kt` 的 `worldRegionNames` 负责翻译）、
   `world-population.json`、`USA.json`、`ch.geo.json`、`iceland.geo.json`、`china.json`（地名是官方
-  全称，`DocMaps.kt` 的 `chinaRegionNames` 负责把上游的简称翻过来）。
+  全称，`DocMaps.kt` 的 `chinaRegionNames` 负责把上游的简称翻过来）；空气质量：`geo-coord-map.json`
+  + `pm25-cities.json`（上游四页各抄一遍的同一份表，`ChinaAqi.kt` 共用）。
 - GL：11 色 `visualMap` 色带在 `Gl.kt` 的 `glPalette` / `glVisualMap()` 与 `GlSurfaceMaterial.kt` 的
   `surfaceRamp()`；HDR 环境图、皮革贴图、地球 / 月球 / 星空纹理在 `resources/data/img/gl/`，来源见
   `resources/data/SOURCE.md`。
@@ -354,6 +355,19 @@ lambda 里先 `ECharts.registerMap(name, MapInput(SVGMapInput))` 再返回 optio
 - 数据与区域**按名字精确匹配**，ECharts 不会去掉「市」「自治区」后缀。`china.json` 的地名是官方全称，
   上游示例写的是简称，所以 `chinaRegionNames` 显式翻译；`world.json` 同理，用 `GlGeo.kt` 的 `regionName`。
 
+空气质量五页在 `examples/ChinaAqi.kt`（`scatter-map` / `effectScatter-map` / `heatmap-map` /
+`geo-map-scatter` / `doc-example/scatter-visualMap-piecewise`）：前四页上游各抄了一遍 190 城坐标表与
+pm2.5 列，逐行比对完全一致，所以抽成 `data/geo-coord-map.json` + `data/pm25-cities.json` 共用，Kotlin 侧
+只留 `convertData`（按城市名取坐标，拼成 `[lng, lat, value]`）。两点要注意：
+
+- `geo-map-scatter` 用同一张坐标表但只列 27 城，这 27 个值写死在文件里，不再产出第三份 JSON；
+  `geo-lines` 的 114 城表坐标与这份不同，不能复用。
+- 坐标表是个纯 `{ 城市: [lng, lat] }` 对象，Kotlin 侧读不到 `Record` 的索引类型，所以用一个 `js()` 小
+  访问器 `coordOf(coords, name)` 取值，其余全走类型化的选项声明。
+- `china.json` 除 34 个省外还带 8 条名为 **`境界线`** 的线要素。ECharts 4 的老边界没有它们，所以凡是
+  `geo.label.show = true` 的页面（`geo-map-scatter`）都要在 `regions` 里把 `境界线` 的 label 关掉，
+  否则地图上会多出「境界线」几个字。
+
 dataset 家族的 `dataset-link` 补在 `examples/DatasetExtra.kt`：它监听 `updateAxisPointer` 把饼图的
 `encode.value` 换成指针所在的年份，上游该事件的 payload 类型是 `any`，所以 `axesInfo[0].value` 只能在
 demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首帧之后挂上，这里直接 `chart.on(...)`。
@@ -434,16 +448,14 @@ icon 数摆进日历格子，`renderItem` 用 `api.font()` 取字号、`linearMa
   `splitLine.show` / `axisLabel.show` 是裸 `Boolean`，只有 `axisLine.show` 是 `BooleanOrString`。
 - 两个 dataZoom（inside + 底部 slider）的 `minSpan = 5` 让视口最多缩到 5 个读数宽。
 
-`doc-example/` 里还没有移植的（上游 80 条 id、已落地 69 条，剩 11 条）。按原因分类：
+`doc-example/` 里还没有移植的（上游 80 条 id、已落地 70 条，剩 10 条）。按原因分类：
 
 - 图标是官方站的 PNG / base64 素材，按排除策略不做：`pictorialBar-graphicType`、
   `pictorialBar-patternSize`、`pictorialBar-repeatDirection`、`pictorialBar-repeatLayout`、
   `axisPointer-handle-image`；
 - 运行期远端脚本：`bar-media-timeline`（`$.getScript` 拉 `timelineGDP.js` 与 `draggable.js`）；
 - 真实指针漫游 + 官方站的 `app.config`：`geo-roam-indicator`、`graph-roam-indicator`；
-- 渲染器开关：`canvas-vs-svg`（含 `-en`），只有两张画布分别用 canvas / SVG 渲染器才有意义；
-- 唯一待补的是 `scatter-visualMap-piecewise`（系列用 `coordinateSystem: 'geo'`）：地图侧已经就绪
-  （`china.json` 已入库），缺的是上游内联的 364 城市坐标表，见 `todo.md`。
+- 渲染器开关：`canvas-vs-svg`（含 `-en`），只有两张画布分别用 canvas / SVG 渲染器才有意义。
 
 `doc-example/` 之外的数据页也按「先拷数据再做」推进：`sankey-energy` / `sankey-levels` /
 `sankey-nodeAlign-left` / `-right` 用 `energy.json` 与 `product.json`，`confidence-band` 用

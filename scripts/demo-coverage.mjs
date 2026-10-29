@@ -167,7 +167,8 @@ const PENDING = [
         title: '缺示例自带的数据',
         reason:
             '地图本身（china / world / USA / Iceland / 瑞士 / HK / SVG）都已入库；剩下的缺示例自带的数据：' +
-            '六页要上游内联的 364 城市坐标表，两页要 `weibo.json`（本地克隆里有）。',
+            '`geo-lines` 要它自己那份 114 城市坐标表（与空气质量五页共用的 190 城表不同），' +
+            '两页要 `weibo.json`（本地克隆里有）。',
         ids: [
             'doc-example/map-example',
             'doc-example/map-visualMap-continuous',

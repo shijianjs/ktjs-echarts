@@ -42,6 +42,11 @@
   `document` 上的监听在 `onUnmount` 里移除，否则换页后还会触到已销毁的实例。
 - **改源码用 UTF-8 工具**：PowerShell 的 `Set-Content` 会按 ANSI 落盘、写坏中文，批量改写用 Node / Python。
 - **静态数据**：放 `resources/data/`，在 `SOURCE.md` 记来源与使用者；文件名保持上游的，方便和示例源码对照。
+- **坐标轴 label 的 `formatter` 收到的是刻度值本身**：类目轴给类目字符串、数值轴给数字，不是
+  `CallbackDataParams`。wrapper 按上游的泛型签名统一成后者，所以回调里要把参数直接当值用
+  （`textOf(params)` / `numeric(params)`），写 `params.value` 会拿到 `undefined`。
+- **emoji 国旗在 Windows 上不渲染**：系统字体不带国旗字形，`{flag|<国旗>}` 画出来是 `NZ` 这样两个
+  大写字母。截图与肉眼检查看到这种结果是平台限制，不是移植错误（`bar-race-country`）。
 
 ## GL / WebGL
 

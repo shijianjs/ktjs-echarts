@@ -4,6 +4,7 @@ import demo.examples.barDrilldownEntries
 import demo.examples.barEntries
 import demo.examples.barExtraEntries
 import demo.examples.barLongTailEntries
+import demo.examples.barRaceCountryEntries
 import demo.examples.boxplotEntries
 import demo.examples.calendarEntries
 import demo.examples.canvasGraphicsEntries
@@ -181,6 +182,7 @@ val catalog: List<CatalogEntry> =
         barExtraEntries,
         barLongTailEntries,
         barDrilldownEntries,
+        barRaceCountryEntries,
         financeTimelineEntries,
         richTextEntries,
         extraPagesEntries,

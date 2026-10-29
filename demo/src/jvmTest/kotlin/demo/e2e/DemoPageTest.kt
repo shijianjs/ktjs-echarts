@@ -610,6 +610,15 @@ class DemoPageTest {
         page.waitForTimeout(3600.0)
         val after = paintedFrame(page)
         assertTrue(before != after, "bar-race did not repaint after its timer tick")
+        // `bar-race-country` is the same shape with a fetched table: the first year comes from the
+        // file and every later year is a timer, so two seconds of that race repaint the canvas too.
+        page.evaluate("(value) => { location.hash = '#/' + value }", "bar-race-country")
+        assertChartRendered(page, "bar-race-country")
+        waitForPainted(page, "bar-race-country")
+        val raceBefore = paintedFrame(page)
+        page.waitForTimeout(4000.0)
+        val raceAfter = paintedFrame(page)
+        assertTrue(raceBefore != raceAfter, "bar-race-country did not advance to the next year")
         assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
     }
 

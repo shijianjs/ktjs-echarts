@@ -109,8 +109,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后落地 **369 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
-的官方清单统计，共 436 条：已移植 370 条，明确不做 51 条，待补 15 条；逐条清单与理由见
+筛选后落地 **370 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
+的官方清单统计，共 436 条：已移植 371 条，明确不做 51 条，待补 14 条；逐条清单与理由见
 [COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -257,6 +257,13 @@ bar 家族的计算长尾在 `examples/BarLongTail.kt`：归一化堆叠（`bar-
 `mix-zoom-on-value`（`examples/BarExtra.kt`）与文档页 `bar-dataZoom-filterMode` 是同一张预算图的两个
 变体：多出 axis 型 tooltip、`magicType` 的 line/bar 切换与纵向滑杆，三者都靠 dataZoom 完成；上游根级
 `calculable: true` 是 ECharts 6 已不读的老字段，去掉。
+
+`bar-race-country`（`examples/BarRaceCountry.kt`）是 bar 家族的年度轮播：19 国人均收入每 2 秒换一年，
+`realtimeSort` 重排 y 轴，国家名后面用 `rich.flag` 拼 emoji 国旗，柱色取该国旗主色的固定表。国旗数据是
+npm 包 `emoji-flags@1.3.0` 的 `data.json`，上游走 CDN，这里入库成 `data/emoji-flags.json`（见 `SOURCE.md`
+里唯一的非 Apache 素材例外）。两个坑：上游遍历年份时把表头行也算作一个「年」，所以 `startIndex = 10`
+落在 1890，先 `slice(1)` 会让整场比赛提前十年；Windows 浏览器不带国旗字形，emoji 会显示成两个大写字母，
+这是平台限制，不是移植错误。
 
 `line-race`（`examples/LineExtra.kt`）复用 `DatasetExtra.kt` 的 `filteredSince1950`：八个国家各一个
 filter 数据集，线尾的 `endLabel` 用 `params.value[3] + ': ' + params.value[0]` 拼「国家: 年份」，重叠

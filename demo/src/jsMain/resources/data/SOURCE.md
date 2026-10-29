@@ -17,7 +17,8 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `ec-option-doc-statistics-201604.json` | `data/` | `treemap-drill-down` |
 | `echarts-package-size.json` | `data/` | `treemap-sunburst-transition` |
 | `life-expectancy.json` | `data/` | `graph-life-expectancy`, `scatter-life-expectancy-timeline` |
-| `life-expectancy-table.json` | `data/` | `dataset-encode1` |
+| `life-expectancy-table.json` | `data/` | `dataset-encode1`, `data-transform-filter`, `line-race`, `bar3d-dataset`, `scatter3d-scatter`, `scatter3D-dataset`, `bar-race-country` |
+| `emoji-flags.json` | npm `emoji-flags@1.3.0` | `bar-race-country` (the emoji of a country name) |
 | `les-miserables.json` | `data/` | `graph`, `graph-circular-layout`, `graph-force`, `graph-label-overlap` |
 | `npmdepgraph.min10.json` | `data/` | `graph-npm` |
 | `webkit-dep.json` | `data/` | `graph-webkit-dep` |
@@ -113,6 +114,13 @@ site should carry, so the repository ships 8 and 20 chunks of 7.7 MB each: 922,9
 and 1,000,000 GPS points. Neither split is a spatial tiling — the street chunks share one bounding
 box and the GPS chunks are one random sample of the world — so the pages show the same geography as
 upstream, only sparser, and `scatterGL-gps` titles itself after the points it actually draws.
+
+`emoji-flags.json` is the one file that is **not** from the Apache examples site: `bar-race-country`
+loads the flags from the `emoji-flags@1.3.0` npm package (MIT,
+<https://github.com/matiassingers/emoji-flags>) through its CDN, so the `data.json` of that package is
+vendored here instead. The port reads only `name` and `emoji`; all 251 records are kept, because the
+country column of the life-expectancy table is matched by name and every one of its 19 countries has
+a flag.
 
 Files added here must keep the upstream name so the example source stays traceable to
 `public/data/asset/{data,geo}/<name>`.

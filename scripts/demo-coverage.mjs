@@ -322,6 +322,11 @@ function render(official2d, officialGl, routes, result) {
     lines.push('')
     lines.push(`## 待补（${pendingCount}）`)
     for (const group of result.pending) {
+        // A category the ports have since emptied leaves nothing to read, so it is dropped rather
+        // than rendered as a header over an empty table.
+        if (group.ids.length === 0) {
+            continue
+        }
         lines.push('')
         lines.push(`### ${group.title}（${group.ids.length}）`)
         lines.push('')

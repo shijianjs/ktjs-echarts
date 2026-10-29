@@ -64,7 +64,7 @@
 
 ### demo
 
-- 官方清单 436 条：**已移植 369 页 / 370 条，明确不做 51，待补 15**。逐条清单、理由与维护方式见
+- 官方清单 436 条：**已移植 370 页 / 371 条，明确不做 51，待补 14**。逐条清单、理由与维护方式见
   [demo/COVERAGE.md](demo/COVERAGE.md)。
 - 跨页注意事项（含 GL）见 [demo/NOTES.md](demo/NOTES.md)；移植约定、各家族做法与可复用数据见
   [demo/AGENTS.md](demo/AGENTS.md)。
@@ -73,15 +73,14 @@
 
 ## 下一步
 
-按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进（15 条），建议顺序：
+按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进（14 条），建议顺序：
 
 1. **补 `china.json`**（一次解锁 13 条）：`doc-example/map-example`、四个 `doc-example/map-visualMap-*`、
    `doc-example/scatter-visualMap-piecewise`、`heatmap-map`、`geo-lines`、`geo-map-scatter`、`scatter-map`、
    `effectScatter-map`、`scatter-weibo`、`scattergl-weibo`。本地克隆里没有 `china.json`（上游地图数据早已
    外置，`echarts/map/js` 也没有），要么从官方站点下载一次并登记到 `data/SOURCE.md`，要么改注册
    `world.json` / 其他已入库地图的等价页面——先确认数据来源再动手。
-2. **补静态数据**（1 条）：`bar-race-country` 要 emoji-flags CDN 数据。
-3. **先补 wrapper 再做**（1 条）：`doc-example/scatter-visualMap-categories` 需要按类目索引的 `visualMap`
+2. **先补 wrapper 再做**（1 条）：`doc-example/scatter-visualMap-categories` 需要按类目索引的 `visualMap`
    字典与 `left: null`。
 
 新增/移植页面后跑 `node scripts/demo-coverage.mjs --write` 更新 COVERAGE。

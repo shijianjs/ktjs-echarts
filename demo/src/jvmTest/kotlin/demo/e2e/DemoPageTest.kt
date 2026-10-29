@@ -281,6 +281,8 @@ class DemoPageTest {
                 "globe-with-echarts-surface",
                 "lines3d-airline-on-globe",
                 "lines3d-flights-on-geo3d",
+                "bar3d-global-population",
+                "global-population-bar3d-on-globe",
             )
         for (route in routes) {
             assertChartRendered(page, route)

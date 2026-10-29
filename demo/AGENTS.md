@@ -91,7 +91,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **308 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **310 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -377,7 +377,7 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
 ## 3D 示例（echarts-gl）
 
 3D 家族在 `examples/Gl.kt`、`examples/GlScatter.kt`、`examples/GlSurfaceMaterial.kt`、
-`examples/GlGeo.kt` 与 `examples/GlLines.kt`，用的是
+`examples/GlGeo.kt`、`examples/GlLines.kt` 与 `examples/GlBarGeo.kt`，用的是
 `ktjs-echarts-gl` 模块，写法与其它家族一样走 `Category.chart`；要先取数据文件的（`bar3d-dataset` 与三页
 `scatter3D`）走 `Category.interactive` + `loadJson`，要等图片加载的（`surface-leather`）走
 `Category.interactive` + `listen(LOAD)`：
@@ -439,6 +439,14 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   `visualMap.inRange.symbolSize = [1, 10]` 与 `blendMode: "lighter"`；`globe-with-echarts-surface` 先用
   `ECharts.init(canvas, null, { width: 4096, height: 2048 })` 画一张 `map` 系列，再把**这个实例**作为
   `globe.baseTexture`。上游的 177 个国家值内联在示例里，与 `world-population.json` 相同，所以直接读文件。
+- **`bar3D` 立在地理坐标系上（`GlBarGeo.kt`）**：`bar3d-global-population` 与
+  `global-population-bar3d-on-globe` 复用同一份 `population.json`，把每格人口取平方根当柱高，
+  柱宽用 `barSize`（上游只从 `bar3DLayout` 读、文档没写，`geo3D` / `globe` 下还会再除以坐标系的
+  `getScale() / 16`，所以不是数据单位）。两页的系列都写了橙色 `itemStyle.color`，但只有地球页真的
+  是橙的：那里 `visualMap` 只映射 `colorLightness`；`geo3D` 页的 `visualMap.inRange.color` 会被写进
+  `itemStyle.color`（`visualStyleAccessPath`），橙色被 11 色带顶掉——与官方页一致，别把它「修」回来。
+  `geo3D` 页的取景（`distance: 50`，默认 `alpha` / `beta`）本身就很低、地图上缘被裁掉，上游渲染同样
+  如此，不是移植错误。
 - **两条航线线在 `GlLines.kt`**：`lines3d-airline-on-globe` 与 `lines3d-flights-on-geo3d` 读
   `data/gl/flights.json`（`data-gl` 那份 1.7 万条航线；2D 的 `lines-airline` 用 6.5 万条的
   `data/flights.json`，两份表结构相同、内容不同），把每个航班的两个机场坐标拼成

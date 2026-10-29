@@ -4,6 +4,7 @@ import echarts.AxisNameLocations
 import echarts.AxisTypes
 import echarts.ECharts
 import echarts.options.AxisMinMax
+import echarts.options.DoubleOrDoubleArray
 import echarts.options.OptionDataValue
 import echarts.options.one
 import echartsgl.options.Axis3DOption
@@ -134,6 +135,7 @@ class Bar3DSeriesTest {
                         bar3DSeries {
                             bevelSize = 0.3
                             bevelSmoothness = 4.0
+                            barSize = DoubleOrDoubleArray(arrayOf(0.2, 0.4))
                             minHeight = 2.0
                             onGridPlane = GridPlaneTypes.xz
                             shading = ShadingTypes.lambert
@@ -154,6 +156,10 @@ class Bar3DSeriesTest {
             assertEquals(EChartsGlSeriesTypes.bar3D, series.type)
             assertEquals(0.3, series.bevelSize)
             assertEquals(4.0, series.bevelSmoothness)
+            val barSize = series.barSize!!.unsafeCast<Array<Double>>()
+            assertEquals(2, barSize.size)
+            assertEquals(0.2, barSize[0])
+            assertEquals(0.4, barSize[1])
             assertEquals(2.0, series.minHeight)
             assertEquals(GridPlaneTypes.xz, series.onGridPlane)
             assertEquals(ShadingTypes.lambert, series.shading)

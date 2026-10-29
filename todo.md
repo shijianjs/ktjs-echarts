@@ -13,7 +13,7 @@
   - `S:\workspace\github\ecomfe\echarts-gl`（GL 的 `defaultOption` 与视图实现）
   - `S:\workspace\github\JetBrains\kotlin-wrappers`（写法参考）
 - 锁定版本：根 `package.json`（`echarts` 6.1.0、`echarts-gl` 2.1.0）；修订号在
-  `wrapper-revisions.properties`（当前 `ktjs-echarts=4`、`ktjs-echarts-gl=5`）。
+  `wrapper-revisions.properties`（当前 `ktjs-echarts=4`、`ktjs-echarts-gl=6`）。
 - 验证：`./gradlew build`（含 detekt）、`:ktjs-echarts:jsBrowserTest`、`:ktjs-echarts-gl:jsBrowserTest`、
   `:demo:e2eTest`。
 
@@ -35,30 +35,31 @@
   是基类型的子接口，调用方 `unsafeJso<精确类型> { }` 即可写，读回来按需 `unsafeCast`。
 - `coordinateSystem` 等关键字收窄、继承来的 `var` 收窄沿用 `@JsName` 同名字段（`TYPE-MAPPING.md` §12）。
 
-### ktjs-echarts-gl（2.1.0-kt.5）
+### ktjs-echarts-gl（2.1.0-kt.6）
 
 - 已建模：`grid3D` / `xAxis3D|yAxis3D|zAxis3D`、`geo3D`、`globe`、`viewControl`、`light`、`postEffect`、
   shading 与材质，`bar3D` / `line3D` / `scatter3D` / `surface` / `lines3D` 五个系列的选项、数据项联合与工厂
   （`*Series { }`），字面量（坐标系统、shading、投影、blendMode、`onGridPlane`、鼠标键、画质、globe 图层
   类型与混合目标、`lines3D` 的 pause/resume/toggle 动作名）。`geo3D` / `globe` 补了核心会读但文档没写的
-  `silent`。
+  `silent`，`bar3D` 补了同样只有源码会读的 `barSize`。
 - 安装器齐全（`Bar3DChart`、`Line3DChart`、`Scatter3DChart`、`SurfaceChart`、`GlobeComponent`…）；
   `echarts-gl` 的 `sideEffects` 列不全，安装器 getter 里读取 `echarts-gl/lib/echarts-gl.js` 来加载核心模块。
 - 缺：`mapbox3D`、`maptalks3D`、`polygons3D`、`map3D`、`scatterGL`、`graphGL`、`flowGL`、`linesGL`
   的选项类型（这些页面本身也多半需要地图数据或外部 JS）。
 
-### demo（308 个示例 / 27 个家族）
+### demo（310 个示例 / 27 个家族）
 
 - 各家族基本铺满；剩下的候选要么需要真实键鼠序列，要么需要外部 JS / GeoJSON / 图片素材
   （原因见 `demo/AGENTS.md`）。
-- `gl` 分组共 29 页：`examples/Gl.kt`（`bar3d-punch-card`、`transparent-bar3d`、`bar3d-dataset`、
+- `gl` 分组共 31 页：`examples/Gl.kt`（`bar3d-punch-card`、`transparent-bar3d`、`bar3d-dataset`、
   `line3d-orthographic`、`simple-surface`、`sphere-parametric-surface`、`surface-wave`、
   `image-surface-sushuang`）、`examples/GlScatter.kt`（`scatter3d`、`scatter3d-scatter`、
   `scatter3D-dataset`）、`examples/GlSurfaceMaterial.kt`（`metal-surface`、`surface-breather`、
   `surface-mollusc-shell`、`surface-golden-rose`、`surface-theme-roses`、`parametric-surface-rose`、
   `surface-leather`）、`examples/GlGeo.kt`（`geo3d`、`geo3d-with-different-height`、六页 `globe-*`、
-  `scatter3d-globe-population`）与 `examples/GlLines.kt`（`lines3d-airline-on-globe`、
-  `lines3d-flights-on-geo3d`）；`main()` 的 `useEChartsGl()` 注册 `Bar3DChart` / `Line3DChart` /
+  `scatter3d-globe-population`）、`examples/GlLines.kt`（`lines3d-airline-on-globe`、
+  `lines3d-flights-on-geo3d`）与 `examples/GlBarGeo.kt`（`bar3d-global-population`、
+  `global-population-bar3d-on-globe`）；`main()` 的 `useEChartsGl()` 注册 `Bar3DChart` / `Line3DChart` /
   `Lines3DChart` / `Scatter3DChart` / `SurfaceChart` / `Grid3DComponent` / `Geo3DComponent` /
   `GlobeComponent`。
 - 可复用数据：`punchCardValues` / `punchCardHours` / `punchCardDays`（`CustomExtra.kt`）、
@@ -72,12 +73,14 @@
 
 ## 下一步（GL 横向铺开）
 
-1. **把 `bar3D` 铺到地理坐标系**：`bar3d-global-population` 与 `global-population-bar3d-on-globe` 用
-   `population.json`（已有）+ `geo3D` / `globe` 的 `bar3D`（`barSize`、按值取色的 `itemStyle.color`
-   回调），顺带补 `stacked-bar3d` / `metal-bar3d`（`grid3D` 已有）。
-2. **暂不做**：`animating-contour-on-globe`（d3-array/contour/geo/timer）、`*-simplex-noise`（需要
-   `simplex-noise` 外部库）、`*-mapbox*` / `*-maptalks*`（页面要额外加载地图 JS）、`iron-globe` 一类依赖
-   官方站点 `/asset/get/s/` 纹理的示例。
+1. **把 `lines3D` / `bar3D` 的剩余数据页铺开**：先看 `lines3d-flights` / `lines3d-flights-gl`（同一份
+   `flights.json`，只是效果不同）、`lines3d-taxi-routes-of-cape-town`、`scatter3d-orthographic`、
+   `bar3d-shanghai` / `scatter3d-shanghai`，按「现有数据 + 现有系列类型」优先；需要新 GeoJSON 或二进制
+   数据的先确认体积再决定。
+2. **暂不做**：`animating-contour-on-globe`（d3-array/contour/geo/timer）、`*-simplex-noise` 与
+   `stacked-bar3d` / `metal-bar3d`（都从 CDN 取 `simplex-noise` 生成数据，`metal-bar3d` 还要 `pisa.hdr`）、
+   `*-mapbox*` / `*-maptalks*`（页面要额外加载地图 JS）、`iron-globe` 一类依赖官方站点 `/asset/get/s/`
+   纹理的示例。
 
 ## 仍然生效的坑
 
@@ -100,6 +103,9 @@
   状态写法。
 - `geo3D` 的 `regions[].height` 才是单个区域的高度，文档里的 `regionHeight` 是整幅地图的默认高度；
   `aspectScale` 与 `debug.wireframe` 没写进文档但会被读取。
+- `bar3D` 的 `barSize` 同样文档没写（只在 `bar3DLayout` 里读），`geo3D` / `globe` 下还会再除以
+  `getScale() / 16`，所以不是数据单位。`visualMap.inRange.color` 会写进系列的 `itemStyle.color`
+  （`visualStyleAccessPath`），系列上写死的颜色被色带顶掉；只映射 `colorLightness` 时才保留原色。
 - `Geo3DBuilder` 构造时会给**所有** shading 建一份地面材质，包括 `"shadow"`（映射到
   `ecgl.displayShadow`）；上游只从 mapbox3D / maptalks3D 视图注册那两个 chunk，所以 wrapper 在
   `Geo3DComponent` getter 里自己注册，否则每个 `geo3D` 页面刷 4 条 missing-shader 错误。

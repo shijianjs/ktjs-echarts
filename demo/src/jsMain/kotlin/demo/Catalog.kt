@@ -26,6 +26,7 @@ import demo.examples.gaugeEntries
 import demo.examples.geoExtraEntries
 import demo.examples.gaugeExtraEntries
 import demo.examples.gaugeLongTailEntries
+import demo.examples.glBarGeoEntries
 import demo.examples.glEntries
 import demo.examples.glGeoEntries
 import demo.examples.glLinesEntries
@@ -214,6 +215,7 @@ val catalog: List<CatalogEntry> =
         sankeyEntries,
         themeRiverEntries,
         glEntries,
+        glBarGeoEntries,
         glGeoEntries,
         glLinesEntries,
         glScatterEntries,

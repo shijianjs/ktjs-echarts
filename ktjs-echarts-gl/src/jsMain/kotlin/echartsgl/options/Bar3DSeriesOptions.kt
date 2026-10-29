@@ -1,5 +1,6 @@
 package echartsgl.options
 
+import echarts.options.DoubleOrDoubleArray
 import echarts.options.OptionDataItemObject
 import echarts.options.OptionDataValue
 import echarts.options.OptionDataValueOrArray
@@ -90,6 +91,15 @@ external interface Bar3DSeriesOption : SeriesOption, ShadingOption {
 
     /** Smoothness of the bevel; a larger value gives a rounder edge. */
     var bevelSmoothness: Double?
+
+    /**
+     * Width and depth of a bar, either one value for both or `[width, depth]`.
+     *
+     * Upstream reads it from the model but does not document it (`bar3DLayout`). When it is not
+     * set, the size is derived from the extent and the density of the data; in `geo3D` and `globe`
+     * the value is divided by the scale of the coordinate system, so it is not in data units.
+     */
+    var barSize: DoubleOrDoubleArray?
 
     /** Stack group name; bars of the same group stack along the value dimension. */
     var stack: String?

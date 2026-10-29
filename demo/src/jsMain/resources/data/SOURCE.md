@@ -62,7 +62,7 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `img/gl/world.topo.bathy.200401.jpg` | `data-gl/asset/` | `globe-echarts-gl-hello-world` (base and height texture) |
 | `img/gl/bathymetry_bw_composite_4k.jpg` | `data-gl/asset/` | `globe-displacement`, `globe-layers` (displacement / height texture) |
 | `world-population.json` | `data-gl/asset/data/` | `geo3d-with-different-height` (region heights), `globe-with-echarts-surface` (map values) |
-| `population.json` | `data-gl/asset/data/` | `scatter3d-globe-population` (`[lng, lat, population]` cells) |
+| `population.json` | `data-gl/asset/data/` | `scatter3d-globe-population`, `bar3d-global-population`, `global-population-bar3d-on-globe` (`[lng, lat, population]` cells) |
 
 The two `rainfall-*.json` files are **derived**, not copied: upstream keeps these 3079-point series
 inline in `examples/ts/grid-multiple.ts` and `examples/ts/area-rainfall.ts`, so a one-off script split

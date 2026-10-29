@@ -164,8 +164,10 @@ const PENDING = [
         ],
     },
     {
-        title: '缺地图数据（GeoJSON / SVG / 二进制轨迹）',
-        reason: '先补地图文件并 registerMap；部分数据（USA / Iceland / 瑞士 / world / ch.geo）已经在仓库里。',
+        title: '缺示例自带的数据',
+        reason:
+            '地图本身（china / world / USA / Iceland / 瑞士 / HK / SVG）都已入库；剩下的缺示例自带的数据：' +
+            '六页要上游内联的 364 城市坐标表，两页要 `weibo.json`（本地克隆里有）。',
         ids: [
             'doc-example/map-example',
             'doc-example/map-visualMap-continuous',

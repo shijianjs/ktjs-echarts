@@ -90,7 +90,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
   `budgetAxisLabel()` 在 `examples/DocInteractive.kt`；`mix-zoom-on-value` 复用它们。
 - 常用表：`resources/data/life-expectancy-table.json`、`nutrients.json`、`population.json`、
   `gl/flights.json`；地图：`world.json`（缩写地名，`GlGeo.kt` 的 `worldRegionNames` 负责翻译）、
-  `world-population.json`、`USA.json`、`ch.geo.json`、`iceland.geo.json`。
+  `world-population.json`、`USA.json`、`ch.geo.json`、`iceland.geo.json`、`china.json`（地名是官方
+  全称，`DocMaps.kt` 的 `chinaRegionNames` 负责把上游的简称翻过来）。
 - GL：11 色 `visualMap` 色带在 `Gl.kt` 的 `glPalette` / `glVisualMap()` 与 `GlSurfaceMaterial.kt` 的
   `surfaceRamp()`；HDR 环境图、皮革贴图、地球 / 月球 / 星空纹理在 `resources/data/img/gl/`，来源见
   `resources/data/SOURCE.md`。
@@ -344,6 +345,15 @@ lambda 里先 `ECharts.registerMap(name, MapInput(SVGMapInput))` 再返回 optio
   `center` 只覆盖数组分支，标量分支是 `typedCenter`（`@JsName("center")`，与 `center` 同一属性）。
   传 `arrayOf("Vestfirðir")` 会被当成 `x = "Vestfirðir"`，饼会静默消失。
 
+文档示例里的五个地图页在 `examples/DocMaps.kt`，它们复用 `GeoMaps.kt` 的 `registerGeojsonMap` /
+`mapData` / `HK_DENSITY` / `hkNameMap` / `usaSpecialAreas`（因此这些是 `internal`）与 `GlGeo.kt` 的
+`registerWorldMap` / `regionName` / `WorldPopulationItem`。两个坑：
+
+- 上游五页都写 `mapType: 'china'` 之类的 **`mapType`**，ECharts 5 起这个键没人读了（`MapSeries.getMapType()`
+  读的是 `map`），照抄会得到一张空白画布；移植统一改成 `map`。
+- 数据与区域**按名字精确匹配**，ECharts 不会去掉「市」「自治区」后缀。`china.json` 的地名是官方全称，
+  上游示例写的是简称，所以 `chinaRegionNames` 显式翻译；`world.json` 同理，用 `GlGeo.kt` 的 `regionName`。
+
 dataset 家族的 `dataset-link` 补在 `examples/DatasetExtra.kt`：它监听 `updateAxisPointer` 把饼图的
 `encode.value` 换成指针所在的年份，上游该事件的 payload 类型是 `any`，所以 `axesInfo[0].value` 只能在
 demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首帧之后挂上，这里直接 `chart.on(...)`。
@@ -424,20 +434,16 @@ icon 数摆进日历格子，`renderItem` 用 `api.font()` 取字号、`linearMa
   `splitLine.show` / `axisLabel.show` 是裸 `Boolean`，只有 `axisLine.show` 是 `BooleanOrString`。
 - 两个 dataZoom（inside + 底部 slider）的 `minSpan = 5` 让视口最多缩到 5 个读数宽。
 
-`doc-example/` 里还没有移植的（上游 80 个文件 = 79 个 `.js` + 1 个 `.ts`、已按 `doc-example/` id 落地
-65 个、`bar-large` / `pie-highlight` 按家族 id 落地，剩 13 条）。按原因分类：
+`doc-example/` 里还没有移植的（上游 80 条 id、已落地 69 条，剩 11 条）。按原因分类：
 
 - 图标是官方站的 PNG / base64 素材，按排除策略不做：`pictorialBar-graphicType`、
   `pictorialBar-patternSize`、`pictorialBar-repeatDirection`、`pictorialBar-repeatLayout`、
   `axisPointer-handle-image`；
 - 运行期远端脚本：`bar-media-timeline`（`$.getScript` 拉 `timelineGDP.js` 与 `draggable.js`）；
-- 地图与 `geo`：`map-example`、`map-visualMap-continuous`、`map-visualMap-continuous-text`、
-  `map-visualMap-pieces`、`map-visualMap-piecewise-text`、`scatter-visualMap-piecewise`（系列用
-  `coordinateSystem: 'geo'`）、`geo-roam-indicator`，都等 `china.json`；
-- 真实指针漫游 + 官方站的 `app.config`：`graph-roam-indicator`；
-- 下一批的可移植项：`scatter-visualMap-categories`（内联 dataset + 两个 `visualMap`，但
-  `inRange.symbol` / `outOfRange.symbolSize` 是按类目索引的字典、`left: null`，要先放宽 wrapper）、
-  `canvas-vs-svg`（含 `-en`，只有两张画布分别用 canvas / SVG 渲染器才有意义，要先给站点加渲染器开关）。
+- 真实指针漫游 + 官方站的 `app.config`：`geo-roam-indicator`、`graph-roam-indicator`；
+- 渲染器开关：`canvas-vs-svg`（含 `-en`），只有两张画布分别用 canvas / SVG 渲染器才有意义；
+- 唯一待补的是 `scatter-visualMap-piecewise`（系列用 `coordinateSystem: 'geo'`）：地图侧已经就绪
+  （`china.json` 已入库），缺的是上游内联的 364 城市坐标表，见 `todo.md`。
 
 `doc-example/` 之外的数据页也按「先拷数据再做」推进：`sankey-energy` / `sankey-levels` /
 `sankey-nodeAlign-left` / `-right` 用 `energy.json` 与 `product.json`，`confidence-band` 用

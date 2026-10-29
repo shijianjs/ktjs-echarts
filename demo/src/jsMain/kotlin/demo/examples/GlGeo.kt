@@ -62,7 +62,7 @@ import zrender.ZRColor
 private val glGeo = Category(Groups.GL, "examples/GlGeo.kt")
 
 /** One row of `world-population.json`. */
-private external interface WorldPopulationItem {
+internal external interface WorldPopulationItem {
     val name: String
     val value: Double
 }

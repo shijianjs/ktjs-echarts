@@ -31,8 +31,9 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `winds.json` | `data-gl/asset/data/` | `custom-wind` |
 | `iceland.geo.json` | `geo/` | `geo-choropleth-scatter`, `map-iceland-pie` |
 | `ch.geo.json` | `geo/` | `geo-graph`, `matrix-mini-bar-geo` |
-| `HK.json` | `geo/` | `map-HK` |
-| `USA.json` | `geo/` | `map-usa`, `map-bar-morph` |
+| `HK.json` | `geo/` | `map-HK`, `doc-example/map-visualMap-continuous-text`, `doc-example/map-visualMap-piecewise-text` |
+| `USA.json` | `geo/` | `map-usa`, `map-bar-morph`, `doc-example/map-visualMap-pieces` |
+| `china.json` | `apache/echarts` `test/data/map/js/china.js` | `doc-example/map-example` |
 | `Sicily_prehellenic_topographic_map.svg` | `geo/` | `geo-svg-map` |
 | `Map_of_Iceland.svg` | `geo/` | `geo-svg-scatter-simple` |
 | `MacOdrum-LV5-floorplan-web.svg` | `geo/` | `geo-svg-lines` |
@@ -121,6 +122,16 @@ loads the flags from the `emoji-flags@1.3.0` npm package (MIT,
 vendored here instead. The port reads only `name` and `emoji`; all 251 records are kept, because the
 country column of the life-expectancy table is matched by name and every one of its 19 countries has
 a flag.
+
+`china.json` is the one map that is **not** from the examples site: it no longer ships a China
+boundary. `public/data/asset/geo/` of the local clone has no `china.json`, and the corresponding URLs
+of the live site (`/en/asset/map/js/china.js`, `/en/examples/data/asset/geo/china.json`, and their `/zh/`
+counterparts) all answer 404. The port therefore takes the GeoJSON of the `apache/echarts` repository
+itself, `test/data/map/js/china.js` at HEAD (Apache License 2.0 like the examples site), where a
+one-off script strips the `echarts.registerMap(...)` wrapper so the file is plain GeoJSON:
+42 features, the 34 provinces plus 8 boundary lines, with `properties.name` carrying the official names
+(`北京市`, `内蒙古自治区`, `台湾省`, …). `DocMaps.kt` translates the short province names of the original
+example into those.
 
 Files added here must keep the upstream name so the example source stays traceable to
 `public/data/asset/{data,geo}/<name>`.

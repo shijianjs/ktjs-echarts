@@ -87,6 +87,11 @@
 - **`world.json` 的地名是缩写**：`Czech Rep.` / `Korea` / `Dem. Rep. Congo`…，与 `world-population.json`
   的全称不同；按名字匹配的 `regions` / 地图 `data` 必须先翻译（`GlGeo.kt` 的 `worldRegionNames`），否则
   这些国家静默没有值。
+- **`china.json` 的地名是官方全称**：`北京市` / `内蒙古自治区` / `台湾省`…，而 `doc-example/map-example`
+  这类老示例写的是简称。ECharts 按名字精确匹配、不会去后缀，所以 `DocMaps.kt` 有一张
+  `chinaRegionNames` 翻译表；漏掉的话整页只剩默认底色，不报错。
+- **`mapType` 是死键**：上游 2D 地图示例（尤其 `doc-example/` 那批）用 `mapType: 'china'`，ECharts 5 起
+  `MapSeries.getMapType()` 只读 `map`。照抄得到一张空白画布，移植一律改成 `map`。
 - **先 `registerMap` 再给纹理**：所有地图 / 行星纹理都依赖地图注册完成；`Category.interactive` +
   `loadJson` 是标准写法。
 - **空的 `viewControl` / `grid3D` 不要写**：不要为了「对齐上游」写空对象，只在真的设了字段时写。

@@ -23,6 +23,7 @@ import demo.examples.datasetEntries
 import demo.examples.datasetExtraEntries
 import demo.examples.docExampleEntries
 import demo.examples.docInteractiveEntries
+import demo.examples.docMapsEntries
 import demo.examples.docMoreEntries
 import demo.examples.funnelEntries
 import demo.examples.extraPagesEntries
@@ -269,6 +270,7 @@ val catalog: List<CatalogEntry> =
         docMoreEntries,
         docInteractiveEntries,
         scatterVisualMapCategoriesEntries,
+        docMapsEntries,
     ).flatten()
 
 private val catalogById: Map<String, CatalogEntry> = catalog.associateBy { it.id }

@@ -19,9 +19,9 @@
 | 官方清单 | 436 |
 | 　· `chart-list-data.js` | 377 |
 | 　· `chart-list-data-gl.js` | 59 |
-| 已移植 | 371 页 / 372 条 |
+| 已移植 | 376 页 / 377 条 |
 | 明确不做 | 51 |
-| 待补 | 13 |
+| 待补 | 8 |
 
 已移植数里的「页」不含总览页（`#/overview`）；「条」把 `bar-large` / `pie-highlight` 同时算作对应 `doc-example/` 条目的移植。
 
@@ -127,19 +127,14 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 | --- |
 | `globe-country-carousel` |
 
-## 待补（13）
+## 待补（8）
 
-### 缺地图数据（GeoJSON / SVG / 二进制轨迹）（13）
+### 缺示例自带的数据（8）
 
-先补地图文件并 registerMap；部分数据（USA / Iceland / 瑞士 / world / ch.geo）已经在仓库里。
+地图本身（china / world / USA / Iceland / 瑞士 / HK / SVG）都已入库；剩下的缺示例自带的数据：六页要上游内联的 364 城市坐标表，两页要 `weibo.json`（本地克隆里有）。
 
 | id |
 | --- |
-| `doc-example/map-example` |
-| `doc-example/map-visualMap-continuous` |
-| `doc-example/map-visualMap-continuous-text` |
-| `doc-example/map-visualMap-pieces` |
-| `doc-example/map-visualMap-piecewise-text` |
 | `doc-example/scatter-visualMap-piecewise` |
 | `heatmap-map` |
 | `geo-lines` |

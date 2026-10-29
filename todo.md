@@ -70,7 +70,7 @@
 
 ### demo
 
-- 官方清单 436 条：**已移植 371 页 / 372 条，明确不做 51，待补 13**。逐条清单、理由与维护方式见
+- 官方清单 436 条：**已移植 376 页 / 377 条，明确不做 51，待补 8**。逐条清单、理由与维护方式见
   [demo/COVERAGE.md](demo/COVERAGE.md)。
 - 跨页注意事项（含 GL）见 [demo/NOTES.md](demo/NOTES.md)；移植约定、各家族做法与可复用数据见
   [demo/AGENTS.md](demo/AGENTS.md)。
@@ -79,13 +79,14 @@
 
 ## 下一步
 
-按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进（13 条），建议顺序：
+按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进（8 条），建议顺序：
 
-1. **补 `china.json`**（一次解锁 13 条）：`doc-example/map-example`、四个 `doc-example/map-visualMap-*`、
-   `doc-example/scatter-visualMap-piecewise`、`heatmap-map`、`geo-lines`、`geo-map-scatter`、`scatter-map`、
-   `effectScatter-map`、`scatter-weibo`、`scattergl-weibo`。本地克隆里没有 `china.json`（上游地图数据早已
-   外置，`echarts/map/js` 也没有），要么从官方站点下载一次并登记到 `data/SOURCE.md`，要么改注册
-   `world.json` / 其他已入库地图的等价页面——先确认数据来源再动手。
+1. **六页空气质量 / 迁徙图**（`doc-example/scatter-visualMap-piecewise`、`heatmap-map`、`geo-lines`、
+   `geo-map-scatter`、`scatter-map`、`effectScatter-map`）：地图侧已就绪（`china.json` 本轮入库），
+   缺的是上游内联在每个示例里的 `geoCoordMap`（364 个城市名 → `[lng, lat]`）。照 `rainfall-*.json` 的
+   先例用一次性脚本抽成 `data/geo-coord-map.json` 并登记 `data/SOURCE.md`，别让六份 Kotlin 各抄一遍。
+2. **两页微博**（`scatter-weibo`、`scattergl-weibo`）：`weibo.json` 在本地克隆
+   `public/data/asset/data/weibo.json`（773 KB），复制入库即可，无需网络。
 
 新增/移植页面后跑 `node scripts/demo-coverage.mjs --write` 更新 COVERAGE。
 

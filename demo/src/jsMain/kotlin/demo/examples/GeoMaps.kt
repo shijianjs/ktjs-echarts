@@ -36,12 +36,15 @@ import zrender.ZRColor
  * `geo-svg-map` also keeps the two "buttons": a scatter series of two invisible points whose labels
  * are the route names, and a `selectchanged` listener that turns the selected button into
  * `geoSelect` + `showTip` on the matching SVG region.
+ *
+ * [registerGeojsonMap], [mapData], [HK_DENSITY], [hkNameMap] and [usaSpecialAreas] are `internal`
+ * because the Hong Kong and USA tutorials of the documentation, ported in `DocMaps.kt`, reuse them.
  */
 
 private val geoMaps = Category(Groups.GEO, "examples/GeoMaps.kt")
 
 /** Registers a GeoJSON document as the map [name]. */
-private fun registerGeojsonMap(name: String, json: kotlin.js.JsAny) {
+internal fun registerGeojsonMap(name: String, json: kotlin.js.JsAny) {
     ECharts.registerMap(
         name,
         MapInput(unsafeJso<GeoJSONMapInput> { geoJSON = json.unsafeCast<GeoJSONSourceInput>() }),
@@ -58,7 +61,7 @@ private fun stringRecordOf(vararg pairs: Pair<String, String>): js.objects.Recor
     ).unsafeCast<js.objects.Record<String, String>>()
 
 /** One `{ name, value }` entry of a map series. */
-private fun mapData(name: String, value: Double): MapDataItem =
+internal fun mapData(name: String, value: Double): MapDataItem =
     MapDataItem(
         unsafeJso<MapDataItemOption> {
             this.name = OptionId(name)
@@ -250,7 +253,7 @@ private fun sicilyOption(): EChartsOption =
 // ---------------------------------------------------------------------------------------------
 
 /** Population density of the 18 districts of Hong Kong (2011), person per square kilometre. */
-private val HK_DENSITY =
+internal val HK_DENSITY =
     arrayOf(
         "中西区" to 20057.34,
         "湾仔" to 15477.48,
@@ -273,7 +276,7 @@ private val HK_DENSITY =
     )
 
 /** English region names of `HK.json` mapped to the Chinese names of [HK_DENSITY]. */
-private fun hkNameMap(): js.objects.Record<String, String> =
+internal fun hkNameMap(): js.objects.Record<String, String> =
     stringRecordOf(
         "Central and Western" to "中西区",
         "Eastern" to "东区",
@@ -357,7 +360,7 @@ private val USA_POPULATION =
     )
 
 /** Special areas of `USA.json`: the three regions that sit outside the mainland. */
-private fun usaSpecialAreas(): GeoSpecialAreas =
+internal fun usaSpecialAreas(): GeoSpecialAreas =
     recordOf(
         "Alaska" to
             unsafeJso<GeoSpecialArea> {

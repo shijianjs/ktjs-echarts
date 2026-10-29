@@ -675,9 +675,11 @@ class DemoPageTest {
     }
 
     /**
-     * The five pages of `GeoMaps.kt` and the matrix map of `MatrixExtra.kt`.
+     * The five pages of `GeoMaps.kt`, the five map tutorials of `DocMaps.kt` and the matrix map of
+     * `MatrixExtra.kt`.
      *
-     * Each of them fetches its map (three GeoJSON files and a 3.7 MB SVG) and registers it before
+     * Each of them fetches its map (four GeoJSON files, the 1.7 MB China boundary, and a 3.7 MB SVG)
+     * and registers it before
      * the first `setOption`, so the canvas stays blank until the request resolves: the painted-pixel
      * wait is what proves the map reached the chart. `map-bar-morph` swaps its map and bar options
      * from a two-second timer, so a frame sampled after one tick must differ from the first one.
@@ -698,6 +700,11 @@ class DemoPageTest {
                     "map-usa",
                     "map-iceland-pie",
                     "matrix-mini-bar-geo",
+                    "doc-example/map-example",
+                    "doc-example/map-visualMap-continuous",
+                    "doc-example/map-visualMap-continuous-text",
+                    "doc-example/map-visualMap-piecewise-text",
+                    "doc-example/map-visualMap-pieces",
                 )
         ) {
             page.evaluate("(value) => { location.hash = '#/' + value }", route)

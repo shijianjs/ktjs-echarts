@@ -91,7 +91,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **289 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **296 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -109,7 +109,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 | `graphic` | 关键帧动画那一档已落地（`examples/GraphicAnimations.kt`，见下），多数剩余示例还配合真实交互或外部素材 |
 | `visualMap` / `dataZoom` 单列家族 | 官方清单里这几条恰好都属其它被排除的类别；能力已由别的示例覆盖 |
 
-`gl` 家族已经接入（`examples/Gl.kt` / `examples/GlScatter.kt`，见下文「3D 示例」），按批继续补。
+`gl` 家族已经接入（`examples/Gl.kt` / `examples/GlScatter.kt` / `examples/GlSurfaceMaterial.kt`，见下文
+「3D 示例」），按批继续补。
 
 `lines` / `map` / `geo` 已经能用静态数据集（`lines-airline`、`custom-hexbin` 就是先例）：只要再拷
 `public/data/asset/geo/` 下的 GeoJSON 或 SVG，就能继续补这两个家族。
@@ -375,9 +376,10 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
 
 ## 3D 示例（echarts-gl）
 
-3D 家族在 `examples/Gl.kt` 与 `examples/GlScatter.kt`，用的是 `ktjs-echarts-gl` 模块，写法与其它家族一样走
-`Category.chart`；要先取数据文件的（`bar3d-dataset` 与三页 `scatter3D`）走 `Category.interactive` +
-`loadJson`：
+3D 家族在 `examples/Gl.kt`、`examples/GlScatter.kt` 与 `examples/GlSurfaceMaterial.kt`，用的是
+`ktjs-echarts-gl` 模块，写法与其它家族一样走 `Category.chart`；要先取数据文件的（`bar3d-dataset` 与三页
+`scatter3D`）走 `Category.interactive` + `loadJson`，要等图片加载的（`surface-leather`）走
+`Category.interactive` + `listen(LOAD)`：
 
 - **安装是全局的一次性动作**：`echarts` 的入口不带 GL 图表，`ECharts.use(...)` 注册的扩展对所有实例生
   效，所以调用点在 `main()` 里的 `useEChartsGl()`，必须在第一个 `ECharts.init` 之前。新页面需要另一种
@@ -407,6 +409,22 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   二维面板（`grid3D.width = '50%'` + 四个百分比定位的 `grid` 和 `scatter` 系列）；`scatter3D-dataset` 用
   分类 x 轴 + `encode` 把三列钉到坐标轴上。上游 `scatter3d` 声明 `theme: dark` 并把坐标轴、`axisPointer`
   与 visual map 文字刷白，本站主题由自己的开关决定，这些颜色不搬（浅色下白字不可见）。
+- **现实材质七页在 `GlSurfaceMaterial.kt`**：`metal-surface` / `surface-breather` /
+  `surface-mollusc-shell` / `surface-golden-rose` / `surface-theme-roses` / `parametric-surface-rose` /
+  `surface-leather` 都是 `shading: "realistic"` 的参数曲面，靠 `realisticMaterial` + 环境立方体贴图
+  （`data/img/gl/canyon.hdr` / `pisa.hdr`）与 `postEffect` 出效果。`SSAO` / `DOF` / `SSR` 这些旧键名在
+  wrapper 里是 `ssao` / `dof` / `ssr`（`@JsName` 映射回原键），官方文档名
+  `screenSpaceAmbientOcclusion` 等也照样能写，两个都设时上游读旧键。
+  `textureTiling` / `textureOffset` 可以写单个数字或 `[u, v]` 一对（`DoubleOrDoubleArray`），玫瑰页的
+  `[200, 20]` 必须写一对。
+- **纹理与素材**：HDR 环境图和皮革贴图放在 `resources/data/img/gl/`，来源与用处记在 `data/SOURCE.md`。
+  `.hdr` 走 `textureUtil.loadTexture(url, {fileType:'hdr'})`（XHR + arraybuffer），静态服务器给的 MIME
+  不影响加载。`surface-leather` 先把 `leather_height.jpg` 画进 2D canvas 读红通道，再把顶点按像素值膨
+  胀，所以这一页必须等图片 `load` 之后才 `setOption`。
+- **上游的死字段不要搬**：`surface-breather` 的「Export OBJ」按钮调 `echarts.exportGL2PLY`，该模块在
+  `echarts-gl` 2.1.0 里已经删掉；`parametric-surface-rose` 的 `realisticMaterial.baseTexture` 没有任何
+  材质读它（只有 `globe.baseTexture` 有用）；玫瑰三页的 `toolbox.iconStyle.normal.borderColor` 是 ECharts
+  已废弃的状态写法。这些都略去，理由写在各文件的头注释里。
 - **WebGL 层是另一张画布**：GL 系列只画在 `echarts-gl` 插进来的 canvas 上，zrender 自己的画布层不会创
   建；没有 WebGL 时 echarts-gl 用 `.ecgl-nowebgl` 占位，页面上连 canvas 都没有。e2e 因此对 GL 页只做
   `assertChartRendered`（画布有尺寸）+ `the 3d pages paint through the webgl layer`（这张画布能取到

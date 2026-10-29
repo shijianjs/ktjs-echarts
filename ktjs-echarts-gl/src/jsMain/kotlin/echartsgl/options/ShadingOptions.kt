@@ -1,5 +1,6 @@
 package echartsgl.options
 
+import echarts.options.DoubleOrDoubleArray
 import echartsgl.NumberOrTexture
 import echartsgl.ShadingType
 import echartsgl.TextureSource
@@ -34,11 +35,15 @@ external interface GlMaterialOption {
     /** Detail texture, stretched over the surface. */
     var detailTexture: TextureSource?
 
-    /** Number of times [detailTexture] is tiled; its width and height must be powers of two. */
-    var textureTiling: Double?
+    /**
+     * Number of times the material textures are tiled; the default stretches them once over the
+     * surface. A pair sets the two axes separately. An axis tiled more than once needs a texture
+     * whose width and height are powers of two.
+     */
+    var textureTiling: DoubleOrDoubleArray?
 
-    /** Offset of [detailTexture]. */
-    var textureOffset: Double?
+    /** Offset of the material textures; a pair offsets the two axes separately. */
+    var textureOffset: DoubleOrDoubleArray?
 }
 
 /**

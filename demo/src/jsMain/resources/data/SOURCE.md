@@ -3,8 +3,8 @@
 Every file here is copied verbatim from the Apache ECharts examples site
 (<https://github.com/apache/echarts-examples>), which is licensed under the Apache License 2.0 — see
 [LICENSE](LICENSE) in this directory for the full text. The GeoJSON / SVG maps come from
-`public/data/asset/geo/`, the small weather icons from `public/data/asset/img/weather/`, the rest from
-`public/data/asset/data/`.
+`public/data/asset/geo/`, the small weather icons from `public/data/asset/img/weather/`, the GL
+textures from `public/data-gl/asset/`, the rest from `public/data/asset/data/`.
 
 They are shipped as static files instead of being transcribed into Kotlin sources: several of them
 are hundreds of kilobytes, and keeping them as data makes the port of each example a diff of code
@@ -44,6 +44,11 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `img/weather/sunny_128.png` | `img/weather/` | `bar-rich-text`, `pie-rich-text` (rich-text label icons) |
 | `img/weather/cloudy_128.png` | `img/weather/` | see `sunny_128.png` |
 | `img/weather/showers_128.png` | `img/weather/` | see `sunny_128.png` |
+| `img/gl/canyon.hdr` | `data-gl/asset/` | `metal-surface`, `surface-breather`, `surface-mollusc-shell`, `parametric-surface-rose` (ambient cubemap) |
+| `img/gl/pisa.hdr` | `data-gl/asset/` | `surface-golden-rose`, `surface-theme-roses`, `surface-leather` (ambient cubemap) |
+| `img/gl/leather/leather_height.jpg` | `data-gl/asset/leather/` | `surface-leather` (height map sampled into the surface) |
+| `img/gl/leather/leather_roughness.jpg` | `data-gl/asset/leather/` | `surface-leather` (roughness map) |
+| `img/gl/leather/leather_normal.jpg` | `data-gl/asset/leather/` | `surface-leather` (normal map) |
 
 The two `rainfall-*.json` files are **derived**, not copied: upstream keeps these 3079-point series
 inline in `examples/ts/grid-multiple.ts` and `examples/ts/area-rainfall.ts`, so a one-off script split

@@ -2,6 +2,7 @@ package echartsgl
 
 import echarts.AxisTypes
 import echarts.ECharts
+import echarts.options.DoubleOrDoubleArray
 import echarts.options.OptionDataValue
 import echarts.options.SymbolShape
 import echarts.options.SymbolSize
@@ -12,6 +13,7 @@ import echartsgl.options.EChartsGlOption
 import echartsgl.options.Grid3DOption
 import echartsgl.options.Line3DDataItem
 import echartsgl.options.Line3DSeriesOption
+import echartsgl.options.RealisticMaterialOption
 import echartsgl.options.Scatter3DDataItem
 import echartsgl.options.Scatter3DSeriesOption
 import echartsgl.options.SurfaceFunction
@@ -199,6 +201,55 @@ class GlSeriesTest {
             assertEquals(2, series.dataShape!!.size)
             assertEquals(41.0, series.dataShape!![0])
             assertEquals(0.6, series.typedItemStyle!!.opacity)
+        } finally {
+            destroyChart(chart, container)
+        }
+    }
+
+    /**
+     * The material textures of a realistic surface are tiled and offset by a single factor or by a
+     * pair of factors; upstream reads `textureTiling` / `textureOffset` as `number | number[]`
+     * (`graphicGL.setMaterialFromModel`), and the leather surface of the gallery tiles its roughness
+     * and normal maps per axis.
+     */
+    @Test
+    fun surfaceRealisticMaterialKeepsItsTextureTiling() {
+        ECharts.use(arrayOf(SurfaceChart, Grid3DComponent))
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(
+                unsafeJso<EChartsGlOption> {
+                    axes()
+                    grid3D = one(unsafeJso<Grid3DOption> {})
+                    series =
+                        one(
+                            surfaceSeries {
+                                waveSurface()
+                                shading = ShadingTypes.realistic
+                                realisticMaterial =
+                                    unsafeJso<RealisticMaterialOption> {
+                                        roughness = NumberOrTexture(0.4)
+                                        metalness = NumberOrTexture("data/img/gl/leather/metalness.jpg")
+                                        normalTexture = TextureSource("data/img/gl/leather/normal.jpg")
+                                        textureTiling = DoubleOrDoubleArray(arrayOf(4.0, 2.0))
+                                        textureOffset = DoubleOrDoubleArray(0.5)
+                                    }
+                            },
+                        )
+                },
+            )
+
+            val series = chart.getOption()
+                .unsafeCast<EChartsGlOption>()
+                .series!![0]
+                .unsafeCast<SurfaceSeriesOption>()
+            val material = series.realisticMaterial!!
+            assertEquals(ShadingTypes.realistic, series.shading)
+            assertEquals(0.5, material.textureOffset!!.unsafeCast<Double>())
+            val tiling = material.textureTiling!!.unsafeCast<Array<Double>>()
+            assertEquals(2, tiling.size)
+            assertEquals(4.0, tiling[0])
+            assertEquals(2.0, tiling[1])
         } finally {
             destroyChart(chart, container)
         }

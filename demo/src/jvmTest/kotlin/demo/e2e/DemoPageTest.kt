@@ -226,11 +226,14 @@ class DemoPageTest {
     }
 
     /**
-     * The `echarts-gl` pages of `Gl.kt` and `GlScatter.kt` paint into a WebGL layer, which is a canvas
-     * of its own next to the (empty) zrender canvas layer. A surface with a broken equation or a
-     * missing `visualMap` dimension only logs an error and stays blank, which is what the console
-     * assertion catches; the `scatter3D` pages fetch their rows first, so a `dataset` whose `encode.z`
-     * never arrived would leave the layer empty without an error of its own.
+     * The `echarts-gl` pages of `Gl.kt`, `GlScatter.kt` and `GlSurfaceMaterial.kt` paint into a WebGL
+     * layer, which is a canvas of its own next to the (empty) zrender canvas layer. A surface with a
+     * broken equation or a missing `visualMap` dimension only logs an error and stays blank, which is
+     * what the console assertion catches; the `scatter3D` pages fetch their rows first, so a `dataset`
+     * whose `encode.z` never arrived would leave the layer empty without an error of its own.
+     *
+     * The leather page waits for a height map image before it sets any option, so its layer is only
+     * expected to be there once the `load` handler ran.
      *
      * A missing core module of `echarts-gl` (its `sideEffects` list does not cover the nested
      * installers, so a bundler may drop the module that registers the post-update hook) leaves the
@@ -257,6 +260,13 @@ class DemoPageTest {
                 "simple-surface",
                 "sphere-parametric-surface",
                 "surface-wave",
+                "metal-surface",
+                "surface-breather",
+                "surface-mollusc-shell",
+                "surface-golden-rose",
+                "surface-theme-roses",
+                "parametric-surface-rose",
+                "surface-leather",
             )
         for (route in routes) {
             assertChartRendered(page, route)

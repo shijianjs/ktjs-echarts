@@ -232,8 +232,8 @@ class DemoPageTest {
      * what the console assertion catches; the `scatter3D` pages fetch their rows first, so a `dataset`
      * whose `encode.z` never arrived would leave the layer empty without an error of its own.
      *
-     * The leather page waits for a height map image before it sets any option, so its layer is only
-     * expected to be there once the `load` handler ran.
+     * The leather and image surfaces wait for an image before they set any option, so those layers
+     * are only expected to be there once the `load` handler ran.
      *
      * A missing core module of `echarts-gl` (its `sideEffects` list does not cover the nested
      * installers, so a bundler may drop the module that registers the post-update hook) leaves the
@@ -267,6 +267,7 @@ class DemoPageTest {
                 "surface-theme-roses",
                 "parametric-surface-rose",
                 "surface-leather",
+                "image-surface-sushuang",
             )
         for (route in routes) {
             assertChartRendered(page, route)

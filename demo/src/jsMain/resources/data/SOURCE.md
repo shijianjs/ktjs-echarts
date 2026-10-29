@@ -49,11 +49,16 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `img/gl/leather/leather_height.jpg` | `data-gl/asset/leather/` | `surface-leather` (height map sampled into the surface) |
 | `img/gl/leather/leather_roughness.jpg` | `data-gl/asset/leather/` | `surface-leather` (roughness map) |
 | `img/gl/leather/leather_normal.jpg` | `data-gl/asset/leather/` | `surface-leather` (normal map) |
+| `img/gl/sushuang.jpg` | derived | `image-surface-sushuang` (per-pixel surface) |
 
 The two `rainfall-*.json` files are **derived**, not copied: upstream keeps these 3079-point series
 inline in `examples/ts/grid-multiple.ts` and `examples/ts/area-rainfall.ts`, so a one-off script split
 the arrays into JSON (`time` plus the two series) to keep the Kotlin port a diff of code rather than
 numbers.
+
+`img/gl/sushuang.jpg` is **derived** as well: upstream keeps the picture inline in
+`examples/ts/gl/image-surface-sushuang.js` as a base64 data URL, so it was decoded into a file and is
+served from `/data/img/gl/sushuang.jpg`.
 
 Files added here must keep the upstream name so the example source stays traceable to
 `public/data/asset/{data,geo}/<name>`.

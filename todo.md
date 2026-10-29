@@ -45,17 +45,17 @@
 - 缺：`geo3D`、`globe`、`mapbox3D`、`maptalks3D`、`lines3D`、`polygons3D`、`map3D`、`scatterGL`、
   `graphGL`、`flowGL`、`linesGL` 的选项类型（这些页面本身也多半需要地图数据或外部 JS）。
 
-### demo（296 个示例 / 27 个家族）
+### demo（297 个示例 / 27 个家族）
 
 - 各家族基本铺满；剩下的候选要么需要真实键鼠序列，要么需要外部 JS / GeoJSON / 图片素材
   （原因见 `demo/AGENTS.md`）。
-- `gl` 分组共 17 页：`examples/Gl.kt`（`bar3d-punch-card`、`transparent-bar3d`、`bar3d-dataset`、
-  `line3d-orthographic`、`simple-surface`、`sphere-parametric-surface`、`surface-wave`）、
-  `examples/GlScatter.kt`（`scatter3d`、`scatter3d-scatter`、`scatter3D-dataset`）与
-  `examples/GlSurfaceMaterial.kt`（`metal-surface`、`surface-breather`、`surface-mollusc-shell`、
-  `surface-golden-rose`、`surface-theme-roses`、`parametric-surface-rose`、`surface-leather`）；
-  `main()` 的 `useEChartsGl()` 注册 `Bar3DChart` / `Line3DChart` / `Scatter3DChart` / `SurfaceChart` /
-  `Grid3DComponent`。
+- `gl` 分组共 18 页：`examples/Gl.kt`（`bar3d-punch-card`、`transparent-bar3d`、`bar3d-dataset`、
+  `line3d-orthographic`、`simple-surface`、`sphere-parametric-surface`、`surface-wave`、
+  `image-surface-sushuang`）、`examples/GlScatter.kt`（`scatter3d`、`scatter3d-scatter`、
+  `scatter3D-dataset`）与 `examples/GlSurfaceMaterial.kt`（`metal-surface`、`surface-breather`、
+  `surface-mollusc-shell`、`surface-golden-rose`、`surface-theme-roses`、`parametric-surface-rose`、
+  `surface-leather`）；`main()` 的 `useEChartsGl()` 注册 `Bar3DChart` / `Line3DChart` /
+  `Scatter3DChart` / `SurfaceChart` / `Grid3DComponent`。
 - 可复用数据：`punchCardValues` / `punchCardHours` / `punchCardDays`（`CustomExtra.kt`）、
   `resources/data/life-expectancy-table.json`、`resources/data/nutrients.json`；11 色 `visualMap` 色带在
   `Gl.kt` 的 `glPalette` / `glVisualMap()` 与 `GlSurfaceMaterial.kt` 的 `surfaceRamp()`。
@@ -63,10 +63,9 @@
 
 ## 下一步（GL 横向铺开）
 
-1. **`image-surface-sushuang`**：把内联 base64 图（约 97 KB）搬到 `resources/data/img/gl/`，按像素采样给
-   每个顶点上色——这是最后一块「不用地图」的 surface。
-2. **之后**：`geo3D` / `globe-*` 需要先补 `Geo3DOption` / `GlobeOption` 与地图数据，成本最高，放最后。
-3. **暂不做**：`*-simplex-noise`（需要 `simplex-noise` 外部库）、`*-mapbox*` / `*-maptalks*`（页面要额外
+1. **`geo3D` / `globe-*`**：需要先补 `Geo3DOption` / `GlobeOption` 与 GeoJSON 数据，成本最高，放最后。
+   先做 `geo3d`（读 `resources/data/world.json`）再铺 `globe-*`。
+2. **暂不做**：`*-simplex-noise`（需要 `simplex-noise` 外部库）、`*-mapbox*` / `*-maptalks*`（页面要额外
    加载地图 JS）、依赖官方站点图片纹理但拿不到原图的示例。
 
 ## 仍然生效的坑

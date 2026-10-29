@@ -91,7 +91,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **296 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **297 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -425,6 +425,10 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   `echarts-gl` 2.1.0 里已经删掉；`parametric-surface-rose` 的 `realisticMaterial.baseTexture` 没有任何
   材质读它（只有 `globe.baseTexture` 有用）；玫瑰三页的 `toolbox.iconStyle.normal.borderColor` 是 ECharts
   已废弃的状态写法。这些都略去，理由写在各文件的头注释里。
+- **图片当数据用的曲面**：`image-surface-sushuang`（在 `Gl.kt`）把照片的每个像素变成顶点
+  `[列, 高 - 行, 亮度]`，颜色用 `itemStyle.color` 的回调按 `params.dataIndex` 取像素 RGB
+  （`GlColor(ZRColor { params -> ... })`）。原例把照片以 base64 内联在源码里，这里解码成
+  `data/img/gl/sushuang.jpg` 走静态资源。
 - **WebGL 层是另一张画布**：GL 系列只画在 `echarts-gl` 插进来的 canvas 上，zrender 自己的画布层不会创
   建；没有 WebGL 时 echarts-gl 用 `.ecgl-nowebgl` 占位，页面上连 canvas 都没有。e2e 因此对 GL 页只做
   `assertChartRendered`（画布有尺寸）+ `the 3d pages paint through the webgl layer`（这张画布能取到

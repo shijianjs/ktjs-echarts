@@ -2,6 +2,7 @@ package demo.examples
 
 import demo.CatalogEntry
 import demo.Groups
+import demo.ui.listen
 import demo.ui.loadJson
 import echarts.AxisTypes
 import echarts.ECharts
@@ -22,6 +23,14 @@ import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
+import web.canvas.CanvasImageSource
+import web.canvas.CanvasRenderingContext2D
+import web.canvas.ID
+import web.dom.document
+import web.events.Event
+import web.events.EventType
+import web.html.HTMLImageElement
+import web.html.HtmlTagName
 import zrender.ZRColor
 
 /*
@@ -53,6 +62,9 @@ internal fun useEChartsGl() {
 }
 
 private val gl = Category(Groups.GL, "examples/Gl.kt")
+
+/** The `load` event of the picture of `image-surface-sushuang`. */
+private val LOAD: EventType<Event> = EventType("load")
 
 /** The eleven-colour palette the `visualMap` of the GL examples uses, dark blue to dark red. */
 private val glPalette =
@@ -142,6 +154,91 @@ private fun SurfaceEquationOption.rippledSurface() {
             step = 0.05
         }
     z = SurfaceFunction { x, y -> sin(x * x + y * y) * x / PI }
+}
+
+/**
+ * The surface and the per-vertex colours of `image-surface-sushuang`.
+ *
+ * Every pixel of the picture becomes one vertex `[column, height - row, luminance]`, where the
+ * luminance `255 - (0.2125 r + 0.7154 g + 0.0721 b)` is shifted into `0..100`, and the vertex keeps
+ * the RGB of its pixel as its colour, so the surface renders the photograph as a relief.
+ *
+ * Upstream inlines the picture as a base64 data URL; it is shipped as `data/img/gl/sushuang.jpg`
+ * instead (see `data/SOURCE.md`).
+ */
+private fun sushuangOption(image: HTMLImageElement): EChartsGlOption {
+    val width = image.width
+    val height = image.height
+    val canvas =
+        document.createElement(HtmlTagName.canvas).apply {
+            this.width = width
+            this.height = height
+        }
+    val context =
+        checkNotNull(canvas.getContext(CanvasRenderingContext2D.ID)) {
+            "the image surface needs a 2d context"
+        }
+    context.drawImage(image.unsafeCast<CanvasImageSource>(), 0.0, 0.0, width.toDouble(), height.toDouble())
+    val pixels = context.getImageData(0, 0, width, height).data
+    val count = width * height
+    val vertices = arrayOfNulls<SurfaceDataItem>(count)
+    val colors = Array(count) { "" }
+    for (index in 0 until count) {
+        val red = pixels[index * 4].toInt() and 0xff
+        val green = pixels[index * 4 + 1].toInt() and 0xff
+        val blue = pixels[index * 4 + 2].toInt() and 0xff
+        val luminance = 255 - (0.2125 * red + 0.7154 * green + 0.0721 * blue)
+        vertices[index] =
+            SurfaceDataItem(
+                doubleRow((index % width).toDouble(), (height - index / width).toDouble(), (luminance - 125) / 10 + 50),
+            )
+        colors[index] = "rgb($red,$green,$blue)"
+    }
+    return unsafeJso {
+        tooltip = one(unsafeJso<TooltipOption> {})
+        backgroundColor = ZRColor("#fff")
+        xAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
+        yAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
+        zAxis3D =
+            one(
+                unsafeJso<Axis3DOption> {
+                    type = AxisTypes.value
+                    min = AxisMinMax(0.0)
+                    max = AxisMinMax(100.0)
+                },
+            )
+        grid3D =
+            one(
+                unsafeJso<Grid3DOption> {
+                    axisPointer = unsafeJso { show = false }
+                    viewControl = unsafeJso { distance = 100.0 }
+                    postEffect = unsafeJso<PostEffectOption> { enable = true }
+                    light =
+                        unsafeJso<LightOption> {
+                            main = unsafeJso { shadow = true; intensity = 2.0 }
+                            ambientCubemap =
+                                unsafeJso<AmbientCubemapLightOption> {
+                                    texture = "data/img/gl/canyon.hdr"
+                                    exposure = 2.0
+                                    diffuseIntensity = 0.2
+                                    specularIntensity = 1.0
+                                }
+                        }
+                },
+            )
+        series =
+            one(
+                surfaceSeries {
+                    silent = true
+                    wireframe = unsafeJso<SurfaceWireframeOption> { show = false }
+                    typedItemStyle =
+                        unsafeJso<GlItemStyleOption> {
+                            color = GlColor(ZRColor { params -> colors[params.dataIndex] })
+                        }
+                    typedData = vertices
+                },
+            )
+    }
 }
 
 val glEntries: List<CatalogEntry> =
@@ -467,5 +564,17 @@ val glEntries: List<CatalogEntry> =
                         },
                     )
             }
+        },
+        gl.interactive(
+            "image-surface-sushuang",
+            "Image Surface Sushuang",
+            "Image Surface Sushuang",
+            "把一张照片的每个像素当作曲面顶点：亮度决定高度，像素本身的颜色决定曲面颜色。",
+            "Every pixel of a photograph becomes a surface vertex: its luminance is the height and " +
+                "its colour is the colour of the surface.",
+        ) { chart ->
+            val picture = document.createElement(HtmlTagName.img)
+            picture.listen(LOAD) { chart.setOption(sushuangOption(picture)) }
+            picture.src = "data/img/gl/sushuang.jpg"
         },
     )

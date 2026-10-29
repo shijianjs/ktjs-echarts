@@ -67,6 +67,15 @@ fun LineDataItem(value: LineDataItemOption): LineDataItem = value.unsafeCast<Lin
  * `borderRadius` member [ItemStyleOption] already declares.
  */
 external interface BarDataItemOption : OptionDataItemObject, DataItemStateOption {
+    /**
+     * Typed view of [OptionDataItemObject.value].
+     *
+     * Upstream `BarDataValue`, i.e. `OptionDataValue | OptionDataValue[]`; the inherited [value]
+     * stays the generic single value. A bar on a time axis carries its `[time, value]` pair this way.
+     */
+    @JsName("value")
+    var typedValue: OptionDataValueOrArray?
+
     /** Cursor shown when hovering the bar. */
     var cursor: String?
 

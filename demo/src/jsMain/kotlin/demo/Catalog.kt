@@ -40,6 +40,7 @@ import demo.examples.lineLongTailEntries
 import demo.examples.matrixEntries
 import demo.examples.matrixExtraEntries
 import demo.examples.matrixLongTailEntries
+import demo.examples.matrixStockEntries
 import demo.examples.overviewEntries
 import demo.examples.parallelAqiEntries
 import demo.examples.parallelEntries
@@ -191,6 +192,7 @@ val catalog: List<CatalogEntry> =
         matrixEntries,
         matrixExtraEntries,
         matrixLongTailEntries,
+        matrixStockEntries,
         customEntries,
         customHexbinEntries,
         customExtraEntries,

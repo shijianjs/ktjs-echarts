@@ -55,6 +55,19 @@ external interface TitleOption {
     /** Target of [sublink]: `"self"` or `"blank"`. */
     var subtarget: TitleTarget?
 
+    /**
+     * Coordinate system the title is laid out on, e.g. `"matrix"`.
+     *
+     * The upstream `.d.ts` gives [TitleOption] only `matrixIndex` / `matrixId` through
+     * `ComponentOnMatrixOptionMixin`, but the title view lays itself out through
+     * `createBoxLayoutReference`, which reads `coordinateSystem` and [coord] at run time; the official
+     * `matrix-stock` example places its titles in matrix cells this way.
+     */
+    var coordinateSystem: String?
+
+    /** Cells of that coordinate system the title is laid out on; see [CoordinateSystemDataCoord]. */
+    var coord: CoordinateSystemDataCoord?
+
     /** Style of the main title. */
     var textStyle: TextStyleOption?
 

@@ -141,6 +141,63 @@ class MatrixAndGraphicOptionTest {
         assertEquals(2, grid.coord!!.unsafeCast<Array<Any>>().size)
     }
 
+    /**
+     * The title view lays itself out through `createBoxLayoutReference`, which reads
+     * `coordinateSystem` and `coord` at run time even though the upstream `.d.ts` does not declare
+     * them on `TitleOption`; this is how the official `matrix-stock` example puts titles into cells.
+     */
+    @Test
+    fun titleCanBeLaidOutOnMatrixCells() {
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(
+                unsafeJso<EChartsOption> {
+                    matrix =
+                        one(
+                            unsafeJso<MatrixOption> {
+                                x =
+                                    unsafeJso<MatrixDimensionOption> {
+                                        data =
+                                            arrayOf(
+                                                MatrixDimensionCellLooseOption("a"),
+                                                MatrixDimensionCellLooseOption("b"),
+                                            )
+                                    }
+                                y =
+                                    unsafeJso<MatrixDimensionOption> {
+                                        data =
+                                            arrayOf(
+                                                MatrixDimensionCellLooseOption("u"),
+                                                MatrixDimensionCellLooseOption("v"),
+                                            )
+                                    }
+                            },
+                        )
+                    title =
+                        one(
+                            unsafeJso<TitleOption> {
+                                text = "Volume"
+                                coordinateSystem = "matrix"
+                                coord =
+                                    CoordinateSystemDataCoord(
+                                        arrayOf(OptionDataValue("a"), OptionDataValue("u")),
+                                    )
+                                left = StringOrDouble(2.0)
+                                top = StringOrDouble(2.0)
+                            },
+                        )
+                },
+            )
+
+            val title = chart.getOption().title!!.first()
+            assertEquals("matrix", title.coordinateSystem)
+            assertEquals(2, title.coord!!.unsafeCast<Array<Any>>().size)
+            assertEquals("Volume", title.text)
+        } finally {
+            destroyChart(chart, container)
+        }
+    }
+
     @Test
     fun graphicOptionAcceptsComponentsAndBareElements() {
         val text =

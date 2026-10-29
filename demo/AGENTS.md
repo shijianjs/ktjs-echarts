@@ -92,7 +92,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **277 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **279 个示例**（覆盖 26 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -223,6 +223,22 @@ demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首�
 `external interface`（`batch[].selected[].dataIndex`）强转后再拼标题。`bar-breaks-brush` 要 zr 级的
 `mousedown` / `mousemove` 加 document 级 `mouseup` 才能改变断轴区间，属真实鼠标序列，按排除策略不做。
 
+`matrix-mbti` 追加在 `examples/MatrixLongTail.kt`（数据表与配色在 `examples/MbtiData.kt`）：16×16 矩阵
+每格承载一对类型，`itemStyle.decal` 用两种符号交替、两色分左右，靠 `aria.decal.show = true` 让 decal
+跟着无障碍开关走；表头是两层 `levels`（`levelSize` 25 / 30）的组头，标签走 `rich` 拆上下两行。页面
+`interactive` 里监听 `click`，把 `series` 换成四组的中位数汇总后再 `setOption(option, true)` 整体替换。
+上游读 `window.innerWidth` / `innerHeight` 决定字号与矩阵边长，这里改成按 `chart.getWidth()` /
+`getHeight()` 推，容器尺寸变化不会让页面跟着视口走。
+
+`matrix-stock` 在 `examples/MatrixStock.kt`：一个交易日的看板铺在 5×6 矩阵上——价格占 4 行，MACD 与
+成交量各占一行，右列是买卖十档与深度图。5 个 grid、4 个标题都用 `coordinateSystem: 'matrix'` + `coord`
+钉进格子，跨格用 `matrix.body.data[].mergeCells` 合并；午休时段由时间轴的 `breaks` 折掉。逐分钟的价格
+与成交量上游用 `Math.random()` 造，这里换成 `Lcg(20251016)`，深度图另用 `Lcg(20251017)`；
+`Date.UTC` 生成的时间戳配 `useUTC = true`。价格格左右两组价格 / 涨跌幅标签是 `markPoint`，**必须写
+`relativeTo: 'coordinate'`**：缺了它百分比按整个容器算，六个标签会散到整张图的高度上（这个坑一开始就
+踩到了）。格线是 6 个 `graphic` line（水平 3 + 垂直 3），位置取 `chart.getWidth()`，所以页面走
+`interactive`；成交量与 MACD 的时间轴柱走 `BarDataItemOption.typedValue` 传 `[time, value]`。
+
 `doc-example/` 里还没有移植的（上游 80 个文件 = 79 个 `.js` + 1 个 `.ts`、已按 `doc-example/` id 落地
 57 个、`bar-large` / `pie-highlight` 按家族 id 落地，剩 21 条）。按原因分类：
 
@@ -286,6 +302,13 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   `MatrixDimensionOption.levelSize`、`MatrixBodyCornerCellOption.coord`（`MatrixCoordRangeOption[]`）、
   `coordClamp`、递归的 `children`。
 - `GridOption`：补 `ComponentOption` 继承来的 `coordinateSystem` / `coord`（矩阵布局的网格需要）。
+- `TitleOption.coordinateSystem` / `coord`：上游 `.d.ts` 只通过 `ComponentOnMatrixOptionMixin` 给了
+  `matrixIndex` / `matrixId`，但标题视图实际走 `createBoxLayoutReference`，运行期读的是这两个字段
+  （`matrix-stock` 把标题钉在矩阵格上就这么写），已补上并由
+  `MatrixAndGraphicOptionTest.titleCanBeLaidOutOnMatrixCells` 断言。
+- `BarDataItemOption.typedValue`：上游 `BarDataValue` 是 `OptionDataValue | OptionDataValue[]`，时间轴上
+  的柱要把 `[time, value]` 二元组写进同一个 `value` 字段；照 line / scatter 的做法用
+  `@JsName("value")` 的联合类型字段，`SeriesTypedDataTest` 断言回读。
 - `EChartsOption.graphic`：从 `Array<GraphicElement>` 改成上游的 `GraphicComponentLooseOption[]`
   （`GraphicComponentOption` 带 `elements`，或裸元素），元素补 `x` / `y` / `width` / `height`。
 - `CustomSeriesRenderItemAPI`：补 `coord` / `size` / `layout`（新增 `CoordinateSystemDataCoord` 联合），

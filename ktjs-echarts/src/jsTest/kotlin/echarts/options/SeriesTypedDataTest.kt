@@ -122,6 +122,19 @@ class SeriesTypedDataTest {
 
         val line = unsafeJso<LineDataItemOption> { typedValue = OptionDataValueOrArray(1.0) }
         assertEquals(1.0, line.value!!.unsafeCast<Double>(), "the inherited value reads the same property")
+
+        val bar =
+            unsafeJso<BarDataItemOption> {
+                typedValue =
+                    OptionDataValueOrArray(
+                        arrayOf(OptionDataValue(1_700_000_000_000.0), OptionDataValue(12.5)),
+                    )
+            }
+        assertEquals(
+            2,
+            bar.value!!.unsafeCast<Array<*>>().size,
+            "a bar on a time axis carries its [time, value] row through the shared property",
+        )
     }
 
     @Test

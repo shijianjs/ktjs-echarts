@@ -239,7 +239,7 @@
 - 验证：`./gradlew build`、`:ktjs-echarts:jsBrowserTest`、`:demo:e2eTest` 三条都要过；
   e2e 会打包站点并用 Playwright **逐页**打开每个示例断言画布。
 
-### 已落地（277 个示例 / 26 个家族 + 文档示例组 + 总览页）
+### 已落地（279 个示例 / 26 个家族 + 文档示例组 + 总览页）
 
 - 第一批（69 个）：bar 13、line 10、pie 10、scatter 3、candlestick 1、boxplot 3、pictorialBar 1、
   parallel 1、heatmap 1、gauge 5、funnel 4、radar 5、treemap 1、graph 2、chord 4、sankey 2、
@@ -274,6 +274,14 @@
   `treemap-obama`（3.7 万亿预算，递归节点转成四维数据，`colorMappingBy: id`）、
   `geo-svg-lines`（楼层平面图 SVG 上的 polyline 路径）。
 
+- 第三十四批（2 个，MBTI 相容矩阵 + 股市矩阵看板）：`matrix-mbti` 追加在 `examples/MatrixLongTail.kt`
+  （数据与配色在 `MbtiData.kt`）：16×16 矩阵每格用两色 decal 图案区分一对类型，两层 `levels`
+  （25 / 30）的组头，点击画布在明细与四组中位数汇总之间 `setOption(option, true)` 切换；上游的
+  `window.innerWidth` / `innerHeight` 改成按图表尺寸推算。新建 `examples/MatrixStock.kt` 的
+  `matrix-stock`：5×6 矩阵上铺价格（4 行）、MACD、成交量、买卖十档与深度图，5 个 grid 与 4 个标题用
+  `coordinateSystem: 'matrix'` + `coord` 钉进格子、`mergeCells` 跨格合并、时间轴 `breaks` 折掉午休；
+  `Math.random()` 换成 `Lcg`，`markPoint` 必须带 `relativeTo: 'coordinate'` 否则标签会铺满整图高度。
+  配套 wrapper 补 `TitleOption.coordinateSystem` / `coord` 与 `BarDataItemOption.typedValue`，均有测试。
 - 第三十三批（2 个，柱状框选 + 元素周期表）：`bar-brush` 追加在 `examples/BarExtra.kt`，工具栏切到
   矩形 / 多边形 / 轴向框选后，`brushSelected` 事件把命中的原始数据下标拼成右下角标题；上游把事件
   payload 声明成 `any`，示例侧用本地 `external interface`（`batch[].selected[].dataIndex`）强转。
@@ -496,7 +504,8 @@
 1. **几乎零成本（option 组合、内联表）**：
    `intraday-breaks-*` / `parallel-aqi` / `scatter-matrix` / `pie-parliament-transition` /
    `calendar-effectscatter` / `bar-multi-drilldown` 已完成。
-2. **要写数据转换脚本**：`matrix-stock` / `matrix-mbti`；`matrix-periodic-table` 已在第三十三批完成；
+2. **要写数据转换脚本**：`matrix-stock` / `matrix-mbti` 已在第三十四批完成；`matrix-periodic-table`
+   已在第三十三批完成；
    `grid-multiple` / `area-rainfall`（各 85KB，已拆成资源文件）、`scatter-world-population`
    已在第三十二批完成；`scatter-weight`、`pictorialBar-vehicle` / `-body-fill` / `-velocity` /
    `-bar-transition`（`path://` 面板图，先例是 `examples/GaugeLongTail.kt`）已在第三十一批完成。
@@ -572,8 +581,8 @@
 ## 待办
 
 - 类型建模：暂无未完成项（见上面各轮）。
-- 示例站（demo）：见「示例站（demo）移植进度」一节。第三十三批（`bar-brush` + `matrix-periodic-table`）
-  之后，第二档只剩 `matrix-stock` / `matrix-mbti`：前者是 713 行的 sparkline 表 + dataZoom + detail
-  视图，后者要 `decal` 图案、点击切换 `setOption(option, true)` 与窗口尺寸适配；`bar-breaks-brush`
-  需 zr 级指针序列，不做；`custom-calendar-icon` 因上游源码只剩缩略图，不移植。
-- 提交：全部已推送到 `origin/main`（最新：第三十三批 2 个示例）。
+- 示例站（demo）：见「示例站（demo）移植进度」一节。第三十四批（`matrix-mbti` + `matrix-stock`）
+  之后，「无外部依赖」的第二档已经清空：只剩 `bar-breaks-brush` 这类需要 zr 级指针序列的
+  （不做）与 `custom-calendar-icon`（上游源码只剩缩略图，不移植）。继续做要按
+  `geo-choropleth-scatter` 的先例补地图类静态 GeoJSON，或回到 `doc-example/` 剩余条目。
+- 提交：全部已推送到 `origin/main`（最新：第三十四批 2 个示例）。

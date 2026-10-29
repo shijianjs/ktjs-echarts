@@ -717,6 +717,13 @@ class ExportSurfaceTest {
                     timeline = unsafeJso<TimelineOption> {
                         axisType = "category"
                         autoPlay = false
+                        width = StringOrDouble(55.0)
+                        height = StringOrDouble(40.0)
+                        tooltip = unsafeJso<TooltipOption> { trigger = TooltipTriggers.item }
+                        emphasis =
+                            unsafeJso<TimelineEmphasisOption> {
+                                itemStyle = unsafeJso<ItemStyleOption> { color = ZRColor("#555555") }
+                            }
                         data =
                             arrayOf(
                                 OptionDataItem(OptionDataValue("first")),
@@ -754,6 +761,10 @@ class ExportSurfaceTest {
             // `ECUnitOption` declares the timeline as a single object but `getOption` normalises
             // every component into an array, so the stored option is the first entry.
             val stored = assertNotNull(chart.getOption().timeline.unsafeCast<Array<TimelineOption>?>())[0]
+            assertEquals(55.0, stored.width!!.unsafeCast<Double>())
+            assertEquals(40.0, stored.height!!.unsafeCast<Double>())
+            assertEquals("item", stored.tooltip!!.trigger!!.unsafeCast<String>())
+            assertEquals("#555555", stored.emphasis!!.itemStyle!!.color!!.unsafeCast<String>())
             val data = assertNotNull(stored.data)
             assertEquals(2, data.size)
             val item = data[1].unsafeCast<TimelineDataItemOption>()

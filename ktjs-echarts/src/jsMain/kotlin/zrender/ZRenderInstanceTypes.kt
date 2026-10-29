@@ -21,6 +21,9 @@ external interface ZRenderType {
     /** Removes an element from the root group. */
     fun remove(element: ZRElement)
 
+    /** Configures the `zLevel`-th canvas layer. */
+    fun configLayer(zLevel: Double, config: ZRLayerConfig)
+
     /** Repaints the instance on the next frame. */
     fun refresh()
 
@@ -62,6 +65,20 @@ external interface ZRenderType {
 
     /** Disposes the instance. */
     fun dispose()
+}
+
+/**
+ * Options of [ZRenderType.configLayer].
+ */
+external interface ZRLayerConfig {
+    /** Colour the layer is cleared with before each frame. */
+    var clearColor: ZRColor?
+
+    /** Whether the content of the previous frame is kept, producing a motion-blur trail. */
+    var motionBlur: Boolean?
+
+    /** Opacity of the previous frame when [motionBlur] is on. */
+    var lastFrameAlpha: Double?
 }
 
 /**

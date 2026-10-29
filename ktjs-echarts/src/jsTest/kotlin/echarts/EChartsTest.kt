@@ -375,6 +375,19 @@ class EChartsTest {
     }
 
     @Test
+    fun configLayerAcceptsMotionBlur() {
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(cartesianLineOption(1.0, 2.0))
+            val zr = assertNotNull(chart.getZr())
+            zr.configLayer(1.0, unsafeJso { motionBlur = true; lastFrameAlpha = 0.5; clearColor = ZRColor("#ffffff") })
+            zr.refresh()
+        } finally {
+            destroyChart(chart, container)
+        }
+    }
+
+    @Test
     fun getDataURLReturnsAPngDataUrl() {
         val (chart, container) = createChart()
         try {

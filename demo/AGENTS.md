@@ -180,6 +180,28 @@ option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
   分类 visualMap 的 `dimension` 指向的数据值必须是**城市名字符串**：上游把城市塞在元组里，
   Kotlin 侧要用 `row(x, y, city)` 而不是把城市换成索引，否则所有点都落到 `outOfRange` 的灰色。
 
+## 散点与平行坐标的数据页
+
+`examples/ScatterNutrients.kt` 收两页共用同一张 `data/nutrients.json`（7637 行、25 个食品组）：
+
+- `normalizeNutrients(json, limit)` 是两页共用的入口：数值列按上游 `parseFloat(v) || 0` 转（306 行有空
+  单元格），组名按**首次出现顺序**收集，配色是 `ECharts.color.modifyHSL('#5A94DF', hStep * i)`。散点页只
+  取前 1000 行、平行坐标页取全量，所以 `limit` 由调用方传，别写死在函数里。
+- 两页都在 `setOption` 之前调 `chart.getZr()?.configLayer(1, { motionBlur = true })`，系列 `zlevel = 1`。
+  因此画布内容落在**第二层** canvas 上：e2e 的 `waitForPainted` 只看第一层，会误判空页，必须用
+  `waitForAnyPainted`。
+- `scatter-nutrients-matrix` 的四个窗格 id 是 `xAxisLeft-yAxisTop` 这类字符串，同时充当 `xAxis.id` /
+  `yAxis.id` / `grid.id` 与 `series.xAxisId` / `yAxisId`；`axisPointer.link` 也按这些 id 分组。`axisPointer`
+  上 `show` 是 `BooleanOrString`、`snap` 是 `Boolean`，写反了编译才报。
+- 分类 visualMap 的 `categories` 在上游是 `unknown`，wrapper 是 `JsAny`：`strings<OptionDataItem>(...)`
+  要显式给类型参数才能赋进去。
+- `scatter-aqi-color` 的三张 31 行表上游就内联在示例里，移植后放在 `ScatterAqiData.kt`；tooltip 回调要把
+  `params` 先 `unsafeCast<CallbackDataParams>()` 才能读 `seriesName`。
+- `scatter-life-expectancy-timeline` 是 `baseOption` + 每年一份 `options`；`visualMap` 有 `categories` 就会
+  被 ECharts 判成 piecewise（`src/component/visualMap/typeDefaulter.ts`），不用写 `type`。
+- `numbers()` 的 vararg 是 `Double`，所以展开实参必须是 `DoubleArray`；`Array<Double>` 能编译到 vararg
+  之外，但 `*` 展开会报类型不匹配。
+
 ## 轴标签的多参回调
 
 轴 / 系列的 formatter 上游常带额外的第三、四个参数（断轴页的 `extra.break`、timeline 的
@@ -388,6 +410,10 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   `BaseBarSeriesOption`，字段保持原样。
 - `TimelineOption`：补 `replaceMerge`（`timeline-dynamic-series` 用 `'series'` 让切换播放点时整组
   替换系列，否则从 3 个切回 1 个会残留）与 `show`。
+- `TimelineOption`（`scatter-life-expectancy-timeline`）：补 `BoxLayoutOptionMixin` 的 `width` / `height`
+  （时间轴靠 `width: 55` 竖排在右侧）与 `tooltip` / `emphasis`。
+- `ZRenderType.configLayer` 与 `ZRLayerConfig`（`clearColor` / `motionBlur` / `lastFrameAlpha`）：
+  两页营养散点用 `configLayer(1, { motionBlur: true })` 开尾迹模糊，wrapper 之前没有这个入口。
 - `PictorialBarDataItemOption`：上游继承 `AnimationOptionMixin`，wrapper 漏了 `AnimationOption`
   （`pictorialBar-clip` 背景系列的 `animationDuration: 0` 需要）。
 - `GraphicElement.rotation`：KDoc 原先写「角度」，实际 zrender 元素读的是弧度
@@ -587,6 +613,9 @@ ECharts 实例在**页面可见时才创建**（`ChartHolder.mount()`），换�
 `the 3d pages paint through the webgl layer`）各自用 `@Timeout(300)` 放宽到 5 分钟：目录每加一页，这两个
 用例就多一次「切路由 + 等画布」，WebGL 页还要先编译着色器；上限写死在单个用例上，别把整个套件的默认预算
 一起抬上去。
+
+同一批里还加了 `waitForAnyPainted`：ECharts 把每个 `zlevel` 画到独立 canvas 上，`zlevel = 1` 的页面（两页
+营养散点）第一层是空的，逐层扫描才等得到内容。
 
 `page(meta)` 会给页面根节点写上 `data-route`，`assertChartRendered` / `waitForPainted` 都按
 `.page[data-route='<id>'] .chart canvas` 找画布。原因是 `location.hash` 改完，`hashchange` 处理器还要

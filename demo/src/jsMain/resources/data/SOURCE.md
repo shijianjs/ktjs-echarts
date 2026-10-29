@@ -16,7 +16,7 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `disk.tree.json` | `data/` | `treemap-disk` |
 | `ec-option-doc-statistics-201604.json` | `data/` | `treemap-drill-down` |
 | `echarts-package-size.json` | `data/` | `treemap-sunburst-transition` |
-| `life-expectancy.json` | `data/` | `graph-life-expectancy` |
+| `life-expectancy.json` | `data/` | `graph-life-expectancy`, `scatter-life-expectancy-timeline` |
 | `life-expectancy-table.json` | `data/` | `dataset-encode1` |
 | `les-miserables.json` | `data/` | `graph`, `graph-circular-layout`, `graph-force`, `graph-label-overlap` |
 | `npmdepgraph.min10.json` | `data/` | `graph-npm` |
@@ -45,7 +45,7 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `product.json` | `data/` | `sankey-levels` |
 | `confidence-band.json` | `data/` | `confidence-band` |
 | `masterPainterColorChoice.json` | `data/` | `scatter-painter-choice` |
-| `nutrients.json` | `data/` | `scatter3d` |
+| `nutrients.json` | `data/` | `scatter3d`, `scatter-nutrients`, `scatter-nutrients-matrix`, `parallel-nutrients` |
 | `rainfall-evaporation.json` | derived | `grid-multiple` |
 | `rainfall-flow.json` | derived | `area-rainfall` |
 | `img/custom-gauge-panel.png` | `img/` | `custom-gauge` (dial picture clipped into the scale arc and the pointer) |

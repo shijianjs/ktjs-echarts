@@ -598,6 +598,85 @@ class DemoPageTest {
     }
 
     /**
+     * The four pages of `ScatterAqi.kt`, `ScatterNutrients.kt` and `ParallelNutrients.kt` plus the
+     * timeline of `ScatterLifeTimeline.kt`.
+     *
+     * All of them build their rows from a fetched table (the AQI page keeps its three tables inline),
+     * so an option that never reached the chart leaves an empty canvas that only the painted-pixel
+     * wait catches. The two nutrient scatters draw on `zlevel = 1` with a motion-blur trail, which
+     * puts their content on a second canvas layer: the layer-aware wait is what makes those two
+     * pass at all. The timeline plays by itself, so a frame sampled after one point must differ from
+     * the first one.
+     */
+    @RetryingTest(maxAttempts = 2)
+    @Timeout(300)
+    fun `the nutrient and aqi data pages paint`(page: Page) {
+        val consoleErrors = mutableListOf<String>()
+        page.onConsoleMessage { message ->
+            if (message.type() == "error") consoleErrors += message.text()
+        }
+        openPage(page)
+        for (
+            route in
+                listOf(
+                    "scatter-aqi-color",
+                    "scatter-nutrients",
+                    "scatter-nutrients-matrix",
+                    "parallel-nutrients",
+                )
+        ) {
+            page.evaluate("(value) => { location.hash = '#/' + value }", route)
+            assertChartRendered(page, route)
+            waitForAnyPainted(page, route)
+        }
+        val route = "scatter-life-expectancy-timeline"
+        page.evaluate("(value) => { location.hash = '#/' + value }", route)
+        assertChartRendered(page, route)
+        waitForPainted(page, route)
+        val before = paintedFrame(page)
+        page.waitForTimeout(2400.0)
+        val after = paintedFrame(page)
+        assertTrue(before != after, "$route did not walk to the next year")
+        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
+    }
+
+    /**
+     * Waits until any canvas layer of [route] holds a painted pixel.
+     *
+     * ECharts puts every `zlevel` on its own canvas, and the pages that fan a scatter out on
+     * `zlevel = 1` leave the first layer empty, so [waitForPainted] would time out on them even
+     * though they draw perfectly well.
+     */
+    private fun waitForAnyPainted(page: Page, route: String) {
+        try {
+            page.waitForFunction(
+                """
+                () => {
+                    const canvases = document.querySelectorAll(".page[data-route='$route'] .chart canvas");
+                    for (const canvas of canvases) {
+                        const context = canvas.getContext('2d');
+                        if (!context) {
+                            continue;
+                        }
+                        const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
+                        for (let index = 3; index < data.length; index += 4 * 97) {
+                            if (data[index] !== 0) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+                """,
+                null,
+                Page.WaitForFunctionOptions().setTimeout(20000.0),
+            )
+        } catch (error: com.microsoft.playwright.TimeoutError) {
+            throw AssertionError("route $route painted nothing on any canvas layer", error)
+        }
+    }
+
+    /**
      * Waits until the chart canvas of [route] holds a painted pixel.
      *
      * The pages that fetch their data set the option later, so a single sample would race with the

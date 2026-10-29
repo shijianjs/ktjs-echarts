@@ -1228,6 +1228,9 @@ external interface TimelineOption {
     /** Whether the component is shown. */
     var show: Boolean?
 
+    /** Tooltip of the timeline points. Upstream narrows `trigger` to `"item"`. */
+    var tooltip: TooltipOption?
+
     /** Type of the timeline axis: `"value"` or `"category"`. */
     var axisType: String?
 
@@ -1261,6 +1264,12 @@ external interface TimelineOption {
     /** Distance to the bottom side. */
     var bottom: StringOrDouble?
 
+    /** Width of the component. */
+    var width: StringOrDouble?
+
+    /** Height of the component. */
+    var height: StringOrDouble?
+
     /** Padding of the component. */
     var padding: DoubleOrDoubleArray?
 
@@ -1293,6 +1302,9 @@ external interface TimelineOption {
 
     /** Style of the progress bar. */
     var progress: TimelineProgressOption?
+
+    /** Hover state of the timeline. */
+    var emphasis: TimelineEmphasisOption?
 
     /**
      * Data of the timeline points.
@@ -1366,6 +1378,26 @@ external interface TimelineDataItemEmphasisOption {
 
     /** Style of the checkpoint over the hovered point. */
     var checkpointStyle: TimelineCheckpointStyle?
+}
+
+/**
+ * Hover state of a timeline.
+ */
+external interface TimelineEmphasisOption {
+    /** Style of the hovered axis line. */
+    var lineStyle: TimelineLineStyleOption?
+
+    /** Style of the hovered points. */
+    var itemStyle: ItemStyleOption?
+
+    /** Style of the checkpoint over the hovered point. */
+    var checkpointStyle: TimelineCheckpointStyle?
+
+    /** Style of the hovered play controls. */
+    var controlStyle: TimelineControlStyle?
+
+    /** Style of the hovered labels. */
+    var label: TimelineLabelOption?
 }
 
 /**

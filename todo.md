@@ -50,29 +50,30 @@
 
 - 各家族基本铺满；剩下的候选要么需要真实键鼠序列，要么需要外部 JS / GeoJSON / 图片素材
   （原因见 `demo/AGENTS.md`）。
-- `gl` 分组共 25 页：`examples/Gl.kt`（`bar3d-punch-card`、`transparent-bar3d`、`bar3d-dataset`、
+- `gl` 分组共 27 页：`examples/Gl.kt`（`bar3d-punch-card`、`transparent-bar3d`、`bar3d-dataset`、
   `line3d-orthographic`、`simple-surface`、`sphere-parametric-surface`、`surface-wave`、
   `image-surface-sushuang`）、`examples/GlScatter.kt`（`scatter3d`、`scatter3d-scatter`、
   `scatter3D-dataset`）、`examples/GlSurfaceMaterial.kt`（`metal-surface`、`surface-breather`、
   `surface-mollusc-shell`、`surface-golden-rose`、`surface-theme-roses`、`parametric-surface-rose`、
-  `surface-leather`）与 `examples/GlGeo.kt`（`geo3d`、`geo3d-with-different-height`、五页 `globe-*`）；
-  `main()` 的 `useEChartsGl()` 注册 `Bar3DChart` / `Line3DChart` / `Scatter3DChart` / `SurfaceChart` /
-  `Grid3DComponent` / `Geo3DComponent` / `GlobeComponent`。
+  `surface-leather`）与 `examples/GlGeo.kt`（`geo3d`、`geo3d-with-different-height`、六页 `globe-*`、
+  `scatter3d-globe-population`）；`main()` 的 `useEChartsGl()` 注册 `Bar3DChart` / `Line3DChart` /
+  `Scatter3DChart` / `SurfaceChart` / `Grid3DComponent` / `Geo3DComponent` / `GlobeComponent`。
 - 可复用数据：`punchCardValues` / `punchCardHours` / `punchCardDays`（`CustomExtra.kt`）、
-  `resources/data/life-expectancy-table.json`、`resources/data/nutrients.json`；11 色 `visualMap` 色带在
-  `Gl.kt` 的 `glPalette` / `glVisualMap()` 与 `GlSurfaceMaterial.kt` 的 `surfaceRamp()`。
+  `resources/data/life-expectancy-table.json`、`resources/data/nutrients.json`、`population.json`；
+  11 色 `visualMap` 色带在 `Gl.kt` 的 `glPalette` / `glVisualMap()` 与 `GlSurfaceMaterial.kt` 的
+  `surfaceRamp()`。
 - 素材：`resources/data/img/gl/` 下是 HDR 环境图、皮革贴图与地球/月球/星空纹理，来源记在
-  `data/SOURCE.md`；`resources/data/world.json` 与 `world-population.json` 供 `geo3D` 使用。
+  `data/SOURCE.md`；`resources/data/world.json` 与 `world-population.json` 供 `geo3D` 与 globe 页面使用，
+  `world.json` 的缩写地名由 `GlGeo.kt` 的 `worldRegionNames` 表翻译。
 
 ## 下一步（GL 横向铺开）
 
-1. **`scatter3D` 落在 globe 上**：`scatter3d-globe-population`（换 `population.json`）与
-   `globe-with-echarts-surface`（`TextureSource(EChartsInstance)` 已经能用，把 4096×2048 的地图实例贴到球
-   面）。
-2. **先补 `lines3D` 再铺飞行线**：`lines3d-flights-on-geo3d`、`lines3d-airline-on-globe`、
-   `animating-contour-on-globe` 都需要 `lines3D` 系列选项与数据项。
-3. **暂不做**：`*-simplex-noise`（需要 `simplex-noise` 外部库）、`*-mapbox*` / `*-maptalks*`（页面要额外
-   加载地图 JS）、`iron-globe` 一类依赖官方站点 `/asset/get/s/` 纹理的示例。
+1. **先补 `lines3D` 再铺飞行线**：`lines3d-flights-on-geo3d`、`lines3d-airline-on-globe` 需要
+   `lines3D` 的系列选项、数据项与 `effect`；数据用 `flights.json`（`{airports, routes}`，机场是
+   `[名字, 城市, 国家, 经度, 纬度]`）。补完 wrapper 还要提升 `ktjs-echarts-gl` 修订号、跑测试并加用例。
+2. **暂不做**：`animating-contour-on-globe`（d3-array/contour/geo/timer）、`*-simplex-noise`（需要
+   `simplex-noise` 外部库）、`*-mapbox*` / `*-maptalks*`（页面要额外加载地图 JS）、`iron-globe` 一类依赖
+   官方站点 `/asset/get/s/` 纹理的示例。
 
 ## 仍然生效的坑
 
@@ -100,6 +101,9 @@
   `Geo3DComponent` getter 里自己注册，否则每个 `geo3D` 页面刷 4 条 missing-shader 错误。
 - 纹理可以是 ECharts 实例，但那个实例必须建在 canvas 上，否则控制台警告「must init on canvas」且取不到
   内容。图层纹理走 URL 时是异步加载，销毁后再回调会在 `api.getZr()` 上崩，测试里用 canvas 纹理。
+- `world.json` 的地名是缩写（`Czech Rep.` / `Korea` / `Dem. Rep. Congo`…），`world-population.json` 与官方
+  站点注册的 ECharts 4.9 世界地图用全称；按名字匹配的 `regions` / 地图 `data` 必须先翻译，否则这些国家
+  静默没有值。
 - 目前所有 planet/地图纹理都需要 `registerMap` 先跑完，`Category.interactive` + `loadJson` 是标准写法。
 - 空的 `viewControl` / `grid3D` 不要为了「对齐上游」写出来，只在真的设了字段时写。
 - `echarts-gl` 没有 TypeScript 声明，选项按 `echarts-doc` 的 `option-gl/` 与源码 `defaultOption` 建模。

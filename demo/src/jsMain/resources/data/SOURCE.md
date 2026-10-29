@@ -52,6 +52,7 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `img/gl/sushuang.jpg` | derived | `image-surface-sushuang` (per-pixel surface) |
 | `img/gl/woods.jpg` | `data-gl/asset/` | `geo3d-with-different-height` (detail texture) |
 | `img/gl/starfield.jpg` | `data-gl/asset/` | the globe pages (environment) |
+| `img/gl/lake.hdr` | `data-gl/asset/` | `scatter3d-globe-population` (ambient cubemap) |
 | `img/gl/earth.jpg` | `data-gl/asset/` | `globe-atmosphere`, `globe-layers` (base texture) |
 | `img/gl/moon-base.jpg` | `data-gl/asset/` | `globe-moon` (base texture) |
 | `img/gl/moon-bump.jpg` | `data-gl/asset/` | `globe-moon` (height texture) |
@@ -59,12 +60,19 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `img/gl/clouds.png` | `data-gl/asset/` | `globe-layers` (overlay layer) |
 | `img/gl/world.topo.bathy.200401.jpg` | `data-gl/asset/` | `globe-echarts-gl-hello-world` (base and height texture) |
 | `img/gl/bathymetry_bw_composite_4k.jpg` | `data-gl/asset/` | `globe-displacement`, `globe-layers` (displacement / height texture) |
-| `world-population.json` | `data-gl/asset/data/` | `geo3d-with-different-height` (region heights) |
+| `world-population.json` | `data-gl/asset/data/` | `geo3d-with-different-height` (region heights), `globe-with-echarts-surface` (map values) |
+| `population.json` | `data-gl/asset/data/` | `scatter3d-globe-population` (`[lng, lat, population]` cells) |
 
 The two `rainfall-*.json` files are **derived**, not copied: upstream keeps these 3079-point series
 inline in `examples/ts/grid-multiple.ts` and `examples/ts/area-rainfall.ts`, so a one-off script split
 the arrays into JSON (`time` plus the two series) to keep the Kotlin port a diff of code rather than
 numbers.
+
+`globe-with-echarts-surface` keeps its 177 country values inline upstream; the port reads
+`world-population.json` instead. The two lists agree except for one name: upstream writes
+`United States of America`, the file writes `United States`, which is the spelling of
+`geometry/world.json` — the name this site registers as the `world` map. That map also abbreviates
+other region names, so `GlGeo.kt` translates the names of the data back to the names of the map.
 
 `img/gl/sushuang.jpg` is **derived** as well: upstream keeps the picture inline in
 `examples/ts/gl/image-surface-sushuang.js` as a base64 data URL, so it was decoded into a file and is

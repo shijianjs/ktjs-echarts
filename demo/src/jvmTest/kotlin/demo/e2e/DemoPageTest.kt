@@ -277,6 +277,8 @@ class DemoPageTest {
                 "globe-displacement",
                 "globe-moon",
                 "globe-layers",
+                "scatter3d-globe-population",
+                "globe-with-echarts-surface",
             )
         for (route in routes) {
             assertChartRendered(page, route)

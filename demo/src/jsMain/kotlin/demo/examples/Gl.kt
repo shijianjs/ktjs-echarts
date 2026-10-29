@@ -77,7 +77,7 @@ private val gl = Category(Groups.GL, "examples/Gl.kt")
 private val LOAD: EventType<Event> = EventType("load")
 
 /** The eleven-colour palette the `visualMap` of the GL examples uses, dark blue to dark red. */
-private val glPalette =
+internal val glPalette =
     arrayOf(
         "#313695",
         "#4575b4",

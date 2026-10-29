@@ -91,7 +91,7 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后仍有 250+ 个候选，目前已落地 **304 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
+筛选后仍有 250+ 个候选，目前已落地 **306 个示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页），
 其余按批推进。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -422,16 +422,30 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
   `.hdr` 走 `textureUtil.loadTexture(url, {fileType:'hdr'})`（XHR + arraybuffer），静态服务器给的 MIME
   不影响加载。`surface-leather` 先把 `leather_height.jpg` 画进 2D canvas 读红通道，再把顶点按像素值膨
   胀，所以这一页必须等图片 `load` 之后才 `setOption`。
-- **地理与地球七页在 `GlGeo.kt`**：`geo3d` / `geo3d-with-different-height` 用 `geo3D` 组件，
+- **地理与地球九页在 `GlGeo.kt`**：`geo3d` / `geo3d-with-different-height` 用 `geo3D` 组件，
   `globe-echarts-gl-hello-world` / `globe-atmosphere` / `globe-displacement` / `globe-moon` /
-  `globe-layers` 用 `globe` 组件，两个 installer 已加进 `useEChartsGl()`。`geo3D` 必须先有地图：两页都在
-  `Category.interactive` 里 `loadJson("data/world.json")` 后 `ECharts.registerMap("world", ...)`，
-  `geo3d-with-different-height` 再取 `world-population.json`，把人口的对数线性映射到 `0..3` 当成
-  `regions[].height`（文档写的 `regionHeight` 是整幅地图的基准高度，两者不同）。`geo3d` 原例的
-  `lambertMaterial.baseTexture`（`woods.jpg`）在 2.1.0 里没有任何材质读（`setMaterialFromModel` 只看
-  `detailTexture`），照官方缩略图那样留白。五页 globe 的 `series: []` 是空操作，省略；
-  `globe-displacement` 的 `debug.wireframe` 上游没写进文档但会被读取，wrapper 照样建模。球面纹理可以是
-  图片 URL，也可以是一个 ECharts 实例（必须建在 canvas 上，否则控制台警告并取不到内容）。
+  `globe-layers` / `globe-with-echarts-surface` 用 `globe` 组件，`scatter3d-globe-population` 是
+  `coordinateSystem: "globe"` 的 `scatter3D`，两个 installer 已加进 `useEChartsGl()`。`geo3D` 必须先有
+  地图：都在 `Category.interactive` 里 `loadJson("data/world.json")` 后
+  `ECharts.registerMap("world", ...)`，`geo3d-with-different-height` 再取 `world-population.json`，把人
+  口的对数线性映射到 `0..3` 当成 `regions[].height`（文档写的 `regionHeight` 是整幅地图的基准高度，两者
+  不同）。`geo3d` 原例的 `lambertMaterial.baseTexture`（`woods.jpg`）在 2.1.0 里没有任何材质读
+  （`setMaterialFromModel` 只看 `detailTexture`），照官方缩略图那样留白。globe 页的 `series: []` 是空操
+  作，省略；`globe-displacement` 的 `debug.wireframe` 上游没写进文档但会被读取，wrapper 照样建模。球面
+  纹理可以是图片 URL，也可以是一个 ECharts 实例（必须建在 canvas 上，否则控制台警告并取不到内容）。
+- **两张页面靠离屏图表与人口数据取值**：`scatter3d-globe-population` 读 `population.json`
+  （`[lng, lat, 人口]`，三万多行全为正，上游那条 `> 0` 过滤是空操作），把 `sqrt(人口)` 当第三列，交给
+  `visualMap.inRange.symbolSize = [1, 10]` 与 `blendMode: "lighter"`；`globe-with-echarts-surface` 先用
+  `ECharts.init(canvas, null, { width: 4096, height: 2048 })` 画一张 `map` 系列，再把**这个实例**作为
+  `globe.baseTexture`。上游的 177 个国家值内联在示例里，与 `world-population.json` 相同，所以直接读文件。
+- **`world.json` 的地名是缩写**：本站注册的 `geo/world.json` 写 `Czech Rep.` / `Korea` / `Dem. Rep. Congo`
+  等，而 `world-population.json`（以及官方站点注册的 ECharts 4.9 世界地图）写全称，`GlGeo.kt` 的
+  `worldRegionNames` 表把数据名翻回地图名，`geo3D` 的区域高度与地图系列都走它。`Kosovo` /
+  `Somaliland` / `West Bank` / `French Guiana` / `French Southern and Antarctic Lands` 在这份 GeoJSON 里
+  没有对应区域，只影响这几块不上色。
+- **不做的 GL 页**：`animating-contour-on-globe` 依赖 `d3-array` / `d3-contour` / `d3-geo` / `d3-timer`
+  在页面里生成等高线，等价实现要先把 d3 的结果算出来；`*-simplex-noise`、`*-mapbox*`、`*-maptalks*`、
+  `iron-globe` 分别需要外部库、地图 JS 或官方站点 `/asset/get/s/` 的纹理。
 - **上游的死字段不要搬**：`surface-breather` 的「Export OBJ」按钮调 `echarts.exportGL2PLY`，该模块在
   `echarts-gl` 2.1.0 里已经删掉；`parametric-surface-rose` 的 `realisticMaterial.baseTexture` 没有任何
   材质读它（只有 `globe.baseTexture` 有用）；玫瑰三页的 `toolbox.iconStyle.normal.borderColor` 是 ECharts

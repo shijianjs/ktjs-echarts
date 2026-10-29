@@ -1,6 +1,7 @@
 package echarts.options
 
 import echarts.VisualMapType
+import echarts.RoamTrigger
 import echarts.BrushMode
 import echarts.BrushThrottleType
 import echarts.BrushToolboxIconType
@@ -883,6 +884,9 @@ external interface GeoOption : BoxLayoutOptionMixin {
 
     /** Whether panning and zooming are enabled. */
     var roam: BooleanOrString?
+
+    /** Area that triggers roaming. */
+    var roamTrigger: RoamTrigger?
 
     /** Center of the map, e.g. `[104.0, 35.0]`. */
     var center: Array<StringOrDouble>?

@@ -24,9 +24,9 @@ import js.objects.unsafeJso
 /*
  * Graph examples ported from `public/examples/ts/graph*.ts` of apache/echarts-examples.
  *
- * `graph`, `graph-circular-layout`, `graph-label-overlap`, `graph-life-expectancy`, `graph-npm`,
- * `graph-webkit-dep`, `graph-force-dynamic` and `graph-grid` are not ported: five of them load
- * their nodes from the example server and the others need a real drag or hover sequence.
+ * The two pages here need no data file. The four renders of `les-miserables.json` and the two
+ * dependency graphs live in `GraphData.kt`, `graph-life-expectancy`, `graph-grid` and
+ * `graph-force-dynamic` in `GraphExtra.kt`.
  */
 
 private val graph = Category(Groups.GRAPH, "examples/Graph.kt")

@@ -1,6 +1,7 @@
 package echarts.options
 
 import echarts.SeriesLayoutBy
+import echarts.RoamTrigger
 import echarts.RoseType
 import echarts.AnimationType
 import echarts.PieAnimationTypeUpdate
@@ -503,6 +504,9 @@ external interface MapSeriesOption :
 
     /** Whether panning and zooming are enabled. */
     var roam: BooleanOrString?
+
+    /** Area that triggers roaming. */
+    var roamTrigger: RoamTrigger?
 
     /** Center of the map. */
     var center: Array<StringOrDouble>?

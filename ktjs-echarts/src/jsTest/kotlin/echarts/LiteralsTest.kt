@@ -12,6 +12,7 @@ import echarts.options.DataZoomOption
 import echarts.options.EChartsOption
 import echarts.options.GaugeSeriesOption
 import echarts.options.GraphicElement
+import echarts.options.GraphSeriesOption
 import echarts.options.GridOption
 import echarts.options.HeatmapSeriesOption
 import echarts.options.LabelOption
@@ -100,6 +101,17 @@ class LiteralsTest {
         assertEquals("category", AxisTypes.category.unsafeCast<String>())
         assertEquals("time", AxisTypes.time.unsafeCast<String>())
         assertEquals("log", AxisTypes.log.unsafeCast<String>())
+    }
+
+    @Test
+    fun roamTriggersMatchTheUpstreamNames() {
+        assertEquals("global", RoamTriggers.global.unsafeCast<String>())
+        assertEquals("selfRect", RoamTriggers.selfRect.unsafeCast<String>())
+        val graph = unsafeJso<GraphSeriesOption> {
+            layout = GraphLayouts.none
+            roamTrigger = RoamTriggers.global
+        }
+        assertEquals(RoamTriggers.global, graph.roamTrigger)
     }
 
     @Test

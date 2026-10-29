@@ -1123,6 +1123,28 @@ object AxisBreakActions {
 }
 
 /**
+ * Area that triggers roaming of a zoomable component or series.
+ *
+ * Upstream `'global' | 'selfRect'`; unset means the intersection of the element's own bounding rect
+ * and the clipping rect, if any.
+ */
+sealed external interface RoamTrigger
+
+/** Wraps a value that comes from JavaScript. Prefer the constants in [RoamTriggers]. */
+inline fun RoamTrigger(value: String): RoamTrigger = value.unsafeCast<RoamTrigger>()
+
+/**
+ * The documented values of [RoamTrigger].
+ */
+object RoamTriggers {
+    /** The whole canvas, clipped by the clipping rect when there is one. */
+    inline val global: RoamTrigger get() = RoamTrigger("global")
+
+    /** The bounding rect of the element itself. */
+    inline val selfRect: RoamTrigger get() = RoamTrigger("selfRect")
+}
+
+/**
  * Action that produced a `selectchanged` event: `"select"`, `"unselect"` or `"toggleSelected"`.
  */
 sealed external interface SelectChangedFromAction

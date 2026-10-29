@@ -16,6 +16,9 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `disk.tree.json` | `data/` | `treemap-disk` |
 | `life-expectancy.json` | `data/` | `graph-life-expectancy` |
 | `life-expectancy-table.json` | `data/` | `dataset-encode1` |
+| `les-miserables.json` | `data/` | `graph`, `graph-circular-layout`, `graph-force`, `graph-label-overlap` |
+| `npmdepgraph.min10.json` | `data/` | `graph-npm` |
+| `webkit-dep.json` | `data/` | `graph-webkit-dep` |
 | `flights.json` | `data/` | `lines-airline` |
 | `gl/flights.json` | `data-gl/asset/data/` | `lines3d-airline-on-globe`, `lines3d-flights-on-geo3d` (17k routes, smaller than the 2D table) |
 | `nba-court.json` | `data/` | `custom-hexbin` |

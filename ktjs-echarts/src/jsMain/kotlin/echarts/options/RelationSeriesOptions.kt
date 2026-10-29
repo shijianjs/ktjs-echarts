@@ -1,6 +1,7 @@
 package echarts.options
 
 import echarts.Orient
+import echarts.RoamTrigger
 import echarts.NodeAlign
 import echarts.GraphLayout
 import echarts.GraphInitLayout
@@ -165,6 +166,9 @@ external interface GraphSeriesOption :
 
     /** Whether panning and zooming are enabled. */
     var roam: BooleanOrString?
+
+    /** Area that triggers roaming. */
+    var roamTrigger: RoamTrigger?
 
     /** Center of the graph. */
     var center: Array<StringOrDouble>?
@@ -376,6 +380,9 @@ external interface ChordSeriesOption :
     /** Whether panning and zooming are enabled. */
     var roam: BooleanOrString?
 
+    /** Area that triggers roaming. */
+    var roamTrigger: RoamTrigger?
+
     /**
      * Typed view of [SeriesOption.data] with the item type of a chord diagram.
      *
@@ -550,6 +557,9 @@ external interface SankeySeriesOption :
 
     /** Whether panning and zooming are enabled. */
     var roam: BooleanOrString?
+
+    /** Area that triggers roaming. */
+    var roamTrigger: RoamTrigger?
 
     /**
      * Typed view of [SeriesOption.data] with the item type of a sankey diagram.

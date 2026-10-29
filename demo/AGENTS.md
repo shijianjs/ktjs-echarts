@@ -104,8 +104,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后落地 **320 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
-的官方清单统计，共 436 条：已移植 321 条，明确不做 51 条，待补 64 条；逐条清单与理由见
+筛选后落地 **326 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
+的官方清单统计，共 436 条：已移植 327 条，明确不做 51 条，待补 58 条；逐条清单与理由见
 [COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -195,6 +195,13 @@ bar 家族的计算长尾在 `examples/BarLongTail.kt`：归一化堆叠（`bar-
 `graph-grid`（笛卡尔坐标系上的 graph）补在 `examples/GraphExtra.kt`，同文件还有 `graph-force-dynamic`：
 节点与边靠 `ChartHolder.setInterval` 每 200ms 长出来，随机源换成种子固定的 `Lcg`，节点 id 从 `"2"`
 开始（上游就是这么漏掉 `"0"` / `"1"` 的，照抄）。
+
+graph 家族里读数据文件的 6 页在 `examples/GraphData.kt`：`les-miserables.json` 的四次渲染
+（`graph`、`graph-circular-layout`、`graph-force`、`graph-label-overlap`），以及
+`npmdepgraph.min10.json` / `webkit-dep.json` 两张依赖图。上游在 `forEach` 里改节点字段的写法
+（`label.show = symbolSize > 30`、`symbolSize = 5`、`id = idx`）改成数据项构造时的参数；
+`graph-npm` 与 `graph-webkit-dep` 的 `thumbnail` 没有移植（站点没有该组件），`roamTrigger` 用
+`RoamTriggers.global` 照抄。
 
 `graphic` 家族的关键帧动画三页在 `examples/GraphicAnimations.kt`：描边文字（`graphic-stroke-animation`）、
 七条加载柱（`graphic-loading`）和噪点驱动的圆点波浪（`graphic-wave-animation`，要读 `chart.getWidth()`
@@ -325,6 +332,8 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
 - `ChordSeriesOption.radius`：上游允许 `[inner, outer]`，放宽为 `StringOrDoubleOrArray`。
 - `DataZoomOption`：补 `BoxLayoutOptionMixin`（上游只有 slider 变体带盒子布局，wrapper 合成了一个）。
 - `EmphasisFocuses`：补 `adjacency` / `ancestor` / `descendant`（sankey、chord、graph、tree 专用取值）。
+- `roamTrigger`：上游 `RoamOptionMixin` 的 `'global' | 'selfRect'` 之前没有声明，补 `RoamTrigger` /
+  `RoamTriggers` 与 geo、tree、treemap、map、graph、chord、sankey 上的 `roamTrigger`。
 - `OptionEncode`：上游是开放索引签名，补上文档列出的坐标维度 `x` / `y` / `value` / `radius` / `angle`。
   `itemChildGroupId` 之前拼成了 `childGroupdId`（对照 `apache/echarts/src/util/types.ts` 修正），
   `OptionEncodeTest` 用它把三个分组维度的属性名钉住——多层下钻的 `bar-multi-drilldown` 就靠它。

@@ -1,6 +1,7 @@
 package echarts.options
 
 import echarts.TreeLayout
+import echarts.RoamTrigger
 import echarts.TreeEdgeShape
 import echarts.TreeOrient
 import echarts.SortOrder
@@ -107,6 +108,9 @@ external interface TreeSeriesOption :
 
     /** Whether panning and zooming are enabled. */
     var roam: BooleanOrString?
+
+    /** Area that triggers roaming. */
+    var roamTrigger: RoamTrigger?
 
     /** Center of the tree. */
     var center: Array<StringOrDouble>?
@@ -307,6 +311,9 @@ external interface TreemapSeriesOption :
 
     /** Whether panning and zooming are enabled. */
     var roam: BooleanOrString?
+
+    /** Area that triggers roaming. */
+    var roamTrigger: RoamTrigger?
 
     /** Gap between nodes in pixels. */
     var nodeGap: Double?

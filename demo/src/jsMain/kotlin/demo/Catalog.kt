@@ -35,6 +35,7 @@ import demo.examples.glLinesEntries
 import demo.examples.glScatterEntries
 import demo.examples.glSurfaceMaterialEntries
 import demo.examples.graphicAnimationEntries
+import demo.examples.graphDataEntries
 import demo.examples.graphEntries
 import demo.examples.graphExtraEntries
 import demo.examples.heatmapEntries
@@ -213,6 +214,7 @@ val catalog: List<CatalogEntry> =
         graphicAnimationEntries,
         canvasGraphicsEntries,
         graphEntries,
+        graphDataEntries,
         graphExtraEntries,
         chordEntries,
         sankeyEntries,

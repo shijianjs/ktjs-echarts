@@ -19,9 +19,9 @@
 | 官方清单 | 436 |
 | 　· `chart-list-data.js` | 377 |
 | 　· `chart-list-data-gl.js` | 59 |
-| 已移植 | 320 页 / 321 条 |
+| 已移植 | 326 页 / 327 条 |
 | 明确不做 | 51 |
-| 待补 | 64 |
+| 待补 | 58 |
 
 已移植数里的「页」不含总览页（`#/overview`）；「条」把 `bar-large` / `pie-highlight` 同时算作对应 `doc-example/` 条目的移植。
 
@@ -127,9 +127,9 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 | --- |
 | `globe-country-carousel` |
 
-## 待补（64）
+## 待补（58）
 
-### 只缺静态数据 / 素材（37）
+### 只缺静态数据 / 素材（31）
 
 数据是静态文件或示例内联的数组，素材大多已在 `demo/src/jsMain/resources/data/` 里，补齐后即可移植。
 
@@ -143,12 +143,6 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 | `custom-ohlc` |
 | `custom-gauge` |
 | `wind-barb` |
-| `graph` |
-| `graph-circular-layout` |
-| `graph-force` |
-| `graph-label-overlap` |
-| `graph-npm` |
-| `graph-webkit-dep` |
 | `graphgl-gpu-layout` |
 | `graphgl-large-internet` |
 | `graphgl-npm-dep` |

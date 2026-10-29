@@ -19,7 +19,7 @@ jobs:
       github.event.head_commit.author.name != 'cnb-npc'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # git-sync 推的是完整分支，需要历史
           fetch-depth: 0

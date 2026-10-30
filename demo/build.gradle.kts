@@ -16,6 +16,12 @@ kotlin {
     jvm()
 
     sourceSets {
+        commonMain.dependencies {
+            // Pure KMP option model behind the "Kotlin JSON model" group: the model options are
+            // declared in `commonMain`, only their presentation is JS-specific.
+            implementation(project(":kmp-echarts-json"))
+        }
+
         jsMain.dependencies {
             implementation("org.jetbrains.kotlin-wrappers:kotlin-browser:2026.10.4")
             // Wrapper modules used by the demo.

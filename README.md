@@ -9,9 +9,10 @@ Kotlin/JS wrappers for the [`echarts`](https://www.npmjs.com/package/echarts) ec
 
 The repository keeps one Gradle module per npm package, or per group of packages that share an
 upstream version and release cadence. The project's namesake package owns the `ktjs-echarts`
-module; additional modules use the `ktjs-echarts-*` prefix. Tree shaking removes unused
-declarations from the final application bundle, so grouping related packages into one module is
-cheaper than one module per package.
+module; wrapper modules use the `ktjs-echarts-*` prefix, while `kmp-echarts-json` is a pure
+Kotlin Multiplatform model of the ECharts option schema and does not bind an npm package. Tree
+shaking removes unused declarations from the final application bundle, so grouping related
+packages into one module is cheaper than one module per package.
 
 ## Modules
 
@@ -19,6 +20,7 @@ cheaper than one module per package.
 | --- | --- | --- | --- |
 | [ktjs-echarts](ktjs-echarts/README.md) | `echarts` | `6.1.0-kt.1` | [![Maven Central](https://img.shields.io/maven-central/v/io.github.shijianjs/ktjs-echarts?label=Maven%20Central&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/io.github.shijianjs/ktjs-echarts) |
 | [ktjs-echarts-gl](ktjs-echarts-gl/README.md) | `echarts-gl` | `2.1.0-kt.1` | [![Maven Central](https://img.shields.io/maven-central/v/io.github.shijianjs/ktjs-echarts-gl?label=Maven%20Central&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/io.github.shijianjs/ktjs-echarts-gl) |
+| [kmp-echarts-json](kmp-echarts-json/README.md) | `echarts` option schema | `6.1.0-kt.1` | [![Maven Central](https://img.shields.io/maven-central/v/io.github.shijianjs/kmp-echarts-json?label=Maven%20Central&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/io.github.shijianjs/kmp-echarts-json) |
 
 ## Versioning
 
@@ -74,6 +76,9 @@ dependencies {
     implementation("io.github.shijianjs:ktjs-echarts:6.1.0-kt.1")
 }
 ```
+
+`kmp-echarts-json` is installed the same way and is used on the side that builds the option
+payload; see its [README](kmp-echarts-json/README.md).
 
 The POMs point at this GitHub repository (`url` and `scm.url`), and every module is a Kotlin
 Multiplatform project publishing `kotlin-tooling-metadata.json`. Those are the requirements for

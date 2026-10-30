@@ -9,6 +9,10 @@ import web.html.HtmlTagName
 /** GitHub blob base of the Kotlin sources of the showcase, used by the "source" link. */
 const val REPO_SOURCE_ROOT = "https://github.com/shijianjs/ktjs-echarts/blob/main/demo/src/jsMain/kotlin/demo"
 
+/** GitHub blob base of the platform-independent demo sources of the showcase. */
+const val REPO_COMMON_SOURCE_ROOT =
+    "https://github.com/shijianjs/ktjs-echarts/blob/main/demo/src/commonMain/kotlin/demo"
+
 /** Index of the official ECharts example gallery, used when a page has no dedicated example. */
 const val OFFICIAL_INDEX = "https://echarts.apache.org/examples/zh/index.html"
 
@@ -27,8 +31,10 @@ class PageMeta(
      * this page.
      */
     val officialUrl: String? = null,
-    /** Path of the Kotlin source of the page, relative to `demo/src/jsMain/kotlin/demo`. */
+    /** Path of the Kotlin source of the page, relative to [sourceRoot]. */
     val sourcePath: String,
+    /** GitHub blob base of [sourcePath]; defaults to the JS sources. */
+    val sourceRoot: String = REPO_SOURCE_ROOT,
 ) {
     private val titleText = title
     private val summaryText = summary
@@ -83,7 +89,7 @@ fun page(meta: PageMeta): PageView {
     links.append(
         anchor(
             tr("查看 Kotlin 源码", "Kotlin source"),
-            "$REPO_SOURCE_ROOT/${meta.sourcePath}",
+            "${meta.sourceRoot}/${meta.sourcePath}",
             "page__link",
             external = true,
         ),

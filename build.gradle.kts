@@ -8,21 +8,21 @@ import org.jetbrains.kotlin.gradle.targets.js.npm.NpmExtension
 
 plugins {
     kotlin("multiplatform") version "2.4.21" apply false
+    kotlin("plugin.serialization") version "2.4.21" apply false
     id("com.vanniktech.maven.publish") version "0.37.0" apply false
     id("dev.detekt") version "2.0.0-alpha.6" apply false
     id("org.jetbrains.dokka") version "2.2.0"
 }
 
-// Every publishable module shares the prefix, which is also how publishing, Dokka and the version
-// report find them. Keep it in sync with the module directories and settings.gradle.kts. The only
-// wrapper module is the project's namesake, so the prefix is the full module name.
-val publishedPrefix = "ktjs-echarts"
+// Modules published to Maven Central are also the ones Dokka documents and the release report
+// lists. Keep this set in sync with the module directories and settings.gradle.kts; every entry
+// must also exist in wrapper-revisions.properties. `demo` is the Pages site and is not published.
+val publishedModuleNames = setOf("ktjs-echarts", "ktjs-echarts-gl", "kmp-echarts-json")
 
-// Dokka aggregates every published module into one API reference. `demo` is not part of the
-// published API surface, so it is excluded by the prefix filter.
+// Dokka aggregates every published module into one API reference.
 dependencies {
     subprojects
-        .filter { it.name.startsWith(publishedPrefix) }
+        .filter { it.name in publishedModuleNames }
         .forEach { dokka(project(it.path)) }
 }
 
@@ -89,8 +89,8 @@ subprojects {
         }
     }
 
-    // Only wrapper modules are published and documented; `demo` is the GitHub Pages site.
-    if (name.startsWith(publishedPrefix)) {
+    // Only published modules are documented; `demo` is the GitHub Pages site.
+    if (name in publishedModuleNames) {
         apply(plugin = "org.jetbrains.dokka")
     }
 }
@@ -102,7 +102,7 @@ subprojects {
 // GitHub repository) and requires the kotlin-tooling-metadata.json produced by the Kotlin
 // Multiplatform plugin. Keep both intact when changing this block.
 subprojects {
-    if (!name.startsWith(publishedPrefix)) return@subprojects
+    if (name !in publishedModuleNames) return@subprojects
 
     check(wrapperRevisions.containsKey(name)) {
         "Missing '$name' in wrapper-revisions.properties"
@@ -185,7 +185,7 @@ subprojects {
 // would upload before running publishToMavenCentral, so version derivation stays in the module
 // scripts rather than being duplicated in shell.
 tasks.register("printPublishedVersions") {
-    val publishedModules = subprojects.filter { it.name.startsWith(publishedPrefix) }
+    val publishedModules = subprojects.filter { it.name in publishedModuleNames }
     doLast {
         publishedModules
             .associate { it.name to it.version.toString() }

@@ -15,6 +15,10 @@
   来源）、`ecomfe/echarts-gl`（GL 的 `defaultOption` 与视图实现）、`JetBrains/kotlin-wrappers`（写法参考）。
 - 本地还没有需要的仓库时，按 `gh repo clone <owner>/<repo> <workspace>/<owner>/<repo>` 克隆后再读，
   不要逐个抓网页。
+- Kotlin/Native 发行包默认从 `download.jetbrains.com` 下载，国内可能只有几 KB/s。本机可加
+  `-Pkotlin.native.distribution.downloadFromMaven=true` 从 Maven Central 拉取（阿里云
+  `repository/central` 有 `kotlin-native-prebuilt`）。只在该次构建临时使用镜像，别把所有依赖解析都
+  前置到阿里云：它缺 `kotlin-wrappers` 的 klib，JS 模块会解析失败。**仅本机使用，不要提交到仓库或工作流。**
 
 ## 项目概况与模块结构
 
@@ -23,11 +27,14 @@
 
 - `ktjs-echarts`：发布模块，`version = {上游 npm 版本}-kt.{修订号}`。
 - `ktjs-echarts-gl`：`echarts-gl` 的发布模块，版本规则同上；依赖 `ktjs-echarts` 的选项类型。
+- `kmp-echarts-json`：纯 KMP（`commonMain`）的 ECharts 选项 JSON 构造库，基于 kotlinx.serialization 与
+  kotlinx-datetime，不绑定 npm 包、也没有 JS 专属依赖；版本基数同样取 `echarts` npm 版本。
 - `demo`：GitHub Pages 演示站点，不发布、也不进入 Dokka。
 - `scaffold/module`：新增模块时复制的骨架，不参与构建。
 
-各发布模块自己的建模取舍与上游行为记录在 [ktjs-echarts/AGENTS.md](ktjs-echarts/AGENTS.md) 与
-[ktjs-echarts-gl/AGENTS.md](ktjs-echarts-gl/AGENTS.md)；demo 的目录结构与移植约定见
+各发布模块自己的建模取舍与上游行为记录在 [ktjs-echarts/AGENTS.md](ktjs-echarts/AGENTS.md)、
+[ktjs-echarts-gl/AGENTS.md](ktjs-echarts-gl/AGENTS.md) 与
+[kmp-echarts-json/AGENTS.md](kmp-echarts-json/AGENTS.md)；demo 的目录结构与移植约定见
 [demo/AGENTS.md](demo/AGENTS.md)。
 
 按「上游发版节奏」而不是「npm 包数量」划分子模块：上游版本号相同、总是一起发版的包放在同一个 Gradle
@@ -104,8 +111,9 @@ wrapper 的目标是让上游 npm 包暴露的公开 API 在 Kotlin/JS 侧都能
 1. 复制 `scaffold/module` 为 `ktjs-echarts-<name>`，替换文件里的所有占位符（包名、npm 包名、项目名）。
 2. `settings.gradle.kts` 加 `include(":ktjs-echarts-<name>")`。
 3. `package.json` 的 `dependencies` 加 npm 包版本；`wrapper-revisions.properties` 加 `ktjs-echarts-<name>=1`。
-4. `demo/build.gradle.kts` 的 `jsMain.dependencies` 加 `implementation(project(":ktjs-echarts-<name>"))`，
-   并在 demo 里实际使用它。
+4. 在 demo 里实际使用它：wrapper 模块加进 `demo/build.gradle.kts` 的 `jsMain.dependencies`
+   （`implementation(project(":ktjs-echarts-<name>"))`）；纯 KMP 工具模块加进 `commonMain.dependencies`
+   （`kmp-echarts-json` 的模型页就是这样接入的），不绑定 npm 包时无需改 `package.json`。
 5. 全局替换时同步检查 `detekt`、Dependabot 分组、README 模块表与 Dokka（Dokka 按前缀自动收集，无需改）。
 
 模块名、`wrapper-revisions.properties` 的 key、目录名三者必须完全一致，否则配置阶段会失败。
@@ -196,10 +204,12 @@ Gradle 9 / JDK 25。升级时注意 2.0 的插件 ID 是 `dev.detekt`，规则�
 
 **测试发现 bug 时修 wrapper，不改断言**：能定位到生成器的问题就修生成器并重新生成，提交信息里说明。
 
-字段级核对用 `node scripts/field-coverage.mjs [模块]`：收集 `src/jsMain` 里 `external interface` 的成员，
-检查名字是否在 `jsTest` 全量文本里出现过；`--limit N` / `--show-covered` 控制输出。它只能找「从没出现过的
-成员」，不是逐用例覆盖率。明确不做的成员登记在脚本的 `NOT_COVERED` 并写理由。当前两个模块都是 0 个未点名，
-`src/jsMain` 新增声明后重跑该脚本找新缺口。
+字段级核对用 `node scripts/field-coverage.mjs [模块]`：收集主源码（wrapper 模块是 `src/jsMain`，纯 KMP
+模块是 `src/commonMain`）里每个 `interface` / `class` / `object` 直接声明的可写成员和顶层工厂函数，检查
+名字是否在测试源码（`src/jsTest`，纯 KMP 模块是 `src/commonTest`）的全量文本里出现过；`--limit N` /
+`--show-covered` 控制输出。它只能找「从没出现过的成员」，不是逐用例覆盖率。明确不做的成员登记在脚本的
+`NOT_COVERED` 并写理由。三个模块当前都是 0 个未点名（`kmp-echarts-json` 的每个模型类都有一个
+「逐字段赋值并断言同名键」的用例）。`src/jsMain` / `src/commonMain` 新增声明后重跑该脚本找新缺口。
 
 ### 上游单元测试的翻译状态
 
@@ -467,9 +477,10 @@ gh workflow run release.yml -f release=release-1 \
 3. 在本仓库 Settings → Secrets 配置 `MAVEN_CENTRAL_SIGNING_KEY`、`MAVEN_CENTRAL_SIGNING_KEY_PASSWORD`
    与 `HUB_RELEASE_TOKEN`（fine-grained PAT：hub 的 Contents + Actions 读写）。Central User Token 配在
    hub 仓库，不放在本仓库。
-4. **若沿用 hub：新增 KMP 模块（产生新的 `*-js` 坐标）时，先在 hub 的 `artifactOverrides` 里补
-   `jar: false` 并关闭 `verifyPom`**。JReleaser 的 PomChecker 不认 klib packaging，且它把 pom/aar/war/zip
-   以外的 packaging 都当成必须有同名 `.jar`；漏配会让 hub 整批失败。
+4. **若沿用 hub：新增 KMP 模块时，先在 hub 的 `artifactOverrides` 里补 `jar: false` 并关闭
+   `verifyPom`**。一个 KMP 模块会产生多个坐标（`*-jvm`、`*-js`、`*-wasm-js`、`*-linuxx64`、
+   `*-mingwx64` 等，取决于目标），全部都要覆盖。JReleaser 的 PomChecker 不认 klib packaging，且它把
+   pom/aar/war/zip 以外的 packaging 都当成必须有同名 `.jar`；漏配会让 hub 整批失败。
 5. 第一次发布用 `release-1`，`modules` 留空（发布全部模块）；之后只列修订号变化的模块。
 
 ### 本地预演

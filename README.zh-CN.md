@@ -8,8 +8,9 @@
 **[API 文档](https://shijianjs.github.io/ktjs-echarts/api/)**
 
 仓库按 npm 包（或一组共享上游版本与发版节奏的包）划分 Gradle 模块。项目同名的包使用
-`ktjs-echarts` 模块，后续模块使用 `ktjs-echarts-*` 前缀。终端应用打包时本来就会摇树，把相关包合并到
-一个模块，比每个包各建一个模块更省发布额度和版本噪音。
+`ktjs-echarts` 模块，wrapper 模块使用 `ktjs-echarts-*` 前缀；`kmp-echarts-json` 是不绑定 npm 包的纯
+Kotlin Multiplatform 选项模型。终端应用打包时本来就会摇树，把相关包合并到一个模块，比每个包各建一个模块
+更省发布额度和版本噪音。
 
 ## 模块
 
@@ -17,6 +18,7 @@
 | --- | --- | --- | --- |
 | [ktjs-echarts](ktjs-echarts/README.zh-CN.md) | `echarts` | `6.1.0-kt.1` | [![Maven Central](https://img.shields.io/maven-central/v/io.github.shijianjs/ktjs-echarts?label=Maven%20Central&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/io.github.shijianjs/ktjs-echarts) |
 | [ktjs-echarts-gl](ktjs-echarts-gl/README.zh-CN.md) | `echarts-gl` | `2.1.0-kt.1` | [![Maven Central](https://img.shields.io/maven-central/v/io.github.shijianjs/ktjs-echarts-gl?label=Maven%20Central&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/io.github.shijianjs/ktjs-echarts-gl) |
+| [kmp-echarts-json](kmp-echarts-json/README.zh-CN.md) | `echarts` 选项结构 | `6.1.0-kt.1` | [![Maven Central](https://img.shields.io/maven-central/v/io.github.shijianjs/kmp-echarts-json?label=Maven%20Central&logo=apachemaven&logoColor=white)](https://central.sonatype.com/artifact/io.github.shijianjs/kmp-echarts-json) |
 
 ## 版本约定
 
@@ -68,6 +70,9 @@ dependencies {
     implementation("io.github.shijianjs:ktjs-echarts:6.1.0-kt.1")
 }
 ```
+
+`kmp-echarts-json` 的安装方式相同，用在构造选项载荷的一侧；用法见它的
+[README](kmp-echarts-json/README.zh-CN.md)。
 
 POM 的 `url` 与 `scm.url` 指向本仓库，每个模块都是 Kotlin Multiplatform 项目并发布
 `kotlin-tooling-metadata.json`。这些是 [klibs.io](https://klibs.io/) 自动收录的条件。

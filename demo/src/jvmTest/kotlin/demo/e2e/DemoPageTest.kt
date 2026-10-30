@@ -93,6 +93,38 @@ class DemoPageTest {
     }
 
     /**
+     * The model pages build their option with `kmp-echarts-json` in `commonMain`; the top-bar source
+     * switch only shows up there and swaps the code panel between the Kotlin builder and the JSON the
+     * chart consumes, without touching the rendered chart.
+     */
+    @RetryingTest(maxAttempts = 2)
+    fun `the source switch shows the JSON of a model page`(page: Page) {
+        openPage(page, "#/kmp-json/line-smooth")
+        assertChartRendered(page, "kmp-json/line-smooth")
+
+        val code = page.locator(".page[data-route='kmp-json/line-smooth'] .code-block")
+        assertTrue(code.textContent()!!.trimStart().startsWith("echartsOption"), "Kotlin source: ${code.textContent()}")
+        assertTrue(page.locator(".source-switch").isVisible, "the source switch is visible on a model page")
+
+        page.locator(".source-switch button").nth(1).click()
+        page.waitForFunction("() => document.querySelector('.code-block').textContent.trimStart().startsWith('{')")
+        assertTrue(code.textContent()!!.contains("\"series\""), "JSON source: ${code.textContent()}")
+        assertChartRendered(page, "kmp-json/line-smooth")
+
+        page.locator(".source-switch button").nth(0).click()
+        page.waitForFunction(
+            "() => document.querySelector('.code-block').textContent.trimStart().startsWith('echartsOption')",
+        )
+    }
+
+    @RetryingTest(maxAttempts = 2)
+    fun `the source switch stays hidden on an official example`(page: Page) {
+        openPage(page, "#/bar-simple")
+        assertChartRendered(page, "bar-simple")
+        assertTrue(!page.locator(".source-switch").isVisible, "official pages have no Kotlin/JSON switch")
+    }
+
+    /**
      * The two theme buttons share one highlighted style, so exactly one of them may carry `is-on`,
      * and its label has to stay readable against the accent of the current theme.
      */

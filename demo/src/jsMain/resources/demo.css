@@ -215,6 +215,7 @@ body {
     text-decoration: underline;
 }
 
+.source-switch,
 .lang-switch,
 .theme-switch {
     display: flex;
@@ -223,6 +224,7 @@ body {
     overflow: hidden;
 }
 
+.source-switch button,
 .lang-switch button,
 .theme-switch button {
     padding: 0.25rem 0.6rem;
@@ -234,12 +236,14 @@ body {
     cursor: pointer;
 }
 
+.source-switch button.is-on,
 .lang-switch button.is-on,
 .theme-switch button.is-on {
     background: var(--page-accent);
     color: var(--switch-on-fg);
 }
 
+.source-switch button:not(.is-on),
 .theme-switch button:not(.is-on) {
     color: var(--page-muted);
 }
@@ -390,6 +394,19 @@ body {
     background: var(--page-accent-soft);
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     font-size: 0.85em;
+}
+
+.code-block {
+    margin: 0;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--page-border);
+    border-radius: 0.5rem;
+    background: var(--page-surface);
+    overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    tab-size: 4;
 }
 
 .row {

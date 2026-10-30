@@ -15,15 +15,18 @@ demo/src/jsMain/kotlin/demo/
   Main.kt            入口：先定语言与主题，再建 shell，最后启动路由
   Language.kt        中英双语与 LanguageState（localStorage 记忆）
   Theme.kt           亮/暗主题（<html data-theme>，localStorage 记忆）
+  SourceMode.kt      顶栏代码源切换（Kotlin / JSON，localStorage 记忆）
   Router.kt          hash 路由
   AppShell.kt        侧边栏目录 + 顶栏 + 内容区；页面缓存、图表随页面挂载/卸载
   Catalog.kt         Groups、CatalogEntry 与整份目录的汇总
   ui/Dom.kt          类型安全的 DOM 构造与小工具
   ui/Blocks.kt       页面骨架（page / pageSection / example）与 PageMeta / PageView
   ui/Chart.kt        ChartHolder：容器的持有者，负责 ECharts 实例的挂载、卸载与 resize
-  examples/          一个图表家族一个文件，每份导出 <name>Entries
+  examples/          一个图表家族一个文件，每份导出 <name>Entries；KmpJson.kt 只做非官方模型页的展示
+demo/src/commonMain/kotlin/demo/
+  json/ModelExamples.kt  非官方模型页的文案、DSL 构造与序列化 JSON（JS 端只负责展示）
 demo/src/jvmTest/kotlin/demo/e2e/
-  DemoPageTest.kt    Playwright 端到端套件（点侧边栏、切语言/主题、过滤索引、抽样渲染）
+  DemoPageTest.kt    Playwright 端到端套件（点侧边栏、切语言/主题/代码源、过滤索引、抽样渲染）
   DemoOptions.kt     浏览器与断言超时设置
   DemoServer.kt      测试内静态服务器
 ```
@@ -116,6 +119,16 @@ demo/src/jvmTest/kotlin/demo/e2e/
 筛选后落地 **384 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
 的官方清单统计，共 436 条：已移植 385 条，明确不做 51 条，待补 0；逐条清单与理由见
 [COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
+
+另有 `Groups.JSON`（`kmp-json`，6 页）不在官方清单内：它们用纯 KMP 的 `kmp-echarts-json` 模型构造
+option，序列化成 JSON 后再 `setOption`（走 wrapper 的 `JsAny` 重载，和从服务端取回一份配置等价）。
+文案、DSL 构造与序列化都在 `commonMain/kotlin/demo/json/ModelExamples.kt`（`demo.json`，纯 KMP，
+`demo` 的 `commonMain` 因此依赖 `kmp-echarts-json`），`examples/KmpJson.kt` 只把每个 `ModelExample`
+变成页面：解析 `json` 交给图表、按代码源开关渲染 Kotlin 或 JSON。页面不经过 `Category`，路由 id 带
+`kmp-json/` 前缀，源码链接指向 `REPO_COMMON_SOURCE_ROOT`，顶栏的代码源开关
+（`SourceModeState`，与语言 / 主题开关同款）在这几页可见，用来切换代码面板显示 Kotlin 构造代码还是
+模型序列化出的 JSON；切换会重走 `rebuild()`，与语言切换一致。`demo-coverage.mjs` 只统计
+`Category.chart / interactive` 声明的官方 id，不会把这几页算进「已移植」。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
 一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。这批页面按依赖分三个文件：

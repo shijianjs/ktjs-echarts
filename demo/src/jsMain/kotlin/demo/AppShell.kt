@@ -6,6 +6,7 @@ import demo.ui.button
 import demo.ui.div
 import demo.ui.element
 import demo.ui.listen
+import demo.ui.setHidden
 import demo.ui.span
 import demo.ui.withClass
 import web.cssom.ClassName
@@ -35,7 +36,8 @@ private class NavGroup(
 
 /**
  * Application shell: a fixed sidebar built once from [catalog], a top bar with the breadcrumb, the
- * language switch, the theme switch and the links, and the content area that hosts the current page.
+ * code-source switch, the language switch, the theme switch and the links, and the content area that
+ * hosts the current page.
  *
  * The shell never rebuilds structure. Navigation swaps the single child of [contentHost] and keeps
  * the built pages cached, so a page keeps its DOM when the user walks the gallery and comes back.
@@ -64,6 +66,13 @@ class AppShell {
 
     private val enButton: HTMLButtonElement = button(Language.EN.label)
 
+    private val kotlinSourceButton: HTMLButtonElement = button(SourceMode.Kotlin.label)
+
+    private val jsonSourceButton: HTMLButtonElement = button(SourceMode.Json.label)
+
+    /** Kotlin/JSON switch; only the model pages have a second code source to show. */
+    private val sourceSwitch: HTMLElement = div("source-switch", kotlinSourceButton, jsonSourceButton)
+
     private val menuButton: HTMLButtonElement = button().withClass("topbar__menu")
 
     private val apiLink = anchor("", API_DOCS_URL, "topbar__link")
@@ -88,18 +97,24 @@ class AppShell {
         darkButton.listen(CLICK) { switchTheme(true) }
         zhButton.listen(CLICK) { LanguageState.set(Language.ZH) }
         enButton.listen(CLICK) { LanguageState.set(Language.EN) }
+        kotlinSourceButton.listen(CLICK) { SourceModeState.set(SourceMode.Kotlin) }
+        jsonSourceButton.listen(CLICK) { SourceModeState.set(SourceMode.Json) }
         menuButton.listen(CLICK) { nav.classList.toggle(ClassName("shell__nav--open")) }
         window.listen(RESIZE) { shownPage?.resize() }
         LanguageState.onChange { rebuild() }
+        SourceModeState.onChange { rebuild() }
         syncChrome()
         syncThemeButtons()
         syncLanguageButtons()
+        syncSourceButtons()
+        sourceSwitch.setHidden(true)
     }
 
     /** Renders [route], falling back to the overview when the fragment names an unknown page. */
     fun show(route: String) {
         val entry = catalogEntry(route) ?: catalogEntry(Router.DEFAULT_ROUTE) ?: return
         currentRoute = entry.id
+        sourceSwitch.setHidden(!entry.switchableSource)
 
         if (shownRoute != entry.id) {
             shownRoute = entry.id
@@ -135,11 +150,12 @@ class AppShell {
         rebuild()
     }
 
-    /** Drops the cached pages and builds the current route again; used by language and theme. */
+    /** Drops the cached pages and builds the current route again; used by each top-bar switch. */
     private fun rebuild() {
         syncChrome()
         syncThemeButtons()
         syncLanguageButtons()
+        syncSourceButtons()
         navItems.forEach { (id, item) -> catalogEntry(id)?.let { item.textContent = it.meta.title } }
         navGroups.values.forEach { it.label.textContent = it.group.label }
         shownPage?.detach()
@@ -174,6 +190,14 @@ class AppShell {
         enButton.classList.toggle(ClassName("is-on"), !chinese)
         zhButton.ariaPressed = if (chinese) "true" else "false"
         enButton.ariaPressed = if (chinese) "false" else "true"
+    }
+
+    private fun syncSourceButtons() {
+        val kotlin = SourceModeState.current == SourceMode.Kotlin
+        kotlinSourceButton.classList.toggle(ClassName("is-on"), kotlin)
+        jsonSourceButton.classList.toggle(ClassName("is-on"), !kotlin)
+        kotlinSourceButton.ariaPressed = if (kotlin) "true" else "false"
+        jsonSourceButton.ariaPressed = if (kotlin) "false" else "true"
     }
 
     private fun setGroupExpanded(groupId: String, expanded: Boolean) {
@@ -230,6 +254,7 @@ class AppShell {
                 "topbar__actions",
                 apiLink,
                 officialLink,
+                sourceSwitch,
                 div("lang-switch", zhButton, enButton),
                 div("theme-switch", lightButton, darkButton),
             )

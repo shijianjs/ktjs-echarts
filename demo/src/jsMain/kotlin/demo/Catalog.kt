@@ -53,6 +53,7 @@ import demo.examples.heatmapEntries
 import demo.examples.heatmapLongTailEntries
 import demo.examples.generatedSeriesEntries
 import demo.examples.intradayBreaksEntries
+import demo.examples.kmpJsonEntries
 import demo.examples.lineEntries
 import demo.examples.linesExtraEntries
 import demo.examples.linesNyEntries
@@ -157,6 +158,14 @@ object Groups {
 
     /** The short examples of the official documentation, `doc-example/` entries of the manifest. */
     val DOC = Group("doc-example", "文档示例", "Doc examples")
+
+    /**
+     * Pages built with the pure-KMP `kmp-echarts-json` model instead of the JS wrapper.
+     *
+     * They are not ports of official examples: each page shows the model code and the JSON it
+     * serializes to, and the chart itself is fed that parsed JSON.
+     */
+    val JSON = Group("kmp-json", "KMP JSON 模型", "KMP JSON model")
 }
 
 /**
@@ -167,6 +176,8 @@ class CatalogEntry(
     val id: String,
     val group: Group,
     val meta: PageMeta,
+    /** Whether the top-bar code-source switch applies to this page. */
+    val switchableSource: Boolean = false,
     private val builder: (PageMeta) -> PageView,
 ) {
     /** Builds a fresh instance of the page. The shell caches one per route. */
@@ -277,6 +288,7 @@ val catalog: List<CatalogEntry> =
         chinaAqiEntries,
         geoLinesEntries,
         weiboCheckinEntries,
+        kmpJsonEntries,
     ).flatten()
 
 private val catalogById: Map<String, CatalogEntry> = catalog.associateBy { it.id }

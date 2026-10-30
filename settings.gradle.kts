@@ -24,6 +24,7 @@ rootProject.name = "ktjs-echarts"
 // The demo is the GitHub Pages site, not a published module.
 include(":demo")
 
-// One Gradle project per published wrapper module.
+// One Gradle project per published module.
 include(":ktjs-echarts")
 include(":ktjs-echarts-gl")
+include(":kmp-echarts-json")

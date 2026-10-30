@@ -129,6 +129,8 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 
 ## 待补（0）
 
+官方清单里的页面要么已移植，要么在「明确不做」里；再出现新 id 说明上游清单新增了条目。
+
 <!-- coverage:end -->
 
 ## 清单之外
@@ -141,6 +143,9 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
   它们依赖 Mapbox / maptalks、Web Audio 或官方站点 `/asset/get/s/` 的素材，同样不做。
 - `public/examples/ts/archive/` 的 6 个过渡动画示例已归档，官方清单不收录，也不计入。
 
+以上两类都不加进 `scripts/demo-coverage.mjs` 的 `EXCLUDED`：脚本对不在官方清单里的 id 会直接报错，
+它们本来就不进账本，只在这里用文字说明。
+
 ## 维护
 
 ```bash
@@ -150,9 +155,10 @@ node scripts/demo-coverage.mjs --write   # 重新生成「盘点」一节
 
 脚本默认读 `../../apache/echarts-examples`（相对仓库根目录），其他位置用 `ECHARTS_EXAMPLES` 指定。
 
-- 新移植一页后运行 `--write`，对应 id 会自动从「待补」里消失；仍留在脚本分类里的条目会被忽略并提示。
-- 「待补」已随 `geo-lines` 清零：官方清单 436 条现在要么已移植，要么在「明确不做」里。以后 `--write`
-  再报出待补条目，说明上游清单新增了 id。- 新判定为「不做」的条目，加进 `scripts/demo-coverage.mjs` 的 `EXCLUDED` 并写清整组理由；没有分类的
+- 新移植一页后运行 `--write`，统计与「明确不做」清单自动更新。
+- 「待补」已随 `geo-lines` 清零：官方清单 436 条现在要么已移植，要么在「明确不做」里，脚本里不再维护
+  待补分类。
+- 新判定为「不做」的条目，加进 `scripts/demo-coverage.mjs` 的 `EXCLUDED` 并写清整组理由；没有分类的
   新 id 会让脚本报错。
 - 官方清单升级后，新 id 会以同样的方式暴露出来。
 

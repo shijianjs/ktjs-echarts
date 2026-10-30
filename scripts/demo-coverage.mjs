@@ -122,54 +122,6 @@ const EXCLUDED = [
     },
 ]
 
-/** 待补。按「还缺什么」分组。 */
-const PENDING = [
-    {
-        title: '只缺静态数据 / 素材',
-        reason:
-            '数据是静态文件或示例内联的数组，素材大多已在 `demo/src/jsMain/resources/data/` 里，' +
-            '补齐后即可移植。',
-        ids: [
-            'bar-race-country',
-            'mix-timeline-finance',
-            'mix-zoom-on-value',
-            'calendar-lunar',
-            'candlestick-touch',
-            'custom-ohlc',
-            'custom-gauge',
-            'wind-barb',
-            'graphgl-gpu-layout',
-            'graphgl-large-internet',
-            'graphgl-npm-dep',
-            'line-race',
-            'parallel-nutrients',
-            'scatter-aqi-color',
-            'scatter-life-expectancy-timeline',
-            'scatter-nebula',
-            'scatter-nutrients',
-            'scatter-nutrients-matrix',
-            'scatter-punchCard',
-            'scatter-stream-visual',
-            'scatter-symbol-morph',
-            'scatter-aggregate-bar',
-            'sankey-itemstyle',
-            'treemap-drill-down',
-            'treemap-show-parent',
-            'treemap-sunburst-transition',
-            'treemap-visual',
-            'matrix-grid-layout',
-            'doc-example/geo-svg-label-basic',
-            'doc-example/geo-svg-layout-basic',
-            'doc-example/geo-svg-named-basic',
-        ],
-    },
-    {
-        title: '需要先补 wrapper',
-        reason: '`inRange.symbol` / `outOfRange.symbolSize` 是按类目索引的字典，且 `left` 允许 `null`。',
-        ids: ['doc-example/scatter-visualMap-categories'],
-    },
-]
-
 function fail(message) {
     console.error(`demo-coverage: ${message}`)
     process.exit(1)
@@ -211,7 +163,6 @@ function classify(officialIds, routes) {
     const missing = officialIds.filter((id) => !covered.has(id))
 
     const excluded = []
-    const pending = []
     const seen = new Set()
     const alreadyPorted = []
     const add = (group) => {
@@ -229,13 +180,12 @@ function classify(officialIds, routes) {
         return { ...group, ids }
     }
     for (const group of EXCLUDED) excluded.push(add(group))
-    for (const group of PENDING) pending.push(add(group))
 
     const unclassified = missing.filter((id) => !seen.has(id))
     if (unclassified.length > 0) {
         fail(`还有 ${unclassified.length} 条既没移植也没分类：\n  ${unclassified.join('\n  ')}`)
     }
-    return { covered, missing, excluded, pending, alreadyPorted }
+    return { covered, missing, excluded, alreadyPorted }
 }
 
 function escapeCell(text) {
@@ -253,7 +203,6 @@ function table(headers, rows) {
 function render(official2d, officialGl, routes, result) {
     const official = [...official2d, ...officialGl]
     const excludedCount = result.excluded.reduce((sum, group) => sum + group.ids.length, 0)
-    const pendingCount = result.pending.reduce((sum, group) => sum + group.ids.length, 0)
     const lines = []
     lines.push('<!-- coverage:begin -->')
     lines.push('')
@@ -268,7 +217,7 @@ function render(official2d, officialGl, routes, result) {
                 ['　· `chart-list-data-gl.js`', String(officialGl.length)],
                 ['已移植', `${routes.size} 页 / ${result.covered.size} 条`],
                 ['明确不做', String(excludedCount)],
-                ['待补', String(pendingCount)],
+                ['待补', '0'],
             ],
         ),
     )
@@ -288,20 +237,9 @@ function render(official2d, officialGl, routes, result) {
         lines.push(table(['id'], group.ids.map((id) => [`\`${id}\``])))
     }
     lines.push('')
-    lines.push(`## 待补（${pendingCount}）`)
-    for (const group of result.pending) {
-        // A category the ports have since emptied leaves nothing to read, so it is dropped rather
-        // than rendered as a header over an empty table.
-        if (group.ids.length === 0) {
-            continue
-        }
-        lines.push('')
-        lines.push(`### ${group.title}（${group.ids.length}）`)
-        lines.push('')
-        lines.push(group.reason)
-        lines.push('')
-        lines.push(table(['id'], group.ids.map((id) => [`\`${id}\``])))
-    }
+    lines.push('## 待补（0）')
+    lines.push('')
+    lines.push('官方清单里的页面要么已移植，要么在「明确不做」里；再出现新 id 说明上游清单新增了条目。')
     lines.push('')
     lines.push('<!-- coverage:end -->')
     return lines.join('\n')
@@ -316,10 +254,9 @@ function main() {
     const routes = portedIds()
     const result = classify(officialIds, routes)
     const excludedCount = result.excluded.reduce((sum, group) => sum + group.ids.length, 0)
-    const pendingCount = result.pending.reduce((sum, group) => sum + group.ids.length, 0)
     console.log(
         `官方 ${officialIds.length} 条，已移植 ${routes.size} 页 / ${result.covered.size} 条，` +
-            `明确不做 ${excludedCount}，待补 ${pendingCount}。`,
+            `明确不做 ${excludedCount}，待补 0。`,
     )
     if (result.alreadyPorted.length > 0) {
         console.log(`以下条目已经移植，已从分类里剔除：${result.alreadyPorted.join(', ')}`)

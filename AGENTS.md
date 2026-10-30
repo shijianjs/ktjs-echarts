@@ -9,6 +9,10 @@
   `AGENTS.md`，查资料前先读它。
 - 上游资料一律读本地克隆，**不要访问 `raw.githubusercontent.com`，也不要用网页抓取 GitHub**：本机所在的
   国内网络访问这些域名经常超时。
+
+  本项目的上游克隆：`S:/workspace/github/apache/echarts`（源码树）、`apache/echarts-doc`（`option-gl/`
+  与 `option/partial/` 是 GL 选项文档）、`apache/echarts-examples`（`public/examples/ts/` 是 demo 的移植
+  来源）、`ecomfe/echarts-gl`（GL 的 `defaultOption` 与视图实现）、`JetBrains/kotlin-wrappers`（写法参考）。
 - 本地还没有需要的仓库时，按 `gh repo clone <owner>/<repo> <workspace>/<owner>/<repo>` 克隆后再读，
   不要逐个抓网页。
 
@@ -21,6 +25,10 @@
 - `ktjs-echarts-gl`：`echarts-gl` 的发布模块，版本规则同上；依赖 `ktjs-echarts` 的选项类型。
 - `demo`：GitHub Pages 演示站点，不发布、也不进入 Dokka。
 - `scaffold/module`：新增模块时复制的骨架，不参与构建。
+
+各发布模块自己的建模取舍与上游行为记录在 [ktjs-echarts/AGENTS.md](ktjs-echarts/AGENTS.md) 与
+[ktjs-echarts-gl/AGENTS.md](ktjs-echarts-gl/AGENTS.md)；demo 的目录结构与移植约定见
+[demo/AGENTS.md](demo/AGENTS.md)。
 
 按「上游发版节奏」而不是「npm 包数量」划分子模块：上游版本号相同、总是一起发版的包放在同一个 Gradle
 模块里，避免每个包都产生一个 Maven 版本和一次 Central 发布。终端应用打包时本来就会摇树，模块内多出的
@@ -187,6 +195,11 @@ Gradle 9 / JDK 25。升级时注意 2.0 的插件 ID 是 `dev.detekt`，规则�
    `hasAttribute`。
 
 **测试发现 bug 时修 wrapper，不改断言**：能定位到生成器的问题就修生成器并重新生成，提交信息里说明。
+
+字段级核对用 `node scripts/field-coverage.mjs [模块]`：收集 `src/jsMain` 里 `external interface` 的成员，
+检查名字是否在 `jsTest` 全量文本里出现过；`--limit N` / `--show-covered` 控制输出。它只能找「从没出现过的
+成员」，不是逐用例覆盖率。明确不做的成员登记在脚本的 `NOT_COVERED` 并写理由。当前两个模块都是 0 个未点名，
+`src/jsMain` 新增声明后重跑该脚本找新缺口。
 
 ### 上游单元测试的翻译状态
 

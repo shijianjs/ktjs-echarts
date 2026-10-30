@@ -113,8 +113,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
 `setInterval` / `setTimeout` 驱动页面的限制已经解除：`ChartHolder` 会登记定时器并在卸载时清理，
 `Category.interactive` 的双参重载把 holder 交给例子。
 
-筛选后落地 **371 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
-的官方清单统计，共 436 条：已移植 372 条，明确不做 51 条，待补 13 条；逐条清单与理由见
+筛选后落地 **384 页示例**（覆盖 27 个家族 + 一个「文档示例」组，另有一张总览页）。按 `echarts-examples`
+的官方清单统计，共 436 条：已移植 385 条，明确不做 51 条，待补 0；逐条清单与理由见
 [COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
@@ -133,10 +133,10 @@ demo/src/jvmTest/kotlin/demo/e2e/
 | --- | --- |
 | `bmap` | 需要百度地图 JS SDK，wrapper 没有覆盖，整个家族不做 |
 | `graphic` | 关键帧动画那一档已落地（`examples/GraphicAnimations.kt`，见下），剩余示例都配合真实交互或外部素材 |
-| `visualMap` / `dataZoom` | 清单里没有独立家族，这几条随所属系列落地或列入待补（`line-tooltip-touch`）；能力已由具体示例（`wind-barb` 等）覆盖 |
+| `visualMap` / `dataZoom` | 清单里没有独立家族，相关条目随所属系列落地（`line-tooltip-touch` 等）；能力已由具体示例（`wind-barb` 等）覆盖 |
 
-`gl` 家族已经接入（`examples/Gl*.kt` 十个文件，见下文「3D 示例」），剩余页面按
-[COVERAGE.md](COVERAGE.md) 的待补清单推进。
+`gl` 家族已经接入（`examples/Gl*.kt` 十个文件，见下文「3D 示例」），官方清单里的 GL 条目已全部落地或
+列入「明确不做」，见 [COVERAGE.md](COVERAGE.md)。
 
 `lines` / `map` / `geo` 已经能用静态数据集（`lines-airline`、`custom-hexbin` 就是先例）：只要再拷
 `public/data/asset/geo/` 下的 GeoJSON 或 SVG，就能继续补这两个家族。

@@ -152,6 +152,12 @@ val chart = EChartsCore.init(
 Both objects come from the same package, so an instance created through `EChartsCore` can be passed
 to helpers that expect the shared `EChartsInstance` type.
 
+Whether the bundle stays modular depends only on what you reference: `EChartsCore` and the full
+`ECharts` entry are separate `@JsModule` declarations, so using only the former does not pull in the
+full build. A single reference to `ECharts` anywhere in the bundle does, so on the modular path use
+`EChartsCore` for registration and for the helper namespaces as well. `ktjs-echarts-gl` depends on
+the full `echarts` build internally and cannot be combined with modular imports.
+
 ## Extension authoring
 
 The classes that custom series, components and views extend are available from `echarts/core`:

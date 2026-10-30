@@ -147,6 +147,11 @@ val chart = EChartsCore.init(
 两个对象来自同一个 npm 包，通过 `EChartsCore` 创建的实例可以传给需要 `EChartsInstance` 的辅助
 函数。
 
+按需是否生效只取决于实际引用：`EChartsCore` 与全量入口 `ECharts` 是两个独立的 `@JsModule` 声明，
+只用前者不会把全量包打进 bundle；但同一 bundle 里只要有一处用到 `ECharts`，全量 `echarts` 就会被
+引入，所以走按需路径时注册和工具命名空间统一用 `EChartsCore`。`ktjs-echarts-gl` 内部依赖全量
+`echarts`，与按需引入不能共存。
+
 ## 扩展开发
 
 自定义序列、组件和视图使用的类都从 `echarts/core` 导出：`Model`、`ComponentModel`、

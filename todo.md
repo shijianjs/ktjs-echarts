@@ -171,13 +171,16 @@
 （`devicePixelRatio` / `useDirtyRect` / `useCoarsePointer` / `pointerSize` / `ssr`）走 `createChart` 并核对
 `getDevicePixelRatio`、`SetOptionOpts`（`notMerge` / `lazyUpdate` / `replaceMerge`）验证替换、`LoadingOpts` 喂给
 `showLoading`、`RenderToSVGStringOpts.useViewBox` 用 svg renderer 渲染、`DispatchActionOpts.flush` 配 `Payload`
-喂给 `dispatchAction`，再加 `Payload` / `ModelFinderObject` / `SelectChangedPayload` 三字段的 `unsafeJso` 读回。
-几批结构型用例都顺带点名了共享基接口与嵌套样式字段，剩 2704 个成员里 482 个没被点名。
+喂给 `dispatchAction`，再加 `Payload` / `ModelFinderObject` / `SelectChangedPayload` 三字段的 `unsafeJso` 读回；
+第七批 `options/CalendarGridMatrixOptionTest`，补 `CalendarOption` 的 `cellSize` / 三套 `*Label`（含 `firstDay`、
+`nameMap`、`margin`）/ `splitLine`、`GridOption` 的 `outerBounds` 与两个 clamp 尺寸、`MatrixOption` 的 `corner`
+/ `backgroundStyle` / `borderZ2`。几批结构型用例都顺带点名了共享基接口与嵌套样式字段，剩 2704 个成员里
+453 个没被点名。
 
 2D 剩余按 `options/` 与 `ECharts*` 分文件推进，缺口最大的几个文件：`zrender/ZRenderElementTypes.kt` 46、
-`ComponentOptions.kt`、`CommonTypes.kt`（`TooltipMarker` 联合等）、`CartesianSeriesOptions.kt`、
-`EChartsTypes.kt`（`LocaleAria*` 本地化文案一节），再往上是 `geo` / `calendar` / `graphic` 一类结构型选项
-与各系列数据项联合。
+`CommonTypes.kt`（`TooltipMarker` 联合等）、`ComponentOptions.kt`、`CartesianSeriesOptions.kt`、
+`EChartsTypes.kt`（`LocaleAria*` 本地化文案一节）、`GeoOption`（`nameMap` / `boundingCoords` 等），
+再往上是各系列数据项联合与 `AxisOption` / `AxisPointer*` 一类坐标轴选项。
 
 `--limit N` 控制每个文件列出的条数，`--show-covered` 反查已覆盖的名字；判据是「名字在 jsTest 全文里出现过」，
 所以 `show` 这类到处都有的成员名几乎总是已覆盖，这个口径用来找**从没出现过的字段**，不是逐用例的覆盖率。

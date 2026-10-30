@@ -111,6 +111,48 @@ class SeriesTypedDataTest {
     }
 
     @Test
+    fun cartesianRowAndObjectUnionsWrapBothBranches() {
+        val candleRow = arrayOf<OptionDataValue?>(
+            OptionDataValue(1.0),
+            OptionDataValue(2.0),
+            OptionDataValue(0.5),
+            OptionDataValue(3.0),
+        )
+        assertEquals(4, CandlestickDataItem(candleRow).unsafeCast<Array<*>>().size)
+        val candleObject = unsafeJso<CandlestickDataItemOption> { name = OptionId("k") }
+        assertSame(candleObject, CandlestickDataItem(candleObject).unsafeCast<CandlestickDataItemOption>())
+
+        val boxRow = arrayOf<OptionDataValue?>(
+            OptionDataValue(1.0),
+            OptionDataValue(2.0),
+            OptionDataValue(2.5),
+            OptionDataValue(3.0),
+            OptionDataValue(4.0),
+        )
+        assertEquals(5, BoxplotDataItem(boxRow).unsafeCast<Array<*>>().size)
+        val boxObject = unsafeJso<BoxplotDataItemOption> { name = OptionId("b") }
+        assertSame(boxObject, BoxplotDataItem(boxObject).unsafeCast<BoxplotDataItemOption>())
+
+        val parallelRow = arrayOf<OptionDataValue?>(OptionDataValue(0.1), OptionDataValue(0.9))
+        assertEquals(2, ParallelSeriesDataItem(parallelRow).unsafeCast<Array<*>>().size)
+        val parallelObject = unsafeJso<ParallelSeriesDataItemOption> { name = OptionId("p") }
+        assertSame(
+            parallelObject,
+            ParallelSeriesDataItem(parallelObject).unsafeCast<ParallelSeriesDataItemOption>(),
+        )
+    }
+
+    @Test
+    fun linesDataItemNamesBothEndpoints() {
+        val line = unsafeJso<LinesDataItemOption> {
+            fromName = "origin"
+            toName = "destination"
+        }
+        assertEquals("origin", line.fromName)
+        assertEquals("destination", line.toName)
+    }
+
+    @Test
     fun typedValueMapsToTheGenericValueProperty() {
         val candle = unsafeJso<CandlestickDataItemOption> {
             typedValue = arrayOf<OptionDataValue?>(

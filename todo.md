@@ -156,7 +156,7 @@
 缺口现在由 `node scripts/field-coverage.mjs` 按**字段**核对（旧的 `build/gl-coverage-gap.mjs` 只看类型名，
 `unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：**GL 575 个成员全部点过名，未点名 0 个**
 （`NOT_COVERED` 的 20 个是安装器 getter 与要第三方 SDK/token 的 `mapbox3D` / `maptalks3D` 成员，明确不做）；
-2D 已推进二十三批：第一批 `EChartsLiterals.kt` 的 40 个 `Xxx(String)` 工厂与 `AnimationEasing((Double) -> Double)`
+2D 已推进二十四批：第一批 `EChartsLiterals.kt` 的 40 个 `Xxx(String)` 工厂与 `AnimationEasing((Double) -> Double)`
 重载，第二批 `EChartsSeriesLiterals.kt` 的 30 个工厂（含 `NodeClickBehavior` 的 `String` 与 `Boolean` 两个
 重载），前两批都在 `echarts/LiteralsTest` 里用不在 `Xxxs` 常量里的自定义值各包一次读回；第三批
 `options/DataZoomVisualMapDatasetOptionTest`，把 `EChartsOption.kt` 里的 `DataZoomOption`（滑柄样式、窗口跨度、
@@ -256,14 +256,17 @@
 `SeriesData.dataType`/`hasItemOption` 这几条可写模型属性（用 `unsafeJso<外部类>` 绕过构造，只核对 JS 键映射）；
 第二十三批 `options/SeriesTypedDataTest` 追加两例，把 `CartesianDataItemOptions.kt` 一次清零：`CandlestickDataItem`、
 `BoxplotDataItem`、`ParallelSeriesDataItem` 三个联合各走「值数组」与「数据项对象」两条工厂重载（数组分支按长度读回、
-对象分支 `assertSame` 证工厂是同一 JS 值的 `unsafeCast`），以及 `LinesDataItemOption.fromName`/`toName` 两端点名设值读回。
-几批结构型用例都顺带点名了共享基接口与嵌套样式字段，剩 2704 个成员里 9 个没被点名。
+对象分支 `assertSame` 证工厂是同一 JS 值的 `unsafeCast`），以及 `LinesDataItemOption.fromName`/`toName` 两端点名设值读回；
+第二十四批 `echarts/LiteralsTest` 追加 `zrenderLiteralFactoriesWrapCustomValues`，把 `ZRenderLiterals.kt` 一次清零：
+`RendererType`/`TextOverflow`/`TransformProp`/`BuiltinTextPosition` 四个 `Xxx(String)` 工厂各用一个不在 `Xxxs` 常量里的
+自定义值包值读回（以前只走常量 getter，从不单走这条「包任意 JavaScript 字符串」路径）。
+几批结构型用例都顺带点名了共享基接口与嵌套样式字段，剩 2704 个成员里 5 个没被点名。
 
-2D 剩余按文件推进，缺口只剩三个：`zrender/ZRenderLiterals.kt`（4）、`options/MarkDataItemOptions.kt`（3）、
-`zrender/ZRenderValueTypes.kt`（2）。已清零的文件不再列（`ComponentOptions.kt`、`EChartsGeoTypes.kt`、`ZRenderElementTypes.kt`、
+2D 剩余只剩两个文件：`options/MarkDataItemOptions.kt`（3，三条 `valueDim`）与 `zrender/ZRenderValueTypes.kt`
+（2，`SVGPatternObject.svgWidth`/`svgHeight`）。已清零的文件不再列（`ComponentOptions.kt`、`EChartsGeoTypes.kt`、`ZRenderElementTypes.kt`、
 `CartesianSeriesOptions.kt`、`CommonTypes.kt`、`HierarchySeriesOptions.kt`、`RelationSeriesOptions.kt`、
 `PartSeriesOptions.kt`、`PartDataItemOptions.kt`、`EChartsOption.kt`、`CustomElementOptions.kt`、`StyleOptions.kt`、
-`EChartsTypes.kt`、`EChartsExtensionTypes.kt`、`EChartsExtension.kt`、`CartesianDataItemOptions.kt` 本轮起 0 缺口）。
+`EChartsTypes.kt`、`EChartsExtensionTypes.kt`、`EChartsExtension.kt`、`CartesianDataItemOptions.kt`、`ZRenderLiterals.kt` 本轮起 0 缺口）。
 
 `--limit N` 控制每个文件列出的条数，`--show-covered` 反查已覆盖的名字；判据是「名字在 jsTest 全文里出现过」，
 所以 `show` 这类到处都有的成员名几乎总是已覆盖，这个口径用来找**从没出现过的字段**，不是逐用例的覆盖率。

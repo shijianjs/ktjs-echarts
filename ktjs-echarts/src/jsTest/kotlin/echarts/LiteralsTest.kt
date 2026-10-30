@@ -49,9 +49,13 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import zrender.RendererType
 import zrender.RendererTypes
+import zrender.TextOverflow
 import zrender.TextOverflows
+import zrender.BuiltinTextPosition
 import zrender.BuiltinTextPositions
+import zrender.TransformProp
 import zrender.TransformProps
 import zrender.ZRFontWeight
 import zrender.ZRFontWeights
@@ -367,6 +371,19 @@ class LiteralsTest {
         assertEquals("reset", AxisBreakAction("reset").unsafeCast<String>())
         assertEquals("both", RoamTrigger("both").unsafeCast<String>())
         assertEquals("selectAll", SelectChangedFromAction("selectAll").unsafeCast<String>())
+    }
+
+    /**
+     * The zrender string-literal unions in `ZRenderLiterals.kt`, wrapped through their `Xxx(String)`
+     * factory with a value the `Xxxs` constant object does not use, so the "wrap a value coming from
+     * JavaScript" path is covered for the renderer/overflow/transform/text-position unions too.
+     */
+    @Test
+    fun zrenderLiteralFactoriesWrapCustomValues() {
+        assertEquals("vgl", RendererType("vgl").unsafeCast<String>())
+        assertEquals("fade", TextOverflow("fade").unsafeCast<String>())
+        assertEquals("scaleZ", TransformProp("scaleZ").unsafeCast<String>())
+        assertEquals("above", BuiltinTextPosition("above").unsafeCast<String>())
     }
 
     /**

@@ -156,7 +156,7 @@
 缺口现在由 `node scripts/field-coverage.mjs` 按**字段**核对（旧的 `build/gl-coverage-gap.mjs` 只看类型名，
 `unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：**GL 575 个成员全部点过名，未点名 0 个**
 （`NOT_COVERED` 的 20 个是安装器 getter 与要第三方 SDK/token 的 `mapbox3D` / `maptalks3D` 成员，明确不做）；
-2D 已推进二十批：第一批 `EChartsLiterals.kt` 的 40 个 `Xxx(String)` 工厂与 `AnimationEasing((Double) -> Double)`
+2D 已推进二十一批：第一批 `EChartsLiterals.kt` 的 40 个 `Xxx(String)` 工厂与 `AnimationEasing((Double) -> Double)`
 重载，第二批 `EChartsSeriesLiterals.kt` 的 30 个工厂（含 `NodeClickBehavior` 的 `String` 与 `Boolean` 两个
 重载），前两批都在 `echarts/LiteralsTest` 里用不在 `Xxxs` 常量里的自定义值各包一次读回；第三批
 `options/DataZoomVisualMapDatasetOptionTest`，把 `EChartsOption.kt` 里的 `DataZoomOption`（滑柄样式、窗口跨度、
@@ -244,16 +244,21 @@
 `CustomDisplayableOption.styleEmphasis` 与 `CustomPathOption.autoBatch`/`morph` 逐个 `unsafeJso` 设值读回；
 第二十批 `options/StyleOptionTest`，把 `StyleOptions.kt` 一次清零：`TextStyleOption`（`textBorderColor`/`textBorderWidth`/
 `textBorderType`/`textBorderDashOffset`）、`LabelLineOption`（`length2`/`minTurnAngle`/`maxSurfaceAngle`）、`LabelOption`
-（`valueAnimation`/`minMargin`/`textMargin`）逐个设值读回，`LabelRotate` 的 `Double`/`String` 两工厂重载各自包值读回。
-几批结构型用例都顺带点名了共享基接口与嵌套样式字段，剩 2704 个成员里 43 个没被点名。
+（`valueAnimation`/`minMargin`/`textMargin`）逐个设值读回，`LabelRotate` 的 `Double`/`String` 两工厂重载各自包值读回；
+第二十一批 `echarts/EChartsTypesUnionTest`，把 `EChartsTypes.kt` 一次清零：`EventQuery` 的 `String`/`ModelFinderObject`
+两重载、`TransitionSeriesFinderList` 的单个/数组两重载、`SetOptionTransition` 的单个/数组两重载各自包值读回，
+`ActionInfo` 工厂配 `publishNonRefinedEvent`/`componentQuery`/`refineEvent` 与 `ActionRefineEventResult.eventContent`
+逐个 `unsafeJso` 设值读回。
+几批结构型用例都顺带点名了共享基接口与嵌套样式字段，剩 2704 个成员里 32 个没被点名。
 
 2D 剩余按 `options/` 与 `ECharts*` 分文件推进，缺口最大的几个文件：
-`EChartsTypes.kt`（`ActionInfo` / `EventQuery` / `TransitionSeriesFinderList` / `SetOptionTransition` 等联合）、
-`EChartsExtensionTypes.kt` 与 `CartesianDataItemOptions.kt`，
+`EChartsExtensionTypes.kt` 与 `CartesianDataItemOptions.kt`，再有 `EChartsExtension.kt`、`ZRenderLiterals.kt`、
+`MarkDataItemOptions.kt`、`ZRenderValueTypes.kt` 各剩几条，
 再往上是各系列数据项联合与 `AxisPointer*` / `GeoOption`（`nameMap`/`boundingCoords`/`scaleLimit`/`nameProperty`）
 一类坐标轴与地理选项。已清零的文件不再列（`ComponentOptions.kt`、`EChartsGeoTypes.kt`、`ZRenderElementTypes.kt`、
 `CartesianSeriesOptions.kt`、`CommonTypes.kt`、`HierarchySeriesOptions.kt`、`RelationSeriesOptions.kt`、
-`PartSeriesOptions.kt`、`PartDataItemOptions.kt`、`EChartsOption.kt`、`CustomElementOptions.kt`、`StyleOptions.kt` 本轮起 0 缺口）。
+`PartSeriesOptions.kt`、`PartDataItemOptions.kt`、`EChartsOption.kt`、`CustomElementOptions.kt`、`StyleOptions.kt`、
+`EChartsTypes.kt` 本轮起 0 缺口）。
 
 `--limit N` 控制每个文件列出的条数，`--show-covered` 反查已覆盖的名字；判据是「名字在 jsTest 全文里出现过」，
 所以 `show` 这类到处都有的成员名几乎总是已覆盖，这个口径用来找**从没出现过的字段**，不是逐用例的覆盖率。

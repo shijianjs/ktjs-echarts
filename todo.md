@@ -114,16 +114,28 @@
 ## 下一步
 
 **移植队列已清空**（`geo-lines` 是待补清单的最后一条）。官方清单 436 条现在要么已移植、要么在
-「明确不做」里，`node scripts/demo-coverage.mjs` 输出「待补 0」。已在推进的方向是候选 3——按
-`AGENTS.md`「测试覆盖」那六条复查 wrapper 的用例缺口，GL 侧已完成三批（第一批 `postEffect` /
-`environment` / 轴子选项，第二批对象形态数据项与 `surface.data`，第二批查出了 `-kt.10` 那个键名 bug，
-第三批四套材质与 `groundPlane`、`geo3D` 区域覆盖、`map3D` 的材质与样式）。下一批候选：
+「明确不做」里，`node scripts/demo-coverage.mjs` 输出「待补 0」。已在推进的方向是按 `AGENTS.md`
+「测试覆盖」那六条复查 wrapper 的用例缺口，GL 侧已完成三批（第一批 `postEffect` / `environment` /
+轴子选项，第二批对象形态数据项与 `surface.data`，第二批查出了 `-kt.10` 那个键名 bug，
+第三批四套材质与 `groundPlane`、`geo3D` 区域覆盖、`map3D` 的材质与样式）。
 
-1. 把缺口审计做成可提交的工具：这批的清单来自一次性脚本（`build/gl-coverage-gap.mjs`，未入库），它只看
-   类型名有没有在测试里以字面量出现过，`unsafeJso {}` 推断出的类型会被误报成缺口，得改成按字段核对才值得
-   放进 `scripts/`。
-2. 2D 侧同样的复查：粗筛有 418 个 `src/jsMain` 声明没在 `src/jsTest` 里以名字出现过，真假要按字段核对，
-   优先 `options/` 里那些只有类型没有用例的系列数据项联合。
+缺口现在由 `node scripts/field-coverage.mjs` 按**字段**核对（旧的 `build/gl-coverage-gap.mjs` 只看类型名，
+`unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：GL 575 个成员里 81 个没被用例点过名、
+20 个在 `NOT_COVERED` 里；2D 2704 个成员里 763 个没被点名。下一批候选，按文件成组、不必逐条讨论：
+
+1. GL 的 `ViewControlOptions`（22 项，整个 3D 层共用的一套相机参数，现在只断言过 `distance` / `alpha` /
+   `beta` / `autoRotate` / `targetCoord`）、`Axis3DOptions`（`id` / `inverse` / `nameTextStyle` / `scale` /
+   `minInterval` / `maxInterval` / `logBase` / `boundaryGap` 八项）、`GlobeOptions` 的半径与
+   `heightTexture` / `displacementTexture`、`LightOptions` 的 `ambientCubemap` 与 `shadowQuality`、
+   `Lines3DEffectOption` 的拖尾五项、`GraphGLForceAtlas2Option` 的力导参数十二项。
+2. `EChartsGlLiterals` 里 13 个联合类型的**工厂函数**没被调用过——`LiteralsTest` 只测了 `Xxxs` 常量对象，
+   `ShadingType("lambert")` 这类自定义字符串那条路还没走。
+3. 2D 那 763 项按 `options/` 分文件推进，优先系列数据项联合与 `visualMap` / `dataset` 一类结构型选项。
+
+`--limit N` 控制每个文件列出的条数，`--show-covered` 反查已覆盖的名字；判据是「名字在 jsTest 全文里出现过」，
+所以 `show` 这类到处都有的成员名几乎总是已覆盖，这个口径用来找**从没出现过的字段**，不是逐用例的覆盖率。
+带 `@JsName` 的键按其 JS 名核对，裸声明同一个 JS 键的成员（`coordinateSystem` 与 `typedCoordinateSystem`）
+不重复计缺口。
 
 已否决的方向：把 COVERAGE「清单之外」那 13 个 mapbox / maptalks / Web Audio GL 源文件与 6 个归档示例并入
 `EXCLUDED`——`scripts/demo-coverage.mjs` 对不在官方清单里的 id 直接 `fail`，这些条目本来就不进账本，
@@ -134,6 +146,8 @@
 ## 收尾清单
 
 - `./gradlew build`、`:ktjs-echarts-gl:jsBrowserTest`、`:demo:e2eTest` 全过；截图目视至少一个新 GL 页面。
+- 补完一批用例跑 `node scripts/field-coverage.mjs <模块>` 确认「未点名」数量下降，新增的「明确不做」进
+  脚本里的 `NOT_COVERED` 并写理由。
 - 改了 wrapper 公开代码就提升对应模块的修订号，并跑
   `./gradlew kotlinUpgradePackageLock --rerun-tasks` 提交锁文件（增量构建下该任务会误报 UP-TO-DATE）。
 - 每批一个 `feat(...)` 提交并推送到 `origin/main`。

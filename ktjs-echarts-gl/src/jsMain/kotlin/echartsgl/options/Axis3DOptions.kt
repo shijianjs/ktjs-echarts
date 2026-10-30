@@ -6,6 +6,7 @@ import echarts.options.AxisInterval
 import echarts.options.AxisMinMax
 import echarts.options.BooleanOrStringArray
 import echarts.options.LabelFormatter
+import echarts.options.LabelOption
 import echarts.options.LineStyleOption
 import echarts.options.OptionDataItem
 import echarts.options.SplitAreaStyleOption
@@ -133,9 +134,9 @@ external interface Axis3DTickOption {
 /**
  * Tick labels of an [Axis3DOption] or of a [Grid3DOption].
  */
-external interface Axis3DLabelOption {
+external interface Axis3DLabelOption : LabelOption {
     /** Whether the labels are shown. */
-    var show: Boolean?
+    override var show: Boolean?
 
     /** Interval between two labels, or a callback deciding which labels to show. */
     var interval: AxisInterval?
@@ -143,16 +144,19 @@ external interface Axis3DLabelOption {
     /** Distance between a label and the axis line, in 3D space. */
     var margin: Double?
 
-    /** Rotation of the labels in degrees. */
-    var rotate: Double?
-
     /** Whether the labels are drawn inside the grid. */
     var inside: Boolean?
 
     /** Formatter: a template string such as `"{value} kg"` or a callback. */
-    var formatter: LabelFormatter?
+    override var formatter: LabelFormatter?
 
-    /** Text style of the labels. */
+    /**
+     * Text style of the labels.
+     *
+     * Deprecated upstream and flattened by ECharts onto the label itself, the members inherited from
+     * [LabelOption]; `Grid3DAxis` reads `color` and the rest from the label model, so prefer writing
+     * those here. Reading this back from `getOption` gives `null`.
+     */
     var textStyle: TextStyleOption?
 }
 

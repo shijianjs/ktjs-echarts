@@ -1,16 +1,13 @@
 package echartsgl
 
-import echarts.AxisTypes
 import echarts.ECharts
 import echarts.options.DoubleOrDoubleArray
-import echarts.options.OptionDataValue
 import echarts.options.OptionDataValueOrArray
 import echarts.options.OptionId
 import echarts.options.SymbolShape
 import echarts.options.SymbolSize
 import echarts.options.StringOrDouble
 import echarts.options.one
-import echartsgl.options.Axis3DOption
 import echartsgl.options.EChartsGlOption
 import echartsgl.options.GlobeOption
 import echartsgl.options.Grid3DOption
@@ -36,10 +33,6 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
-import web.html.HTMLCanvasElement
-import web.html.HTMLElement
 import zrender.ZRColor
 
 /**
@@ -56,7 +49,7 @@ class GlSeriesTest {
         val (chart, container) = createChart()
         chart.setOption(
             unsafeJso<EChartsGlOption> {
-                axes()
+                cartesian3DAxes()
                 grid3D = one(unsafeJso<Grid3DOption> {})
                 series =
                     one(
@@ -161,7 +154,7 @@ class GlSeriesTest {
         val (chart, container) = createChart()
         chart.setOption(
             unsafeJso<EChartsGlOption> {
-                axes()
+                cartesian3DAxes()
                 grid3D = one(unsafeJso<Grid3DOption> {})
                 series =
                     one(
@@ -208,7 +201,7 @@ class GlSeriesTest {
         val (chart, container) = createChart()
         chart.setOption(
             unsafeJso<EChartsGlOption> {
-                axes()
+                cartesian3DAxes()
                 grid3D = one(unsafeJso<Grid3DOption> {})
                 series =
                     one(
@@ -243,7 +236,7 @@ class GlSeriesTest {
         try {
             chart.setOption(
                 unsafeJso<EChartsGlOption> {
-                    axes()
+                    cartesian3DAxes()
                     grid3D = one(unsafeJso<Grid3DOption> {})
                     series =
                         one(
@@ -292,7 +285,7 @@ class GlSeriesTest {
         try {
             chart.setOption(
                 unsafeJso<EChartsGlOption> {
-                    axes()
+                    cartesian3DAxes()
                     grid3D = one(unsafeJso<Grid3DOption> {})
                     series =
                         one(
@@ -328,25 +321,6 @@ class GlSeriesTest {
         }
     }
 
-    /**
-     * Asserts that the WebGL layer was created and painted into the only canvas of the container.
-     */
-    private fun assertWebGlCanvas(container: HTMLElement) {
-        assertNull(container.querySelector(".ecgl-nowebgl"), "WebGL is not available")
-        val canvases = container.querySelectorAll("canvas")
-        assertEquals(1, canvases.length)
-        val canvas = canvases.item(0).unsafeCast<HTMLCanvasElement>()
-        assertTrue(canvas.width > 0 && canvas.height > 0, "${canvas.width}x${canvas.height}")
-    }
-}
-
-/**
- * Adds the three value axes a `cartesian3D` series needs.
- */
-private fun EChartsGlOption.axes() {
-    xAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
-    yAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
-    zAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
 }
 
 /**
@@ -363,8 +337,3 @@ private fun SurfaceSeriesOption.waveSurface() {
         }
 }
 
-/**
- * Builds an `x, y, z` row.
- */
-private fun row(vararg values: Double): Array<OptionDataValue?> =
-    Array(values.size) { index -> OptionDataValue(values[index]) }

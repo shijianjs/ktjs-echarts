@@ -448,8 +448,3 @@ private fun EChartsGlOption.axes() {
     yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
 }
 
-/**
- * Builds an `x, y` row.
- */
-private fun row(vararg values: Double): Array<OptionDataValue?> =
-    Array(values.size) { index -> OptionDataValue(values[index]) }

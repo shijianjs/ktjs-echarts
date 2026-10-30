@@ -1,14 +1,23 @@
 package echartsgl
 
+import echarts.AxisTypes
 import echarts.ECharts
 import echarts.EChartsInitOpts
 import echarts.EChartsInstance
 import echarts.options.OptionDataValue
+import echarts.options.one
+import echartsgl.options.Axis3DOption
 import echartsgl.options.Bar3DDataItem
+import echartsgl.options.EChartsGlOption
+import js.objects.unsafeJso
 import kotlin.js.Promise
 import kotlin.js.unsafeCast
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import web.animations.requestAnimationFrame
 import web.dom.document
+import web.html.HTMLCanvasElement
 import web.html.HTMLElement
 
 /**
@@ -76,3 +85,29 @@ internal fun bar3DItems(vararg xyz: Double): Array<Bar3DDataItem?> {
  */
 internal fun hasOwn(value: Any, key: String): Boolean =
     js("Object.prototype.hasOwnProperty").call(value, key).unsafeCast<Boolean>()
+
+/**
+ * Builds one data row, for example an `x, y, z` triple.
+ */
+internal fun row(vararg values: Double): Array<OptionDataValue?> =
+    Array(values.size) { index -> OptionDataValue(values[index]) }
+
+/**
+ * Asserts that the WebGL layer was created and painted into the only canvas of the container.
+ */
+internal fun assertWebGlCanvas(container: HTMLElement) {
+    assertNull(container.querySelector(".ecgl-nowebgl"), "WebGL is not available")
+    val canvases = container.querySelectorAll("canvas")
+    assertEquals(1, canvases.length)
+    val canvas = canvases.item(0).unsafeCast<HTMLCanvasElement>()
+    assertTrue(canvas.width > 0 && canvas.height > 0, "${canvas.width}x${canvas.height}")
+}
+
+/**
+ * Adds the three value axes a `cartesian3D` series needs.
+ */
+internal fun EChartsGlOption.cartesian3DAxes() {
+    xAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
+    yAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
+    zAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
+}

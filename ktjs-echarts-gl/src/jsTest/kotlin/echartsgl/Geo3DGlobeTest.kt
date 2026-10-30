@@ -22,12 +22,9 @@ import kotlin.js.Promise
 import kotlin.js.unsafeCast
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 import web.dom.document
-import web.html.HTMLCanvasElement
-import web.html.HTMLElement
 import web.html.HtmlTagName
 import zrender.ZRColor
 
@@ -209,16 +206,6 @@ class Geo3DGlobeTest {
         assertTrue(graphicGlNamespace.shader.source("ecgl.displayShadow.fragment").isNotEmpty())
     }
 
-    /**
-     * Asserts that the WebGL layer was created and painted into the only canvas of the container.
-     */
-    private fun assertWebGlCanvas(container: HTMLElement) {
-        assertNull(container.querySelector(".ecgl-nowebgl"), "WebGL is not available")
-        val canvases = container.querySelectorAll("canvas")
-        assertEquals(1, canvases.length)
-        val canvas = canvases.item(0).unsafeCast<HTMLCanvasElement>()
-        assertTrue(canvas.width > 0 && canvas.height > 0, "${canvas.width}x${canvas.height}")
-    }
 }
 
 /** Name of the map registered by [registerSquareMap]. */

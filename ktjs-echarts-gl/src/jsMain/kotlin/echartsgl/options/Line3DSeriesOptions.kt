@@ -24,8 +24,13 @@ external interface Line3DDataItemOption : OptionDataItemObject {
     @JsName("value")
     var typedValue: OptionDataValueOrArray?
 
-    /** Color and opacity of this point of the polyline. */
-    var itemStyle: LineStyleOption?
+    /**
+     * Color and opacity of this point of the polyline.
+     *
+     * Named `lineStyle`, not `itemStyle`: `Line3DSeries` sets `visualStyleAccessPath = 'lineStyle'`,
+     * so echarts reads the style of a data item from this key.
+     */
+    var lineStyle: LineStyleOption?
 }
 
 /**

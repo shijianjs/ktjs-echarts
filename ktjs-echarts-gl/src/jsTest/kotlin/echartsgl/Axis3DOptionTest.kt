@@ -5,7 +5,6 @@ import echarts.ECharts
 import echarts.options.AxisInterval
 import echarts.options.LabelFormatter
 import echarts.options.StringOrDouble
-import echarts.options.TextStyleOption
 import echarts.options.ZRColorOrArray
 import echarts.options.one
 import echartsgl.options.Axis3DOption
@@ -59,11 +58,8 @@ class Axis3DOptionTest {
             // ECharts flattens the deprecated `axisLabel.textStyle` onto the label itself and leaves
             // the nested object null, unlike `axisPointer.label.textStyle`, which it keeps.
             assertNull(grid.axisLabel!!.textStyle)
-            assertEquals("#112233", grid.axisLabel!!.unsafeCast<TextStyleOption>().color)
-            assertEquals(
-                12.0,
-                grid.axisLabel!!.unsafeCast<TextStyleOption>().fontSize!!.unsafeCast<Double>(),
-            )
+            assertEquals("#112233", grid.axisLabel!!.color)
+            assertEquals(12.0, grid.axisLabel!!.fontSize!!.unsafeCast<Double>())
             assertEquals(true, grid.splitLine!!.show)
             // typedColor is the @JsName("color") view of a palette, so it must be on `color`.
             assertEquals("#ff0000", grid.splitLine!!.lineStyle!!.typedColor!!.unsafeCast<String>())

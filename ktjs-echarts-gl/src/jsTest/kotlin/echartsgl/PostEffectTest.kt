@@ -1,9 +1,7 @@
 package echartsgl
 
-import echarts.AxisTypes
 import echarts.ECharts
 import echarts.options.one
-import echartsgl.options.Axis3DOption
 import echartsgl.options.EChartsGlOption
 import echartsgl.options.GlobeOption
 import echartsgl.options.Grid3DOption
@@ -15,10 +13,7 @@ import kotlin.js.unsafeCast
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
-import web.html.HTMLCanvasElement
-import web.html.HTMLElement
 import zrender.GradientColorStop
 import zrender.LinearGradientObject
 import zrender.linearGradient
@@ -239,24 +234,11 @@ class PostEffectTest {
                 temporalSuperSampling = unsafeJso { enable = BooleanOrAutos.auto }
             },
         )
-        xAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
-        yAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
-        zAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
+        cartesian3DAxes()
         series = one(
             bar3DSeries {
                 typedData = bar3DItems(0.0, 0.0, 3.0, 1.0, 1.0, 5.0)
             },
         )
-    }
-
-    /**
-     * Asserts that the WebGL layer was created and painted into the only canvas of the container.
-     */
-    private fun assertWebGlCanvas(container: HTMLElement) {
-        assertNull(container.querySelector(".ecgl-nowebgl"), "WebGL is not available")
-        val canvases = container.querySelectorAll("canvas")
-        assertEquals(1, canvases.length)
-        val canvas = canvases.item(0).unsafeCast<HTMLCanvasElement>()
-        assertTrue(canvas.width > 0 && canvas.height > 0, "${canvas.width}x${canvas.height}")
     }
 }

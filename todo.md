@@ -83,7 +83,9 @@
   用 `textureCanvases` 生成，同步加载，dispose 时没有悬挂的加载任务）；`Geo3DGlobeTest` 里 `geo3D`
   的区域覆盖写全了 `itemStyle` / `label` / `emphasis`，不再只写 `name` / `height`；
   `ViewControlTest` 用一条 `geo3D` 场景把 `ViewControlOption` 二十八个成员全部点名，另用 `grid3D`
-  核对组件自己的相机默认值。
+  核对组件自己的相机默认值；`Geo3DGlobeTest` 补了 `globe` 的 `globeRadius` / `globeOuterRadius`、
+  `heightTexture` / `displacementTexture` 与大气的 `innerGlowPower`，以及 `light` 的
+  `main.shadowQuality` 与 `ambientCubemap` 的三个强度字段。
 - 用例查出的五处上游行为，别再当 wrapper 的 bug：
   `ViewGL.setPostEffect` 先读 `DOF` / `SSAO` / `SSR` / `FXAA`，camelCase 只是回退，所以这四个键只能靠
   `@JsName` 写对——写错键名时类型化读写依然自洽，用例用 `hasOwn`（`TestSupport`）直接问 JavaScript；
@@ -104,6 +106,13 @@
   此时才用 `roughnessAdjust` / `metalnessAdjust` 当标量，`hatching` 必须给满 6 张 `hatchingTextures`
   （少于 6 张上游 `console.error`），`textureTiling` 大于 1 时贴图得是 2 的整数次幂边长。
   材质集是「四套都写、只用一套」的，所以 `bar3D` 一条系列同时带四套就能全部核对。
+- `globe` 与 `light` 同理：`GlobeModel.getDisplacementTexture()` 是 `displacementTexture || heightTexture`，
+  但 `hasDisplacement()` 要 `displacementScale > 0` 才走顶点位移，`globeCreator.js:150` 的加载回调对画布
+  是同步的（`isValueImage` 认 canvas），所以贴图画布不会留下悬挂任务；`SceneHelper.updateAmbientCubemap`
+  只在 `light.ambientCubemap.texture` 有值时才建 cubemap，且那是异步的 prefilter，所以用例只写
+  `exposure` / `diffuseIntensity` / `specularIntensity` 三个强度、不写那个 URL。`main.shadowQuality`
+  走 `graphicGL.getShadowResolution`（low/medium/high/ultra = 512/1024/2048/4096），与 `shadow` 开关无关，
+  所以关掉阴影也能核对这个字段。
 - 已确认的死字段（不建模）：`graphGL` 的 `roam` / `center`、`edgeSymbol` / `edgeSymbolSize`、
   `initLayout` / `stopThreshold`；hatching 材质只读 `hatchingTextures`，`paperColor` 无人读取；mapbox3D /
   maptalks3D 文档里的 `shading` 不会被读。
@@ -121,23 +130,24 @@
 
 **移植队列已清空**（`geo-lines` 是待补清单的最后一条）。官方清单 436 条现在要么已移植、要么在
 「明确不做」里，`node scripts/demo-coverage.mjs` 输出「待补 0」。已在推进的方向是按 `AGENTS.md`
-「测试覆盖」那六条复查 wrapper 的用例缺口，GL 侧已完成四批（第一批 `postEffect` / `environment` /
+「测试覆盖」那六条复查 wrapper 的用例缺口，GL 侧已完成五批（第一批 `postEffect` / `environment` /
 轴子选项，第二批对象形态数据项与 `surface.data`，第二批查出了 `-kt.10` 那个键名 bug，
 第三批四套材质与 `groundPlane`、`geo3D` 区域覆盖、`map3D` 的材质与样式，第四批整套相机
-`ViewControlOption` 与 `Axis3DOption` 的八个轴级字段）。
+`ViewControlOption` 与 `Axis3DOption` 的八个轴级字段，第五批 `globe` 的半径/两张贴图/大气与 `light`）。
 
 缺口现在由 `node scripts/field-coverage.mjs` 按**字段**核对（旧的 `build/gl-coverage-gap.mjs` 只看类型名，
-`unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：GL 575 个成员里 51 个没被用例点过名、
+`unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：GL 575 个成员里 42 个没被用例点过名、
 20 个在 `NOT_COVERED` 里；2D 2704 个成员里 763 个没被点名。下一批候选，按文件成组、不必逐条讨论：
 
-1. GL 剩下的按组件成组：`GlobeOptions`（`globeRadius` / `globeOuterRadius` / `heightTexture` /
-   `displacementTexture` / 大气的 `innerGlowPower`，加 `zlevel` / `top`）、`GraphGLForceAtlas2Option`
-   的力导参数十二项与 `GraphGLSeriesOption.edges`、`Lines3DEffectOption` 的拖尾五项、`LightOptions` 的
-   `ambientCubemap` 与 `shadowQuality`（`diffuseIntensity` / `specularIntensity`），以及散在各组件的
-   `zlevel` / `top` 与三个系列的 `globeIndex`、`bar3D.stack`。
-2. `EChartsGlLiterals` 里 13 个联合类型的**工厂函数**没被调用过——`LiteralsTest` 只测了 `Xxxs` 常量对象，
+1. 各组件的布局与索引字段：`Grid3DOption` / `Geo3DOption` / `GlobeOption` 的 `zlevel` 与 `top`、
+   `Map3DSeriesOption.top`，加 `bar3D` / `scatter3D` / `lines3D` 三个系列的 `globeIndex` 和
+   `bar3D.stack`——`zlevel` 决定 WebGL 层落在哪一层，是不能和 canvas 组件共用的那一个。
+2. `GraphGLForceAtlas2Option` 的力导参数十二项与 `GraphGLSeriesOption.edges`、
+   `Lines3DEffectOption` 的拖尾五项（`period` / `constantSpeed` / `trailColor` / `trailOpacity` /
+   `spotIntensity`）。
+3. `EChartsGlLiterals` 里 13 个联合类型的**工厂函数**没被调用过——`LiteralsTest` 只测了 `Xxxs` 常量对象，
    `ShadingType("lambert")` 这类自定义字符串那条路还没走。
-3. 2D 那 763 项按 `options/` 分文件推进，优先系列数据项联合与 `visualMap` / `dataset` 一类结构型选项。
+4. 2D 那 763 项按 `options/` 分文件推进，优先系列数据项联合与 `visualMap` / `dataset` 一类结构型选项。
 
 `--limit N` 控制每个文件列出的条数，`--show-covered` 反查已覆盖的名字；判据是「名字在 jsTest 全文里出现过」，
 所以 `show` 这类到处都有的成员名几乎总是已覆盖，这个口径用来找**从没出现过的字段**，不是逐用例的覆盖率。

@@ -15,6 +15,7 @@ import kotlin.js.Promise
 import kotlin.js.unsafeCast
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.test.assertSame
 import kotlin.test.assertTrue
 import web.dom.document
@@ -173,6 +174,75 @@ class Geo3DGlobeTest {
                 assertEquals(0.8, layers[0].intensity)
                 assertEquals(GlobeLayerTypes.overlay, layers[1].type)
                 assertEquals(5.0, layers[1].distance)
+                assertWebGlCanvas(container)
+            } finally {
+                destroyChart(chart, container)
+            }
+        }
+    }
+
+    /**
+     * The size of the earth, the two textures that shape it and the light that is baked into the
+     * environment.
+     *
+     * `globeRadius` / `globeOuterRadius` are the defaults of `GlobeModel` (`100` / `150`) and are read
+     * by `globeCreator` to decide where the series float above the surface. `GlobeModel
+     * .getDisplacementTexture` falls back to `heightTexture`, and the displacement pass only runs
+     * when `displacementScale` is above zero, so both are set here to keep the two keys distinguishable.
+     *
+     * `light.ambientCubemap.texture` is left out on purpose: `SceneHelper.updateAmbientCubemap`
+     * creates the cubemap only when that URL is set, and it then loads and pre-filters the panorama
+     * asynchronously, which would still be pending when the chart is disposed.
+     */
+    @Test
+    fun globeCarriesRadiusTexturesAndEnvironmentLight(): Promise<Unit> {
+        ECharts.use(arrayOf(GlobeComponent))
+        val (chart, container) = createChart()
+        val heightMap = TextureSource(textureCanvas())
+        val displacementMap = TextureSource(textureCanvas())
+        chart.setOption(
+            unsafeJso<EChartsGlOption> {
+                globe =
+                    one(
+                        unsafeJso<GlobeOption> {
+                            silent = true
+                            globeRadius = 60.0
+                            globeOuterRadius = 90.0
+                            heightTexture = heightMap
+                            displacementTexture = displacementMap
+                            displacementScale = 0.05
+                            shading = ShadingTypes.lambert
+                            atmosphere = unsafeJso { show = true; innerGlowPower = 3.0 }
+                            light =
+                                unsafeJso {
+                                    main = unsafeJso { shadowQuality = QualityTypes.ultra }
+                                    ambientCubemap = unsafeJso {
+                                        exposure = 0.5
+                                        diffuseIntensity = 0.7
+                                        specularIntensity = 0.9
+                                    }
+                                }
+                            viewControl = unsafeJso { distance = 200.0 }
+                        },
+                    )
+            },
+        )
+        return nextFrames(2).then {
+            try {
+                val globe = chart.getOption()
+                    .unsafeCast<EChartsGlOption>()
+                    .globe!![0]
+                assertEquals(60.0, globe.globeRadius)
+                assertEquals(90.0, globe.globeOuterRadius)
+                assertSame(heightMap, globe.heightTexture)
+                assertSame(displacementMap, globe.displacementTexture)
+                assertEquals(0.05, globe.displacementScale)
+                assertEquals(3.0, globe.atmosphere!!.innerGlowPower)
+                assertEquals(QualityTypes.ultra, globe.light!!.main!!.shadowQuality)
+                assertEquals(0.5, globe.light!!.ambientCubemap!!.exposure)
+                assertEquals(0.7, globe.light!!.ambientCubemap!!.diffuseIntensity)
+                assertEquals(0.9, globe.light!!.ambientCubemap!!.specularIntensity)
+                assertNull(globe.light!!.ambientCubemap!!.texture)
                 assertWebGlCanvas(container)
             } finally {
                 destroyChart(chart, container)

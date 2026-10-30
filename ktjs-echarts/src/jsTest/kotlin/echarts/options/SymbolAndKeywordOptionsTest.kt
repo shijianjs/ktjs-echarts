@@ -125,6 +125,18 @@ class SymbolAndKeywordOptionsTest {
     }
 
     @Test
+    fun markDataItemsNameTheValueDimension() {
+        val shared = unsafeJso<MarkerPositionOption> { valueDim = "y" }
+        assertEquals("y", shared.valueDim)
+
+        val lineItem = unsafeJso<MarkLine1DDataItemOption> { valueDim = "value" }
+        assertEquals("value", lineItem.valueDim)
+
+        val areaItem = unsafeJso<MarkArea1DDataItemOption> { valueDim = "valueY" }
+        assertEquals("valueY", areaItem.valueDim)
+    }
+
+    @Test
     fun pictorialBarKeywordFieldsAreLiterals() {
         val series = pictorialBarSeries {
             symbolSize = StringOrDoubleOrArray(arrayOf(StringOrDouble("10%"), StringOrDouble(20.0)))

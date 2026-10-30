@@ -156,7 +156,7 @@
 缺口现在由 `node scripts/field-coverage.mjs` 按**字段**核对（旧的 `build/gl-coverage-gap.mjs` 只看类型名，
 `unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：**GL 575 个成员全部点过名，未点名 0 个**
 （`NOT_COVERED` 的 20 个是安装器 getter 与要第三方 SDK/token 的 `mapbox3D` / `maptalks3D` 成员，明确不做）；
-2D 已推进五批：第一批 `EChartsLiterals.kt` 的 40 个 `Xxx(String)` 工厂与 `AnimationEasing((Double) -> Double)`
+2D 已推进八批：第一批 `EChartsLiterals.kt` 的 40 个 `Xxx(String)` 工厂与 `AnimationEasing((Double) -> Double)`
 重载，第二批 `EChartsSeriesLiterals.kt` 的 30 个工厂（含 `NodeClickBehavior` 的 `String` 与 `Boolean` 两个
 重载），前两批都在 `echarts/LiteralsTest` 里用不在 `Xxxs` 常量里的自定义值各包一次读回；第三批
 `options/DataZoomVisualMapDatasetOptionTest`，把 `EChartsOption.kt` 里的 `DataZoomOption`（滑柄样式、窗口跨度、
@@ -174,8 +174,12 @@
 喂给 `dispatchAction`，再加 `Payload` / `ModelFinderObject` / `SelectChangedPayload` 三字段的 `unsafeJso` 读回；
 第七批 `options/CalendarGridMatrixOptionTest`，补 `CalendarOption` 的 `cellSize` / 三套 `*Label`（含 `firstDay`、
 `nameMap`、`margin`）/ `splitLine`、`GridOption` 的 `outerBounds` 与两个 clamp 尺寸、`MatrixOption` 的 `corner`
-/ `backgroundStyle` / `borderZ2`。几批结构型用例都顺带点名了共享基接口与嵌套样式字段，剩 2704 个成员里
-453 个没被点名。
+/ `backgroundStyle` / `borderZ2`；第八批 `echarts/GeoTypesTest`，覆盖 `EChartsGeoTypes.kt` 的 Geo 类型：
+`GeoJSON` 的 `UTF8Encoding` / `UTF8Scale`、`GeoJSONProperties.cp`、`GeoJSONGeometry.encodeOffsets`、
+`GeoJSONMapInput.specialAreas`（配 `GeoSpecialArea` 的 left/top/width/height）逐个设值读回并喂 `registerMap`
+再从 `getMap` 核对，加 `GeoJSONSourceInput` 的 `String` / `GeoJSON` 两参与 `GeoSVGSourceInput` 的
+`String` / `Document` / `SVGElement` 三个工厂重载。几批结构型用例都顺带点名了共享基接口与嵌套样式字段，
+剩 2704 个成员里 443 个没被点名。
 
 2D 剩余按 `options/` 与 `ECharts*` 分文件推进，缺口最大的几个文件：`zrender/ZRenderElementTypes.kt` 46、
 `CommonTypes.kt`（`TooltipMarker` 联合等）、`ComponentOptions.kt`、`CartesianSeriesOptions.kt`、

@@ -92,7 +92,8 @@ demo/src/jvmTest/kotlin/demo/e2e/
   `gl/flights.json`；地图：`world.json`（缩写地名，`GlGeo.kt` 的 `worldRegionNames` 负责翻译）、
   `world-population.json`、`USA.json`、`ch.geo.json`、`iceland.geo.json`、`china.json`（地名是官方
   全称，`DocMaps.kt` 的 `chinaRegionNames` 负责把上游的简称翻过来）；空气质量：`geo-coord-map.json`
-  + `pm25-cities.json`（上游四页各抄一遍的同一份表，`ChinaAqi.kt` 共用）；微博签到：`weibo.json`
+  + `pm25-cities.json`（上游四页各抄一遍的同一份表，`ChinaAqi.kt` 共用）；`geo-lines` 另用
+  `geo-lines-coord-map.json`（114 城，与 190 城表没有一个坐标相同）；微博签到：`weibo.json`
   （三份增量编码的经纬度数组，`WeiboCheckin.kt` 共用）。
 - GL：11 色 `visualMap` 色带在 `Gl.kt` 的 `glPalette` / `glVisualMap()` 与 `GlSurfaceMaterial.kt` 的
   `surfaceRamp()`；HDR 环境图、皮革贴图、地球 / 月球 / 星空纹理在 `resources/data/img/gl/`，来源见
@@ -359,15 +360,25 @@ lambda 里先 `ECharts.registerMap(name, MapInput(SVGMapInput))` 再返回 optio
 空气质量五页在 `examples/ChinaAqi.kt`（`scatter-map` / `effectScatter-map` / `heatmap-map` /
 `geo-map-scatter` / `doc-example/scatter-visualMap-piecewise`）：前四页上游各抄了一遍 190 城坐标表与
 pm2.5 列，逐行比对完全一致，所以抽成 `data/geo-coord-map.json` + `data/pm25-cities.json` 共用，Kotlin 侧
-只留 `convertData`（按城市名取坐标，拼成 `[lng, lat, value]`）。两点要注意：
+只留 `convertData`（按城市名取坐标，拼成 `[lng, lat, value]`）。三点要注意：
 
 - `geo-map-scatter` 用同一张坐标表但只列 27 城，这 27 个值写死在文件里，不再产出第三份 JSON；
-  `geo-lines` 的 114 城表坐标与这份不同，不能复用。
+  `geo-lines` 的 114 城表名字全在这份里、坐标却一个都不相同，是另一份数据，见 `GeoLines.kt`。
 - 坐标表是个纯 `{ 城市: [lng, lat] }` 对象，Kotlin 侧读不到 `Record` 的索引类型，所以用一个 `js()` 小
   访问器 `coordOf(coords, name)` 取值，其余全走类型化的选项声明。
 - `china.json` 除 34 个省外还带 8 条名为 **`境界线`** 的线要素。ECharts 4 的老边界没有它们，所以凡是
   `geo.label.show = true` 的页面（`geo-map-scatter`）都要在 `regions` 里把 `境界线` 的 label 关掉，
   否则地图上会多出「境界线」几个字。
+
+`geo-lines`（模拟迁徙）在 `examples/GeoLines.kt`：三组航线各画三遍（拖尾 `lines`、带箭头与飞机符号的
+`lines`、目的地的涟漪散点），共 9 个系列。三点要注意：
+
+- 它内联的 114 城坐标表抽成 `data/geo-lines-coord-map.json`，与空气质量的 190 城表**不能合并**：
+  脚本比对过，114 个名字两边都有，但没有一个坐标相同（那份四舍五入到两位小数，这份保留四位）。
+- 三组路线（30 条）与颜色写死在 Kotlin 里，只有坐标走 JSON；`convertData` 的「两端都有坐标才保留」
+  语义照抄，实测 33 个城市全在表里，一条都不会被丢掉。
+- 飞机 `path://` 字形与 `geo-map-scatter` 的是同一个字符串，上游两个文件都叫 `planePath`，这里合成
+  `PLANE_SYMBOL_PATH` 一处声明。注意别和 `PictorialBarPaths.kt` 的 `PLANE_PATH` 搞混，那是侧视剪影。
 
 微博签到两页在 `examples/WeiboCheckin.kt`（`scatter-weibo` / `scattergl-weibo`），共用
 `data/weibo.json`：三个图例系列各是一个扁平的**增量编码**数组，头两个数是首点经纬度乘 1000，之后每两个

@@ -71,8 +71,12 @@ private fun loadChinaAqi(): Promise<ChinaAqiData> =
         ),
     ).then { loaded -> ChinaAqiData(loaded[0], loaded[1].unsafeCast<Array<Pm25Row>>()) }
 
-/** The `[lng, lat]` of [name] in the coordinate table, or null when upstream has no entry for it. */
-private fun coordOf(coords: JsAny, name: String): Pair<Double, Double>? {
+/**
+ * The `[lng, lat]` of [name] in the coordinate table, or null when upstream has no entry for it.
+ *
+ * `internal` because `GeoLines.kt` looks its cities up in its own coordinate table the same way.
+ */
+internal fun coordOf(coords: JsAny, name: String): Pair<Double, Double>? {
     val value: JsAny? = js("(coords, name) => coords[name]")(coords, name)
     if (value == null) return null
     return (js("(v) => v[0]")(value) as Double) to (js("(v) => v[1]")(value) as Double)
@@ -107,6 +111,19 @@ private fun namedScatterData(converted: List<Pair<String, Array<OptionDataValue?
             }
             .toTypedArray(),
     )
+
+/**
+ * The airplane silhouette upstream calls `planePath`.
+ *
+ * `geo-map-scatter` draws it instead of a dot for its 27 cities and `GeoLines.kt` flies it along the
+ * migration routes; the two upstream files carry the identical string. Not [PLANE_PATH], the side
+ * silhouette of the pictorialBar pages.
+ */
+internal const val PLANE_SYMBOL_PATH =
+    "path://M1705.06,1318.313v-89.254l-319.9-221.799l0.073-208.063c0.521-84.662-26.629-121.796" +
+        "-63.961-121.491c-37.332-0.305-64.482,36.829-63.961,121.491l0.073,208.063l-319.9,221.799v89.254" +
+        "l330.343-157.288l12.238,241.308l-134.449,92.931l0.531,42.034l175.125-42.917l175.125,42.917" +
+        "l0.531-42.034l-134.449-92.931l12.238-241.308L1705.06,1318.313z"
 
 /** The title every air-quality page shows, with the upstream PM25.in attribution. */
 private fun aqiTitle(text: String): Array<TitleOption> =
@@ -349,13 +366,6 @@ private fun docScatterPiecewiseOption(data: ChinaAqiData): EChartsOption =
 // geo-map-scatter
 // ---------------------------------------------------------------------------------------------
 
-/** The airplane silhouette of `geo-map-scatter`, drawn instead of a dot for the 27 cities. */
-private const val AQI_PLANE_PATH =
-    "path://M1705.06,1318.313v-89.254l-319.9-221.799l0.073-208.063c0.521-84.662-26.629-121.796" +
-        "-63.961-121.491c-37.332-0.305-64.482,36.829-63.961,121.491l0.073,208.063l-319.9,221.799v89.254" +
-        "l330.343-157.288l12.238,241.308l-134.449,92.931l0.531,42.034l175.125-42.917l175.125,42.917" +
-        "l0.531-42.034l-134.449-92.931l12.238-241.308L1705.06,1318.313z"
-
 /** The 27 cities of `geo-map-scatter`: a subset of the shared table, with upstream's own values. */
 private val GEO_MAP_SCATTER_CITIES: List<Pair<String, Double>> =
     listOf(
@@ -428,7 +438,7 @@ private fun geoMapScatterOption(data: ChinaAqiData): EChartsOption {
                     typedData =
                         namedScatterData(geoCoordRows(data, GEO_MAP_SCATTER_CITIES))
                     symbolSize = SymbolSize(20.0)
-                    symbol = SymbolShape(AQI_PLANE_PATH)
+                    symbol = SymbolShape(PLANE_SYMBOL_PATH)
                     symbolRotate = SymbolRotate(35.0)
                     label =
                         unsafeJso<LabelOption> {

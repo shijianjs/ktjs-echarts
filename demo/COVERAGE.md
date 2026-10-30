@@ -19,9 +19,9 @@
 | 官方清单 | 436 |
 | 　· `chart-list-data.js` | 377 |
 | 　· `chart-list-data-gl.js` | 59 |
-| 已移植 | 383 页 / 384 条 |
+| 已移植 | 384 页 / 385 条 |
 | 明确不做 | 51 |
-| 待补 | 1 |
+| 待补 | 0 |
 
 已移植数里的「页」不含总览页（`#/overview`）；「条」把 `bar-large` / `pie-highlight` 同时算作对应 `doc-example/` 条目的移植。
 
@@ -127,15 +127,7 @@ canvas-vs-svg 需要先给站点加渲染器开关才有意义。
 | --- |
 | `globe-country-carousel` |
 
-## 待补（1）
-
-### 缺示例自带的数据（1）
-
-地图本身（china / world / USA / Iceland / 瑞士 / HK / SVG）都已入库；剩下的缺示例自带的数据：`geo-lines` 要它自己那份 114 城市坐标表（与空气质量五页共用的 190 城表不同）。
-
-| id |
-| --- |
-| `geo-lines` |
+## 待补（0）
 
 <!-- coverage:end -->
 
@@ -159,7 +151,8 @@ node scripts/demo-coverage.mjs --write   # 重新生成「盘点」一节
 脚本默认读 `../../apache/echarts-examples`（相对仓库根目录），其他位置用 `ECHARTS_EXAMPLES` 指定。
 
 - 新移植一页后运行 `--write`，对应 id 会自动从「待补」里消失；仍留在脚本分类里的条目会被忽略并提示。
-- 新判定为「不做」的条目，加进 `scripts/demo-coverage.mjs` 的 `EXCLUDED` 并写清整组理由；没有分类的
+- 「待补」已随 `geo-lines` 清零：官方清单 436 条现在要么已移植，要么在「明确不做」里。以后 `--write`
+  再报出待补条目，说明上游清单新增了 id。- 新判定为「不做」的条目，加进 `scripts/demo-coverage.mjs` 的 `EXCLUDED` 并写清整组理由；没有分类的
   新 id 会让脚本报错。
 - 官方清单升级后，新 id 会以同样的方式暴露出来。
 

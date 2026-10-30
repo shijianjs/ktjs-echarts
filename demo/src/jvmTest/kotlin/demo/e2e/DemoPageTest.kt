@@ -676,8 +676,8 @@ class DemoPageTest {
 
     /**
      * The five pages of `GeoMaps.kt`, the five map tutorials of `DocMaps.kt`, the five air-quality
-     * pages of `ChinaAqi.kt`, the two check-in pages of `WeiboCheckin.kt` and the matrix map of
-     * `MatrixExtra.kt`.
+     * pages of `ChinaAqi.kt`, the migration page of `GeoLines.kt`, the two check-in pages of
+     * `WeiboCheckin.kt` and the matrix map of `MatrixExtra.kt`.
      *
      * Each of them fetches its map (four GeoJSON files, the 1.7 MB China boundary, and a 3.7 MB SVG);
      * the China pages add the city tables or the 773 kB check-in file on top, and the canvas stays
@@ -711,6 +711,7 @@ class DemoPageTest {
                     "heatmap-map",
                     "geo-map-scatter",
                     "doc-example/scatter-visualMap-piecewise",
+                    "geo-lines",
                     "scatter-weibo",
                     "scattergl-weibo",
                 )

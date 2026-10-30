@@ -31,6 +31,7 @@ import demo.examples.extraPagesEntries
 import demo.examples.financeTimelineEntries
 import demo.examples.gaugeEntries
 import demo.examples.geoExtraEntries
+import demo.examples.geoLinesEntries
 import demo.examples.geoMapsEntries
 import demo.examples.gaugeExtraEntries
 import demo.examples.gaugeLongTailEntries
@@ -274,6 +275,7 @@ val catalog: List<CatalogEntry> =
         scatterVisualMapCategoriesEntries,
         docMapsEntries,
         chinaAqiEntries,
+        geoLinesEntries,
         weiboCheckinEntries,
     ).flatten()
 

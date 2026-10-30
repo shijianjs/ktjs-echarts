@@ -95,7 +95,9 @@
   `MapSeries.getMapType()` 只读 `map`。照抄得到一张空白画布，移植一律改成 `map`。
 - **上游会把同一份数据抄进多个示例**：合并前先逐行比对，别假定同名就是同值。空气质量四页的 190 城表
   完全一致（`ChinaAqi.kt` 因此共用 `geo-coord-map.json` + `pm25-cities.json`），但 `geo-lines` 那份 114 城
-  表坐标与它们不同，只能另开一份文件。
+  表坐标与它们不同，只能另开一份文件。名字也不能当依据：脚本比对下来，`geo-lines` 的 114 个城市名
+  **全部**出现在 190 城表里，坐标却一个都不相同（那份只到两位小数）。字符串常量同理，
+  `geo-map-scatter` 与 `geo-lines` 的 `planePath` 逐字节相同，就合成一处声明。
 - **先 `registerMap` 再给纹理**：所有地图 / 行星纹理都依赖地图注册完成；`Category.interactive` +
   `loadJson` 是标准写法。
 - **空的 `viewControl` / `grid3D` 不要写**：不要为了「对齐上游」写空对象，只在真的设了字段时写。

@@ -70,7 +70,7 @@
 
 ### demo
 
-- 官方清单 436 条：**已移植 383 页 / 384 条，明确不做 51，待补 1**。逐条清单、理由与维护方式见
+- 官方清单 436 条：**已移植 384 页 / 385 条，明确不做 51，待补 0**。逐条清单、理由与维护方式见
   [demo/COVERAGE.md](demo/COVERAGE.md)。
 - 跨页注意事项（含 GL）见 [demo/NOTES.md](demo/NOTES.md)；移植约定、各家族做法与可复用数据见
   [demo/AGENTS.md](demo/AGENTS.md)。
@@ -79,10 +79,15 @@
 
 ## 下一步
 
-按 [demo/COVERAGE.md](demo/COVERAGE.md) 的「待补」清单推进（1 条）：
+**移植队列已清空**（`geo-lines` 是待补清单的最后一条）。官方清单 436 条现在要么已移植、要么在
+「明确不做」里，`node scripts/demo-coverage.mjs` 输出「待补 0」。继续推进需要先定方向，候选：
 
-1. **`geo-lines`**：它内联的 `geoCoordMap` 只有 114 个城市，且与空气质量五页共用的 190 城表坐标并不一致，
-   是上游另一份数据，不能复用 `geo-coord-map.json`；照同样的一次性脚本抽成单独一份文件再登记。
+1. 把 COVERAGE「清单之外」那 13 个未进官方清单的 mapbox / maptalks / Web Audio GL 源文件与 6 个归档示例
+   正式并入 `EXCLUDED`，让「不做」的 51 条覆盖全部已知未移植项，账本上不再有游离条目。
+2. 复查 demo 侧残留的 `js()` 兜底：逐个确认是否已按 `TYPE-MAPPING.md` §12 过一遍、有没有能收回类型化
+   声明的（如坐标表访问器 `coordOf`）。
+3. 回到 wrapper 本身：按 `AGENTS.md`「测试覆盖」那六条复查 `src/jsMain` 每个包是否都有对应用例，
+   补齐缺口。
 
 新增/移植页面后跑 `node scripts/demo-coverage.mjs --write` 更新 COVERAGE。
 

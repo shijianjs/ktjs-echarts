@@ -35,6 +35,7 @@ rather than a diff of numbers. They are served from `/data/<name>` and loaded wi
 | `USA.json` | `geo/` | `map-usa`, `map-bar-morph`, `doc-example/map-visualMap-pieces` |
 | `china.json` | `apache/echarts` `test/data/map/js/china.js` | `doc-example/map-example`, `scatter-map`, `effectScatter-map`, `heatmap-map`, `geo-map-scatter`, `doc-example/scatter-visualMap-piecewise` |
 | `geo-coord-map.json` | derived from the example sources | the five China air-quality pages above (city name → `[lng, lat]`) |
+| `geo-lines-coord-map.json` | derived from `geo-lines.js` | `geo-lines` (its own 114-city name → `[lng, lat]` table) |
 | `pm25-cities.json` | derived from the example sources | the same five pages (city name → pm2.5) |
 | `weibo.json` | `data/` | `scatter-weibo`, `scattergl-weibo` (three delta-encoded lon/lat check-in series) |
 | `Sicily_prehellenic_topographic_map.svg` | `geo/` | `geo-svg-map` |
@@ -142,8 +143,13 @@ example into those.
 compared the four and found them identical, so `geo-coord-map.json` is the 190-entry `{ city: [lng, lat] }`
 object of `scatter-map.js` with its keys sorted and `pm25-cities.json` is its 190 `{ name, value }` rows in
 upstream order. `geo-map-scatter.js` inlines the same coordinate table but only 27 of its cities; those 27
-values are written in `ChinaAqi.kt` instead of becoming a third file. `geo-lines.js`, which is not ported
-yet, has a 114-city table of its own whose coordinates differ, so it will need a separate file.
+values are written in `ChinaAqi.kt` instead of becoming a third file.
+
+`geo-lines-coord-map.json` is the same shape and **not** the same data. `geo-lines.js` inlines a
+114-city `geoCoordMap` of its own, and a one-off script checked it against the 190-city table: all 114
+names occur in both, but not one coordinate pair agrees — the air-quality table is rounded to two
+decimals, this one keeps four. It is therefore a second file, keys sorted the same way. All 33 cities the
+three route groups mention are in it, so upstream's `convertData` drops no route here either.
 
 `weibo.json` is the check-in table of `scatter-weibo.ts` and `scattergl-weibo.js`, and the only file here
 whose bytes are load-bearing for the port. It is three flat arrays of 181,626 / 38,424 / 16,958 numbers —

@@ -3,6 +3,7 @@ package echartsgl
 import echarts.AxisTypes
 import echarts.ECharts
 import echarts.options.DimensionDefinitionLoose
+import echarts.options.DoubleOrDoubleArray
 import echarts.options.OptionDataValue
 import echarts.options.OptionDataValueOrArray
 import echarts.options.OptionId
@@ -339,6 +340,18 @@ class GlSeries2DTest {
                                     maxSteps = 4.0
                                     gravity = 0.5
                                     barnesHutOptimize = false
+                                    repulsionByDegree = true
+                                    linLogMode = true
+                                    strongGravityMode = true
+                                    gravityCenter = arrayOf(10.0, 20.0)
+                                    scaling = 50.0
+                                    edgeWeightInfluence = 2.0
+                                    edgeWeight = DoubleOrDoubleArray(arrayOf(1.0, 4.0))
+                                    nodeWeight = DoubleOrDoubleArray(2.0)
+                                    preventOverlap = true
+                                    barnesHutTheta = 1.2
+                                    jitterTolerence = 0.1
+                                    dissuadeHubs = true
                                 }
                             focusNodeAdjacency = false
                             zoom = 1.5
@@ -381,6 +394,14 @@ class GlSeries2DTest {
                                         typedValue = OptionDataValueOrArray(2.0)
                                     },
                                 )
+                            // `edges` is the alias upstream prefers (`option.edges || option.links`).
+                            edges =
+                                arrayOf<GraphGLLinkOption?>(
+                                    unsafeJso {
+                                        source = StringOrDouble(0.0)
+                                        target = StringOrDouble(1.0)
+                                    },
+                                )
                         },
                     )
             },
@@ -398,6 +419,21 @@ class GlSeries2DTest {
                 assertEquals(4.0, series.forceAtlas2!!.maxSteps)
                 assertEquals(0.5, series.forceAtlas2!!.gravity)
                 assertEquals(false, series.forceAtlas2!!.barnesHutOptimize)
+                assertEquals(true, series.forceAtlas2!!.repulsionByDegree)
+                assertEquals(true, series.forceAtlas2!!.linLogMode)
+                assertEquals(true, series.forceAtlas2!!.strongGravityMode)
+                assertEquals(2, series.forceAtlas2!!.gravityCenter!!.size)
+                assertEquals(20.0, series.forceAtlas2!!.gravityCenter!![1])
+                assertEquals(50.0, series.forceAtlas2!!.scaling)
+                assertEquals(2.0, series.forceAtlas2!!.edgeWeightInfluence)
+                val edgeWeight = series.forceAtlas2!!.edgeWeight!!.unsafeCast<Array<Double>>()
+                assertEquals(2, edgeWeight.size)
+                assertEquals(4.0, edgeWeight[1])
+                assertEquals(2.0, series.forceAtlas2!!.nodeWeight!!.unsafeCast<Double>())
+                assertEquals(true, series.forceAtlas2!!.preventOverlap)
+                assertEquals(1.2, series.forceAtlas2!!.barnesHutTheta)
+                assertEquals(0.1, series.forceAtlas2!!.jitterTolerence)
+                assertEquals(true, series.forceAtlas2!!.dissuadeHubs)
                 assertEquals(false, series.focusNodeAdjacency)
                 assertEquals(GraphGLFocusNodeAdjacencyOns.mouseover, series.focusNodeAdjacencyOn)
                 assertEquals(1.5, series.zoom)
@@ -412,6 +448,8 @@ class GlSeries2DTest {
                 assertEquals(StringOrDouble(0.0), series.typedData!![0]!!.category)
                 assertEquals(1, series.links!!.size)
                 assertEquals(StringOrDouble(1.0), series.links!![0]!!.target)
+                assertEquals(1, series.edges!!.size)
+                assertEquals(StringOrDouble(1.0), series.edges!![0]!!.target)
                 assertWebGlCanvas(container)
             } finally {
                 destroyChart(chart, container)

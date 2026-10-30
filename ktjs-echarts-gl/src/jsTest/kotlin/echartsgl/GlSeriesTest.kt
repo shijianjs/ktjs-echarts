@@ -36,6 +36,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import zrender.ZRColor
 
 /**
@@ -102,7 +103,17 @@ class GlSeriesTest {
                         lines3DSeries {
                             typedCoordinateSystem = CoordinateSystems3D.globe
                             typedBlendMode = GlBlendModes.lighter
-                            effect = unsafeJso { show = true; trailWidth = 2.0; trailLength = 0.2 }
+                            effect =
+                                unsafeJso {
+                                    show = true
+                                    period = 3.0
+                                    constantSpeed = 5.0
+                                    trailWidth = 2.0
+                                    trailLength = 0.2
+                                    trailColor = GlColor(ZRColor("rgb(0, 255, 0)"))
+                                    trailOpacity = 0.6
+                                    spotIntensity = 1.4
+                                }
                             typedLineStyle =
                                 unsafeJso {
                                     width = 0.0
@@ -135,7 +146,13 @@ class GlSeriesTest {
                 assertEquals(CoordinateSystems3D.globe, series.typedCoordinateSystem)
                 assertEquals(GlBlendModes.lighter, series.typedBlendMode)
                 assertEquals(true, series.effect!!.show)
+                assertEquals(3.0, series.effect!!.period)
+                assertEquals(5.0, series.effect!!.constantSpeed)
                 assertEquals(2.0, series.effect!!.trailWidth)
+                assertEquals(0.2, series.effect!!.trailLength)
+                assertEquals(0.6, series.effect!!.trailOpacity)
+                assertEquals(1.4, series.effect!!.spotIntensity)
+                assertNotNull(series.effect!!.trailColor)
                 assertEquals(0.0, series.typedLineStyle!!.width)
                 assertEquals(0.2, series.typedLineStyle!!.opacity)
                 assertEquals(2, series.typedData!!.size)

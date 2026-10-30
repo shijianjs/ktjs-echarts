@@ -16,8 +16,6 @@ import demo.ui.example
 import demo.ui.interactiveChart
 import demo.ui.page
 import demo.ui.pageSection
-import kotlin.js.JsAny
-import kotlin.js.js
 import web.html.HtmlTagName
 
 /**
@@ -39,6 +37,7 @@ private fun modelEntry(example: ModelExample): CatalogEntry {
             officialUrl = null,
             sourcePath = "json/ModelExamples.kt",
             sourceRoot = REPO_COMMON_SOURCE_ROOT,
+            jsonSourcePath = "json/ModelExamples.kt",
         )
     return CatalogEntry(example.id, Groups.JSON, meta, switchableSource = true) { pageMeta ->
         buildModelPage(pageMeta, example)
@@ -58,7 +57,7 @@ private fun buildModelPage(meta: PageMeta, example: ModelExample): PageView {
             ),
         )
     chartSection.body.append(
-        example(null, view.track(interactiveChart { chart, _ -> chart.setOption(parseOption(example.json)) }).root),
+        example(null, view.track(interactiveChart { chart, _ -> chart.setOption(parseJsonOption(example.json)) }).root),
     )
     view.body.append(chartSection.root)
 
@@ -79,6 +78,3 @@ private fun buildModelPage(meta: PageMeta, example: ModelExample): PageView {
 
     return view
 }
-
-/** Parses the model output into the plain option object `setOption` accepts. */
-private fun parseOption(json: String): JsAny = js("(text) => JSON.parse(text)")(json)

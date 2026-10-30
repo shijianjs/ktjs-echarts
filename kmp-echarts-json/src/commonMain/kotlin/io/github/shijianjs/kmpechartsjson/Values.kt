@@ -14,6 +14,7 @@ import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.double
 import kotlinx.serialization.json.doubleOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -290,6 +291,15 @@ public class DataItem {
     /** Per-item symbol name. */
     public var symbol: String? = null
 
+    /** Fixed x position on a `graph` or `tree` layout that does not compute positions. */
+    public var x: Double? = null
+
+    /** Fixed y position on a `graph` or `tree` layout that does not compute positions. */
+    public var y: Double? = null
+
+    /** Category index of a `graph` node. */
+    public var category: Int? = null
+
     /** Per-item symbol size. */
     public var symbolSize: NumberOrStringOrNumbers? = null
 
@@ -312,6 +322,59 @@ public fun DataItem.asDataValue(): DataValue =
 
 /** Builds a typed data item. */
 public fun dataItem(block: DataItem.() -> Unit): DataValue = DataItem().apply(block).asDataValue()
+
+/**
+ * A value ECharts accepts as one number or an array of numbers.
+ *
+ * Used by `symbolBoundingData`, whose array form sets the lower and upper bound of a pictorial bar
+ * in one value.
+ */
+@kotlinx.serialization.Serializable(with = NumberOrNumbersSerializer::class)
+public sealed interface NumberOrNumbers {
+    /** One number. */
+    public data class Single(public val value: Double) : NumberOrNumbers
+
+    /** Several numbers, encoded as a JSON array. */
+    public data class Multiple(public val values: List<Double>) : NumberOrNumbers
+
+    public companion object {
+        /** Wraps [value] without an array. */
+        public fun of(value: Number): NumberOrNumbers = Single(value.toDouble())
+
+        /** Wraps [values] as a number array. */
+        public fun of(vararg values: Number): NumberOrNumbers =
+            Multiple(values.map { it.toDouble() })
+    }
+}
+
+/**
+ * A boolean option that also accepts a number or a string mode.
+ *
+ * ECharts uses this for `symbolRepeat`: a boolean, a repeat count or the `"fixed"` keyword that
+ * repeats as often as the symbol fits without clipping it to the data value.
+ */
+@kotlinx.serialization.Serializable(with = BooleanOrNumberOrStringSerializer::class)
+public sealed interface BooleanOrNumberOrString {
+    /** Boolean variant. */
+    public data class BooleanValue(public val value: Boolean) : BooleanOrNumberOrString
+
+    /** Number variant. */
+    public data class NumberValue(public val value: Double) : BooleanOrNumberOrString
+
+    /** String variant. */
+    public data class Text(public val value: String) : BooleanOrNumberOrString
+
+    public companion object {
+        /** Wraps a boolean. */
+        public fun of(value: Boolean): BooleanOrNumberOrString = BooleanValue(value)
+
+        /** Wraps a number. */
+        public fun of(value: Number): BooleanOrNumberOrString = NumberValue(value.toDouble())
+
+        /** Wraps a string mode. */
+        public fun of(value: String): BooleanOrNumberOrString = Text(value)
+    }
+}
 
 /** Serializer for [NumberOrString]; not needed directly in normal use. */
 public object NumberOrStringSerializer : KSerializer<NumberOrString> {
@@ -399,6 +462,55 @@ public object BooleanOrNumberSerializer : KSerializer<BooleanOrNumber> {
             BooleanOrNumber.NumberValue(number)
         } else {
             BooleanOrNumber.BooleanValue(primitive.booleanOrNull ?: false)
+        }
+    }
+}
+
+/** Serializer for [NumberOrNumbers]; not needed directly in normal use. */
+public object NumberOrNumbersSerializer : KSerializer<NumberOrNumbers> {
+    override val descriptor: SerialDescriptor = JsonElement.serializer().descriptor
+
+    override fun serialize(encoder: Encoder, value: NumberOrNumbers) {
+        val element = when (value) {
+            is NumberOrNumbers.Single -> JsonPrimitive(value.value)
+            is NumberOrNumbers.Multiple -> JsonArray(value.values.map { JsonPrimitive(it) })
+        }
+        encoder.encodeSerializableValue(JsonElement.serializer(), element)
+    }
+
+    override fun deserialize(decoder: Decoder): NumberOrNumbers {
+        val element = decoder.decodeSerializableValue(JsonElement.serializer())
+        return if (element is JsonArray) {
+            NumberOrNumbers.Multiple(element.map { it.jsonPrimitive.double })
+        } else {
+            NumberOrNumbers.Single(element.jsonPrimitive.double)
+        }
+    }
+}
+
+/** Serializer for [BooleanOrNumberOrString]; not needed directly in normal use. */
+public object BooleanOrNumberOrStringSerializer : KSerializer<BooleanOrNumberOrString> {
+    override val descriptor: SerialDescriptor = JsonElement.serializer().descriptor
+
+    override fun serialize(encoder: Encoder, value: BooleanOrNumberOrString) {
+        encoder.encodeSerializableValue(
+            JsonElement.serializer(),
+            when (value) {
+                is BooleanOrNumberOrString.BooleanValue -> JsonPrimitive(value.value)
+                is BooleanOrNumberOrString.NumberValue -> JsonPrimitive(value.value)
+                is BooleanOrNumberOrString.Text -> JsonPrimitive(value.value)
+            },
+        )
+    }
+
+    override fun deserialize(decoder: Decoder): BooleanOrNumberOrString {
+        val primitive = decoder.decodeSerializableValue(JsonElement.serializer()).jsonPrimitive
+        if (primitive.isString) return BooleanOrNumberOrString.Text(primitive.content)
+        val number = primitive.doubleOrNull
+        return if (number != null) {
+            BooleanOrNumberOrString.NumberValue(number)
+        } else {
+            BooleanOrNumberOrString.BooleanValue(primitive.booleanOrNull ?: false)
         }
     }
 }

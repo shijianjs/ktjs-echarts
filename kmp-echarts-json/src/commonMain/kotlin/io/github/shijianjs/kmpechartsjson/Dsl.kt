@@ -223,6 +223,9 @@ public class SeriesBuilder {
     public fun parallel(block: SeriesOption.() -> Unit): Unit =
         add(SeriesType.Parallel, block)
 
+    /** Adds a chord diagram series. */
+    public fun chord(block: SeriesOption.() -> Unit): Unit = add(SeriesType.Chord, block)
+
     /** Adds a series of any type, including third-party extensions. */
     public fun add(type: SeriesType, block: SeriesOption.() -> Unit) {
         entries += SeriesOption(type).apply(block)
@@ -355,4 +358,108 @@ public fun DataItem.label(block: LabelOption.() -> Unit) {
 /** Sets or edits the item style of a data item. */
 public fun DataItem.itemStyle(block: ItemStyleOption.() -> Unit) {
     itemStyle = (itemStyle ?: ItemStyleOption()).apply(block)
+}
+
+/** Builds a text style; useful for the `rich` map of a label. */
+public fun textStyleOf(block: TextStyleOption.() -> Unit): TextStyleOption =
+    TextStyleOption().apply(block)
+
+/** Sets or edits the text style of a title. */
+public fun TitleOption.textStyle(block: TextStyleOption.() -> Unit) {
+    textStyle = (textStyle ?: TextStyleOption()).apply(block)
+}
+
+/** Sets or edits the subtext style of a title. */
+public fun TitleOption.subtextStyle(block: TextStyleOption.() -> Unit) {
+    subtextStyle = (subtextStyle ?: TextStyleOption()).apply(block)
+}
+
+/** Sets or edits the text style of a legend. */
+public fun LegendOption.textStyle(block: TextStyleOption.() -> Unit) {
+    textStyle = (textStyle ?: TextStyleOption()).apply(block)
+}
+
+/** Sets or edits the text style of a tooltip. */
+public fun TooltipOption.textStyle(block: TextStyleOption.() -> Unit) {
+    textStyle = (textStyle ?: TextStyleOption()).apply(block)
+}
+
+/** Sets or edits the connector line of a series label. */
+public fun SeriesOption.labelLine(block: LabelLineOption.() -> Unit) {
+    labelLine = (labelLine ?: LabelLineOption()).apply(block)
+}
+
+/** Sets or edits the label of the end of a line series. */
+public fun SeriesOption.endLabel(block: LabelOption.() -> Unit) {
+    endLabel = (endLabel ?: LabelOption()).apply(block)
+}
+
+/** Sets or edits `markPoint` of a series. */
+public fun SeriesOption.markPoint(block: MarkPointOption.() -> Unit) {
+    markPoint = (markPoint ?: MarkPointOption()).apply(block)
+}
+
+/** Sets or edits `markLine` of a series. */
+public fun SeriesOption.markLine(block: MarkLineOption.() -> Unit) {
+    markLine = (markLine ?: MarkLineOption()).apply(block)
+}
+
+/** Sets or edits `markArea` of a series. */
+public fun SeriesOption.markArea(block: MarkAreaOption.() -> Unit) {
+    markArea = (markArea ?: MarkAreaOption()).apply(block)
+}
+
+/** Sets or edits the axis line of an axis. */
+public fun AxisOption.axisLine(block: AxisLineOption.() -> Unit) {
+    axisLine = (axisLine ?: AxisLineOption()).apply(block)
+}
+
+/** Sets or edits the tick marks of an axis. */
+public fun AxisOption.axisTick(block: AxisTickOption.() -> Unit) {
+    axisTick = (axisTick ?: AxisTickOption()).apply(block)
+}
+
+/** Sets or edits the tick labels of an axis. */
+public fun AxisOption.axisLabel(block: AxisLabelOption.() -> Unit) {
+    axisLabel = (axisLabel ?: AxisLabelOption()).apply(block)
+}
+
+/** Sets or edits the name style of an axis. */
+public fun AxisOption.nameTextStyle(block: TextStyleOption.() -> Unit) {
+    nameTextStyle = (nameTextStyle ?: TextStyleOption()).apply(block)
+}
+
+/** Sets or edits the split lines of an axis. */
+public fun AxisOption.splitLine(block: SplitLineOption.() -> Unit) {
+    splitLine = (splitLine ?: SplitLineOption()).apply(block)
+}
+
+/** Sets or edits the split areas of an axis. */
+public fun AxisOption.splitArea(block: SplitAreaOption.() -> Unit) {
+    splitArea = (splitArea ?: SplitAreaOption()).apply(block)
+}
+
+/** Sets or edits `inRange` of a visual map. */
+public fun VisualMapOption.inRange(block: VisualMapRange.() -> Unit) {
+    inRange = (inRange ?: VisualMapRange()).apply(block)
+}
+
+/** Sets or edits `outOfRange` of a visual map. */
+public fun VisualMapOption.outOfRange(block: VisualMapRange.() -> Unit) {
+    outOfRange = (outOfRange ?: VisualMapRange()).apply(block)
+}
+
+/** Sets or edits the day labels of a calendar. */
+public fun CalendarOption.dayLabel(block: CalendarLabelOption.() -> Unit) {
+    dayLabel = (dayLabel ?: CalendarLabelOption()).apply(block)
+}
+
+/** Sets or edits the month labels of a calendar. */
+public fun CalendarOption.monthLabel(block: CalendarLabelOption.() -> Unit) {
+    monthLabel = (monthLabel ?: CalendarLabelOption()).apply(block)
+}
+
+/** Sets or edits the year labels of a calendar. */
+public fun CalendarOption.yearLabel(block: CalendarLabelOption.() -> Unit) {
+    yearLabel = (yearLabel ?: CalendarLabelOption()).apply(block)
 }

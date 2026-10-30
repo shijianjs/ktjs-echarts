@@ -23,6 +23,7 @@ class SeriesFieldsTest {
         value.polarIndex = 1
         value.radiusAxisIndex = 1
         value.angleAxisIndex = 1
+        value.radarIndex = 1
         value.geoIndex = 1
         value.calendarIndex = 1
         value.parallelIndex = 1
@@ -89,11 +90,11 @@ class SeriesFieldsTest {
         value.backgroundStyle = ItemStyleOption()
         value.realtimeSort = true
         value.symbolPosition = "s"
-        value.symbolRepeat = BooleanOrNumber.of(1.0)
+        value.symbolRepeat = BooleanOrNumberOrString.of(1.0)
         value.symbolRepeatDirection = "s"
         value.symbolMargin = num(1.0)
         value.symbolClip = true
-        value.symbolBoundingData = 1.0
+        value.symbolBoundingData = NumberOrNumbers.of(1.0)
         value.symbolPatternSize = 1.0
         value.large = true
         value.largeThreshold = 1.0
@@ -200,6 +201,7 @@ class SeriesFieldsTest {
                 "polarIndex",
                 "radiusAxisIndex",
                 "angleAxisIndex",
+                "radarIndex",
                 "geoIndex",
                 "calendarIndex",
                 "parallelIndex",
@@ -376,12 +378,16 @@ class SeriesFieldsTest {
         value.show = true
         value.width = 1.0
         value.roundCap = true
+        value.overlap = true
+        value.clip = true
         value.itemStyle = ItemStyleOption()
         assertEquals(
             setOf(
                 "show",
                 "width",
                 "roundCap",
+                "overlap",
+                "clip",
                 "itemStyle",
             ),
             value.encodeWith(GaugeProgressOption.serializer()).keys,

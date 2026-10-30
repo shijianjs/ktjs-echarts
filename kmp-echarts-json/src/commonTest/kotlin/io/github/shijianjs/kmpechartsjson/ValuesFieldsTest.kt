@@ -19,6 +19,9 @@ class ValuesFieldsTest {
         value.label = LabelOption()
         value.emphasis = EmphasisOption()
         value.symbol = "s"
+        value.x = 1.0
+        value.y = 1.0
+        value.category = 1
         value.symbolSize = NumberOrStringOrNumbers.of(1.0)
         value.symbolRotate = 1.0
         value.symbolOffset = listOf(num(1.0))
@@ -35,6 +38,9 @@ class ValuesFieldsTest {
                 "label",
                 "emphasis",
                 "symbol",
+                "x",
+                "y",
+                "category",
                 "symbolSize",
                 "symbolRotate",
                 "symbolOffset",

@@ -52,6 +52,35 @@ class ValuesTest {
     }
 
     @Test
+    fun encodesNumberOrNumbers() {
+        val series = echartsOption {
+            series {
+                pictorialBar { symbolBoundingData = NumberOrNumbers.of(40) }
+                pictorialBar { symbolBoundingData = NumberOrNumbers.of(-60, 40) }
+            }
+        }.toJsonElement()["series"]!!.jsonArray
+        assertEquals(40.0, series[0].jsonObject["symbolBoundingData"]!!.jsonPrimitive.double)
+        assertEquals(
+            listOf(-60.0, 40.0),
+            series[1].jsonObject["symbolBoundingData"]!!.jsonArray.map { it.jsonPrimitive.double },
+        )
+    }
+
+    @Test
+    fun encodesBooleanOrNumberOrString() {
+        val series = echartsOption {
+            series {
+                pictorialBar { symbolRepeat = BooleanOrNumberOrString.of("fixed") }
+                pictorialBar { symbolRepeat = BooleanOrNumberOrString.of(true) }
+                pictorialBar { symbolRepeat = BooleanOrNumberOrString.of(3) }
+            }
+        }.toJsonElement()["series"]!!.jsonArray
+        assertEquals("fixed", series[0].jsonObject["symbolRepeat"]!!.jsonPrimitive.content)
+        assertTrue(series[1].jsonObject["symbolRepeat"]!!.jsonPrimitive.boolean)
+        assertEquals(3.0, series[2].jsonObject["symbolRepeat"]!!.jsonPrimitive.double)
+    }
+
+    @Test
     fun encodesSingleAndMultipleNumbers() {
         val series = echartsOption {
             series {

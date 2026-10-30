@@ -2,7 +2,7 @@ package demo
 
 import kotlin.js.js
 
-/** Which code form the "KMP JSON model" pages display above their chart. */
+/** Which code form a page shows: the Kotlin/JS wrapper example or its `kmp-echarts-json` builder. */
 enum class SourceMode(val label: String, internal val stored: String) {
     Kotlin("Kotlin", "kotlin"),
     Json("JSON", "json"),
@@ -11,9 +11,11 @@ enum class SourceMode(val label: String, internal val stored: String) {
 /**
  * Code-source switch of the top bar.
  *
- * Language and theme change how a page is built, and so does this switch: it selects whether the
- * model pages show the Kotlin that builds the option or the JSON that model serializes to. The shell
- * therefore drops the cached pages and rebuilds the current route, exactly like a language switch.
+ * Language and theme change how a page is built, and so does this switch: every page that has a
+ * `kmp-echarts-json` counterpart (see `demo.json.jsonExamples`) renders the wrapper option in
+ * [SourceMode.Kotlin] and the model's serialized JSON in [SourceMode.Json]. The shell therefore drops
+ * the cached pages and rebuilds the current route, exactly like a language switch; pages without a
+ * counterpart hide the switch.
  *
  * The choice is remembered in `localStorage`, so a reload keeps the last view.
  */

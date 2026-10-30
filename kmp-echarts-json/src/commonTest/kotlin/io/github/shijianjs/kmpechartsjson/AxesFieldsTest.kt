@@ -35,11 +35,21 @@ class AxesFieldsTest {
         value.logBase = 1.0
         value.boundaryGap = BoundaryGap.of(true)
         value.inverse = true
+        value.startAngle = 1.0
+        value.endAngle = 1.0
+        value.left = num(1.0)
+        value.top = num(1.0)
+        value.right = num(1.0)
+        value.bottom = num(1.0)
+        value.width = num(1.0)
+        value.height = num(1.0)
         value.axisLine = AxisLineOption()
         value.axisTick = AxisTickOption()
         value.axisLabel = AxisLabelOption()
         value.splitLine = SplitLineOption()
         value.splitArea = SplitAreaOption()
+        value.minorSplitLine = SplitLineOption()
+        value.minorTick = AxisTickOption()
         value.axisPointer = AxisPointerOption()
         value.data = listOf(valueOf(1.0))
         value.z = 1.0
@@ -75,11 +85,21 @@ class AxesFieldsTest {
                 "logBase",
                 "boundaryGap",
                 "inverse",
+                "startAngle",
+                "endAngle",
+                "left",
+                "top",
+                "right",
+                "bottom",
+                "width",
+                "height",
                 "axisLine",
                 "axisTick",
                 "axisLabel",
                 "splitLine",
                 "splitArea",
+                "minorSplitLine",
+                "minorTick",
                 "axisPointer",
                 "data",
                 "z",
@@ -118,6 +138,7 @@ class AxesFieldsTest {
         value.inside = true
         value.rotate = 1.0
         value.margin = 1.0
+        value.distance = 1.0
         value.formatter = "s"
         value.showMinLabel = true
         value.showMaxLabel = true
@@ -129,6 +150,7 @@ class AxesFieldsTest {
                 "inside",
                 "rotate",
                 "margin",
+                "distance",
                 "formatter",
                 "showMinLabel",
                 "showMaxLabel",
@@ -148,6 +170,7 @@ class AxesFieldsTest {
         value.symbol = "s"
         value.symbolSize = NumberOrStringOrNumbers.of(1.0)
         value.symbolOffset = listOf(num(1.0))
+        value.roundCap = true
         value.lineStyle = LineStyleOption()
         assertEquals(
             setOf(
@@ -157,6 +180,7 @@ class AxesFieldsTest {
                 "symbol",
                 "symbolSize",
                 "symbolOffset",
+                "roundCap",
                 "lineStyle",
             ),
             value.encodeWith(AxisLineOption.serializer()).keys,
@@ -172,6 +196,7 @@ class AxesFieldsTest {
         value.interval = num(1.0)
         value.inside = true
         value.length = 1.0
+        value.distance = 1.0
         value.lineStyle = LineStyleOption()
         assertEquals(
             setOf(
@@ -180,6 +205,7 @@ class AxesFieldsTest {
                 "interval",
                 "inside",
                 "length",
+                "distance",
                 "lineStyle",
             ),
             value.encodeWith(AxisTickOption.serializer()).keys,
@@ -192,11 +218,15 @@ class AxesFieldsTest {
         val value = SplitLineOption()
         value.show = true
         value.interval = num(1.0)
+        value.length = 1.0
+        value.distance = 1.0
         value.lineStyle = LineStyleOption()
         assertEquals(
             setOf(
                 "show",
                 "interval",
+                "length",
+                "distance",
                 "lineStyle",
             ),
             value.encodeWith(SplitLineOption.serializer()).keys,

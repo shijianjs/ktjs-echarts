@@ -1,6 +1,8 @@
 package demo.ui
 
 import demo.Bilingual
+import demo.SourceMode
+import demo.SourceModeState
 import demo.tr
 import web.dom.Node
 import web.html.HTMLElement
@@ -35,6 +37,13 @@ class PageMeta(
     val sourcePath: String,
     /** GitHub blob base of [sourcePath]; defaults to the JS sources. */
     val sourceRoot: String = REPO_SOURCE_ROOT,
+    /**
+     * Path of the `kmp-echarts-json` builder of the page, relative to [REPO_COMMON_SOURCE_ROOT].
+     *
+     * Non-null when the page has a JSON counterpart: the source link then follows the top-bar code
+     * source switch and points at the model builder instead of the JS wrapper example.
+     */
+    val jsonSourcePath: String? = null,
 ) {
     private val titleText = title
     private val summaryText = summary
@@ -83,13 +92,18 @@ fun page(meta: PageMeta): PageView {
     val body = div("page__body")
     val links = div("page__links")
 
+    val jsonMode = meta.jsonSourcePath != null && SourceModeState.current == SourceMode.Json
+    val sourceLabel = if (jsonMode) tr("查看 JSON 源码", "JSON source") else tr("查看 Kotlin 源码", "Kotlin source")
+    val sourcePath = if (jsonMode) meta.jsonSourcePath!! else meta.sourcePath
+    val sourceRoot = if (jsonMode) REPO_COMMON_SOURCE_ROOT else meta.sourceRoot
+
     links.append(
         anchor(tr("官方示例", "Official example"), meta.officialUrl ?: OFFICIAL_INDEX, "page__link", external = true),
     )
     links.append(
         anchor(
-            tr("查看 Kotlin 源码", "Kotlin source"),
-            "${meta.sourceRoot}/${meta.sourcePath}",
+            sourceLabel,
+            "$sourceRoot/$sourcePath",
             "page__link",
             external = true,
         ),

@@ -117,11 +117,18 @@ class DemoPageTest {
         )
     }
 
+    /**
+     * The JSON port covers most of the catalog, so an official example that has a counterpart shows
+     * the top-bar switch, while a page that only exists in Kotlin keeps it hidden.
+     */
     @RetryingTest(maxAttempts = 2)
-    fun `the source switch stays hidden on an official example`(page: Page) {
+    fun `the source switch follows the JSON coverage of a page`(page: Page) {
         openPage(page, "#/bar-simple")
         assertChartRendered(page, "bar-simple")
-        assertTrue(!page.locator(".source-switch").isVisible, "official pages have no Kotlin/JSON switch")
+        assertTrue(page.locator(".source-switch").isVisible, "an example with a JSON source shows the switch")
+
+        assertChartRendered(page, "bar-breaks-simple")
+        assertTrue(!page.locator(".source-switch").isVisible, "a Kotlin-only page hides the Kotlin/JSON switch")
     }
 
     /**
@@ -224,6 +231,66 @@ class DemoPageTest {
 
         routes.forEach { route -> assertChartRendered(page, route) }
         assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
+    }
+
+    /**
+     * Walks the catalog with the top-bar source switch set to JSON.
+     *
+     * The other catalog sweep runs every page in its Kotlin form; this one turns the switch on once
+     * and then visits every route again, so each `kmp-echarts-json` option is serialized, parsed and
+     * handed to `setOption` in a real browser. A page keeps its canvas on the switchable routes, and
+     * those routes must show a JSON code block; the routes without a counterpart hide the switch and
+     * keep their Kotlin chart.
+     *
+     * Failures are collected per route instead of aborting on the first one, because a broken model
+     * field can surface on several pages and the whole list is a better report than one route.
+     *
+     * Uncaught exceptions are attributed to the route that was open when they fired. ECharts reports
+     * some option problems as a thrown `TypeError` and still leaves a blank chart, which the canvas
+     * check alone would not see.
+     */
+    @Test
+    @Timeout(600)
+    fun `every JSON source renders without errors`(page: Page) {
+        val consoleErrors = mutableListOf<String>()
+        page.onConsoleMessage { message ->
+            if (message.type() == "error") consoleErrors += message.text()
+        }
+        val pageErrors = mutableListOf<String>()
+        page.onPageError { message -> pageErrors += message }
+        openPage(page)
+
+        val routes =
+            (page.locator(".example-card").evaluateAll("(nodes) => nodes.map((node) => node.dataset.route)") as List<*>)
+                .filterIsInstance<String>()
+
+        // Turn the switch on once; the choice is remembered for the rest of the walk.
+        page.evaluate("(value) => { location.hash = '#/' + value }", "kmp-json/line-smooth")
+        page.locator(".source-switch button").nth(1).click()
+        page.waitForFunction("() => document.querySelector('.code-block').textContent.trimStart().startsWith('{')")
+
+        val failures = mutableListOf<String>()
+        routes.forEach { route ->
+            pageErrors.clear()
+            try {
+                assertChartRendered(page, route)
+                val switchVisible = page.locator(".source-switch").isVisible
+                if (switchVisible) {
+                    val code = page.locator(".page[data-route='$route'] .code-block").textContent()!!
+                    assertTrue(
+                        code.trimStart().startsWith("{"),
+                        "route $route did not show its JSON source",
+                    )
+                }
+                assertTrue(pageErrors.isEmpty(), "route $route raised ${pageErrors.toList()}")
+            } catch (error: Throwable) {
+                failures += "$route: ${error.message}"
+            }
+        }
+        assertTrue(
+            failures.isEmpty() && consoleErrors.isEmpty(),
+            "JSON routes that failed: $failures; console errors: $consoleErrors",
+        )
     }
 
     /**

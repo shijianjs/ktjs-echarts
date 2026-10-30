@@ -365,4 +365,15 @@ class DslTest {
         assertEquals(1, option.timeline!!.currentIndex)
         assertEquals("wide", option.media!![0].option!!.title!![0].text)
     }
+
+    @Test
+    fun textStyleHelperBuildsRichEntries() {
+        val rich =
+            mapOf(
+                "value" to textStyleOf { fontWeight = str("bold") },
+                "unit" to textStyleOf { fontSize = 12.0 },
+            )
+        assertEquals(str("bold"), rich.getValue("value").fontWeight)
+        assertEquals(12.0, rich.getValue("unit").fontSize)
+    }
 }

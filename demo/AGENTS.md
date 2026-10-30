@@ -5,8 +5,9 @@
 `https://echarts.apache.org/examples/zh/editor.html?c=bar-simple`）。这一层只消费 wrapper 的公开 API，
 不导入 `ktjs-echarts` 内部实现。
 
-示例覆盖（官方总数、明确不做与待补的逐条清单）见 [COVERAGE.md](COVERAGE.md)；跨页注意事项见
-[NOTES.md](NOTES.md)。本文只保留目录结构、移植约定与各家族的具体做法。
+示例覆盖（官方总数、明确不做与待补的逐条清单）见 [COVERAGE.md](COVERAGE.md)；顶栏 Kotlin/JSON 两种
+代码源的逐条对应见 [COVERAGE-JSON.md](COVERAGE-JSON.md)；跨页注意事项见 [NOTES.md](NOTES.md)。本文只
+保留目录结构、移植约定与各家族的具体做法。
 
 ## 目录结构
 
@@ -24,12 +25,17 @@ demo/src/jsMain/kotlin/demo/
   ui/Chart.kt        ChartHolder：容器的持有者，负责 ECharts 实例的挂载、卸载与 resize
   examples/          一个图表家族一个文件，每份导出 <name>Entries；KmpJson.kt 只做非官方模型页的展示
 demo/src/commonMain/kotlin/demo/
+  json/JsonExamples.kt   跨目录的 JSON 示例注册表（按官方示例 id 索引）
+  json/JsonData.kt       JSON 示例共用的数据项构造小工具
+  json/examples/         与 demo/src/jsMain/kotlin/demo/examples 一一对应的模型构造，一族一文件
   json/ModelExamples.kt  非官方模型页的文案、DSL 构造与序列化 JSON（JS 端只负责展示）
 demo/src/jvmTest/kotlin/demo/e2e/
   DemoPageTest.kt    Playwright 端到端套件（点侧边栏、切语言/主题/代码源、过滤索引、抽样渲染）
   DemoOptions.kt     浏览器与断言超时设置
   DemoServer.kt      测试内静态服务器
-```
+scripts/
+  demo-coverage.mjs  官方清单与已移植页面的比对
+  json-coverage.mjs  静态页面与 JSON 示例的比对（生成 COVERAGE-JSON.md 的清单）
 
 ## 移植约定
 
@@ -120,15 +126,33 @@ demo/src/jvmTest/kotlin/demo/e2e/
 的官方清单统计，共 436 条：已移植 385 条，明确不做 51 条，待补 0；逐条清单与理由见
 [COVERAGE.md](COVERAGE.md)，`node scripts/demo-coverage.mjs` 负责重算。
 
-另有 `Groups.JSON`（`kmp-json`，6 页）不在官方清单内：它们用纯 KMP 的 `kmp-echarts-json` 模型构造
-option，序列化成 JSON 后再 `setOption`（走 wrapper 的 `JsAny` 重载，和从服务端取回一份配置等价）。
-文案、DSL 构造与序列化都在 `commonMain/kotlin/demo/json/ModelExamples.kt`（`demo.json`，纯 KMP，
-`demo` 的 `commonMain` 因此依赖 `kmp-echarts-json`），`examples/KmpJson.kt` 只把每个 `ModelExample`
-变成页面：解析 `json` 交给图表、按代码源开关渲染 Kotlin 或 JSON。页面不经过 `Category`，路由 id 带
-`kmp-json/` 前缀，源码链接指向 `REPO_COMMON_SOURCE_ROOT`，顶栏的代码源开关
-（`SourceModeState`，与语言 / 主题开关同款）在这几页可见，用来切换代码面板显示 Kotlin 构造代码还是
-模型序列化出的 JSON；切换会重走 `rebuild()`，与语言切换一致。`demo-coverage.mjs` 只统计
-`Category.chart / interactive` 声明的官方 id，不会把这几页算进「已移植」。
+## Kotlin / JSON 两种代码源
+
+顶栏的代码源开关（`SourceModeState`，与语言 / 主题开关同款）作用在**整份目录**上，与图表家族正交：
+只要某个官方示例在 `commonMain/kotlin/demo/json/examples/` 里有对应的 `kmp-echarts-json` 构造，该页
+就是可切换的。Kotlin 模式显示 wrapper 写法的图表与 `jsMain` 源码链接；JSON 模式改用模型序列化出的
+JSON 交给 `setOption`，源码链接换成 `REPO_COMMON_SOURCE_ROOT` 下的模型构造，并在图表下方列出这份
+JSON。切换会重走 `rebuild()`，与语言切换一致。
+
+- 注册：每个家族文件导出一份 `*JsonExamples`，再由 `json/JsonExamples.kt` 按官方示例 id 汇总成
+  `jsonExamples`。`Category.chart` 建页时查这张表，命中即 `switchableSource = true`；没有命中的页面
+  （3D、自定义 `renderItem`、timeline 动画、真实指针交互、依赖外部素材的）保持 Kotlin-only。
+- 只对静态页生效：`Category.interactive` 的页面需要回调、定时器或真实宽高，JSON 示例表达不了，顶栏开关
+  对它们不可见。这也是 `scripts/json-coverage.mjs` 以静态 `chart(...)` 页面为分母的原因。
+- 构造必须真的经过模型：示例用 `JsonCategory("json/examples/XJson.kt")` + 模型 DSL 写 option，序列化
+  后解析成普通对象再 `setOption`，不是把 wrapper 的 `EChartsOption` 转成 JSON。这样每一页都在实测
+  `kmp-echarts-json` 的字段与序列化，示例数量本身就是模型的压力测试。
+- 目录规则与 Kotlin 侧一致：示例 id 就是官方示例 id，标题、分组、官方示例链接全部沿用
+  `Category` 生成的那一份；只有源码链接按代码源切换。
+- 覆盖率：`node scripts/json-coverage.mjs` 比对静态页面与 JSON 示例，列出缺失的 id 与带原因的排除项；
+  `--write` 把清单写回 [COVERAGE-JSON.md](COVERAGE-JSON.md) 的标记块。新增静态页面或 JSON 示例后重跑，
+  未分类的 id 会直接报错。
+
+另有 `Groups.JSON`（`kmp-json`，6 页）不在官方清单内：它们同样用纯 KMP 模型构造 option，但页面本身
+是模型的展示页，文案与 DSL 构造在 `commonMain/kotlin/demo/json/ModelExamples.kt`（`demo.json`，纯
+KMP，`demo` 的 `commonMain` 因此依赖 `kmp-echarts-json`），`examples/KmpJson.kt` 负责展示。页面不经过
+`Category`，路由 id 带 `kmp-json/` 前缀。`demo-coverage.mjs` 只统计 `Category.chart / interactive`
+声明的官方 id，不会把这几页算进「已移植」；`json-coverage.mjs` 同样只统计官方静态页。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
 一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。这批页面按依赖分三个文件：

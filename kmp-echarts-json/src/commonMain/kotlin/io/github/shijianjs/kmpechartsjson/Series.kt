@@ -48,6 +48,9 @@ public class SeriesOption(
     /** Index of the angle axis. */
     public var angleAxisIndex: Int? = null
 
+    /** Index of the radar coordinate system. */
+    public var radarIndex: Int? = null
+
     /** Index of the geo coordinate system. */
     public var geoIndex: Int? = null
 
@@ -250,8 +253,8 @@ public class SeriesOption(
     /** Position of a pictorial bar symbol: `"start"`, `"end"` or `"middle"`. */
     public var symbolPosition: String? = null
 
-    /** Pictorial bar repetition: a boolean or a count. */
-    public var symbolRepeat: BooleanOrNumber? = null
+    /** Pictorial bar repetition: a boolean, a count or the `"fixed"` keyword. */
+    public var symbolRepeat: BooleanOrNumberOrString? = null
 
     /** Repetition direction: `"start"` or `"end"`. */
     public var symbolRepeatDirection: String? = null
@@ -262,8 +265,8 @@ public class SeriesOption(
     /** Whether the series shape clips the repeated symbols. */
     public var symbolClip: Boolean? = null
 
-    /** Data value the symbols are sized against. */
-    public var symbolBoundingData: Double? = null
+    /** Data value the symbols are sized against, one bound or a `[lower, upper]` pair. */
+    public var symbolBoundingData: NumberOrNumbers? = null
 
     /** Size of one tile of the symbol pattern. */
     public var symbolPatternSize: Double? = null
@@ -572,6 +575,12 @@ public class GaugeProgressOption {
 
     /** Whether the ends of the progress bar are rounded. */
     public var roundCap: Boolean? = null
+
+    /** Whether progress bars of several data items may overlap instead of being clipped. */
+    public var overlap: Boolean? = null
+
+    /** Whether the progress bar is clipped to the axis line. */
+    public var clip: Boolean? = null
 
     /** Progress bar style. */
     public var itemStyle: ItemStyleOption? = null

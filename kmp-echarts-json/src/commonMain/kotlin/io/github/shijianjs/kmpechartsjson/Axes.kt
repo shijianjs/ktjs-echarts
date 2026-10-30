@@ -104,6 +104,30 @@ public class AxisOption {
     /** Whether the axis direction is reversed. */
     public var inverse: Boolean? = null
 
+    /** Start angle of a polar angle axis, in degrees. */
+    public var startAngle: Double? = null
+
+    /** End angle of a polar angle axis, in degrees. */
+    public var endAngle: Double? = null
+
+    /** Distance to the left edge, used by a `singleAxis`. */
+    public var left: NumberOrString? = null
+
+    /** Distance to the top edge, used by a `singleAxis`. */
+    public var top: NumberOrString? = null
+
+    /** Distance to the right edge, used by a `singleAxis`. */
+    public var right: NumberOrString? = null
+
+    /** Distance to the bottom edge, used by a `singleAxis`. */
+    public var bottom: NumberOrString? = null
+
+    /** Width of a `singleAxis`. */
+    public var width: NumberOrString? = null
+
+    /** Height of a `singleAxis`. */
+    public var height: NumberOrString? = null
+
     /** Axis line style and arrow symbols. */
     public var axisLine: AxisLineOption? = null
 
@@ -118,6 +142,12 @@ public class AxisOption {
 
     /** Alternating background bands between split lines. */
     public var splitArea: SplitAreaOption? = null
+
+    /** Secondary split lines drawn between the main ones. */
+    public var minorSplitLine: SplitLineOption? = null
+
+    /** Secondary ticks drawn between the main ones. */
+    public var minorTick: AxisTickOption? = null
 
     /** Pointer shown for this axis on hover. */
     public var axisPointer: AxisPointerOption? = null
@@ -175,6 +205,9 @@ public class AxisLabelOption : TextStyleOption() {
     /** Distance between the label and the axis line. */
     public var margin: Double? = null
 
+    /** Distance between the label and the axis line, used by gauge series. */
+    public var distance: Double? = null
+
     /** String template; `{value}` is replaced with the tick value. */
     public var formatter: String? = null
 
@@ -209,6 +242,9 @@ public class AxisLineOption {
     /** Arrow offset as `[x, y]`. */
     public var symbolOffset: List<NumberOrString>? = null
 
+    /** Whether the ends of a gauge axis line are rounded. */
+    public var roundCap: Boolean? = null
+
     /** Line style. */
     public var lineStyle: LineStyleOption? = null
 }
@@ -231,6 +267,9 @@ public class AxisTickOption {
     /** Tick length in pixels. */
     public var length: Double? = null
 
+    /** Distance between the tick and the axis line, used by gauge series. */
+    public var distance: Double? = null
+
     /** Tick style. */
     public var lineStyle: LineStyleOption? = null
 }
@@ -243,6 +282,12 @@ public class SplitLineOption {
 
     /** Interval between split lines; `"auto"` or a number. */
     public var interval: NumberOrString? = null
+
+    /** Length of a gauge split line in pixels. */
+    public var length: Double? = null
+
+    /** Distance between a gauge split line and the axis line. */
+    public var distance: Double? = null
 
     /** Line style. */
     public var lineStyle: LineStyleOption? = null
@@ -315,10 +360,4 @@ public class AxisPointerOption {
 
 /** Label of an [AxisPointerOption]. */
 @Serializable
-public class AxisPointerLabelOption : LabelOption() {
-    /** Number of decimals of the displayed value. */
-    public var precision: Int? = null
-
-    /** Distance between the label and the pointer. */
-    public var margin: NumberOrString? = null
-}
+public class AxisPointerLabelOption : LabelOption()

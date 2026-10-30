@@ -97,6 +97,9 @@ public value class SeriesType(public val value: String) {
 
         /** Parallel coordinates. */
         public val Parallel: SeriesType = SeriesType("parallel")
+
+        /** Chord diagram. */
+        public val Chord: SeriesType = SeriesType("chord")
     }
 }
 

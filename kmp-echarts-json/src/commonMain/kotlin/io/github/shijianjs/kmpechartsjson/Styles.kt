@@ -1,6 +1,13 @@
 package io.github.shijianjs.kmpechartsjson
 
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 
 /**
  * Text style shared by labels, axis labels, titles, legends and tooltips.
@@ -136,6 +143,15 @@ public open class LabelOption : TextStyleOption() {
 
     /** Margin before the label edge when [alignTo] is `"edge"`. */
     public var bleedMargin: Double? = null
+
+    /** Distance between the label and the edge of the chart when [alignTo] is `"edge"`. */
+    public var margin: NumberOrString? = null
+
+    /** Center of a gauge detail label relative to the gauge center, as `[x, y]` percentages. */
+    public var offsetCenter: NumberOrStringOrNumbers? = null
+
+    /** Number of decimals of the displayed value, used by gauge details. */
+    public var precision: Int? = null
 }
 
 /** Style of the label connector line used by pie, funnel and similar series. */
@@ -169,8 +185,14 @@ public open class ItemStyleOption {
     /** Fill color. */
     public var color: EChartsColor? = null
 
+    /** Fill color of a falling candlestick or boxplot item. */
+    public var color0: EChartsColor? = null
+
     /** Border color. */
     public var borderColor: EChartsColor? = null
+
+    /** Border color of a falling candlestick or boxplot item. */
+    public var borderColor0: EChartsColor? = null
 
     /** Border width. */
     public var borderWidth: Double? = null
@@ -342,6 +364,18 @@ public class MarkPointData {
     /** Explicit value. */
     public var value: DataValue? = null
 
+    /** Index of the data dimension the statistic refers to. */
+    public var valueIndex: Int? = null
+
+    /** Name of the data dimension the statistic refers to. */
+    public var valueDim: String? = null
+
+    /** X value of the marker on a cartesian axis. */
+    public var xAxis: NumberOrString? = null
+
+    /** Y value of the marker on a cartesian axis. */
+    public var yAxis: NumberOrString? = null
+
     /** Coordinate on the series' coordinate system. */
     public var coord: List<NumberOrString>? = null
 
@@ -394,17 +428,40 @@ public class MarkLineOption {
     /** Marker emphasis state. */
     public var emphasis: EmphasisOption? = null
 
-    /** Lines to draw. */
-    public var data: List<MarkLineData>? = null
+    /** Lines to draw, each one a single line or a pair of ends. */
+    public var data: List<MarkLineDataItem>? = null
 }
 
-/** One `markLine` entry. */
+/**
+ * One `markLine` data entry: a 1D line or the two ends of a line in any direction.
+ *
+ * ECharts reads a bare object as a 1D line and an array of exactly two objects as the ends of a 2D
+ * line, so the two forms cannot be told apart by their fields.
+ */
+@kotlinx.serialization.Serializable(with = MarkLineDataItemSerializer::class)
+public sealed interface MarkLineDataItem {
+    /** One 1D line, placed by [MarkLineData.xAxis], [MarkLineData.yAxis] or [MarkLineData.type]. */
+    public data class Single(public val option: MarkLineData) : MarkLineDataItem
+
+    /** A line from [from] to [to]; each end sets its own [MarkLineData.coord]. */
+    public data class Pair(public val from: MarkLineData, public val to: MarkLineData) : MarkLineDataItem
+
+    public companion object {
+        /** Wraps one 1D line. */
+        public fun of(option: MarkLineData): MarkLineDataItem = Single(option)
+
+        /** Wraps a line from `from` to `to`. */
+        public fun of(from: MarkLineData, to: MarkLineData): MarkLineDataItem = Pair(from, to)
+    }
+}
+
+/** One 1D `markLine` line or one end of a 2D line. */
 @Serializable
 public class MarkLineData {
     /** Display name. */
     public var name: String? = null
 
-    /** Built-in type: `"min"`, `"max"`, `"average"`. */
+    /** Built-in type: `"min"`, `"max"`, `"average"` or `"median"`. */
     public var type: String? = null
 
     /** X value of the line when it is vertical. */
@@ -413,8 +470,26 @@ public class MarkLineData {
     /** Y value of the line when it is horizontal. */
     public var yAxis: NumberOrString? = null
 
-    /** Two coordinates defining the line. */
-    public var coord: List<List<NumberOrString>>? = null
+    /** Position of one end on the coordinate system, as `[x, y]`. */
+    public var coord: List<NumberOrString>? = null
+
+    /** Absolute x position in pixels or as a percentage; it wins over the axis position. */
+    public var x: NumberOrString? = null
+
+    /** Absolute y position in pixels or as a percentage; it wins over the axis position. */
+    public var y: NumberOrString? = null
+
+    /** What [x] and [y] are relative to: `"container"` or `"coordinate"`. */
+    public var relativeTo: String? = null
+
+    /** Position on the radius axis of a polar coordinate system. */
+    public var radiusAxis: NumberOrString? = null
+
+    /** Position on the angle axis of a polar coordinate system. */
+    public var angleAxis: NumberOrString? = null
+
+    /** Value shown by the label instead of the axis position. */
+    public var value: NumberOrString? = null
 
     /** Index of the data dimension the value refers to. */
     public var valueIndex: Int? = null
@@ -422,11 +497,61 @@ public class MarkLineData {
     /** Name of the data dimension the value refers to. */
     public var valueDim: String? = null
 
+    /** Symbol at this end, drawn on both ends when the option sets `symbol` instead. */
+    public var symbol: String? = null
+
+    /** Symbol size at this end. */
+    public var symbolSize: NumberOrStringOrNumbers? = null
+
+    /** Symbol rotation at this end in degrees. */
+    public var symbolRotate: Double? = null
+
+    /** Symbol offset at this end as `[x, y]`. */
+    public var symbolOffset: List<NumberOrString>? = null
+
     /** Line style for this entry only. */
     public var lineStyle: LineStyleOption? = null
 
+    /** Symbol style for this entry only. */
+    public var itemStyle: ItemStyleOption? = null
+
     /** Label for this entry only. */
     public var label: LabelOption? = null
+
+    /** Emphasis state for this entry only. */
+    public var emphasis: EmphasisOption? = null
+
+    /** z-order of the line and its symbols. */
+    public var z2: Int? = null
+}
+
+/** Serializer for [MarkLineDataItem]; not needed directly in normal use. */
+public object MarkLineDataItemSerializer : KSerializer<MarkLineDataItem> {
+    override val descriptor: SerialDescriptor = JsonElement.serializer().descriptor
+
+    override fun serialize(encoder: Encoder, value: MarkLineDataItem) {
+        val element =
+            when (value) {
+                is MarkLineDataItem.Single -> encode(value.option)
+                is MarkLineDataItem.Pair -> JsonArray(listOf(encode(value.from), encode(value.to)))
+            }
+        encoder.encodeSerializableValue(JsonElement.serializer(), element)
+    }
+
+    override fun deserialize(decoder: Decoder): MarkLineDataItem {
+        val element = decoder.decodeSerializableValue(JsonElement.serializer())
+        if (element !is JsonArray) return MarkLineDataItem.Single(decode(element))
+        if (element.size != 2) {
+            throw SerializationException("A markLine entry has either one object or two ends: $element")
+        }
+        return MarkLineDataItem.Pair(decode(element[0]), decode(element[1]))
+    }
+
+    private fun encode(value: MarkLineData): JsonElement =
+        EChartsJson.format.encodeToJsonElement(MarkLineData.serializer(), value)
+
+    private fun decode(element: JsonElement): MarkLineData =
+        EChartsJson.format.decodeFromJsonElement(MarkLineData.serializer(), element)
 }
 
 /** `markArea` marker. */
@@ -444,17 +569,40 @@ public class MarkAreaOption {
     /** Area emphasis state. */
     public var emphasis: EmphasisOption? = null
 
-    /** Areas to draw. */
-    public var data: List<MarkAreaData>? = null
+    /** Areas to draw, each one a single range or a pair of corners. */
+    public var data: List<MarkAreaDataItem>? = null
 }
 
-/** One `markArea` entry; an area is defined by two corners. */
+/**
+ * One `markArea` data entry: a 1D range or two opposite corners.
+ *
+ * ECharts reads a bare object as a range along one axis and an array of exactly two objects as the
+ * corners of an area, so the two forms cannot be told apart by their fields.
+ */
+@kotlinx.serialization.Serializable(with = MarkAreaDataItemSerializer::class)
+public sealed interface MarkAreaDataItem {
+    /** One 1D range, placed by [MarkAreaData.xAxis], [MarkAreaData.yAxis] or [MarkAreaData.type]. */
+    public data class Single(public val option: MarkAreaData) : MarkAreaDataItem
+
+    /** An area between [from] and [to]; each corner sets its own [MarkAreaData.coord]. */
+    public data class Pair(public val from: MarkAreaData, public val to: MarkAreaData) : MarkAreaDataItem
+
+    public companion object {
+        /** Wraps one 1D range. */
+        public fun of(option: MarkAreaData): MarkAreaDataItem = Single(option)
+
+        /** Wraps an area between `from` and `to`. */
+        public fun of(from: MarkAreaData, to: MarkAreaData): MarkAreaDataItem = Pair(from, to)
+    }
+}
+
+/** One 1D `markArea` range or one corner of an area. */
 @Serializable
 public class MarkAreaData {
     /** Display name. */
     public var name: String? = null
 
-    /** Built-in type: `"min"`, `"max"`, `"average"`. */
+    /** Built-in type: `"min"`, `"max"`, `"average"` or `"median"`. */
     public var type: String? = null
 
     /** X value of one corner. */
@@ -463,8 +611,26 @@ public class MarkAreaData {
     /** Y value of one corner. */
     public var yAxis: NumberOrString? = null
 
-    /** Two corners as `[[x1, y1], [x2, y2]]`. */
-    public var coord: List<List<NumberOrString>>? = null
+    /** Position of one corner on the coordinate system, as `[x, y]`. */
+    public var coord: List<NumberOrString>? = null
+
+    /** Absolute x position in pixels or as a percentage; it wins over the axis position. */
+    public var x: NumberOrString? = null
+
+    /** Absolute y position in pixels or as a percentage; it wins over the axis position. */
+    public var y: NumberOrString? = null
+
+    /** What [x] and [y] are relative to: `"container"` or `"coordinate"`. */
+    public var relativeTo: String? = null
+
+    /** Position on the radius axis of a polar coordinate system. */
+    public var radiusAxis: NumberOrString? = null
+
+    /** Position on the angle axis of a polar coordinate system. */
+    public var angleAxis: NumberOrString? = null
+
+    /** Value shown by the label instead of the axis position. */
+    public var value: NumberOrString? = null
 
     /** Index of the data dimension the value refers to. */
     public var valueIndex: Int? = null
@@ -477,6 +643,41 @@ public class MarkAreaData {
 
     /** Label for this area only. */
     public var label: LabelOption? = null
+
+    /** Emphasis state for this area only. */
+    public var emphasis: EmphasisOption? = null
+
+    /** z-order of the area. */
+    public var z2: Int? = null
+}
+
+/** Serializer for [MarkAreaDataItem]; not needed directly in normal use. */
+public object MarkAreaDataItemSerializer : KSerializer<MarkAreaDataItem> {
+    override val descriptor: SerialDescriptor = JsonElement.serializer().descriptor
+
+    override fun serialize(encoder: Encoder, value: MarkAreaDataItem) {
+        val element =
+            when (value) {
+                is MarkAreaDataItem.Single -> encode(value.option)
+                is MarkAreaDataItem.Pair -> JsonArray(listOf(encode(value.from), encode(value.to)))
+            }
+        encoder.encodeSerializableValue(JsonElement.serializer(), element)
+    }
+
+    override fun deserialize(decoder: Decoder): MarkAreaDataItem {
+        val element = decoder.decodeSerializableValue(JsonElement.serializer())
+        if (element !is JsonArray) return MarkAreaDataItem.Single(decode(element))
+        if (element.size != 2) {
+            throw SerializationException("A markArea entry has either one object or two corners: $element")
+        }
+        return MarkAreaDataItem.Pair(decode(element[0]), decode(element[1]))
+    }
+
+    private fun encode(value: MarkAreaData): JsonElement =
+        EChartsJson.format.encodeToJsonElement(MarkAreaData.serializer(), value)
+
+    private fun decode(element: JsonElement): MarkAreaData =
+        EChartsJson.format.decodeFromJsonElement(MarkAreaData.serializer(), element)
 }
 
 /** Ripple animation of `effectScatter` and `lines`. */

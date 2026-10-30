@@ -156,15 +156,16 @@
 缺口现在由 `node scripts/field-coverage.mjs` 按**字段**核对（旧的 `build/gl-coverage-gap.mjs` 只看类型名，
 `unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：**GL 575 个成员全部点过名，未点名 0 个**
 （`NOT_COVERED` 的 20 个是安装器 getter 与要第三方 SDK/token 的 `mapbox3D` / `maptalks3D` 成员，明确不做）；
-2D 已推进第一批（`EChartsLiterals.kt` 的 40 个 `Xxx(String)` 工厂与 `AnimationEasing((Double) -> Double)`
-重载，`echarts/LiteralsTest.stringLiteralFactoriesWrapCustomValues` 用不在 `Xxxs` 常量里的自定义字符串
-各包一次读回），剩 2704 个成员里 721 个没被点名。
+2D 已推进两批：第一批 `EChartsLiterals.kt` 的 40 个 `Xxx(String)` 工厂与 `AnimationEasing((Double) -> Double)`
+重载，第二批 `EChartsSeriesLiterals.kt` 的 30 个工厂（含 `NodeClickBehavior` 的 `String` 与 `Boolean` 两个
+重载），两处都在 `echarts/LiteralsTest` 的 `stringLiteralFactoriesWrapCustomValues` 与
+`seriesLiteralFactoriesWrapCustomValues` 里用不在 `Xxxs` 常量里的自定义值各包一次读回，剩 2704 个成员里
+691 个没被点名。
 
 2D 剩余按 `options/` 与 `ECharts*` 分文件推进，缺口最大的几个文件：`EChartsOption.kt` 173、
 `EChartsTypes.kt` 80、`ComponentOptions.kt` 75、`CartesianSeriesOptions.kt` 62、
-`zrender/ZRenderElementTypes.kt` 47、`CommonTypes.kt` 42、`EChartsSeriesLiterals.kt` 30（和已清的
-`EChartsLiterals` 同一类工厂，下一步一起补），再往上是各系列数据项联合与 `visualMap` / `dataset` 一类
-结构型选项。
+`zrender/ZRenderElementTypes.kt` 47、`CommonTypes.kt` 42（`TooltipMarker` 联合等），再往上是各系列数据项
+联合与 `visualMap` / `dataset` 一类结构型选项。
 
 `--limit N` 控制每个文件列出的条数，`--show-covered` 反查已覆盖的名字；判据是「名字在 jsTest 全文里出现过」，
 所以 `show` 这类到处都有的成员名几乎总是已覆盖，这个口径用来找**从没出现过的字段**，不是逐用例的覆盖率。

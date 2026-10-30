@@ -369,6 +369,45 @@ class LiteralsTest {
         assertEquals("selectAll", SelectChangedFromAction("selectAll").unsafeCast<String>())
     }
 
+    /**
+     * The series-literal factories in `EChartsSeriesLiterals.kt`, wrapped through their `Xxx(String)`
+     * (and the one `NodeClickBehavior(Boolean)`) overload with a value the constants do not use, so
+     * the "wrap a value that comes from JavaScript" path is covered for the series unions too.
+     */
+    @Test
+    fun seriesLiteralFactoriesWrapCustomValues() {
+        assertEquals("mean", MarkerStatisticType("mean").unsafeCast<String>())
+        assertEquals("pixel", MarkerRelativeTo("pixel").unsafeCast<String>())
+        assertEquals("random", SortOrder("random").unsafeCast<String>())
+        assertEquals("name", ColorMappingBy("name").unsafeCast<String>())
+        assertEquals("viewport", ClipWindow("viewport").unsafeCast<String>())
+        assertEquals("pan", NodeClickBehavior("pan").unsafeCast<String>())
+        assertEquals(true, NodeClickBehavior(true).unsafeCast<Boolean>())
+        assertEquals("fade", AnimationType("fade").unsafeCast<String>())
+        assertEquals("node", NodeAlign("node").unsafeCast<String>())
+        assertEquals("hide", MoveOverlap("hide").unsafeCast<String>())
+        assertEquals("auto", SeriesLayoutBy("auto").unsafeCast<String>())
+        assertEquals("auto", FunnelSort("auto").unsafeCast<String>())
+        assertEquals("inner", FunnelAlign("inner").unsafeCast<String>())
+        assertEquals("square", RadarShape("square").unsafeCast<String>())
+        assertEquals("stress", GraphLayout("stress").unsafeCast<String>())
+        assertEquals("random", GraphInitLayout("random").unsafeCast<String>())
+        assertEquals("polar", TreeLayout("polar").unsafeCast<String>())
+        assertEquals("straight", TreeEdgeShape("straight").unsafeCast<String>())
+        assertEquals("inner", PictorialBarSymbolPosition("inner").unsafeCast<String>())
+        assertEquals("both", PictorialBarSymbolRepeatDirection("both").unsafeCast<String>())
+        assertEquals("tile", ProgressiveChunkMode("tile").unsafeCast<String>())
+        assertEquals("single", CartesianPolarCoordinateSystem("single").unsafeCast<String>())
+        assertEquals("polar", CartesianCoordinateSystem("polar").unsafeCast<String>())
+        assertEquals("polar", HeatmapCoordinateSystem("polar").unsafeCast<String>())
+        assertEquals("geo", RadarCoordinateSystem("geo").unsafeCast<String>())
+        assertEquals("chord", ChordCoordinateSystem("chord").unsafeCast<String>())
+        assertEquals("chart", SankeyCoordinateSystem("chart").unsafeCast<String>())
+        assertEquals("cartesian2d", SingleAxisCoordinateSystem("cartesian2d").unsafeCast<String>())
+        assertEquals("opacity", VisualProp("opacity").unsafeCast<String>())
+        assertEquals("spin", PieAnimationTypeUpdate("spin").unsafeCast<String>())
+    }
+
     @Test
     fun typedSeriesFieldsKeepTheirValues() {
         val option = unsafeJso<EChartsOption> {

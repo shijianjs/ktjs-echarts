@@ -81,8 +81,10 @@
   各测试文件不再自己复制。`MaterialOptionTest` 覆盖四种 shading 各自的材质（`bar3D` 一次带齐四套、
   只有选中的那套进 GPU）、`hatching` 的六张贴图与 `geo3D` / `map3D` 的 `groundPlane` 材质集（贴图画布
   用 `textureCanvases` 生成，同步加载，dispose 时没有悬挂的加载任务）；`Geo3DGlobeTest` 里 `geo3D`
-  的区域覆盖写全了 `itemStyle` / `label` / `emphasis`，不再只写 `name` / `height`。
-- 用例查出的四处上游行为，别再当 wrapper 的 bug：
+  的区域覆盖写全了 `itemStyle` / `label` / `emphasis`，不再只写 `name` / `height`；
+  `ViewControlTest` 用一条 `geo3D` 场景把 `ViewControlOption` 二十八个成员全部点名，另用 `grid3D`
+  核对组件自己的相机默认值。
+- 用例查出的五处上游行为，别再当 wrapper 的 bug：
   `ViewGL.setPostEffect` 先读 `DOF` / `SSAO` / `SSR` / `FXAA`，camelCase 只是回退，所以这四个键只能靠
   `@JsName` 写对——写错键名时类型化读写依然自洽，用例用 `hasOwn`（`TestSupport`）直接问 JavaScript；
   ECharts 会把 `axisLabel.textStyle` 展平到 `axisLabel` 本身并把 `textStyle` 置成 `null`，
@@ -92,7 +94,11 @@
   拼成了 `visualStyleAccessPathvisu`，但 echarts 的默认值本来就是 `itemStyle`（`src/model/Series.ts:220`），
   所以 `bar3D` 的数据项仍用 `itemStyle`；
   `map3D` 没有 `regions` 选项，`Map3DSeries.js:40` 用 `getFilledRegions(option.data, option.map)` 把 GeoJSON
-  里的区域名补进 `data`，所以地图区域的高度与样式一律走数据项，`getOption()` 里能看到补出来的那条。
+  里的区域名补进 `data`，所以地图区域的高度与样式一律走数据项，`getOption()` 里能看到补出来的那条；
+  `componentViewControlMixin` 的 `setView` 会被 `Geo3DView` / `Grid3DView` 在每次渲染的 `control.update()`
+  里触发（`OrbitControl.update()` 无条件把 `_needsUpdate` 置真并 `trigger('update')`），把
+  `alpha` / `beta` / `distance` / `center` 写回组件选项，所以这四个字段的回读值等于相机自己算出来的那个——
+  相机正是从这四个选项初始化的、用例里又不动它，回读才仍等于写进去的值。
 - 材质这一层只有 `graphicGL.setMaterialFromModel`（`util/graphicGL.js:539`）真正读的键会生效：
   `shading` 决定读哪套 `<shading>Material`，`realistic` 的 `roughness` / `metalness` 是非数字时按贴图上传、
   此时才用 `roughnessAdjust` / `metalnessAdjust` 当标量，`hatching` 必须给满 6 张 `hatchingTextures`
@@ -115,19 +121,20 @@
 
 **移植队列已清空**（`geo-lines` 是待补清单的最后一条）。官方清单 436 条现在要么已移植、要么在
 「明确不做」里，`node scripts/demo-coverage.mjs` 输出「待补 0」。已在推进的方向是按 `AGENTS.md`
-「测试覆盖」那六条复查 wrapper 的用例缺口，GL 侧已完成三批（第一批 `postEffect` / `environment` /
+「测试覆盖」那六条复查 wrapper 的用例缺口，GL 侧已完成四批（第一批 `postEffect` / `environment` /
 轴子选项，第二批对象形态数据项与 `surface.data`，第二批查出了 `-kt.10` 那个键名 bug，
-第三批四套材质与 `groundPlane`、`geo3D` 区域覆盖、`map3D` 的材质与样式）。
+第三批四套材质与 `groundPlane`、`geo3D` 区域覆盖、`map3D` 的材质与样式，第四批整套相机
+`ViewControlOption` 与 `Axis3DOption` 的八个轴级字段）。
 
 缺口现在由 `node scripts/field-coverage.mjs` 按**字段**核对（旧的 `build/gl-coverage-gap.mjs` 只看类型名，
-`unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：GL 575 个成员里 81 个没被用例点过名、
+`unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：GL 575 个成员里 51 个没被用例点过名、
 20 个在 `NOT_COVERED` 里；2D 2704 个成员里 763 个没被点名。下一批候选，按文件成组、不必逐条讨论：
 
-1. GL 的 `ViewControlOptions`（22 项，整个 3D 层共用的一套相机参数，现在只断言过 `distance` / `alpha` /
-   `beta` / `autoRotate` / `targetCoord`）、`Axis3DOptions`（`id` / `inverse` / `nameTextStyle` / `scale` /
-   `minInterval` / `maxInterval` / `logBase` / `boundaryGap` 八项）、`GlobeOptions` 的半径与
-   `heightTexture` / `displacementTexture`、`LightOptions` 的 `ambientCubemap` 与 `shadowQuality`、
-   `Lines3DEffectOption` 的拖尾五项、`GraphGLForceAtlas2Option` 的力导参数十二项。
+1. GL 剩下的按组件成组：`GlobeOptions`（`globeRadius` / `globeOuterRadius` / `heightTexture` /
+   `displacementTexture` / 大气的 `innerGlowPower`，加 `zlevel` / `top`）、`GraphGLForceAtlas2Option`
+   的力导参数十二项与 `GraphGLSeriesOption.edges`、`Lines3DEffectOption` 的拖尾五项、`LightOptions` 的
+   `ambientCubemap` 与 `shadowQuality`（`diffuseIntensity` / `specularIntensity`），以及散在各组件的
+   `zlevel` / `top` 与三个系列的 `globeIndex`、`bar3D.stack`。
 2. `EChartsGlLiterals` 里 13 个联合类型的**工厂函数**没被调用过——`LiteralsTest` 只测了 `Xxxs` 常量对象，
    `ShadingType("lambert")` 这类自定义字符串那条路还没走。
 3. 2D 那 763 项按 `options/` 分文件推进，优先系列数据项联合与 `visualMap` / `dataset` 一类结构型选项。

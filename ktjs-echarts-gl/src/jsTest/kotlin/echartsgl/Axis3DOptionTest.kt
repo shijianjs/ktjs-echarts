@@ -3,6 +3,7 @@ package echartsgl
 import echarts.AxisTypes
 import echarts.ECharts
 import echarts.options.AxisInterval
+import echarts.options.BooleanOrStringArray
 import echarts.options.LabelFormatter
 import echarts.options.StringOrDouble
 import echarts.options.ZRColorOrArray
@@ -112,6 +113,31 @@ class Axis3DOptionTest {
     }
 
     /**
+     * The axis-level fields that are not one of the six sub-options: identity, inversion, the name
+     * style, and the scale limits an axis shares with the 2D axes.
+     */
+    @Test
+    fun axis3DBasicOptionsRoundTrip() {
+        ECharts.use(arrayOf(Bar3DChart, Grid3DComponent))
+        val (chart, container) = createChart()
+        try {
+            chart.setOption(axisStyleScene(xAxis3D = { axisBasics() }))
+
+            val axis = chart.getOption().unsafeCast<EChartsGlOption>().xAxis3D!![0]
+            assertEquals("ktjs-x", axis.id)
+            assertEquals(true, axis.inverse)
+            assertEquals(true, axis.scale)
+            assertEquals(0.5, axis.minInterval)
+            assertEquals(2.0, axis.maxInterval)
+            assertEquals(10.0, axis.logBase)
+            assertEquals(true, axis.boundaryGap!!.unsafeCast<Boolean>())
+            assertEquals("#aabbcc", axis.nameTextStyle!!.color)
+        } finally {
+            destroyChart(chart, container)
+        }
+    }
+
+    /**
      * [Axis3DPointerFormatter] wraps the callback instead of copying it, so `ViewGL` and the caller
      * hold the same function.
      */
@@ -186,6 +212,20 @@ class Axis3DOptionTest {
                 }
             }
         }
+    }
+
+    /**
+     * Fills the axis-level fields that [axis3DBasicOptionsRoundTrip] reads back.
+     */
+    private fun Axis3DOption.axisBasics() {
+        id = "ktjs-x"
+        inverse = true
+        scale = true
+        minInterval = 0.5
+        maxInterval = 2.0
+        logBase = 10.0
+        boundaryGap = BooleanOrStringArray(true)
+        nameTextStyle = unsafeJso { color = "#aabbcc" }
     }
 
     /**

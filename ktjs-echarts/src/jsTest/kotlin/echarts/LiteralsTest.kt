@@ -313,6 +313,60 @@ class LiteralsTest {
         assertEquals("category", AxisType("category").unsafeCast<String>())
         assertEquals(700.0, ZRFontWeight(700.0).unsafeCast<Double>())
         assertEquals("solid", ZRLineType("solid").unsafeCast<String>())
+
+        // The function overload of `AnimationEasing`: an easing that maps `0..1` to `0..1`.
+        val easing = AnimationEasing { fraction -> fraction * 2 }.unsafeCast<(Double) -> Double>()
+        assertEquals(4.0, easing(2.0))
+    }
+
+    /**
+     * The `Xxx(String)` factories wrap a value that comes from JavaScript, so they also accept a
+     * literal the [Xxxs] constant object does not enumerate — one a newer upstream adds. Each case
+     * wraps a string that is deliberately NOT one of the constants and reads it back; the constant
+     * getters are built on this very call but the other cases never exercise it on its own.
+     */
+    @Test
+    fun stringLiteralFactoriesWrapCustomValues() {
+        assertEquals("diagonal", TreeOrient("diagonal").unsafeCast<String>())
+        assertEquals("oblique", Orient("oblique").unsafeCast<String>())
+        assertEquals("perimeter", RoseType("perimeter").unsafeCast<String>())
+        assertEquals("focus", TooltipTrigger("focus").unsafeCast<String>())
+        assertEquals("carousel", LegendType("carousel").unsafeCast<String>())
+        assertEquals("select", DataZoomType("select").unsafeCast<String>())
+        assertEquals("gradient", VisualMapType("gradient").unsafeCast<String>())
+        assertEquals("remove", FilterMode("remove").unsafeCast<String>())
+        assertEquals("adjacency", EmphasisFocus("adjacency").unsafeCast<String>())
+        assertEquals("panel", BlurScope("panel").unsafeCast<String>())
+        assertEquals("circle", AxisPointerType("circle").unsafeCast<String>())
+        assertEquals("webp", ImageType("webp").unsafeCast<String>())
+        assertEquals("customEase", AnimationEasing("customEase").unsafeCast<String>())
+        assertEquals("hover", TooltipTriggerOn("hover").unsafeCast<String>())
+        assertEquals("center", AxisPosition("center").unsafeCast<String>())
+        assertEquals("inside", AxisNameLocation("inside").unsafeCast<String>())
+        assertEquals("parent", TitleTarget("parent").unsafeCast<String>())
+        assertEquals("justify", HorizontalAlign("justify").unsafeCast<String>())
+        assertEquals("middle", LegendPageButtonPosition("middle").unsafeCast<String>())
+        assertEquals("center", TimelineControlPosition("center").unsafeCast<String>())
+        assertEquals("wrap", LabelLineOverflow("wrap").unsafeCast<String>())
+        assertEquals("precise", GraphicBounding("precise").unsafeCast<String>())
+        assertEquals("point", BrushType("point").unsafeCast<String>())
+        assertEquals("union", BrushMode("union").unsafeCast<String>())
+        assertEquals("throttle", BrushThrottleType("throttle").unsafeCast<String>())
+        assertEquals("time", MatrixDimensionType("time").unsafeCast<String>())
+        assertEquals("shared", CoordinateSystemUsage("shared").unsafeCast<String>())
+        assertEquals("start", DataZoomRangeMode("start").unsafeCast<String>())
+        assertEquals("touch", AxisPointerTriggerOn("touch").unsafeCast<String>())
+        assertEquals("toggle", AxisPointerStatus("toggle").unsafeCast<String>())
+        assertEquals("move", GraphicAction("move").unsafeCast<String>())
+        assertEquals("circle", BrushToolboxIconType("circle").unsafeCast<String>())
+        assertEquals("extend", OuterBoundsMode("extend").unsafeCast<String>())
+        assertEquals("markLine", OuterBoundsContain("markLine").unsafeCast<String>())
+        assertEquals("indexAsc", TooltipOrder("indexAsc").unsafeCast<String>())
+        assertEquals("dblclick", ParallelAxisExpandTriggerOn("dblclick").unsafeCast<String>())
+        assertEquals("updateAll", ECUpdateMethodName("updateAll").unsafeCast<String>())
+        assertEquals("reset", AxisBreakAction("reset").unsafeCast<String>())
+        assertEquals("both", RoamTrigger("both").unsafeCast<String>())
+        assertEquals("selectAll", SelectChangedFromAction("selectAll").unsafeCast<String>())
     }
 
     @Test

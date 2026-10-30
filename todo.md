@@ -156,7 +156,7 @@
 缺口现在由 `node scripts/field-coverage.mjs` 按**字段**核对（旧的 `build/gl-coverage-gap.mjs` 只看类型名，
 `unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：**GL 575 个成员全部点过名，未点名 0 个**
 （`NOT_COVERED` 的 20 个是安装器 getter 与要第三方 SDK/token 的 `mapbox3D` / `maptalks3D` 成员，明确不做）；
-2D 已推进十二批：第一批 `EChartsLiterals.kt` 的 40 个 `Xxx(String)` 工厂与 `AnimationEasing((Double) -> Double)`
+2D 已推进十三批：第一批 `EChartsLiterals.kt` 的 40 个 `Xxx(String)` 工厂与 `AnimationEasing((Double) -> Double)`
 重载，第二批 `EChartsSeriesLiterals.kt` 的 30 个工厂（含 `NodeClickBehavior` 的 `String` 与 `Boolean` 两个
 重载），前两批都在 `echarts/LiteralsTest` 里用不在 `Xxxs` 常量里的自定义值各包一次读回；第三批
 `options/DataZoomVisualMapDatasetOptionTest`，把 `EChartsOption.kt` 里的 `DataZoomOption`（滑柄样式、窗口跨度、
@@ -204,13 +204,23 @@
 `stackStrategy`/`showBackground`）、`BarSeriesOption`（`stackOrder`/`barMax`~`barMinWidth`/`barCategoryGap`/`barMinHeight`/
 `barMinAngle`/`realtimeSort`/`sampling`）、`Scatter`/`EffectScatter`（含 `RippleEffectOption.period`）、`Candlestick`/`Boxplot`
 （`boxWidth`）/`Heatmap`（`blurSize`/`min`~`maxOpacity`）/`Parallel`（`inactive`~`activeOpacity`）/`Custom`（`itemPayload`）
-与 `LinesEffectOption`、`BarGridLayoutOptionForCustomSeries`，并把 line/bar/scatter/effectScatter 四系列喂 `setOption`。
-几批结构型用例都顺带点名了共享基接口与嵌套样式字段，剩 2704 个成员里 208 个没被点名。
+与 `LinesEffectOption`、`BarGridLayoutOptionForCustomSeries`，并把 line/bar/scatter/effectScatter 四系列喂 `setOption`；
+第十三批 `options/CommonTypesUnionTest`，把 `CommonTypes.kt` 一次清零：六个不透明联合的工厂重载各包一个值读回
+（`TooltipMarker` 的 `String`/`RichTextTooltipMarker`、`BooleanOrDoubleOrString` 的 `Boolean`/`Double`/`String`、
+`BooleanOrStringArray` 的 `Boolean`/`Array<StringOrDouble>`、`SelectionMode` 的 `Boolean`/`String`、
+`OptionDataValueDate` 的 `Date`/`String`/`Double`、`ZRColorOrArray` 的 `ZRColor`/`Array<ZRColor>`），四个
+`DatasetSource` 形态工厂（`datasetOriginal`/`datasetObjectRows`/`datasetKeyedColumns`/`datasetTypedArray`）逐个
+构造真实输入并读回，再 `unsafeJso` 设值读回 `RichTextTooltipMarker.content`、`DimensionDefinition.displayName`、
+`OptionEncode.itemId`、`DataTransformOption.print`、`SeriesOnRadarOptionMixin.radarIndex`/`radarId`、
+`VisualPiece` 继承自 `VisualOptionUnit` 的 `colorLightness`/`colorHue` 与自身的 `gte`/`lte`、
+`UniversalTransitionOption.divideShape`/`seriesKey`、`CoordinateSystemDataLayout.contentRect`/`matrixXYLocatorRange`。
+几批结构型用例都顺带点名了共享基接口与嵌套样式字段，剩 2704 个成员里 176 个没被点名。
 
 2D 剩余按 `options/` 与 `ECharts*` 分文件推进，缺口最大的几个文件：
-`CommonTypes.kt`（`TooltipMarker` 联合等）、`EChartsTypes.kt`（`ActionInfo` / `EventQuery` /
-`TransitionSeriesFinderList` / `SetOptionTransition` 等联合），再往上是各系列数据项联合与 `AxisPointer*` 一类坐标轴选项。
-已清零的文件不再列（`ComponentOptions.kt`、`EChartsGeoTypes.kt`、`ZRenderElementTypes.kt` 本轮起 0 缺口）。
+`EChartsTypes.kt`（`ActionInfo` / `EventQuery` / `TransitionSeriesFinderList` / `SetOptionTransition` 等联合），
+再往上是各系列数据项联合与 `AxisPointer*` / `GeoOption`（`nameMap`/`boundingCoords`/`scaleLimit`/`nameProperty`）
+一类坐标轴与地理选项。已清零的文件不再列（`ComponentOptions.kt`、`EChartsGeoTypes.kt`、`ZRenderElementTypes.kt`、
+`CartesianSeriesOptions.kt`、`CommonTypes.kt` 本轮起 0 缺口）。
 
 `--limit N` 控制每个文件列出的条数，`--show-covered` 反查已覆盖的名字；判据是「名字在 jsTest 全文里出现过」，
 所以 `show` 这类到处都有的成员名几乎总是已覆盖，这个口径用来找**从没出现过的字段**，不是逐用例的覆盖率。

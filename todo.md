@@ -156,7 +156,7 @@
 缺口现在由 `node scripts/field-coverage.mjs` 按**字段**核对（旧的 `build/gl-coverage-gap.mjs` 只看类型名，
 `unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：**GL 575 个成员全部点过名，未点名 0 个**
 （`NOT_COVERED` 的 20 个是安装器 getter 与要第三方 SDK/token 的 `mapbox3D` / `maptalks3D` 成员，明确不做）；
-2D 已推进二十五批：第一批 `EChartsLiterals.kt` 的 40 个 `Xxx(String)` 工厂与 `AnimationEasing((Double) -> Double)`
+2D 已推进二十六批：第一批 `EChartsLiterals.kt` 的 40 个 `Xxx(String)` 工厂与 `AnimationEasing((Double) -> Double)`
 重载，第二批 `EChartsSeriesLiterals.kt` 的 30 个工厂（含 `NodeClickBehavior` 的 `String` 与 `Boolean` 两个
 重载），前两批都在 `echarts/LiteralsTest` 里用不在 `Xxxs` 常量里的自定义值各包一次读回；第三批
 `options/DataZoomVisualMapDatasetOptionTest`，把 `EChartsOption.kt` 里的 `DataZoomOption`（滑柄样式、窗口跨度、
@@ -262,18 +262,18 @@
 自定义值包值读回（以前只走常量 getter，从不单走这条「包任意 JavaScript 字符串」路径）；
 第二十五批 `options/SymbolAndKeywordOptionsTest` 追加 `markDataItemsNameTheValueDimension`，把
 `MarkDataItemOptions.kt` 一次清零：`MarkerPositionOption`、`MarkLine1DDataItemOption`、`MarkArea1DDataItemOption`
-三条各自的 `valueDim`（都映射到 JS 键 `valueDim`）逐个 `unsafeJso` 设值读回。
-几批结构型用例都顺带点名了共享基接口与嵌套样式字段，剩 2704 个成员里 2 个没被点名。
+三条各自的 `valueDim`（都映射到 JS 键 `valueDim`）逐个 `unsafeJso` 设值读回；第二十六批
+`options/ZRColorAndPatternTest` 追加 `anSvgPatternCarriesItsTileSize`，把最后一处缺口 `ZRenderValueTypes.kt` 清零：
+`SVGPatternObject.svgWidth`/`svgHeight` 设值读回，并经 `PatternObject(SVGPatternObject)` 重载当作 `ZRColor`
+喂给 `label.backgroundColor`（与 image pattern 那条对称）。
 
-2D 只剩一个文件：`zrender/ZRenderValueTypes.kt`（2，`SVGPatternObject.svgWidth`/`svgHeight`）。已清零的文件不再列（`ComponentOptions.kt`、`EChartsGeoTypes.kt`、`ZRenderElementTypes.kt`、
-`CartesianSeriesOptions.kt`、`CommonTypes.kt`、`HierarchySeriesOptions.kt`、`RelationSeriesOptions.kt`、
-`PartSeriesOptions.kt`、`PartDataItemOptions.kt`、`EChartsOption.kt`、`CustomElementOptions.kt`、`StyleOptions.kt`、
-`EChartsTypes.kt`、`EChartsExtensionTypes.kt`、`EChartsExtension.kt`、`CartesianDataItemOptions.kt`、`ZRenderLiterals.kt`、`MarkDataItemOptions.kt` 本轮起 0 缺口）。
+**至此 `field-coverage.mjs` 报 2D 2704 个成员全部点过名，未点名 0 个**（GL 侧上一轮也已 0 个）。这两套字段级
+用例都在 `src/jsTest` 里，不动 `src/jsMain`，因此 `wrapper-revisions.properties` 与 `kotlin-js-store` 锁文件不变。
 
 `--limit N` 控制每个文件列出的条数，`--show-covered` 反查已覆盖的名字；判据是「名字在 jsTest 全文里出现过」，
 所以 `show` 这类到处都有的成员名几乎总是已覆盖，这个口径用来找**从没出现过的字段**，不是逐用例的覆盖率。
 带 `@JsName` 的键按其 JS 名核对，裸声明同一个 JS 键的成员（`coordinateSystem` 与 `typedCoordinateSystem`）
-不重复计缺口。
+不重复计缺口。后续若 `src/jsMain` 新增声明，重跑 `node scripts/field-coverage.mjs <模块>` 找新缺口即可。
 
 已否决的方向：把 COVERAGE「清单之外」那 13 个 mapbox / maptalks / Web Audio GL 源文件与 6 个归档示例并入
 `EXCLUDED`——`scripts/demo-coverage.mjs` 对不在官方清单里的 id 直接 `fail`，这些条目本来就不进账本，

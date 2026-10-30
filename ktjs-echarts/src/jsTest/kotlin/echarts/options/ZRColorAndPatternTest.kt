@@ -7,10 +7,12 @@ import kotlin.js.JsAny
 import kotlin.js.unsafeCast
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertSame
 import kotlin.test.assertTrue
 import zrender.ImageLike
 import zrender.ImagePatternObject
 import zrender.PatternObject
+import zrender.SVGPatternObject
 import zrender.ZRColor
 
 /**
@@ -52,6 +54,20 @@ class ZRColorAndPatternTest {
 
         val label: LabelOption = unsafeJso { backgroundColor = ZRColor(pattern) }
         assertEquals<JsAny?>(pattern, label.backgroundColor)
+    }
+
+    @Test
+    fun anSvgPatternCarriesItsTileSize() {
+        val svgTile = unsafeJso<SVGPatternObject> {
+            svgWidth = 16.0
+            svgHeight = 24.0
+        }
+        assertEquals(16.0, svgTile.svgWidth)
+        assertEquals(24.0, svgTile.svgHeight)
+
+        val pattern = PatternObject(svgTile)
+        val label: LabelOption = unsafeJso { backgroundColor = ZRColor(pattern) }
+        assertSame<JsAny?>(pattern, label.backgroundColor)
     }
 
     @Test

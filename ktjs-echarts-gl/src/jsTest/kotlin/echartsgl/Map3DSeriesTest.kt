@@ -1,13 +1,6 @@
 package echartsgl
 
 import echarts.ECharts
-import echarts.GeoJSON
-import echarts.GeoJSONFeature
-import echarts.GeoJSONGeometry
-import echarts.GeoJSONMapInput
-import echarts.GeoJSONProperties
-import echarts.GeoJSONSourceInput
-import echarts.MapInput
 import echarts.options.OptionDataValueOrArray
 import echarts.options.OptionId
 import echarts.options.one
@@ -22,7 +15,6 @@ import echartsgl.options.Polygons3DSeriesOption
 import echartsgl.options.map3DSeries
 import echartsgl.options.polygons3DSeries
 import js.objects.unsafeJso
-import kotlin.js.JsAny
 import kotlin.js.Promise
 import kotlin.js.unsafeCast
 import kotlin.test.Test
@@ -44,14 +36,14 @@ class Map3DSeriesTest {
     @Test
     fun polygons3DRendersExtrudedPolygons(): Promise<Unit> {
         ECharts.use(arrayOf(Polygons3DChart, Geo3DComponent))
-        registerMap3DSquareMap()
+        registerSquareMap()
         val (chart, container) = createChart()
         chart.setOption(
             unsafeJso<EChartsGlOption> {
                 geo3D =
                     one(
                         unsafeJso<Geo3DOption> {
-                            map = MAP3D_SQUARE_MAP
+                            map = SQUARE_MAP
                             silent = true
                             regionHeight = 1.0
                         },
@@ -114,7 +106,7 @@ class Map3DSeriesTest {
     @Test
     fun map3DWithoutGeo3DComponentExtrudesItsMap(): Promise<Unit> {
         ECharts.use(arrayOf(Map3DChart))
-        registerMap3DSquareMap()
+        registerSquareMap()
         val (chart, container) = createChart()
         chart.setOption(
             unsafeJso<EChartsGlOption> {
@@ -122,7 +114,7 @@ class Map3DSeriesTest {
                     one(
                         map3DSeries {
                             typedCoordinateSystem = CoordinateSystems3D.geo3D
-                            map = MAP3D_SQUARE_MAP
+                            map = SQUARE_MAP
                             boxHeight = 10.0
                             regionHeight = 2.0
                             shading = ShadingTypes.lambert
@@ -149,7 +141,7 @@ class Map3DSeriesTest {
                     .unsafeCast<Map3DSeriesOption>()
                 assertEquals(EChartsGlSeriesTypes.map3D, series.type)
                 assertEquals(CoordinateSystems3D.geo3D, series.typedCoordinateSystem)
-                assertEquals(MAP3D_SQUARE_MAP, series.map)
+                assertEquals(SQUARE_MAP, series.map)
                 assertEquals(10.0, series.boxHeight)
                 assertEquals(2.0, series.regionHeight)
                 assertEquals(ShadingTypes.lambert, series.shading)
@@ -168,11 +160,9 @@ class Map3DSeriesTest {
 
 }
 
-/** Name of the map registered by [registerSquareMap]. */
-private const val MAP3D_SQUARE_MAP = "ktjs-echarts-gl-test-map3d-square"
-
 /**
- * A closed ring inside the square of [MAP3D_SQUARE_MAP], so that the extruded polygon is visible.
+ * A closed ring inside the square of the map registered by [registerSquareMap], so that the
+ * extruded polygon is visible.
  */
 private fun innerSquareRing(): Array<Array<Double>> =
     arrayOf(
@@ -182,36 +172,3 @@ private fun innerSquareRing(): Array<Array<Double>> =
         arrayOf(8.0, 2.0),
         arrayOf(2.0, 2.0),
     )
-
-/**
- * Registers a single square region, so that `geo3D` and `map3D` have a map to extrude.
- */
-private fun registerMap3DSquareMap() {
-    val ring =
-        arrayOf(
-            arrayOf(0.0, 0.0),
-            arrayOf(0.0, 10.0),
-            arrayOf(10.0, 10.0),
-            arrayOf(10.0, 0.0),
-            arrayOf(0.0, 0.0),
-        )
-    val feature =
-        unsafeJso<GeoJSONFeature> {
-            type = "Feature"
-            properties = unsafeJso<GeoJSONProperties> { name = "Square" }
-            geometry =
-                unsafeJso<GeoJSONGeometry> {
-                    type = "Polygon"
-                    coordinates = arrayOf(ring).unsafeCast<JsAny>()
-                }
-        }
-    val geoJson =
-        unsafeJso<GeoJSON> {
-            type = "FeatureCollection"
-            features = arrayOf(feature)
-        }
-    ECharts.registerMap(
-        MAP3D_SQUARE_MAP,
-        MapInput(unsafeJso<GeoJSONMapInput> { geoJSON = GeoJSONSourceInput(geoJson) }),
-    )
-}

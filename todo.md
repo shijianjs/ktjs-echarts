@@ -77,8 +77,12 @@
   的那条分支；这些文件都按「选项能被 `setOption` 接受、字段能从 `getOption` 读回」这个约定写，
   `SSR` 在用例里保持关掉（2.1.0 的这个 pass 在 Chrome 下画黑帧）。
   公共辅助在 `TestSupport`：`createChart` / `nextFrames` / `row` / `bar3DItems` / `hasOwn` /
-  `assertWebGlCanvas` / `cartesian3DAxes`，各测试文件不再自己复制。
-- 用例查出的三处上游行为，别再当 wrapper 的 bug：
+  `assertWebGlCanvas` / `cartesian3DAxes` / `textureCanvas` / `textureCanvases` / `registerSquareMap`，
+  各测试文件不再自己复制。`MaterialOptionTest` 覆盖四种 shading 各自的材质（`bar3D` 一次带齐四套、
+  只有选中的那套进 GPU）、`hatching` 的六张贴图与 `geo3D` / `map3D` 的 `groundPlane` 材质集（贴图画布
+  用 `textureCanvases` 生成，同步加载，dispose 时没有悬挂的加载任务）；`Geo3DGlobeTest` 里 `geo3D`
+  的区域覆盖写全了 `itemStyle` / `label` / `emphasis`，不再只写 `name` / `height`。
+- 用例查出的四处上游行为，别再当 wrapper 的 bug：
   `ViewGL.setPostEffect` 先读 `DOF` / `SSAO` / `SSR` / `FXAA`，camelCase 只是回退，所以这四个键只能靠
   `@JsName` 写对——写错键名时类型化读写依然自洽，用例用 `hasOwn`（`TestSupport`）直接问 JavaScript；
   ECharts 会把 `axisLabel.textStyle` 展平到 `axisLabel` 本身并把 `textStyle` 置成 `null`，
@@ -86,7 +90,14 @@
   数据项的样式键跟的是该系列的 `visualStyleAccessPath`（echarts `src/visual/style.ts` 的 `dataStyleTask`）——
   `line3D` / `lines3D` / `linesGL` 是 `lineStyle`，其余是 `itemStyle`；`Bar3DSeries.js:13` 把这个属性
   拼成了 `visualStyleAccessPathvisu`，但 echarts 的默认值本来就是 `itemStyle`（`src/model/Series.ts:220`），
-  所以 `bar3D` 的数据项仍用 `itemStyle`。
+  所以 `bar3D` 的数据项仍用 `itemStyle`；
+  `map3D` 没有 `regions` 选项，`Map3DSeries.js:40` 用 `getFilledRegions(option.data, option.map)` 把 GeoJSON
+  里的区域名补进 `data`，所以地图区域的高度与样式一律走数据项，`getOption()` 里能看到补出来的那条。
+- 材质这一层只有 `graphicGL.setMaterialFromModel`（`util/graphicGL.js:539`）真正读的键会生效：
+  `shading` 决定读哪套 `<shading>Material`，`realistic` 的 `roughness` / `metalness` 是非数字时按贴图上传、
+  此时才用 `roughnessAdjust` / `metalnessAdjust` 当标量，`hatching` 必须给满 6 张 `hatchingTextures`
+  （少于 6 张上游 `console.error`），`textureTiling` 大于 1 时贴图得是 2 的整数次幂边长。
+  材质集是「四套都写、只用一套」的，所以 `bar3D` 一条系列同时带四套就能全部核对。
 - 已确认的死字段（不建模）：`graphGL` 的 `roam` / `center`、`edgeSymbol` / `edgeSymbolSize`、
   `initLayout` / `stopThreshold`；hatching 材质只读 `hatchingTextures`，`paperColor` 无人读取；mapbox3D /
   maptalks3D 文档里的 `shading` 不会被读。
@@ -104,16 +115,14 @@
 
 **移植队列已清空**（`geo-lines` 是待补清单的最后一条）。官方清单 436 条现在要么已移植、要么在
 「明确不做」里，`node scripts/demo-coverage.mjs` 输出「待补 0」。已在推进的方向是候选 3——按
-`AGENTS.md`「测试覆盖」那六条复查 wrapper 的用例缺口，GL 侧已完成两批（第一批 `postEffect` /
-`environment` / 轴子选项，第二批对象形态数据项与 `surface.data`，第二批查出了 `-kt.10` 那个键名 bug）。
-下一批候选：
+`AGENTS.md`「测试覆盖」那六条复查 wrapper 的用例缺口，GL 侧已完成三批（第一批 `postEffect` /
+`environment` / 轴子选项，第二批对象形态数据项与 `surface.data`，第二批查出了 `-kt.10` 那个键名 bug，
+第三批四套材质与 `groundPlane`、`geo3D` 区域覆盖、`map3D` 的材质与样式）。下一批候选：
 
-1. GL 还没被点名的分支：`Geo3DRegionOption` 的区域级 `itemStyle` / `label`（现有用例只写了 `name` /
-   `height`）、`globe` 的 `layer` / 材质组合，以及 `map3D` 的 `shading` 与 `regions`。
-2. 把缺口审计做成可提交的工具：这批的清单来自一次性脚本（`build/gl-coverage-gap.mjs`，未入库），它只看
+1. 把缺口审计做成可提交的工具：这批的清单来自一次性脚本（`build/gl-coverage-gap.mjs`，未入库），它只看
    类型名有没有在测试里以字面量出现过，`unsafeJso {}` 推断出的类型会被误报成缺口，得改成按字段核对才值得
    放进 `scripts/`。
-3. 2D 侧同样的复查：粗筛有 418 个 `src/jsMain` 声明没在 `src/jsTest` 里以名字出现过，真假要按字段核对，
+2. 2D 侧同样的复查：粗筛有 418 个 `src/jsMain` 声明没在 `src/jsTest` 里以名字出现过，真假要按字段核对，
    优先 `options/` 里那些只有类型没有用例的系列数据项联合。
 
 已否决的方向：把 COVERAGE「清单之外」那 13 个 mapbox / maptalks / Web Audio GL 源文件与 6 个归档示例并入

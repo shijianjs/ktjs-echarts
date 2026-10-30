@@ -2,13 +2,7 @@ package echartsgl
 
 import echarts.ECharts
 import echarts.EChartsInstance
-import echarts.GeoJSON
-import echarts.GeoJSONFeature
-import echarts.GeoJSONGeometry
-import echarts.GeoJSONMapInput
-import echarts.GeoJSONProperties
-import echarts.GeoJSONSourceInput
-import echarts.MapInput
+import echarts.options.StringOrDouble
 import echarts.options.one
 import echartsgl.options.EChartsGlOption
 import echartsgl.options.Geo3DOption
@@ -17,7 +11,6 @@ import echartsgl.options.GlobeLayerOption
 import echartsgl.options.GlobeOption
 import echartsgl.options.GlobeSunTime
 import js.objects.unsafeJso
-import kotlin.js.JsAny
 import kotlin.js.Promise
 import kotlin.js.unsafeCast
 import kotlin.test.Test
@@ -53,8 +46,24 @@ class Geo3DGlobeTest {
                             aspectScale = 0.8
                             regionHeight = 2.0
                             groundPlane = unsafeJso { show = true }
+                            label = unsafeJso { show = true; fontSize = StringOrDouble(14.0) }
                             itemStyle = unsafeJso { borderColor = GlColor(ZRColor("#000")); borderWidth = 0.5 }
-                            regions = arrayOf(unsafeJso<Geo3DRegionOption> { name = "Square"; height = 1.5 })
+                            emphasis = unsafeJso {
+                                label = unsafeJso { color = "#f00" }
+                                itemStyle = unsafeJso { opacity = 0.6 }
+                            }
+                            regions =
+                                arrayOf(
+                                    unsafeJso<Geo3DRegionOption> {
+                                        name = "Square"
+                                        height = 1.5
+                                        label = unsafeJso { show = false }
+                                        itemStyle = unsafeJso { color = GlColor(ZRColor("#123456")) }
+                                        emphasis = unsafeJso {
+                                            itemStyle = unsafeJso { opacity = 1.0 }
+                                        }
+                                    },
+                                )
                             viewControl = unsafeJso { distance = 50.0 }
                         },
                     )
@@ -74,8 +83,17 @@ class Geo3DGlobeTest {
                 assertEquals(true, geo3D.groundPlane!!.show)
                 assertEquals(GlColor(ZRColor("#000")), geo3D.itemStyle!!.borderColor)
                 assertEquals(0.5, geo3D.itemStyle!!.borderWidth)
-                assertEquals("Square", geo3D.regions!![0].name)
-                assertEquals(1.5, geo3D.regions!![0].height)
+                assertEquals(true, geo3D.label!!.show)
+                assertEquals(StringOrDouble(14.0), geo3D.label!!.fontSize)
+                assertEquals("#f00", geo3D.emphasis!!.label!!.color)
+                assertEquals(0.6, geo3D.emphasis!!.itemStyle!!.opacity)
+
+                val region = geo3D.regions!![0]!!
+                assertEquals("Square", region.name)
+                assertEquals(1.5, region.height)
+                assertEquals(false, region.label!!.show)
+                assertEquals(GlColor(ZRColor("#123456")), region.itemStyle!!.color)
+                assertEquals(1.0, region.emphasis!!.itemStyle!!.opacity)
                 assertEquals(50.0, geo3D.viewControl!!.distance)
                 assertWebGlCanvas(container)
             } finally {
@@ -89,7 +107,7 @@ class Geo3DGlobeTest {
         ECharts.use(arrayOf(GlobeComponent))
         val (chart, container) = createChart()
         // A canvas texture loads synchronously, so nothing is pending when the chart is disposed.
-        val layerTexture = TextureSource(document.createElement(HtmlTagName.canvas))
+        val layerTexture = TextureSource(textureCanvas())
         chart.setOption(
             unsafeJso<EChartsGlOption> {
                 globe =
@@ -206,40 +224,4 @@ class Geo3DGlobeTest {
         assertTrue(graphicGlNamespace.shader.source("ecgl.displayShadow.fragment").isNotEmpty())
     }
 
-}
-
-/** Name of the map registered by [registerSquareMap]. */
-private const val SQUARE_MAP = "ktjs-echarts-gl-test-square"
-
-/**
- * Registers a single square region, so that `geo3D` has a map to extrude.
- */
-private fun registerSquareMap() {
-    val ring =
-        arrayOf(
-            arrayOf(0.0, 0.0),
-            arrayOf(0.0, 10.0),
-            arrayOf(10.0, 10.0),
-            arrayOf(10.0, 0.0),
-            arrayOf(0.0, 0.0),
-        )
-    val feature =
-        unsafeJso<GeoJSONFeature> {
-            type = "Feature"
-            properties = unsafeJso<GeoJSONProperties> { name = "Square" }
-            geometry =
-                unsafeJso<GeoJSONGeometry> {
-                    type = "Polygon"
-                    coordinates = arrayOf(ring).unsafeCast<JsAny>()
-                }
-        }
-    val geoJson =
-        unsafeJso<GeoJSON> {
-            type = "FeatureCollection"
-            features = arrayOf(feature)
-        }
-    ECharts.registerMap(
-        SQUARE_MAP,
-        MapInput(unsafeJso<GeoJSONMapInput> { geoJSON = GeoJSONSourceInput(geoJson) }),
-    )
 }

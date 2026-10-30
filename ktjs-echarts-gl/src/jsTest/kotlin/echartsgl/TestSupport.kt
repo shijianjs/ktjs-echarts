@@ -4,12 +4,20 @@ import echarts.AxisTypes
 import echarts.ECharts
 import echarts.EChartsInitOpts
 import echarts.EChartsInstance
+import echarts.GeoJSON
+import echarts.GeoJSONFeature
+import echarts.GeoJSONGeometry
+import echarts.GeoJSONMapInput
+import echarts.GeoJSONProperties
+import echarts.GeoJSONSourceInput
+import echarts.MapInput
 import echarts.options.OptionDataValue
 import echarts.options.one
 import echartsgl.options.Axis3DOption
 import echartsgl.options.Bar3DDataItem
 import echartsgl.options.EChartsGlOption
 import js.objects.unsafeJso
+import kotlin.js.JsAny
 import kotlin.js.Promise
 import kotlin.js.unsafeCast
 import kotlin.test.assertEquals
@@ -18,6 +26,7 @@ import kotlin.test.assertTrue
 import web.animations.requestAnimationFrame
 import web.dom.document
 import web.html.HTMLCanvasElement
+import web.html.HtmlTagName
 import web.html.HTMLElement
 
 /**
@@ -104,10 +113,69 @@ internal fun assertWebGlCanvas(container: HTMLElement) {
 }
 
 /**
+ * A canvas used as a texture.
+ *
+ * A canvas texture is created synchronously by `graphicGL.loadTexture`, so nothing is still pending
+ * when the chart is disposed. The size stays a power of two because WebGL 1 cannot wrap a
+ * non-power-of-two texture with `REPEAT`, which is what `setMaterialFromModel` picks as soon as
+ * `textureTiling` is above 1.
+ */
+internal fun textureCanvas(): HTMLCanvasElement =
+    document.createElement(HtmlTagName.canvas).apply {
+        width = 4
+        height = 4
+    }
+
+/**
+ * [count] canvas textures, for the options that need a fixed number of them such as
+ * `hatchingTextures`.
+ */
+internal fun textureCanvases(count: Int): Array<TextureSource?> =
+    Array<TextureSource?>(count) { TextureSource(textureCanvas()) }
+
+/**
  * Adds the three value axes a `cartesian3D` series needs.
  */
 internal fun EChartsGlOption.cartesian3DAxes() {
     xAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
     yAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
     zAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
+}
+
+/** Name of the map registered by [registerSquareMap]. */
+internal const val SQUARE_MAP = "ktjs-echarts-gl-test-square"
+
+/**
+ * Registers a map with a single square region, so that `geo3D` and `map3D` have a map to extrude.
+ *
+ * Every case re-registers it, so the order the test files run in does not matter.
+ */
+internal fun registerSquareMap() {
+    val ring =
+        arrayOf(
+            arrayOf(0.0, 0.0),
+            arrayOf(0.0, 10.0),
+            arrayOf(10.0, 10.0),
+            arrayOf(10.0, 0.0),
+            arrayOf(0.0, 0.0),
+        )
+    val feature =
+        unsafeJso<GeoJSONFeature> {
+            type = "Feature"
+            properties = unsafeJso<GeoJSONProperties> { name = "Square" }
+            geometry =
+                unsafeJso<GeoJSONGeometry> {
+                    type = "Polygon"
+                    coordinates = arrayOf(ring).unsafeCast<JsAny>()
+                }
+        }
+    val geoJson =
+        unsafeJso<GeoJSON> {
+            type = "FeatureCollection"
+            features = arrayOf(feature)
+        }
+    ECharts.registerMap(
+        SQUARE_MAP,
+        MapInput(unsafeJso<GeoJSONMapInput> { geoJSON = GeoJSONSourceInput(geoJson) }),
+    )
 }

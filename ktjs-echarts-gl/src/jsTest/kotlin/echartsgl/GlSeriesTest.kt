@@ -4,10 +4,12 @@ import echarts.ECharts
 import echarts.options.DoubleOrDoubleArray
 import echarts.options.OptionDataValueOrArray
 import echarts.options.OptionId
+import echarts.options.SeriesOption
 import echarts.options.SymbolShape
 import echarts.options.SymbolSize
 import echarts.options.StringOrDouble
 import echarts.options.one
+import echartsgl.options.Bar3DSeriesOption
 import echartsgl.options.EChartsGlOption
 import echartsgl.options.GlobeOption
 import echartsgl.options.Grid3DOption
@@ -21,6 +23,7 @@ import echartsgl.options.Scatter3DDataItem
 import echartsgl.options.Scatter3DSeriesOption
 import echartsgl.options.SurfaceFunction
 import echartsgl.options.SurfaceSeriesOption
+import echartsgl.options.bar3DSeries
 import echartsgl.options.line3DSeries
 import echartsgl.options.lines3DSeries
 import echartsgl.options.scatter3DSeries
@@ -141,6 +144,59 @@ class GlSeriesTest {
                 assertEquals(OptionId("route"), item.name)
                 assertEquals(2, item.coords!!.size)
                 assertEquals(1.0, item.lineStyle!!.width)
+                assertWebGlCanvas(container)
+            } finally {
+                destroyChart(chart, container)
+            }
+        }
+    }
+
+    /**
+     * The three series that can be drawn on an earth say which one they belong to with `globeIndex`.
+     *
+     * `globeCreator.js:121` resolves it through `getReferringComponents('globe')`, which queries
+     * `{globeIndex, globeId}` on the series model, so the key is the one echarts builds from the
+     * component name; the value is only meaningful when there is more than one globe to choose from.
+     */
+    @Test
+    fun globeSeriesResolveTheirGlobeByIndex(): Promise<Unit> {
+        ECharts.use(arrayOf(Bar3DChart, Scatter3DChart, Lines3DChart, GlobeComponent))
+        val (chart, container) = createChart()
+        chart.setOption(
+            unsafeJso<EChartsGlOption> {
+                globe = arrayOf(
+                    unsafeJso<GlobeOption> { silent = true; globeRadius = 60.0 },
+                    unsafeJso<GlobeOption> { silent = true; globeRadius = 40.0 },
+                )
+                series = arrayOf(
+                    bar3DSeries {
+                        typedCoordinateSystem = CoordinateSystems3D.globe
+                        globeIndex = 1.0
+                        typedData = bar3DItems(0.0, 0.0, 3.0, 10.0, 20.0, 5.0)
+                    },
+                    scatter3DSeries {
+                        typedCoordinateSystem = CoordinateSystems3D.globe
+                        globeIndex = 1.0
+                        typedData = arrayOf<Scatter3DDataItem?>(
+                            Scatter3DDataItem(row(-74.0, 40.0, 1.0)),
+                        )
+                    },
+                    lines3DSeries {
+                        typedCoordinateSystem = CoordinateSystems3D.globe
+                        globeIndex = 0.0
+                        typedData = arrayOf<Lines3DDataItem?>(
+                            Lines3DDataItem(arrayOf(arrayOf(0.0, 0.0), arrayOf(10.0, 20.0))),
+                        )
+                    },
+                )
+            },
+        )
+        return nextFrames(2).then {
+            try {
+                val series = chart.getOption().unsafeCast<EChartsGlOption>().series!!
+                assertEquals(1.0, series[0].unsafeCast<Bar3DSeriesOption>().globeIndex)
+                assertEquals(1.0, series[1].unsafeCast<Scatter3DSeriesOption>().globeIndex)
+                assertEquals(0.0, series[2].unsafeCast<Lines3DSeriesOption>().globeIndex)
                 assertWebGlCanvas(container)
             } finally {
                 destroyChart(chart, container)

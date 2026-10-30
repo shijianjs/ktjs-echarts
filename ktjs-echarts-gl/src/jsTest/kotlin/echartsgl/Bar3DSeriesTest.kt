@@ -133,6 +133,7 @@ class Bar3DSeriesTest {
                     zAxis3D = one(unsafeJso<Axis3DOption> { type = AxisTypes.value })
                     series = one(
                         bar3DSeries {
+                            stack = "ktjs-stack"
                             bevelSize = 0.3
                             bevelSmoothness = 4.0
                             barSize = DoubleOrDoubleArray(arrayOf(0.2, 0.4))
@@ -154,6 +155,7 @@ class Bar3DSeriesTest {
                 .series!![0]
                 .unsafeCast<Bar3DSeriesOption>()
             assertEquals(EChartsGlSeriesTypes.bar3D, series.type)
+            assertEquals("ktjs-stack", series.stack)
             assertEquals(0.3, series.bevelSize)
             assertEquals(4.0, series.bevelSmoothness)
             val barSize = series.barSize!!.unsafeCast<Array<Double>>()

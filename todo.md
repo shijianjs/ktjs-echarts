@@ -85,7 +85,13 @@
   `ViewControlTest` 用一条 `geo3D` 场景把 `ViewControlOption` 二十八个成员全部点名，另用 `grid3D`
   核对组件自己的相机默认值；`Geo3DGlobeTest` 补了 `globe` 的 `globeRadius` / `globeOuterRadius`、
   `heightTexture` / `displacementTexture` 与大气的 `innerGlowPower`，以及 `light` 的
-  `main.shadowQuality` 与 `ambientCubemap` 的三个强度字段。
+  `main.shadowQuality` 与 `ambientCubemap` 的三个强度字段；`ComponentLayoutTest` 用两条 `geo3D`
+  证明不同 `zlevel` 各占一张 WebGL 画布（`echarts-gl.js:56` 的 `getLayerGL` 按 zlevel 建 `LayerGL`），
+  又把 `grid3D` / `geo3D` / `globe` 三个组件的 `left` / `top` / `width` / `height` 盒布局各自点名
+  （`grid3DCreator` / `geo3DCreator` / `globeCreator` 用 `getBoxLayoutParams()` 读它们，`grid3D` 得配
+  三条 `*Axis3D` 否则 `Cartesian3D.resize` 报「don't have xAxis」），`GlSeriesTest` 用两条 `globe`
+  让 `bar3D` / `scatter3D` / `lines3D` 各自用 `globeIndex` 选定要贴的那颗地球（`globeCreator.js:121` 走
+  echarts 的 `<mainType>Index` 引用规则），`Bar3DSeriesTest` 补了 `bar3D.stack` 的同组堆叠键名。
 - 用例查出的五处上游行为，别再当 wrapper 的 bug：
   `ViewGL.setPostEffect` 先读 `DOF` / `SSAO` / `SSR` / `FXAA`，camelCase 只是回退，所以这四个键只能靠
   `@JsName` 写对——写错键名时类型化读写依然自洽，用例用 `hasOwn`（`TestSupport`）直接问 JavaScript；
@@ -130,24 +136,22 @@
 
 **移植队列已清空**（`geo-lines` 是待补清单的最后一条）。官方清单 436 条现在要么已移植、要么在
 「明确不做」里，`node scripts/demo-coverage.mjs` 输出「待补 0」。已在推进的方向是按 `AGENTS.md`
-「测试覆盖」那六条复查 wrapper 的用例缺口，GL 侧已完成五批（第一批 `postEffect` / `environment` /
+「测试覆盖」那六条复查 wrapper 的用例缺口，GL 侧已完成六批（第一批 `postEffect` / `environment` /
 轴子选项，第二批对象形态数据项与 `surface.data`，第二批查出了 `-kt.10` 那个键名 bug，
 第三批四套材质与 `groundPlane`、`geo3D` 区域覆盖、`map3D` 的材质与样式，第四批整套相机
-`ViewControlOption` 与 `Axis3DOption` 的八个轴级字段，第五批 `globe` 的半径/两张贴图/大气与 `light`）。
+`ViewControlOption` 与 `Axis3DOption` 的八个轴级字段，第五批 `globe` 的半径/两张贴图/大气与 `light`，
+第六批三个组件的 `zlevel` 与盒布局、`bar3D` / `scatter3D` / `lines3D` 的 `globeIndex` 和 `bar3D.stack`）。
 
 缺口现在由 `node scripts/field-coverage.mjs` 按**字段**核对（旧的 `build/gl-coverage-gap.mjs` 只看类型名，
-`unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：GL 575 个成员里 42 个没被用例点过名、
+`unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：GL 575 个成员里 31 个没被用例点过名、
 20 个在 `NOT_COVERED` 里；2D 2704 个成员里 763 个没被点名。下一批候选，按文件成组、不必逐条讨论：
 
-1. 各组件的布局与索引字段：`Grid3DOption` / `Geo3DOption` / `GlobeOption` 的 `zlevel` 与 `top`、
-   `Map3DSeriesOption.top`，加 `bar3D` / `scatter3D` / `lines3D` 三个系列的 `globeIndex` 和
-   `bar3D.stack`——`zlevel` 决定 WebGL 层落在哪一层，是不能和 canvas 组件共用的那一个。
-2. `GraphGLForceAtlas2Option` 的力导参数十二项与 `GraphGLSeriesOption.edges`、
+1. `GraphGLForceAtlas2Option` 的力导参数十二项与 `GraphGLSeriesOption.edges`、
    `Lines3DEffectOption` 的拖尾五项（`period` / `constantSpeed` / `trailColor` / `trailOpacity` /
    `spotIntensity`）。
-3. `EChartsGlLiterals` 里 13 个联合类型的**工厂函数**没被调用过——`LiteralsTest` 只测了 `Xxxs` 常量对象，
+2. `EChartsGlLiterals` 里 13 个联合类型的**工厂函数**没被调用过——`LiteralsTest` 只测了 `Xxxs` 常量对象，
    `ShadingType("lambert")` 这类自定义字符串那条路还没走。
-4. 2D 那 763 项按 `options/` 分文件推进，优先系列数据项联合与 `visualMap` / `dataset` 一类结构型选项。
+3. 2D 那 763 项按 `options/` 分文件推进，优先系列数据项联合与 `visualMap` / `dataset` 一类结构型选项。
 
 `--limit N` 控制每个文件列出的条数，`--show-covered` 反查已覆盖的名字；判据是「名字在 jsTest 全文里出现过」，
 所以 `show` 这类到处都有的成员名几乎总是已覆盖，这个口径用来找**从没出现过的字段**，不是逐用例的覆盖率。

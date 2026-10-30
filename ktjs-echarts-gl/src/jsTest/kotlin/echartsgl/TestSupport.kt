@@ -3,7 +3,10 @@ package echartsgl
 import echarts.ECharts
 import echarts.EChartsInitOpts
 import echarts.EChartsInstance
+import echarts.options.OptionDataValue
+import echartsgl.options.Bar3DDataItem
 import kotlin.js.Promise
+import kotlin.js.unsafeCast
 import web.animations.requestAnimationFrame
 import web.dom.document
 import web.html.HTMLElement
@@ -54,3 +57,22 @@ internal fun nextFrame(): Promise<Unit> = Promise { resolve, _ ->
  */
 internal fun nextFrames(count: Int): Promise<Unit> =
     if (count <= 0) Promise.resolve(Unit) else nextFrame().then { nextFrames(count - 1) }
+
+/**
+ * Builds `bar3D` data items from flat `x, y, z` triples.
+ */
+internal fun bar3DItems(vararg xyz: Double): Array<Bar3DDataItem?> {
+    require(xyz.size % 3 == 0) { "A bar3D data item needs three values" }
+    return Array(xyz.size / 3) { index ->
+        Bar3DDataItem(Array(3) { offset -> OptionDataValue(xyz[index * 3 + offset]) })
+    }
+}
+
+/**
+ * Whether [value] really owns [key].
+ *
+ * Reading a typed accessor proves only that `@JsName` is symmetric; this asks JavaScript itself, the
+ * way upstream decides which spelling of an aliased option key wins.
+ */
+internal fun hasOwn(value: Any, key: String): Boolean =
+    js("Object.prototype.hasOwnProperty").call(value, key).unsafeCast<Boolean>()

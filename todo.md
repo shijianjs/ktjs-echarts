@@ -64,6 +64,14 @@
   `echarts-gl/lib/echarts-gl.js` 来加载核心模块。
 - 浏览器测试：`GlSeries2DTest`（`scatterGL` / `linesGL` / `flowGL` / `graphGL`）与 `Map3DSeriesTest`；
   `mapbox3D` / `maptalks3D` 要第三方地图 SDK 和全局 token，只做类型不做渲染用例。
+  `PostEffectTest` 覆盖 `postEffect` 七个 pass、`temporalSuperSampling` 与 `environment`，
+  `Axis3DOptionTest` 覆盖 `grid3D` 与 `xAxis3D` 共用的六个轴子选项；两个文件都按「选项能被 `setOption`
+  接受、字段能从 `getOption` 读回」这个约定写，`SSR` 在用例里保持关掉（2.1.0 的这个 pass 在 Chrome 下画黑帧）。
+- 用例查出的两处上游行为，别再当 wrapper 的 bug：
+  `ViewGL.setPostEffect` 先读 `DOF` / `SSAO` / `SSR` / `FXAA`，camelCase 只是回退，所以这四个键只能靠
+  `@JsName` 写对——写错键名时类型化读写依然自洽，用例用 `hasOwn`（`TestSupport`）直接问 JavaScript；
+  ECharts 会把 `axisLabel.textStyle` 展平到 `axisLabel` 本身并把 `textStyle` 置成 `null`，
+  但 `axisPointer.label.textStyle` 原样保留，所以读回 3D 轴标签的文字样式要在 label 层 `unsafeCast<TextStyleOption>`。
 - 已确认的死字段（不建模）：`graphGL` 的 `roam` / `center`、`edgeSymbol` / `edgeSymbolSize`、
   `initLayout` / `stopThreshold`；hatching 材质只读 `hatchingTextures`，`paperColor` 无人读取；mapbox3D /
   maptalks3D 文档里的 `shading` 不会被读。
@@ -80,14 +88,22 @@
 ## 下一步
 
 **移植队列已清空**（`geo-lines` 是待补清单的最后一条）。官方清单 436 条现在要么已移植、要么在
-「明确不做」里，`node scripts/demo-coverage.mjs` 输出「待补 0」。继续推进需要先定方向，候选：
+「明确不做」里，`node scripts/demo-coverage.mjs` 输出「待补 0」。已在推进的方向是候选 3——按
+`AGENTS.md`「测试覆盖」那六条复查 wrapper 的用例缺口，GL 侧第一批（`postEffect` / `environment` / 轴子选项）
+已完成。下一批候选：
 
-1. 把 COVERAGE「清单之外」那 13 个未进官方清单的 mapbox / maptalks / Web Audio GL 源文件与 6 个归档示例
-   正式并入 `EXCLUDED`，让「不做」的 51 条覆盖全部已知未移植项，账本上不再有游离条目。
-2. 复查 demo 侧残留的 `js()` 兜底：逐个确认是否已按 `TYPE-MAPPING.md` §12 过一遍、有没有能收回类型化
-   声明的（如坐标表访问器 `coordOf`）。
-3. 回到 wrapper 本身：按 `AGENTS.md`「测试覆盖」那六条复查 `src/jsMain` 每个包是否都有对应用例，
-   补齐缺口。
+1. GL 剩下的没被点名的分支：`Bar3DDataItemOption` / `Scatter3DDataItemOption` / `Line3DDataItemOption` /
+   `SurfaceDataItemOption` 这些**对象形态**的数据项（现有用例走的是数组工厂），以及 `surface` 用 `data`
+   而不是 `equation` / `parametricEquation` 的那条分支。
+2. 把缺口审计做成可提交的工具：这一轮的清单来自一次性脚本（`build/gl-coverage-gap.mjs`，未入库），它只看
+   类型名有没有在测试里以字面量出现过，`unsafeJso {}` 推断出的类型会被误报成缺口，得改成按字段核对才值得
+   放进 `scripts/`。
+3. `Axis3DLabelOption.textStyle` 的 KDoc 该写明「运行期会被展平」，但这是纯注释改动、按版本约定要提升
+   `ktjs-echarts-gl` 修订号并重生成锁文件，留给下一次真正改这个模块时一起带上。
+
+已否决的方向：把 COVERAGE「清单之外」那 13 个 mapbox / maptalks / Web Audio GL 源文件与 6 个归档示例并入
+`EXCLUDED`——`scripts/demo-coverage.mjs` 对不在官方清单里的 id 直接 `fail`，这些条目本来就不进账本，
+继续留在 COVERAGE 的「清单之外」一节用文字说明。
 
 新增/移植页面后跑 `node scripts/demo-coverage.mjs --write` 更新 COVERAGE。
 

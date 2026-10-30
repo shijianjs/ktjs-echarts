@@ -81,7 +81,10 @@
   `nodeWeight` / `preventOverlap` / `barnesHutTheta` / `jitterTolerence` / `dissuadeHubs`，这些键在
   `ForceAtlas2.js` 里都被布局真正读到），并同时写 `links` 与别名 `edges`（`GraphGLSeries.js:41` 取
   `option.edges || option.links`）；`GlSeriesTest` 的 `lines3D` 拖尾把 `effect` 八个成员写全，补了
-  `period` / `constantSpeed` / `trailColor` / `trailOpacity` / `spotIntensity`。
+  `period` / `constantSpeed` / `trailColor` / `trailOpacity` / `spotIntensity`。`LiteralsTest` 的
+  `stringUnionsWrapACustomValue` 直接调 13 个 `sealed external interface` 的 `Xxx(String)` 工厂（各包一个
+  不在 `Xxxs` 常量里的自定义字符串读回），补上以前只走常量 getter、从不单独走那条「包任意 JavaScript
+  字符串」路径的空缺——至此 `field-coverage.mjs` 报 GL 575 个成员里未点名 **0 个**（只剩 `NOT_COVERED` 的 20 个）。
   公共辅助在 `TestSupport`：`createChart` / `nextFrames` / `row` / `bar3DItems` / `hasOwn` /
   `assertWebGlCanvas` / `cartesian3DAxes` / `textureCanvas` / `textureCanvases` / `registerSquareMap`，
   各测试文件不再自己复制。`MaterialOptionTest` 覆盖四种 shading 各自的材质（`bar3D` 一次带齐四套、
@@ -142,20 +145,20 @@
 
 **移植队列已清空**（`geo-lines` 是待补清单的最后一条）。官方清单 436 条现在要么已移植、要么在
 「明确不做」里，`node scripts/demo-coverage.mjs` 输出「待补 0」。已在推进的方向是按 `AGENTS.md`
-「测试覆盖」那六条复查 wrapper 的用例缺口，GL 侧已完成七批（第一批 `postEffect` / `environment` /
+「测试覆盖」那六条复查 wrapper 的用例缺口，GL 侧八批全部走完（第一批 `postEffect` / `environment` /
 轴子选项，第二批对象形态数据项与 `surface.data`，第二批查出了 `-kt.10` 那个键名 bug，
 第三批四套材质与 `groundPlane`、`geo3D` 区域覆盖、`map3D` 的材质与样式，第四批整套相机
 `ViewControlOption` 与 `Axis3DOption` 的八个轴级字段，第五批 `globe` 的半径/两张贴图/大气与 `light`，
 第六批三个组件的 `zlevel` 与盒布局、`bar3D` / `scatter3D` / `lines3D` 的 `globeIndex` 和 `bar3D.stack`，
-第七批 `graphGL` 力导全十七项与 `edges` 别名、`lines3D` 拖尾全八项）。
+第七批 `graphGL` 力导全十七项与 `edges` 别名、`lines3D` 拖尾全八项，第八批 `EChartsGlLiterals` 的
+13 个 `Xxx(String)` 工厂函数）。
 
 缺口现在由 `node scripts/field-coverage.mjs` 按**字段**核对（旧的 `build/gl-coverage-gap.mjs` 只看类型名，
-`unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：GL 575 个成员里只剩 13 个没被用例点过名、
-20 个在 `NOT_COVERED` 里；2D 2704 个成员里 763 个没被点名。GL 侧只剩最后一批，2D 按 `options/` 分文件推进：
+`unsafeJso {}` 推断出的接收者类型会被误报，已废弃）。当前输出：**GL 575 个成员全部点过名，未点名 0 个**
+（`NOT_COVERED` 的 20 个是安装器 getter 与要第三方 SDK/token 的 `mapbox3D` / `maptalks3D` 成员，明确不做）；
+2D 2704 个成员里 763 个没被点名，是下一个要推进的方向。
 
-1. `EChartsGlLiterals` 里 13 个联合类型的**工厂函数**没被调用过——`LiteralsTest` 只测了 `Xxxs` 常量对象，
-   `ShadingType("lambert")` 这类自定义字符串那条路还没走。
-2. 2D 那 763 项按 `options/` 分文件推进，优先系列数据项联合与 `visualMap` / `dataset` 一类结构型选项。
+1. 2D 那 763 项按 `options/` 分文件推进，优先系列数据项联合与 `visualMap` / `dataset` 一类结构型选项。
 
 `--limit N` 控制每个文件列出的条数，`--show-covered` 反查已覆盖的名字；判据是「名字在 jsTest 全文里出现过」，
 所以 `show` 这类到处都有的成员名几乎总是已覆盖，这个口径用来找**从没出现过的字段**，不是逐用例的覆盖率。

@@ -100,6 +100,30 @@ class LiteralsTest {
         assertEquals("click", GraphGLFocusNodeAdjacencyOns.click.unsafeCast<String>())
     }
 
+    /**
+     * The `Xxx(String)` factories wrap a value that comes from JavaScript, so they also accept a
+     * literal the constants do not enumerate — a value a newer upstream adds, for example. Each case
+     * wraps a string that is deliberately NOT one of the [Xxxs] constants and reads it back, which
+     * is the path the constant getters themselves are built on but the other cases never exercise on
+     * its own.
+     */
+    @Test
+    fun stringUnionsWrapACustomValue() {
+        assertEquals("gridXYZ", CoordinateSystem3D("gridXYZ").unsafeCast<String>())
+        assertEquals("geoXY", CoordinateSystem2D("geoXY").unsafeCast<String>())
+        assertEquals("dot", FlowGLParticleType("dot").unsafeCast<String>())
+        assertEquals("mouseenter", GraphGLFocusNodeAdjacencyOn("mouseenter").unsafeCast<String>())
+        assertEquals("physical", ShadingType("physical").unsafeCast<String>())
+        assertEquals("orthogonal", ProjectionType("orthogonal").unsafeCast<String>())
+        assertEquals("highest", QualityType("highest").unsafeCast<String>())
+        assertEquals("clockwise", AutoRotateDirection("clockwise").unsafeCast<String>())
+        assertEquals("back", MouseButton("back").unsafeCast<String>())
+        assertEquals("multiply", GlBlendMode("multiply").unsafeCast<String>())
+        assertEquals("zx", GridPlaneType("zx").unsafeCast<String>())
+        assertEquals("base", GlobeLayerType("base").unsafeCast<String>())
+        assertEquals("specular", GlobeBlendTarget("specular").unsafeCast<String>())
+    }
+
     @Test
     fun effectActionsMatchTheUpstreamNames() {
         assertEquals("lines3DPauseEffect", EChartsGlActions.Lines3DPauseEffect)

@@ -167,11 +167,17 @@
 （`optionToContent` / `contentToOption` 回调）；第五批 `options/TimelineParallelBrushOptionTest`，补
 `TimelineOption` / `TimelineControlStyle` 的播放控制、`ParallelOption` 的可展开轴窗口与 `parallelAxisDefault`
 （含 `ParallelAxisOption` 的 `dim` / `areaSelectStyle`）以及 `BrushOption` 的 `inBrush` / `outOfBrush` /
-`brushLink`。几批结构型用例都顺带点名了共享基接口与嵌套样式字段，剩 2704 个成员里 526 个没被点名。
+`brushLink`；第六批 `echarts/RuntimeOptsPayloadTest`，把驱动实例的运行时对象喂给真实方法：`EChartsInitOpts`
+（`devicePixelRatio` / `useDirtyRect` / `useCoarsePointer` / `pointerSize` / `ssr`）走 `createChart` 并核对
+`getDevicePixelRatio`、`SetOptionOpts`（`notMerge` / `lazyUpdate` / `replaceMerge`）验证替换、`LoadingOpts` 喂给
+`showLoading`、`RenderToSVGStringOpts.useViewBox` 用 svg renderer 渲染、`DispatchActionOpts.flush` 配 `Payload`
+喂给 `dispatchAction`，再加 `Payload` / `ModelFinderObject` / `SelectChangedPayload` 三字段的 `unsafeJso` 读回。
+几批结构型用例都顺带点名了共享基接口与嵌套样式字段，剩 2704 个成员里 482 个没被点名。
 
-2D 剩余按 `options/` 与 `ECharts*` 分文件推进，缺口最大的几个文件：`EChartsTypes.kt` 80、
-`zrender/ZRenderElementTypes.kt` 46、`CartesianSeriesOptions.kt`、`ComponentOptions.kt`、`CommonTypes.kt`
-（`TooltipMarker` 联合等），再往上是 `geo` / `calendar` / `graphic` 一类结构型选项与各系列数据项联合。
+2D 剩余按 `options/` 与 `ECharts*` 分文件推进，缺口最大的几个文件：`zrender/ZRenderElementTypes.kt` 46、
+`ComponentOptions.kt`、`CommonTypes.kt`（`TooltipMarker` 联合等）、`CartesianSeriesOptions.kt`、
+`EChartsTypes.kt`（`LocaleAria*` 本地化文案一节），再往上是 `geo` / `calendar` / `graphic` 一类结构型选项
+与各系列数据项联合。
 
 `--limit N` 控制每个文件列出的条数，`--show-covered` 反查已覆盖的名字；判据是「名字在 jsTest 全文里出现过」，
 所以 `show` 这类到处都有的成员名几乎总是已覆盖，这个口径用来找**从没出现过的字段**，不是逐用例的覆盖率。

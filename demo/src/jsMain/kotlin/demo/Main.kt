@@ -1,6 +1,6 @@
 package demo
 
-import demo.examples.useEChartsGl
+import demo.examples.gl.useEChartsGl
 import web.dom.document
 
 /**

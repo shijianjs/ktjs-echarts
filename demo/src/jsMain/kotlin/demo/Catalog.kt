@@ -1,110 +1,40 @@
 package demo
 
-import demo.examples.barDrilldownEntries
-import demo.examples.barEntries
-import demo.examples.barExtraEntries
-import demo.examples.barLongTailEntries
-import demo.examples.barRaceCountryEntries
-import demo.examples.boxplotEntries
-import demo.examples.calendarEntries
-import demo.examples.canvasGraphicsEntries
-import demo.examples.candlestickEntries
-import demo.examples.candlestickLongTailEntries
-import demo.examples.chordEntries
-import demo.examples.chinaAqiEntries
-import demo.examples.customEntries
-import demo.examples.customHexbinEntries
-import demo.examples.customExtraEntries
-import demo.examples.customGaugeEntries
-import demo.examples.customLongTailEntries
-import demo.examples.customMoreEntries
-import demo.examples.windBarbEntries
-import demo.examples.customTransitionEntries
-import demo.examples.datasetEntries
-import demo.examples.datasetExtraEntries
-import demo.examples.docExampleEntries
-import demo.examples.docInteractiveEntries
-import demo.examples.docMapsEntries
-import demo.examples.docMoreEntries
-import demo.examples.funnelEntries
-import demo.examples.extraPagesEntries
-import demo.examples.financeTimelineEntries
-import demo.examples.gaugeEntries
-import demo.examples.geoExtraEntries
-import demo.examples.geoLinesEntries
-import demo.examples.geoMapsEntries
-import demo.examples.gaugeExtraEntries
-import demo.examples.gaugeLongTailEntries
-import demo.examples.glBarGeoEntries
-import demo.examples.glBigDataEntries
-import demo.examples.glGraphEntries
-import demo.examples.glEntries
-import demo.examples.glGeoEntries
-import demo.examples.glMapEntries
-import demo.examples.glImageBarsEntries
-import demo.examples.glLinesEntries
-import demo.examples.glScatterEntries
-import demo.examples.glSurfaceMaterialEntries
-import demo.examples.graphicAnimationEntries
-import demo.examples.graphDataEntries
-import demo.examples.graphEntries
-import demo.examples.graphExtraEntries
-import demo.examples.heatmapEntries
-import demo.examples.heatmapLongTailEntries
-import demo.examples.generatedSeriesEntries
-import demo.examples.intradayBreaksEntries
-import demo.examples.kmpJsonEntries
-import demo.examples.lineEntries
-import demo.examples.linesExtraEntries
-import demo.examples.linesNyEntries
-import demo.examples.lineExtraEntries
-import demo.examples.lineLongTailEntries
-import demo.examples.matrixEntries
-import demo.examples.matrixExtraEntries
-import demo.examples.matrixGridLayoutEntries
-import demo.examples.matrixLongTailEntries
-import demo.examples.matrixStockEntries
-import demo.examples.overviewEntries
-import demo.examples.parallelAqiEntries
-import demo.examples.parallelNutrientsEntries
-import demo.examples.parallelEntries
-import demo.examples.pictorialBarEntries
-import demo.examples.pictorialBarLongTailEntries
-import demo.examples.pieEntries
-import demo.examples.radarEntries
-import demo.examples.rainfallLineEntries
-import demo.examples.richTextEntries
-import demo.examples.sankeyEntries
-import demo.examples.scatterEntries
-import demo.examples.scatterAqiEntries
-import demo.examples.scatterExtraEntries
-import demo.examples.scatterLongTailEntries
-import demo.examples.scatterNebulaEntries
-import demo.examples.scatterLifeTimelineEntries
-import demo.examples.scatterMatrixEntries
-import demo.examples.scatterTransitionEntries
-import demo.examples.scatterNutrientsEntries
-import demo.examples.scatterPunchCardEntries
-import demo.examples.scatterStreamVisualEntries
-import demo.examples.scatterVisualMapCategoriesEntries
-import demo.examples.scatterWeightEntries
-import demo.examples.scatterWorldEntries
-import demo.examples.sunburstEntries
-import demo.examples.themeRiverEntries
-import demo.examples.treeEntries
-import demo.examples.treemapDataEntries
-import demo.examples.treemapEntries
-import demo.examples.treemapExtraEntries
-import demo.examples.weiboCheckinEntries
+import demo.examples.overview.overviewEntries
+import demo.examples.bar.barEntries
+import demo.examples.pie.pieEntries
+import demo.examples.line.lineEntries
+import demo.examples.lines.linesEntries
+import demo.examples.candlestick.candlestickEntries
+import demo.examples.scatter.scatterEntries
+import demo.examples.boxplot.boxplotEntries
+import demo.examples.pictorialbar.pictorialbarEntries
+import demo.examples.parallel.parallelEntries
+import demo.examples.heatmap.heatmapEntries
+import demo.examples.gauge.gaugeEntries
+import demo.examples.geo.geoEntries
+import demo.examples.funnel.funnelEntries
+import demo.examples.radar.radarEntries
+import demo.examples.tree.treeEntries
+import demo.examples.treemap.treemapEntries
+import demo.examples.sunburst.sunburstEntries
+import demo.examples.dataset.datasetEntries
+import demo.examples.calendar.calendarEntries
+import demo.examples.matrix.matrixEntries
+import demo.examples.custom.customEntries
+import demo.examples.graphic.graphicEntries
+import demo.examples.graph.graphEntries
+import demo.examples.chord.chordEntries
+import demo.examples.sankey.sankeyEntries
+import demo.examples.themeriver.themeriverEntries
+import demo.examples.gl.glEntries
+import demo.examples.doc.docEntries
+import demo.examples.kmpjson.kmpJsonEntries
 import demo.ui.PageMeta
 import demo.ui.PageView
 import demo.ui.officialExampleUrl
 
-/**
- * Dokka output assembled by `pagesSite` next to the demo.
- *
- * The wrapper is one module, so the API reference is the module index rather than a page per type.
- */
+/** Dokka output assembled by `pagesSite` next to the demo. */
 const val API_ROOT = "api/ktjs-echarts"
 
 /** Top-bar entry point of the API reference. */
@@ -184,110 +114,45 @@ class CatalogEntry(
     fun create(): PageView = builder(meta)
 }
 
+
 /**
- * Every ported example, one page each.
+ * Every ported example, one page each, grouped by the examples' family.
  *
- * The order of the lists below is the order of the sidebar groups; within a group the declaration
- * order of the category file is kept. `examples/Overview.kt` indexes the whole list, so a new entry
- * shows up there without a second registration.
+ * Each family directory owns one `<family>Entries` list and every page is its own file there, so a
+ * new example only touches the family it belongs to. The order of the list below is the order of the
+ * sidebar groups; within a group the declaration order of the family's `Entries.kt` is kept.
  */
 val catalog: List<CatalogEntry> =
     listOf(
         overviewEntries,
         barEntries,
-        barExtraEntries,
-        barLongTailEntries,
-        barDrilldownEntries,
-        barRaceCountryEntries,
-        financeTimelineEntries,
-        richTextEntries,
-        extraPagesEntries,
-        lineEntries,
-        rainfallLineEntries,
-        linesExtraEntries,
-        linesNyEntries,
-        lineExtraEntries,
-        lineLongTailEntries,
-        intradayBreaksEntries,
-        generatedSeriesEntries,
         pieEntries,
-        scatterEntries,
-        scatterExtraEntries,
-        scatterAqiEntries,
-        scatterLifeTimelineEntries,
-        scatterNutrientsEntries,
-        scatterPunchCardEntries,
-        scatterStreamVisualEntries,
-        scatterNebulaEntries,
-        scatterTransitionEntries,
-        scatterLongTailEntries,
-        scatterMatrixEntries,
-        scatterWeightEntries,
-        scatterWorldEntries,
+        lineEntries,
+        linesEntries,
         candlestickEntries,
-        candlestickLongTailEntries,
+        scatterEntries,
         boxplotEntries,
-        pictorialBarEntries,
-        pictorialBarLongTailEntries,
+        pictorialbarEntries,
         parallelEntries,
-        parallelAqiEntries,
-        parallelNutrientsEntries,
         heatmapEntries,
-        heatmapLongTailEntries,
         gaugeEntries,
-        geoExtraEntries,
-        geoMapsEntries,
-        gaugeExtraEntries,
-        gaugeLongTailEntries,
+        geoEntries,
         funnelEntries,
         radarEntries,
         treeEntries,
         treemapEntries,
-        treemapDataEntries,
-        treemapExtraEntries,
         sunburstEntries,
         datasetEntries,
-        datasetExtraEntries,
         calendarEntries,
         matrixEntries,
-        matrixExtraEntries,
-        matrixGridLayoutEntries,
-        matrixLongTailEntries,
-        matrixStockEntries,
         customEntries,
-        customHexbinEntries,
-        customExtraEntries,
-        customGaugeEntries,
-        customLongTailEntries,
-        customMoreEntries,
-        windBarbEntries,
-        customTransitionEntries,
-        graphicAnimationEntries,
-        canvasGraphicsEntries,
+        graphicEntries,
         graphEntries,
-        graphDataEntries,
-        graphExtraEntries,
         chordEntries,
         sankeyEntries,
-        themeRiverEntries,
+        themeriverEntries,
         glEntries,
-        glGraphEntries,
-        glBarGeoEntries,
-        glGeoEntries,
-        glMapEntries,
-        glImageBarsEntries,
-        glLinesEntries,
-        glScatterEntries,
-        glBigDataEntries,
-        glSurfaceMaterialEntries,
-        docExampleEntries,
-        docMoreEntries,
-        docInteractiveEntries,
-        scatterVisualMapCategoriesEntries,
-        docMapsEntries,
-        chinaAqiEntries,
-        geoLinesEntries,
-        weiboCheckinEntries,
+        docEntries,
         kmpJsonEntries,
     ).flatten()
 

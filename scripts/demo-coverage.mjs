@@ -139,11 +139,21 @@ function readManifest(name) {
     return JSON.parse(source.slice(start, end + 1))
 }
 
+/** Every `.kt` file below [dir], recursively: examples live in one directory per family. */
+function kotlinFiles(dir) {
+    const out = []
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name)
+        if (entry.isDirectory()) out.push(...kotlinFiles(full))
+        else if (entry.name.endsWith('.kt')) out.push(full)
+    }
+    return out
+}
+
 function portedIds() {
     const ids = new Set()
-    for (const name of fs.readdirSync(examplesDir)) {
-        if (!name.endsWith('.kt')) continue
-        const source = fs.readFileSync(path.join(examplesDir, name), 'utf8')
+    for (const file of kotlinFiles(examplesDir)) {
+        const source = fs.readFileSync(file, 'utf8')
         for (const match of source.matchAll(/\.(?:chart|interactive)\(\s*"([^"]+)"/g)) {
             ids.add(match[1])
         }

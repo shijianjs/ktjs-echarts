@@ -3,22 +3,28 @@ package demo.json
 import io.github.shijianjs.kmpechartsjson.EChartsOption
 import io.github.shijianjs.kmpechartsjson.echartsOption
 import io.github.shijianjs.kmpechartsjson.toJsonString
-import demo.json.examples.barJsonExamples
-import demo.json.examples.calendarJsonExamples
-import demo.json.examples.candleBoxHeatmapJsonExamples
-import demo.json.examples.datasetJsonExamples
-import demo.json.examples.docExtraJsonExamples
-import demo.json.examples.docJsonExamples
-import demo.json.examples.gaugeFunnelRadarJsonExamples
-import demo.json.examples.graphChordJsonExamples
-import demo.json.examples.lineJsonExamples
-import demo.json.examples.parallelPictorialJsonExamples
-import demo.json.examples.pieJsonExamples
-import demo.json.examples.radarScatterExtraJsonExamples
-import demo.json.examples.sankeyJsonExamples
-import demo.json.examples.scatterJsonExamples
-import demo.json.examples.sunburstJsonExamples
-import demo.json.examples.treeJsonExamples
+import demo.json.examples.bar.barJsonExamples
+import demo.json.examples.calendar.calendarJsonExamples
+import demo.json.examples.candlestick.candlestickJsonExamples
+import demo.json.examples.boxplot.boxplotJsonExamples
+import demo.json.examples.heatmap.heatmapJsonExamples
+import demo.json.examples.dataset.datasetJsonExamples
+import demo.json.examples.doc.docJsonExamples
+import demo.json.examples.gauge.gaugeJsonExamples
+import demo.json.examples.funnel.funnelJsonExamples
+import demo.json.examples.radar.radarJsonExamples
+import demo.json.examples.graph.graphJsonExamples
+import demo.json.examples.chord.chordJsonExamples
+import demo.json.examples.line.lineJsonExamples
+import demo.json.examples.parallel.parallelJsonExamples
+import demo.json.examples.pictorialbar.pictorialbarJsonExamples
+import demo.json.examples.pie.pieJsonExamples
+import demo.json.examples.scatter.scatterJsonExamples
+import demo.json.examples.sankey.sankeyJsonExamples
+import demo.json.examples.themeriver.themeriverJsonExamples
+import demo.json.examples.sunburst.sunburstJsonExamples
+import demo.json.examples.tree.treeJsonExamples
+import demo.json.examples.treemap.treemapJsonExamples
 
 /**
  * One example rendered from a `kmp-echarts-json` option.
@@ -53,34 +59,34 @@ class JsonCategory(private val sourcePath: String) {
         JsonExample(id, sourcePath) { echartsOption(block) }
 }
 
-/**
- * Every JSON example, keyed by the official example id.
- *
- * The js layer looks a page's id up in this map: a hit makes the top-bar Kotlin/JSON switch apply to
- * the page, and the JSON mode builds the chart from [JsonExample.json]. Examples that have no JSON
- * counterpart (3D charts, pages driven by user interaction or external assets) stay Kotlin-only and
- * are recorded in `demo/COVERAGE-JSON.md`.
- */
+
+/** Every JSON example, keyed by the official example id. */
 val jsonExamples: Map<String, JsonExample> =
     buildMap {
         for (examples in
             listOf(
                 barJsonExamples,
-                lineJsonExamples,
-                pieJsonExamples,
-                scatterJsonExamples,
-                gaugeFunnelRadarJsonExamples,
-                candleBoxHeatmapJsonExamples,
-                graphChordJsonExamples,
-                treeJsonExamples,
-                sunburstJsonExamples,
-                sankeyJsonExamples,
                 calendarJsonExamples,
+                candlestickJsonExamples,
+                boxplotJsonExamples,
+                heatmapJsonExamples,
                 datasetJsonExamples,
                 docJsonExamples,
-                docExtraJsonExamples,
-                radarScatterExtraJsonExamples,
-                parallelPictorialJsonExamples,
+                gaugeJsonExamples,
+                funnelJsonExamples,
+                radarJsonExamples,
+                graphJsonExamples,
+                chordJsonExamples,
+                lineJsonExamples,
+                parallelJsonExamples,
+                pictorialbarJsonExamples,
+                pieJsonExamples,
+                scatterJsonExamples,
+                sankeyJsonExamples,
+                themeriverJsonExamples,
+                sunburstJsonExamples,
+                treeJsonExamples,
+                treemapJsonExamples,
             )) {
             for (example in examples) put(example.id, example)
         }

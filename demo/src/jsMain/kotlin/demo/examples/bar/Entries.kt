@@ -1,0 +1,43 @@
+package demo.examples.bar
+
+import demo.CatalogEntry
+
+val barEntries: List<CatalogEntry> =
+    listOf(
+        barSimpleEntry,
+        barTickAlignEntry,
+        barBackgroundEntry,
+        barDataColorEntry,
+        barYCategoryEntry,
+        barNegativeEntry,
+        barNegative2Entry,
+        barStackEntry,
+        barYCategoryStackEntry,
+        barWaterfallEntry,
+        mixLineBarEntry,
+        multipleYAxisEntry,
+        barAnimationDelayEntry,
+        barLabelRotationEntry,
+        barGradientEntry,
+        barLargeEntry,
+        barBreaksSimpleEntry,
+        barBrushEntry,
+        barPolarLabelRadialEntry,
+        barPolarLabelTangentialEntry,
+        barPolarStackEntry,
+        barPolarStackRadialEntry,
+        barPolarRealEstateEntry,
+        polarRoundCapEntry,
+        polarEndAngleEntry,
+        mixZoomOnValueEntry,
+        bar1Entry,
+        barStackNormalizationEntry,
+        barStackNormalizationAndVariationEntry,
+        barStackBorderRadiusEntry,
+        barWaterfall2Entry,
+        barMultiDrilldownEntry,
+        barRaceCountryEntry,
+        mixTimelineFinanceEntry,
+        barRichTextEntry,
+        dynamicDataEntry,
+    )

@@ -23,26 +23,52 @@ demo/src/jsMain/kotlin/demo/
   ui/Dom.kt          类型安全的 DOM 构造与小工具
   ui/Blocks.kt       页面骨架（page / pageSection / example）与 PageMeta / PageView
   ui/Chart.kt        ChartHolder：容器的持有者，负责 ECharts 实例的挂载、卸载与 resize
-  examples/          一个图表家族一个文件，每份导出 <name>Entries；KmpJson.kt 只做非官方模型页的展示
+  examples/Category.kt   Category 工厂（分组 + 源码路径绑定的入口）
+  examples/JsonMode.kt   把模型序列化出的 JSON 解析成 setOption 能吃的对象
+  examples/shared/       跨家族共用的构造器与数据（Items.kt、PerlinNoise.kt、MixedTimelineData…）
+  examples/<family>/     一族一个目录：bar/ line/ pie/ scatter/ custom/ matrix/ geo/ gl/ doc/ …
 demo/src/commonMain/kotlin/demo/
   json/JsonExamples.kt   跨目录的 JSON 示例注册表（按官方示例 id 索引）
   json/JsonData.kt       JSON 示例共用的数据项构造小工具
-  json/examples/         与 demo/src/jsMain/kotlin/demo/examples 一一对应的模型构造，一族一文件
   json/ModelExamples.kt  非官方模型页的文案、DSL 构造与序列化 JSON（JS 端只负责展示）
+  json/examples/<family>/ 与 jsMain 的家族目录一一对应的模型构造
 demo/src/jvmTest/kotlin/demo/e2e/
-  DemoPageTest.kt    Playwright 端到端套件（点侧边栏、切语言/主题/代码源、过滤索引、抽样渲染）
+  DemoPageTest.kt    Playwright 端到端套件（点侧边栏、切语言/主题/代码源、过滤索引、逐页渲染）
   DemoOptions.kt     浏览器与断言超时设置
   DemoServer.kt      测试内静态服务器
 scripts/
-  demo-coverage.mjs  官方清单与已移植页面的比对
+  demo-coverage.mjs  官方清单与已移植页面的比对（递归遍历 examples 家族目录）
   json-coverage.mjs  静态页面与 JSON 示例的比对（生成 COVERAGE-JSON.md 的清单）
+```
+
+### 示例文件的组织
+
+移植页与家族子目录一一对应，家族目录名用侧边栏分组的 id（`pictorial-bar` → `pictorialbar`、
+`theme-river` → `themeriver`、`doc-example` → `doc`、`kmp-json` → `kmpjson`）：
+
+- **一页一文件**：每个官方示例单独一个 `.kt`（`examples/bar/BarSimple.kt` 里的
+  `barSimpleEntry`），文件内先用 `Category(Groups.X, "examples/<family>/<File>.kt")` 绑定分组与
+  源码路径，再声明这一个示例。家族目录里的 `Entries.kt` 按声明顺序把这批页面收成 `<family>Entries`，
+  `Catalog.kt` 再按侧边栏顺序把它们拼成整份目录。
+- **辅助声明跟着原文件走**：拆分前的 `Bar.kt` 里的辅助函数/常量落在同目录的 `BarSupport.kt`
+  （声明提升为 `internal`）。跨家族引用的（`GeoMaps.kt` 的 `registerGeojsonMap` 被 doc 页复用等）
+  由 import 显式引入。
+- **跨家族混在一个文件里的**（`ChinaAqi.kt`、`ExtraPages.kt`、`IntradayBreaks.kt`、`RichText.kt`、
+  `WeiboCheckin.kt` 这类）辅助声明落到 `examples/shared/`；名字在同一包里撞车时后写入的会带文件名后缀
+  （`GlImageBars.kt` 的 `LOAD` 变成 `LOADGlImageBars`，因为 `Gl.kt` 已占用 `LOAD`）。
+- **纯数据文件**（`MixTimelineData.kt`、`SunburstData.kt`…）保留原文件名，不再带 `Support` 后缀。
+- **JSON 侧镜像同一套目录**：`json/examples/<family>/<PageId>Json.kt` 一页一文件，
+  `<family>JsonEntries.kt` 是家族聚合，`<Name>JsonSupport.kt` 保存该文件拆出来的辅助声明；
+  `JsonExamples.kt` 汇总各家族的 `*JsonExamples`。
+- 页面的源码链接随文件走：Kotlin 模式指向 `examples/<family>/<File>.kt`，JSON 模式指向
+  `json/examples/<family>/<File>Json.kt`。
 
 ## 移植约定
 
 - **一页一示例、id 与官方一致**：路由 id 就是官方示例 id，页面上的「官方示例」链接由此拼出。
-- **每个示例一族一文件**：`examples/Bar.kt`、`examples/Pie.kt`…；文件里先用
-  `Category(Groups.X, "examples/X.kt")` 绑定分组与源码路径，再用 `chart(...)` /`interactive(...)`
-  声明示例。文件内的声明顺序就是侧边栏顺序。
+- **每个示例一族一文件**：`examples/bar/BarSimple.kt`、`examples/pie/Pie.kt`…；文件里先用
+  `Category(Groups.X, "examples/<family>/<File>.kt")` 绑定分组与源码路径，再声明示例。家族目录
+  内 `<family>Entries.kt` 的声明顺序就是侧边栏顺序。
 - **静态示例用 `chart { option }`**：选项在挂载时构造（懒构造，避免建页时白算数据）。
   **需要自己驱动图表的用 `interactive { chart -> }`**：定时动画、`getWidth()` 相关布局、事件等。
 - **中文标题抄官方清单**（`echarts-examples/src/data/chart-list-data.js` 的 `titleCN`），
@@ -52,7 +78,7 @@ scripts/
 - **通配导入**：`examples/` 下的文件统一用 `import echarts.options.*` / `import echarts.*`。一个示例
   通常触及大半个选项包，逐个列举反而更容易漏；`detekt` 的规则集（只有 `ForbiddenImport`）不禁止它。
 - **数据项名称与取值走联合工厂**：`name` 是 `string | number`、`value` 是 `string | number | Date`，
-  所以写 `OptionId("x")`、`OptionDataValue(1.0)`；`examples/Items.kt` 收了这批常用构造器
+  所以写 `OptionId("x")`、`OptionDataValue(1.0)`；`examples/shared/Items.kt` 收了这批常用构造器
   （`pieItem`、`radarItem`、`row`、`doubleRow`、`recordOf`、`toolbox`、`every`…）。
 - **KDoc 里别写 `/*`**：Kotlin 的块注释可嵌套，注释里写 `doc-example/*.js` 会开一个内层注释，
   整个文件后半段都被当成注释，报错位置还不在这一行。写目录时用 `doc-example/` 就好。
@@ -91,12 +117,12 @@ scripts/
 
 ## 可复用数据与素材
 
-- 打卡表：`examples/CustomExtra.kt` 的 `punchCardValues` / `punchCardHours` / `punchCardDays`。
-- 省级十年表：`examples/MixTimelineData.kt` 的 `mixTimelineProvinces` / `mixTimelineYears` 与六张
+- 打卡表：`examples/custom/CustomExtraSupport.kt` 的 `punchCardValues` / `punchCardHours` / `punchCardDays`。
+- 省级十年表：`examples/shared/MixTimelineData.kt` 的 `mixTimelineProvinces` / `mixTimelineYears` 与六张
   `mixTimeline*` 数据；`doc-example/mix-timeline-all` 与 `mix-timeline-finance` 共用。timeline 的
   点位、按年柱与双行省名也复用 `DocInteractive.kt` 里那几个 `internal` 辅助。
 - 预算表：`resources/data/obama_budget_proposal_2012.list.json`，`ObamaBudgetJson` 与
-  `budgetAxisLabel()` 在 `examples/DocInteractive.kt`；`mix-zoom-on-value` 复用它们。
+  `budgetAxisLabel()` 在 `examples/doc/DocInteractiveSupport.kt`；`mix-zoom-on-value` 复用它们。
 - 常用表：`resources/data/life-expectancy-table.json`、`nutrients.json`、`population.json`、
   `gl/flights.json`；地图：`world.json`（缩写地名，`GlGeo.kt` 的 `worldRegionNames` 负责翻译）、
   `world-population.json`、`USA.json`、`ch.geo.json`、`iceland.geo.json`、`china.json`（地名是官方
@@ -150,17 +176,17 @@ JSON。切换会重走 `rebuild()`，与语言切换一致。
 
 另有 `Groups.JSON`（`kmp-json`，6 页）不在官方清单内：它们同样用纯 KMP 模型构造 option，但页面本身
 是模型的展示页，文案与 DSL 构造在 `commonMain/kotlin/demo/json/ModelExamples.kt`（`demo.json`，纯
-KMP，`demo` 的 `commonMain` 因此依赖 `kmp-echarts-json`），`examples/KmpJson.kt` 负责展示。页面不经过
+KMP，`demo` 的 `commonMain` 因此依赖 `kmp-echarts-json`），`examples/kmpjson/KmpJson.kt` 负责展示。页面不经过
 `Category`，路由 id 带 `kmp-json/` 前缀。`demo-coverage.mjs` 只统计 `Category.chart / interactive`
 声明的官方 id，不会把这几页算进「已移植」；`json-coverage.mjs` 同样只统计官方静态页。
 
 「文档示例」组（`Groups.DOC`）对应官方清单里的 `doc-example/*` 条目：它们不属于任何家族，一个例子只讲
-一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。这批页面按依赖分三个文件：
-`examples/DocExamples.kt`（静态页，33 个）、`examples/DocMore.kt`（象形柱图教程、dataZoom 散点、
-文本 / 标签、动画、旭日图 / 矩形树图入门与 `baseOption` + `media` 教程，16 个）与
-`examples/DocInteractive.kt`（首次绘制后还要 `setOption` / `dispatchAction` / 起定时器，或使用 timeline
-组件的 12 个）。数据量大到值得单独成页的 doc 例子放自己的文件，仍用 `Groups.DOC` 建 `Category`，
-`examples/ScatterVisualMapCategories.kt` 就是第一个。
+一个字段。路由 id 保留 `doc-example/` 前缀，官方链接才指向同一页。这批页面都落在 `examples/doc/`，
+一页一文件；辅助声明按原来的三个来源文件收在同目录的 `DocExamplesSupport.kt`（静态页，33 个）、
+`DocMoreSupport.kt`（象形柱图教程、dataZoom 散点、文本 / 标签、动画、旭日图 / 矩形树图入门与
+`baseOption` + `media` 教程，16 个）与 `DocInteractiveSupport.kt`（首次绘制后还要 `setOption` /
+`dispatchAction` / 起定时器，或使用 timeline 组件的 12 个）。数据量大到值得单独成页的 doc 例子
+自带 `ScatterVisualMapCategoriesSupport.kt`，仍用 `Groups.DOC` 建 `Category`。
 
 ### 家族的剩余情况
 
@@ -169,7 +195,7 @@ KMP，`demo` 的 `commonMain` 因此依赖 `kmp-echarts-json`），`examples/Kmp
 | 家族 | 情况 |
 | --- | --- |
 | `bmap` | 需要百度地图 JS SDK，wrapper 没有覆盖，整个家族不做 |
-| `graphic` | 关键帧动画那一档已落地（`examples/GraphicAnimations.kt`，见下），剩余示例都配合真实交互或外部素材 |
+| `graphic` | 关键帧动画那一档已落地（`examples/graphic/GraphicAnimationsSupport.kt`，见下），剩余示例都配合真实交互或外部素材 |
 | `visualMap` / `dataZoom` | 清单里没有独立家族，相关条目随所属系列落地（`line-tooltip-touch` 等）；能力已由具体示例（`wind-barb` 等）覆盖 |
 
 `gl` 家族已经接入（`examples/Gl*.kt` 十个文件，见下文「3D 示例」），官方清单里的 GL 条目已全部落地或
@@ -178,36 +204,36 @@ KMP，`demo` 的 `commonMain` 因此依赖 `kmp-echarts-json`），`examples/Kmp
 `lines` / `map` / `geo` 已经能用静态数据集（`lines-airline`、`custom-hexbin` 就是先例）：只要再拷
 `public/data/asset/geo/` 下的 GeoJSON 或 SVG，就能继续补这两个家族。
 
-百万级轨迹那一档已经落地：`lines-ny` 在 `examples/LinesNy.kt`，两页 WebGL 版在
-`examples/GlBigData.kt`。上游把数据切成 `.bin` 分片（32 片 `links_ny_*.bin`、230 片 `gps_*.bin`），
+百万级轨迹那一档已经落地：`lines-ny` 在 `examples/lines/LinesNySupport.kt`，两页 WebGL 版在
+`examples/gl/GlBigDataSupport.kt`。上游把数据切成 `.bin` 分片（32 片 `links_ny_*.bin`、230 片 `gps_*.bin`），
 站内只入库 8 片与 20 片（各 7.7 MB，取舍见 `data/SOURCE.md`），页面用 `loadFloat32` / `loadInt32`
 一片一片读、转成扁平数组后 `chart.appendData(...)` 追加，读完或图表已销毁就停下递归。转换函数
 `nyChunk` / `gpsChunk` 是 `internal`，两页街道图共用同一份分片，不各写一遍。
 
 竞速、下钻那一档已经落地：`bar-race`（每 3 秒加一截，定时器交给 `ChartHolder`）与
 `bar-drilldown`（点击柱体换层，`universalTransition` 做形变，Back 是带 `onclick` 的 graphic
-text）在 `examples/CanvasGraphics.kt`，多层版 `bar-multi-drilldown` 单独放在
-`examples/BarDrilldown.kt`：上游用 `myChart.getOption().id` 记住当前层，wrapper 不建模这个写在
+text）在 `examples/graphic/CanvasGraphicsSupport.kt`，多层版 `bar-multi-drilldown` 单独放在
+`examples/graphic/BarDrilldown.kt`：上游用 `myChart.getOption().id` 记住当前层，wrapper 不建模这个写在
 option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
 `watermark` 同文件（canvas 画的斜向水印当
 `backgroundColor` 的 pattern）。剩下的长尾里还要真实交互的（`scatter-clustering` 要 ecStat、
 `line-pen` / `line-draggable` 要指针序列）仍不做。
 
 `path://` 素材不是障碍：上游的 path 字符串原样内联即可，gauge 家族的五个面板图就是这么落地的
-（`examples/GaugeLongTail.kt`，同时把 `Math.random()` 换成 `Lcg`、定时器交给 `ChartHolder`）。
-`custom-gauge` 在 `examples/CustomGauge.kt`：面板 PNG 拷到 `resources/data/img/`，整只表盘由
+（`examples/gauge/GaugeLongTailSupport.kt`，同时把 `Math.random()` 换成 `Lcg`、定时器交给 `ChartHolder`）。
+`custom-gauge` 在 `examples/custom/CustomGaugeSupport.kt`：面板 PNG 拷到 `resources/data/img/`，整只表盘由
 `renderItem` 返回的一个 group 里的四张元素拼出（两张同款面板图分别用 sector / polygon 裁剪成刻度弧与
 指针，再加白色圆盘和数值文本），三种过渡各挂在不同对象上——弧的 `endAngle` 在 shape 上、文本的
 `opacity` 在 style 上、指针角度在 `extra` 上，`during` 里用 `getExtra` + `setShape` / `setStyle`
 重算。象形柱图的四页 `pictorialBar-vehicle` / `-body-fill` / `-velocity` /
-`-bar-transition` 也照此落地（`examples/PictorialBarLongTail.kt`，path 常量与身高体重表分别由
+`-bar-transition` 也照此落地（`examples/pictorialbar/PictorialBarLongTailSupport.kt`，path 常量与身高体重表分别由
 一次性脚本生成到 `PictorialBarPaths.kt` / `ScatterWeightData.kt`）；上游 `pictorialBar-body-fill`
 在根级写的 `markLine: { z: -100 }` 没有移植，因为 wrapper 的 `EChartsOption` 不建模根级 mark 组件，
 该字段只影响层级、不影响画面。
 
 ## 数据自己算的页面
 
-`examples/IntradayBreaks.kt` 收了四个「数据不是抄的、是算出来的」页面，它们共用一个种子固定的
+`examples/shared/IntradayBreaksSupport.kt` 收了四个「数据不是抄的、是算出来的」页面，它们共用一个种子固定的
 `Lcg`：
 
 - `intraday-breaks-1` / `-2`：逐分钟价格 + 断轴。时间一律用 `Date.UTC` 从「天」推，**不要**
@@ -221,7 +247,7 @@ option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
   `largeCandles()` 放进循环里会重算二十万行 × 二十万次。涨跌颜色靠额外的 `sign` 列 + 隐藏的
   piecewise `visualMap`，和上游一致；`itemStyle` 得用 `CandlestickItemStyleOption`
   （`color0` / `borderColor0` 只在它上面）。
-- `scatter-matrix`（`examples/ScatterMatrix.kt`）：网格的 `left` / `top` / `width` / `height`
+- `scatter-matrix`（`examples/scatter/ScatterMatrixSupport.kt`）：网格的 `left` / `top` / `width` / `height`
   必须是**百分比字符串**。上游算的是数字再拼 `+ '%'`，Kotlin 侧如果直接写
   `StringOrDouble(11.5)` 就是 11.5 像素，十六个单元格会全叠在左上角（画出来只有一小块，
   e2e 仍然过，只能靠截图发现）。
@@ -230,7 +256,7 @@ option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
 
 ## 散点与平行坐标的数据页
 
-`examples/ScatterNutrients.kt` 收两页共用同一张 `data/nutrients.json`（7637 行、25 个食品组）：
+`examples/scatter/ScatterNutrientsSupport.kt` 收两页共用同一张 `data/nutrients.json`（7637 行、25 个食品组）：
 
 - `normalizeNutrients(json, limit)` 是两页共用的入口：数值列按上游 `parseFloat(v) || 0` 转（306 行有空
   单元格），组名按**首次出现顺序**收集，配色是 `ECharts.color.modifyHSL('#5A94DF', hStep * i)`。散点页只
@@ -245,7 +271,7 @@ option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
   要显式给类型参数才能赋进去。
 - `scatter-aqi-color` 的三张 31 行表上游就内联在示例里，移植后放在 `ScatterAqiData.kt`；tooltip 回调要把
   `params` 先 `unsafeCast<CallbackDataParams>()` 才能读 `seriesName`。
-- `doc-example/scatter-visualMap-categories`（`examples/ScatterVisualMapCategories.kt`）复用这三张表，
+- `doc-example/scatter-visualMap-categories`（`examples/doc/ScatterVisualMapCategoriesSupport.kt`）复用这三张表，
   只把北京第 9 天的 CO 换回该页上游的 `'-'`（`scatter-aqi-color.ts` 同一格是 `4.8`）：改的是 `copyOf()`
   出来的副本，共享表保持原样。按类目取形状/大小用 `VisualOptionUnit` 的 `categorySymbol` /
   `categorySymbolSize` 字典视图，空串 `''` 键是没被点名类目的默认值，`selected` 关掉的类目落到
@@ -255,22 +281,22 @@ option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
 - `numbers()` 的 vararg 是 `Double`，所以展开实参必须是 `DoubleArray`；`Array<Double>` 能编译到 vararg
   之外，但 `*` 展开会报类型不匹配。
 
-`scatter-punchCard` 在 `examples/ScatterPunchCard.kt`：上游的数据是 `[day, hour, count]` 顺序，而
+`scatter-punchCard` 在 `examples/scatter/ScatterPunchCardSupport.kt`：上游的数据是 `[day, hour, count]` 顺序，而
 `xAxis` 是 24 小时、`yAxis` 是 7 天，所以写进 `ScatterDataItem` 时必须换成 `doubleRow(hour, day, count)`。
 照抄上游顺序时 `symbolSize` 读的仍是第三列、图例也正常，e2e 照样通过，只有截图能看出 168 个气泡全堆在
 同一列（`animationDelay` 还是按 `index * 5` 排，看不出异常）。
 
-`scatter-stream-visual` 在 `examples/ScatterStreamVisual.kt`：`loadJson("data/house-price-area2.json")`
+`scatter-stream-visual` 在 `examples/scatter/ScatterStreamVisualSupport.kt`：`loadJson("data/house-price-area2.json")`
 后把两列直接写进 `ScatterDataItem`（`[面积, 价格]`），`visualMap.dimension = 1` 映射的是价格那列，
 `inRange.color` 要写成 `StringOrStringArray`，不能塞 `ZRColor` 数组；tooltip 与其余样式都照上游的默认值，
 不用自造 formatter。
 
-`scatter-nebula` 在 `examples/ScatterNebula.kt`：一百万点来自 `data/fake-nebula.bin`（8 MB 的 32 位浮点表），
+`scatter-nebula` 在 `examples/scatter/ScatterNebulaSupport.kt`：一百万点来自 `data/fake-nebula.bin`（8 MB 的 32 位浮点表），
 `loadFloat32` 读成 `Float32Array` 后直接赋给 `typedFlatData` —— 上游 `data?: ... | ArrayLike<number>` 的扁平
 分支，必须同时给 `dimensions: ['x', 'y']`，ECharts 才按行读；换成一个一个的 `ScatterDataItem` 会白造一百万个
 对象。标题里的点数用 `ECharts.format.addCommas`，四个 `dataZoom`（内外 × 横纵）与 `largeThreshold` 照抄。
 
-`scatter-symbol-morph` 与 `scatter-aggregate-bar` 收在 `examples/ScatterTransition.kt`：
+`scatter-symbol-morph` 与 `scatter-aggregate-bar` 收在 `examples/scatter/ScatterTransitionSupport.kt`：
 
 - 两页都靠 `universalTransition` 做形变：morph 页在 10 个符号间循环，每帧只换一次 `series`（`symbol` +
   `symbolSize`）并靠 `BooleanOrUniversalTransitionOption(true)` 让 ECharts 自己配对同 `dataGroupId` 的点；
@@ -286,88 +312,88 @@ option 上的野字段，改成在例子侧用 `ArrayDeque` 记下钻路径。
 `extra`），而 wrapper 的 `LabelFormatterCallback` 只建模了第一个参数。写法是给回调套一层
 JS 适配：Kotlin 侧写成 `(value: JsAny, extra: JsAny?) -> String`，再用
 `js("(fn) => (value, index, extra) => fn(value, extra)")` 拓宽成三参（见
-`examples/IntradayBreaks.kt` 的 `axisLabel(::fn)`）。时间格式化走
+`examples/shared/IntradayBreaksSupport.kt` 的 `axisLabel(::fn)`）。时间格式化走
 `ECharts.time.format(value, template, true)`，第三个参数是 UTC。
 
 ## 家族长尾的分布
 
-line 家族的数据生成长尾在 `examples/LineLongTail.kt`：两万点的 `area-time-axis`、按 easing 函数逐个
+line 家族的数据生成长尾在 `examples/line/LineLongTailSupport.kt`：两万点的 `area-time-axis`、按 easing 函数逐个
 建 grid 的 `line-easing`、每秒滚动窗口的 `dynamic-data2`、名次随机但种子固定的 `bump-chart`、用
 `graphic` 浮层画横幅与说明框的 `line-graphic`，以及 piecewise visualMap 涂面积、双 x 轴、
 双 continuous visualMap、渐变堆叠面积图这几条 option 组合。随机序列同样换成 `Lcg`。
 
-bar 家族的计算长尾在 `examples/BarLongTail.kt`：归一化堆叠（`bar-stack-normalization`）和它的
+bar 家族的计算长尾在 `examples/bar/BarLongTailSupport.kt`：归一化堆叠（`bar-stack-normalization`）和它的
 `graphic` 多边形变体（`-and-variation`，因为要用图表实际宽高摆多边形，走 `Category.interactive`）、
 只有真正封住栈顶的柱子才带圆角的 `bar-stack-borderRadius`、透明占位柱顶起的 `bar-waterfall2`，
 以及带 `markPoint` / `markLine` 的 `bar1`。上游根 option 上的 `calculable: true` 是 ECharts 6
 已经不读的老字段，wrapper 里也没有对应声明，移植时直接去掉。
-`mix-zoom-on-value`（`examples/BarExtra.kt`）与文档页 `bar-dataZoom-filterMode` 是同一张预算图的两个
+`mix-zoom-on-value`（`examples/bar/BarExtraSupport.kt`）与文档页 `bar-dataZoom-filterMode` 是同一张预算图的两个
 变体：多出 axis 型 tooltip、`magicType` 的 line/bar 切换与纵向滑杆，三者都靠 dataZoom 完成；上游根级
 `calculable: true` 是 ECharts 6 已不读的老字段，去掉。
 
-`bar-race-country`（`examples/BarRaceCountry.kt`）是 bar 家族的年度轮播：19 国人均收入每 2 秒换一年，
+`bar-race-country`（`examples/bar/BarRaceCountrySupport.kt`）是 bar 家族的年度轮播：19 国人均收入每 2 秒换一年，
 `realtimeSort` 重排 y 轴，国家名后面用 `rich.flag` 拼 emoji 国旗，柱色取该国旗主色的固定表。国旗数据是
 npm 包 `emoji-flags@1.3.0` 的 `data.json`，上游走 CDN，这里入库成 `data/emoji-flags.json`（见 `SOURCE.md`
 里唯一的非 Apache 素材例外）。两个坑：上游遍历年份时把表头行也算作一个「年」，所以 `startIndex = 10`
 落在 1890，先 `slice(1)` 会让整场比赛提前十年；Windows 浏览器不带国旗字形，emoji 会显示成两个大写字母，
 这是平台限制，不是移植错误。
 
-`line-race`（`examples/LineExtra.kt`）复用 `DatasetExtra.kt` 的 `filteredSince1950`：八个国家各一个
+`line-race`（`examples/line/LineExtraSupport.kt`）复用 `DatasetExtra.kt` 的 `filteredSince1950`：八个国家各一个
 filter 数据集，线尾的 `endLabel` 用 `params.value[3] + ': ' + params.value[0]` 拼「国家: 年份」，重叠
-靠 `labelLayout.moveOverlap: 'shiftY'` 挪开。`candlestick-touch`（`examples/Candlestick.kt`）不需要
+靠 `labelLayout.moveOverlap: 'shiftY'` 挪开。`candlestick-touch`（`examples/candlestick/CandlestickSupport.kt`）不需要
 指针逻辑：tooltip 的 `triggerOn: 'none'` 与坐标轴 handle 都在 option 里，横轴指示器用
 `axisPointer.link` 联动上下两个网格。
 
-`graph-grid`（笛卡尔坐标系上的 graph）补在 `examples/GraphExtra.kt`，同文件还有 `graph-force-dynamic`：
+`graph-grid`（笛卡尔坐标系上的 graph）补在 `examples/graph/GraphExtraSupport.kt`，同文件还有 `graph-force-dynamic`：
 节点与边靠 `ChartHolder.setInterval` 每 200ms 长出来，随机源换成种子固定的 `Lcg`，节点 id 从 `"2"`
 开始（上游就是这么漏掉 `"0"` / `"1"` 的，照抄）。
 
-graph 家族里读数据文件的 6 页在 `examples/GraphData.kt`：`les-miserables.json` 的四次渲染
+graph 家族里读数据文件的 6 页在 `examples/graph/GraphDataSupport.kt`：`les-miserables.json` 的四次渲染
 （`graph`、`graph-circular-layout`、`graph-force`、`graph-label-overlap`），以及
 `npmdepgraph.min10.json` / `webkit-dep.json` 两张依赖图。上游在 `forEach` 里改节点字段的写法
 （`label.show = symbolSize > 30`、`symbolSize = 5`、`id = idx`）改成数据项构造时的参数；
 `graph-npm` 与 `graph-webkit-dep` 的 `thumbnail` 没有移植（站点没有该组件），`roamTrigger` 用
 `RoamTriggers.global` 照抄。
 
-`graphic` 家族的关键帧动画三页在 `examples/GraphicAnimations.kt`：描边文字（`graphic-stroke-animation`）、
+`graphic` 家族的关键帧动画三页在 `examples/graphic/GraphicAnimationsSupport.kt`：描边文字（`graphic-stroke-animation`）、
 七条加载柱（`graphic-loading`）和噪点驱动的圆点波浪（`graphic-wave-animation`，要读 `chart.getWidth()`
 所以走 `Category.interactive`）。三页都不设定时器，动画交给元素的 `keyframeAnimation`；波浪页上游的
 `app.config` 面板只做「改参数再 `setOption`」，参数固定成上游默认值（含 `offsetY: 100`）后面板没有存在
 意义，直接去掉。上游的 `Math.random()` 噪声种子换成 `0.42`，否则每页每次刷新都是另一张画布，e2e 的
-帧比对就无从下手。noisejs 的那段 perlin 实现移植成 `examples/PerlinNoise.kt`，波浪动画与两张大数据
+帧比对就无从下手。noisejs 的那段 perlin 实现移植成 `examples/shared/PerlinNoise.kt`，波浪动画与两张大数据
 热力图共用它。
 
-大数据热力图在 `examples/HeatmapLongTail.kt`：`heatmap-large`（continuous visualMap）和
+大数据热力图在 `examples/heatmap/HeatmapLongTailSupport.kt`：`heatmap-large`（continuous visualMap）和
 `heatmap-large-piecewise`（piecewise + `splitNumber: 8`）共用一份 201×101 的噪点场，靠
 `progressive: 1000` 与 `animation: false` 撑住两万格。上游的 y 轴只列 `0..99` 却采样到 `j = 100`，
 最后一行没有类目、永远不显示，这一点照原样保留并在文件头注明。
 
-`cycle-plot`（周期图）在 `examples/CustomLongTail.kt`：x 轴是月份，每年在自己的类目带里画一条折线，
+`cycle-plot`（周期图）在 `examples/custom/CustomLongTailSupport.kt`：x 轴是月份，每年在自己的类目带里画一条折线，
 `renderItem` 用 `api.size([0, 0])[0]` 取带宽再按 `(year - rawData.length / 2)` 平移，均值系列画带中央的
 横线。上游 `rawData.length / 2` 是 `5.5`，Kotlin 侧要写成 `/ 2.0`，整数除法会把偏移算成 `5`。
 
-`pie-parliament-transition` 在 `examples/CustomTransition.kt`：饼图与自定义系列共用 series id
+`pie-parliament-transition` 在 `examples/custom/CustomTransitionSupport.kt`：饼图与自定义系列共用 series id
 `distribution`，`universalTransition` 把扇形拆成议会席位圆点，`ChartHolder.setInterval` 每两秒换一次
 option。`renderItem` 的排座算法（环半径、按座位宽度对齐的起点）照抄上游；上游那句
 `coordinateSystem: undefined` 是没有作用的死字段，移植时直接不写。
 
-`calendar-effectscatter` 追加在 `examples/Calendar.kt`：上下两张半年历，散点用 `Lcg` 造 365 天的
+`calendar-effectscatter` 追加在 `examples/calendar/CalendarSupport.kt`：上下两张半年历，散点用 `Lcg` 造 365 天的
 成交额，Top 12 再叠一层 `effectScatter` 涟漪。日历的 `splitLine.lineStyle.color` 在 wrapper 里叫
 `typedColor`（`ZRColorOrArray`，`@JsName("color")`），`type` 用 `ZRLineType`；标题与图例的
 `textStyle` 是 `LabelOption`，它的 `color` 是 `String` 而不是 `ZRColor`，写 `ZRColor("#fff")` 编译不过。
 
-`calendar-lunar` 同样在 `examples/Calendar.kt`：365 行农历表是从上游 `dateList` 字面量摊出来的
+`calendar-lunar` 同样在 `examples/calendar/CalendarSupport.kt`：365 行农历表是从上游 `dateList` 字面量摊出来的
 `data/calendar-lunar.json`，行内第三列「节气」可有可无。两个 `scatter` 只负责上标签（`symbolSize` 为 0）：
 第一行是「日期 + 农历日」，第二行是节气（上游写 `value[3] || ''`，Kotlin 侧用 `js()` 取，`textAt` 会把
 `undefined` 拼成字符串）；热力图那层才是降雨量，`visualMap.seriesIndex = [2]` 指向它。
 
-三个 `doc-example/geo-svg-*` 页面在 `examples/DocExamples.kt`：SVG 直接内联成常量，`chart(...)` 的 option
+三个 `doc-example/geo-svg-*` 页面在 `examples/doc/DocExamplesSupport.kt`：SVG 直接内联成常量，`chart(...)` 的 option
 lambda 里先 `ECharts.registerMap(name, MapInput(SVGMapInput))` 再返回 option（lambda 每挂载一次跑一次，重进
 页面会重新注册）。`geo-svg-label-basic` 的区域标签只在 hover 时出现（文档原话「将鼠标 hover 到元素上能显示
 标签」），所以截图里没有标签是对的；`geo-svg-layout-basic` 的说明文字由 `graphic` 的 `rect` + `textContent`
 画，`ZRStyleProps` 还没声明 `rich`，本地补了一个子接口。
 
-地图家族的 `examples/GeoMaps.kt` 五页共用 `registerGeojsonMap` / `mapData` 两个小工具，地图文件由
+地图家族的 `examples/geo/GeoMapsSupport.kt` 五页共用 `registerGeojsonMap` / `mapData` 两个小工具，地图文件由
 `loadJson` / `loadText` 读入后在 `Category.interactive` 的 setup 里注册（`chart.showLoading(null)` 挡住
 首帧空白）：
 
@@ -385,7 +411,7 @@ lambda 里先 `ECharts.registerMap(name, MapInput(SVGMapInput))` 再返回 optio
   `center` 只覆盖数组分支，标量分支是 `typedCenter`（`@JsName("center")`，与 `center` 同一属性）。
   传 `arrayOf("Vestfirðir")` 会被当成 `x = "Vestfirðir"`，饼会静默消失。
 
-文档示例里的五个地图页在 `examples/DocMaps.kt`，它们复用 `GeoMaps.kt` 的 `registerGeojsonMap` /
+文档示例里的五个地图页在 `examples/doc/DocMapsSupport.kt`，它们复用 `GeoMaps.kt` 的 `registerGeojsonMap` /
 `mapData` / `HK_DENSITY` / `hkNameMap` / `usaSpecialAreas`（因此这些是 `internal`）与 `GlGeo.kt` 的
 `registerWorldMap` / `regionName` / `WorldPopulationItem`。两个坑：
 
@@ -394,7 +420,7 @@ lambda 里先 `ECharts.registerMap(name, MapInput(SVGMapInput))` 再返回 optio
 - 数据与区域**按名字精确匹配**，ECharts 不会去掉「市」「自治区」后缀。`china.json` 的地名是官方全称，
   上游示例写的是简称，所以 `chinaRegionNames` 显式翻译；`world.json` 同理，用 `GlGeo.kt` 的 `regionName`。
 
-空气质量五页在 `examples/ChinaAqi.kt`（`scatter-map` / `effectScatter-map` / `heatmap-map` /
+空气质量五页在 `examples/shared/ChinaAqiSupport.kt`（`scatter-map` / `effectScatter-map` / `heatmap-map` /
 `geo-map-scatter` / `doc-example/scatter-visualMap-piecewise`）：前四页上游各抄了一遍 190 城坐标表与
 pm2.5 列，逐行比对完全一致，所以抽成 `data/geo-coord-map.json` + `data/pm25-cities.json` 共用，Kotlin 侧
 只留 `convertData`（按城市名取坐标，拼成 `[lng, lat, value]`）。三点要注意：
@@ -407,7 +433,7 @@ pm2.5 列，逐行比对完全一致，所以抽成 `data/geo-coord-map.json` + 
   `geo.label.show = true` 的页面（`geo-map-scatter`）都要在 `regions` 里把 `境界线` 的 label 关掉，
   否则地图上会多出「境界线」几个字。
 
-`geo-lines`（模拟迁徙）在 `examples/GeoLines.kt`：三组航线各画三遍（拖尾 `lines`、带箭头与飞机符号的
+`geo-lines`（模拟迁徙）在 `examples/geo/GeoLinesSupport.kt`：三组航线各画三遍（拖尾 `lines`、带箭头与飞机符号的
 `lines`、目的地的涟漪散点），共 9 个系列。三点要注意：
 
 - 它内联的 114 城坐标表抽成 `data/geo-lines-coord-map.json`，与空气质量的 190 城表**不能合并**：
@@ -417,7 +443,7 @@ pm2.5 列，逐行比对完全一致，所以抽成 `data/geo-coord-map.json` + 
 - 飞机 `path://` 字形与 `geo-map-scatter` 的是同一个字符串，上游两个文件都叫 `planePath`，这里合成
   `PLANE_SYMBOL_PATH` 一处声明。注意别和 `PictorialBarPaths.kt` 的 `PLANE_PATH` 搞混，那是侧视剪影。
 
-微博签到两页在 `examples/WeiboCheckin.kt`（`scatter-weibo` / `scattergl-weibo`），共用
+微博签到两页在 `examples/shared/WeiboCheckinSupport.kt`（`scatter-weibo` / `scattergl-weibo`），共用
 `data/weibo.json`：三个图例系列各是一个扁平的**增量编码**数组，头两个数是首点经纬度乘 1000，之后每两个
 数是相对上一点的偏移。上游把它直接交给 `geo` 坐标系，这里解码成 `[lng, lat, 1]` 的连续行、写进
 `typedFlatData` + `dimensions`，11.8 万点因此只分配一块 `Float64Array`，不再逐点建数组。三点要注意：
@@ -429,13 +455,13 @@ pm2.5 列，逐行比对完全一致，所以抽成 `data/geo-coord-map.json` + 
   `src/chart/common/PointsBuilder.js` 生成精灵图时把 `shadowColor` 强制写成 `transparent`，只读
   `lineWidth`，这两个键在 2D GL 散点上本来就不生效。
 
-dataset 家族的 `dataset-link` 补在 `examples/DatasetExtra.kt`：它监听 `updateAxisPointer` 把饼图的
+dataset 家族的 `dataset-link` 补在 `examples/dataset/DatasetExtraSupport.kt`：它监听 `updateAxisPointer` 把饼图的
 `encode.value` 换成指针所在的年份，上游该事件的 payload 类型是 `any`，所以 `axesInfo[0].value` 只能在
 demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首帧之后挂上，这里直接 `chart.on(...)`。
 合并选项里上游写的是 `series: {id: 'pie', ...}` 对象形式，wrapper 的 `series` 只有数组形式，而 ECharts
 本来就按 `id` 合并，两者行为一致。
 
-`matrix-periodic-table` 在 `examples/MatrixLongTail.kt`：`custom` 系列的 `renderItem` 用 `api.layout(...)`
+`matrix-periodic-table` 在 `examples/matrix/MatrixLongTailSupport.kt`：`custom` 系列的 `renderItem` 用 `api.layout(...)`
 把 19×10 的矩阵格子铺成矩形，`api.value(2)` 对占位行返回 NaN，正好用来区分「真有元素」与 `La~Yb`
 这样的整段占位格；块说明文字是 `graphic` 元素，位置要靠 `convertToPixel` 在第一帧之后才量得出来，
 所以页面走 `Category.interactive`，用 `holder.setTimeout(..., 0)` 补第二张 option。上游把矩阵固定成
@@ -443,18 +469,18 @@ demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首�
 `s-block` 一类的标注会略微互相压住，官方缩略图同样存在这个裁剪，属可接受偏差。上游 `label.textStyle`
 在 ECharts 6 里不被读取（label 只回退到全局 `textStyle`），没有移植。
 
-`bar-brush` 追加在 `examples/BarExtra.kt`：`brushSelected` 的 payload 上游声明成 `any`，示例侧用本地
+`bar-brush` 追加在 `examples/bar/BarExtraSupport.kt`：`brushSelected` 的 payload 上游声明成 `any`，示例侧用本地
 `external interface`（`batch[].selected[].dataIndex`）强转后再拼标题。`bar-breaks-brush` 要 zr 级的
 `mousedown` / `mousemove` 加 document 级 `mouseup` 才能改变断轴区间，属真实鼠标序列，按排除策略不做。
 
-`matrix-mbti` 追加在 `examples/MatrixLongTail.kt`（数据表与配色在 `examples/MbtiData.kt`）：16×16 矩阵
+`matrix-mbti` 追加在 `examples/matrix/MatrixLongTailSupport.kt`（数据表与配色在 `examples/matrix/MbtiData.kt`）：16×16 矩阵
 每格承载一对类型，`itemStyle.decal` 用两种符号交替、两色分左右，靠 `aria.decal.show = true` 让 decal
 跟着无障碍开关走；表头是两层 `levels`（`levelSize` 25 / 30）的组头，标签走 `rich` 拆上下两行。页面
 `interactive` 里监听 `click`，把 `series` 换成四组的中位数汇总后再 `setOption(option, true)` 整体替换。
 上游读 `window.innerWidth` / `innerHeight` 决定字号与矩阵边长，这里改成按 `chart.getWidth()` /
 `getHeight()` 推，容器尺寸变化不会让页面跟着视口走。
 
-`matrix-stock` 在 `examples/MatrixStock.kt`：一个交易日的看板铺在 5×6 矩阵上——价格占 4 行，MACD 与
+`matrix-stock` 在 `examples/matrix/MatrixStockSupport.kt`：一个交易日的看板铺在 5×6 矩阵上——价格占 4 行，MACD 与
 成交量各占一行，右列是买卖十档与深度图。5 个 grid、4 个标题都用 `coordinateSystem: 'matrix'` + `coord`
 钉进格子，跨格用 `matrix.body.data[].mergeCells` 合并；午休时段由时间轴的 `breaks` 折掉。逐分钟的价格
 与成交量上游用 `Math.random()` 造，这里换成 `Lcg(20251016)`，深度图另用 `Lcg(20251017)`；
@@ -463,14 +489,14 @@ demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首�
 踩到了）。格线是 6 个 `graphic` line（水平 3 + 垂直 3），位置取 `chart.getWidth()`，所以页面走
 `interactive`；成交量与 MACD 的时间轴柱走 `BarDataItemOption.typedValue` 传 `[time, value]`。
 
-`matrix-grid-layout` 在 `examples/MatrixGridLayout.kt`：五个板块（标题、页眉、侧栏、主区、页脚）各占一组
+`matrix-grid-layout` 在 `examples/matrix/MatrixGridLayoutSupport.kt`：五个板块（标题、页眉、侧栏、主区、页脚）各占一组
 `grid` + `title`，用 `coordinateSystem: 'matrix'` + `coord`（`section_xxx_1` 这类 id）钉进格子。响应式靠
 `media`：基座 `matrix.x` / `matrix.y` 都**不写 `data`**，两个 media 分支用 `MatrixDimensionOption.length`
 给出列数 / 行数，再按 section id 打 `coord` 补丁——`length` 只在没有 `data` 时生效，写了 `data` 就被忽略，
 正好对应上游 `MatrixDim` 里「按 length 填 null 格」的行为。上游页面右上角的矩阵网格开关是自绘控制面板、
 不是图表 API，没有移植。
 
-`matrix-mini-bar-geo` 追加在 `examples/MatrixExtra.kt`：10 个瑞士州 × 2 年（2020 / 2021）的小条形图，
+`matrix-mini-bar-geo` 追加在 `examples/matrix/MatrixExtraSupport.kt`：10 个瑞士州 × 2 年（2020 / 2021）的小条形图，
 最后一列每行放一张 `ch.geo.json` 的小地图。关键是 `geo` 也能当矩阵格子用——`GeoOption` 混入了
 `ComponentOption`（带通用的 `coordinateSystem` / `coordinateSystemUsage` / `coord`）、
 `ComponentOnMatrixOptionMixin`、`BoxLayoutOptionMixin` 与 `AnimationOptionMixin`，所以每行
@@ -479,22 +505,22 @@ demo 侧用 `js()` 取；上游还用一个 `setTimeout` 保证监听器在首�
 `regions[].selected = true` + `select.itemStyle` 把本行对应的州涂成深蓝，`selectedMode = false` 关掉点选。
 条形用 `barGap: '40%'` / `barWidth: '40%'` 让两年的柱子贴在一起，`encode.label = 0` 把数值标在柱子内侧。
 
-`data-transform-filter` 追加在 `examples/DatasetExtra.kt`：三份 dataset，`dataset_raw` 是
+`data-transform-filter` 追加在 `examples/dataset/DatasetExtraSupport.kt`：三份 dataset，`dataset_raw` 是
 `life-expectancy-table.json`，另两份用内置 `filter` transform 从它派生（`and` 条件：`Year >= 1950`
 且 `Country` 等于某个国家）。`config` 里的字段名 `=` 在 Kotlin 侧要写成 `@JsName("=")`。
 
-`line-tooltip-touch` 追加在 `examples/LineExtra.kt`：移动端触摸提示，`tooltip.triggerOn = 'none'`、
+`line-tooltip-touch` 追加在 `examples/line/LineExtraSupport.kt`：移动端触摸提示，`tooltip.triggerOn = 'none'`、
 `position` 回调把提示框钉在 `y = 130`，`axisPointer.label.formatter` 用 `formatTime` 取日期，
 `dataZoom.inside.throttle = 50` 让拖动时提示框跟手。两天的序列由 `Lcg` 生成，先随机取起始值再随机游走，
 落到非正数时重抽。
 
-`custom-calendar-icon` 与 `flame-graph` 在 `examples/CustomMore.kt`：前者把四段内联 SVG path 按随机
+`custom-calendar-icon` 与 `flame-graph` 在 `examples/custom/CustomMoreSupport.kt`：前者把四段内联 SVG path 按随机
 icon 数摆进日历格子，`renderItem` 用 `api.font()` 取字号、`linearMap` 把 ±0.25 的偏移换算成像素；
 后者读 `resources/data/stack-trace.json`（`SOURCE.md` 里有登记），把堆栈按深度铺成矩形火焰图，
 点击某帧时深拷贝后只保留该帧以下的子树再 `setOption`。两者的 `textContent.style` 用到 zrender 的文本
 偏移字段 `x` / `y`，这次一并补进 `ZRStyleProps`。
 
-`wind-barb` 在 `examples/WindBarb.kt`，是最大的一页自定义系列：四层系列（风速面积线、`renderItem` 画的
+`wind-barb` 在 `examples/custom/WindBarbSupport.kt`，是最大的一页自定义系列：四层系列（风速面积线、`renderItem` 画的
 风向箭头、海波高度虚线、`renderItem` 画的天气图标行）叠在同一张 time 轴上。
 
 - 上游把读数的时间字段直接当字符串塞进数据项，再用 `+ 86400000` 加一天；Kotlin 侧先
@@ -524,7 +550,7 @@ icon 数摆进日历格子，`renderItem` 用 `api.font()` 取字号、`linearMa
 是 plotly 导出的**字符串**（照上游的一元 `+` 用 `Number(...)` 转换），`itemStyle.color` 是按 `dataIndex`
 取色的回调（wrapper 的 `ZRColor(callback)` 就是为它加的）。`sankey-itemstyle` 的数据整份内联在上游
 源码里（99 个节点各带一种颜色 + 109 条边），已按 `arrayOf("Werne" to "#f18bbf", …)` /
-`Triple(source, target, value)` 两张表写进 `examples/Sankey.kt`。
+`Triple(source, target, value)` 两张表写进 `examples/sankey/SankeySupport.kt`。
 
 `scatter-large` 的两条 50 万点序列用 `Lcg` 生成、`dynamic-data` 的两条滚动序列同样换成 `Lcg`，
 定时器交给 `ChartHolder`，所以两页每次刷新都是同一张（能稳定断言）的动画。
@@ -534,7 +560,7 @@ icon 数摆进日历格子，`renderItem` 用 `api.font()` 取字号、`linearMa
 包成颜色。富文本里只有图片没有文字的 tag（`{Sunny|}`）没有固有宽度，**必须给这个 tag 显式 `width`**，
 否则 pattern 被画进零宽盒子、看起来像图标丢了。
 
-candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candlestick-sh`（上证指数 2013 年
+candlestick 家族的两张长表在 `examples/candlestick/CandlestickLongTailSupport.kt`：`candlestick-sh`（上证指数 2013 年
 上半年，88 行）与 `candlestick-sh-2015`（2015 全年，246 行）。表由一次性脚本转成 `OhlcDay` 数组，
 `calculateMA` 的等价实现按 `window` 内收盘价求和，前 `window - 1` 个点写 `OptionDataValue("-")`，
 均线才从窗口满格处开始画。2015 的上游表本身是「最后一天在前」再 `reverse()` 的，反过来的表格开头
@@ -661,9 +687,9 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
 
 ## 3D 示例（echarts-gl）
 
-3D 家族在 `examples/Gl.kt`、`examples/GlScatter.kt`、`examples/GlSurfaceMaterial.kt`、
-`examples/GlGeo.kt`、`examples/GlLines.kt`、`examples/GlBarGeo.kt`、`examples/GlImageBars.kt`、
-`examples/GlGraph.kt`、`examples/GlMap.kt` 与 `examples/GlBigData.kt`，用的是 `ktjs-echarts-gl` 模块，
+3D 家族在 `examples/gl/GlSupport.kt`、`examples/gl/GlScatterSupport.kt`、`examples/gl/GlSurfaceMaterialSupport.kt`、
+`examples/gl/GlGeoSupport.kt`、`examples/gl/GlLinesSupport.kt`、`examples/gl/GlBarGeoSupport.kt`、`examples/gl/GlImageBarsSupport.kt`、
+`examples/gl/GlGraphSupport.kt`、`examples/gl/GlMapSupport.kt` 与 `examples/gl/GlBigDataSupport.kt`，用的是 `ktjs-echarts-gl` 模块，
 写法与其它家族一样走
 `Category.chart`；要先取数据文件的（`bar3d-dataset`、三页 `scatter3D`、两页图谱与四页 `map3D`）走
 `Category.interactive` + `loadJson`，要等图片加载的（`surface-leather`、`bar3d-myth` 一类）走
@@ -688,7 +714,7 @@ candlestick 家族的两张长表在 `examples/CandlestickLongTail.kt`：`candle
 - **曲面用函数而不是数组**：`simple-surface` / `surface-wave` / `sphere-parametric-surface` 只给
   `equation` / `parametricEquation`，由 `SurfaceFunction { x, y -> ... }` 采样。原例在原点附近返回 `'-'`
   挖洞，Kotlin 侧用 `Double.NaN`：`SurfaceView` 只要有一个顶点不是数就整片四边形不画。
-- **数据能复用就复用**：`bar3d-punch-card` 与 `transparent-bar3d` 的打卡表就是 `examples/CustomExtra.kt`
+- **数据能复用就复用**：`bar3d-punch-card` 与 `transparent-bar3d` 的打卡表就是 `examples/custom/CustomExtraSupport.kt`
   里的 `punchCardValues` / `punchCardHours` / `punchCardDays`，只是把前两个坐标换成 `[hour, day, value]`；
   `bar3d-dataset` 直接用 `dataset` 的列名当三个坐标轴（`encode.z` 走 `Life Expectancy`）。
   `resources/data/life-expectancy-table.json` 同时喂给 `bar3d-dataset`、`scatter3d-scatter` 和

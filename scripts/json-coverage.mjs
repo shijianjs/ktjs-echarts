@@ -119,13 +119,23 @@ function fail(message) {
     process.exit(1)
 }
 
+/** Every `.kt` file below [dir], recursively: examples live in one directory per family. */
+function kotlinFiles(dir) {
+    const out = []
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name)
+        if (entry.isDirectory()) out.push(...kotlinFiles(full))
+        else if (entry.name.endsWith('.kt')) out.push(full)
+    }
+    return out
+}
+
 /** demo 里 `chart(...)` 与 `interactive(...)` 的声明。 */
 function demoIds() {
     const chart = new Set()
     const interactive = new Set()
-    for (const name of fs.readdirSync(demoExamples)) {
-        if (!name.endsWith('.kt')) continue
-        const source = fs.readFileSync(path.join(demoExamples, name), 'utf8')
+    for (const file of kotlinFiles(demoExamples)) {
+        const source = fs.readFileSync(file, 'utf8')
         for (const match of source.matchAll(/\.(chart|interactive)\(\s*"([^"]+)"/g)) {
             ;(match[1] === 'chart' ? chart : interactive).add(match[2])
         }
@@ -136,9 +146,8 @@ function demoIds() {
 /** `JsonCategory(...).example("id")` 的声明。 */
 function jsonIds() {
     const ids = new Set()
-    for (const name of fs.readdirSync(jsonExamples)) {
-        if (!name.endsWith('.kt')) continue
-        const source = fs.readFileSync(path.join(jsonExamples, name), 'utf8')
+    for (const file of kotlinFiles(jsonExamples)) {
+        const source = fs.readFileSync(file, 'utf8')
         for (const match of source.matchAll(/\.example\(\s*"([^"]+)"/g)) ids.add(match[1])
     }
     return ids

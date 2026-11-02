@@ -1,0 +1,41 @@
+package demo.examples.line
+
+import demo.CatalogEntry
+
+val lineEntries: List<CatalogEntry> =
+    listOf(
+        confidenceBandEntry,
+        lineSimpleEntry,
+        lineSmoothEntry,
+        areaBasicEntry,
+        lineStackEntry,
+        areaStackEntry,
+        lineStepEntry,
+        lineStyleEntry,
+        lineLogEntry,
+        lineYCategoryEntry,
+        lineInCartesianCoordinateSystemEntry,
+        gridMultipleEntry,
+        areaRainfallEntry,
+        linePolarEntry,
+        linePolar2Entry,
+        lineFunctionEntry,
+        lineAqiEntry,
+        lineTooltipTouchEntry,
+        lineMarklineEntry,
+        lineSectionsEntry,
+        lineMarkerEntry,
+        lineRaceEntry,
+        areaStackGradientEntry,
+        areaPiecesEntry,
+        areaTimeAxisEntry,
+        lineGradientEntry,
+        multipleXAxisEntry,
+        dynamicData2Entry,
+        lineEasingEntry,
+        bumpChartEntry,
+        lineGraphicEntry,
+        intradayBreaks1Entry,
+        intradayBreaks2Entry,
+        areaSimpleEntry,
+    )

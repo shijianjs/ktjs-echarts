@@ -11,7 +11,7 @@
   `items(...)`；`numbers` 收 `DoubleArray`，自己造数组写 `DoubleArray { }`。`Array<T?>`（helper 的返回）
   不能直接赋给需要非空元素的字段。
 - **数据项的联合类型**：`name` 是 `string | number`、`value` 是 `string | number | Date`，用
-  `OptionId` / `OptionDataValue` 包装（构造器在 `examples/Items.kt`）。
+  `OptionId` / `OptionDataValue` 包装（构造器在 `examples/shared/Items.kt`）。
 - **plotly 导出的 JSON**：看着像数字的列可能是字符串，用 `Number(...)` 转换，不要直接 `as Double`。
 - **富文本里只有图片的 tag**：`{Sunny|}` 这类没有文字的 tag 没有固有宽度，必须给显式 `width`，否则
   pattern 被画进零宽盒子，看起来像图标丢了。

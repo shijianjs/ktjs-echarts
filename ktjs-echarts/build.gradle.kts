@@ -33,7 +33,7 @@ kotlin {
 
             // The public API exposes `web.html.HTMLElement` for the chart container. kotlin-browser
             // types must not be mixed with Kotlin/JS's own org.w3c.dom.* / kotlinx.browser.*.
-            api("org.jetbrains.kotlin-wrappers:kotlin-browser:2026.10.4")
+            api("org.jetbrains.kotlin-wrappers:kotlin-browser:2026.11.0")
         }
         jsTest.dependencies {
             implementation(kotlin("test"))

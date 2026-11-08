@@ -215,7 +215,7 @@ external interface GraphSeriesOption :
     /**
      * Typed view of [SeriesOption.data] with the item type of a graph series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<GraphDataItem?>?
@@ -386,7 +386,7 @@ external interface ChordSeriesOption :
     /**
      * Typed view of [SeriesOption.data] with the item type of a chord diagram.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<ChordDataItem?>?
@@ -564,7 +564,7 @@ external interface SankeySeriesOption :
     /**
      * Typed view of [SeriesOption.data] with the item type of a sankey diagram.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<SankeyNodeItemOption?>?

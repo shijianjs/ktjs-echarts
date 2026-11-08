@@ -1041,7 +1041,7 @@ external interface BaseAxisBreakPayload : Payload {
      * Index of the x axis, including `"all"` and index arrays.
      *
      * `@JsName("xAxisIndex")`: same JavaScript property as [Payload.xAxisIndex], see
-     * `TYPE-MAPPING.md` §12.
+     * `ktjs-type-mapping` skill §12.
      */
     @JsName("xAxisIndex")
     var typedXAxisIndex: ModelFinderIndexQuery?

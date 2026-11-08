@@ -1,8 +1,9 @@
 # ktjs-echarts 模块说明
 
 `echarts` 6.1.0 的 Kotlin/JS wrapper。通用约定（类型映射、测试覆盖、版本与发布）在仓库根
-[AGENTS.md](../AGENTS.md) 与 [TYPE-MAPPING.md](../TYPE-MAPPING.md)，这里只记本模块特有的建模取舍和
-上游行为。
+[AGENTS.md](../AGENTS.md) 与类型映射技能
+[`.agents/skills/ktjs-type-mapping/`](../.agents/skills/ktjs-type-mapping/SKILL.md)，这里只记本模块特有的
+建模取舍和上游行为。
 
 ## 已确认的建模取舍（不要重复修）
 
@@ -17,7 +18,7 @@
   具名类型或更宽类型，理由见各接口 KDoc。
 - series 级 `itemStyle` / `label` 上游的 `Omit<...> & { ... }` 收窄不另加 `typedItemStyle`：精确类型本身
   是基类型的子接口，调用方 `unsafeJso<精确类型> { }` 即可写，读回来按需 `unsafeCast`。
-- `coordinateSystem` 等关键字收窄、继承来的 `var` 收窄沿用 `@JsName` 同名字段（TYPE-MAPPING §12）。
+- `coordinateSystem` 等关键字收窄、继承来的 `var` 收窄沿用 `@JsName` 同名字段（`ktjs-type-mapping` 技能 §12）。
 
 ## 同一 `data` 属性的类型化视图
 

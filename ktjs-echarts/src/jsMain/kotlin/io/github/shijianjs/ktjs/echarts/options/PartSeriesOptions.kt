@@ -51,7 +51,7 @@ external interface PieSeriesOption :
      *
      * Upstream `CircleLayoutOptionMixin` types `center` as `(string | number)[] | string | number`;
      * [center] covers the array form, this property the scalar one. Both read and write the same
-     * JavaScript property, see `TYPE-MAPPING.md` §12.
+     * JavaScript property, see the `ktjs-type-mapping` skill §12.
      */
     @JsName("center")
     var typedCenter: StringOrDouble?
@@ -107,7 +107,7 @@ external interface PieSeriesOption :
     /** Style of the labels. */
     override var label: LabelOption?
 
-    /** Typed view of [label] with the pie-specific members; see `TYPE-MAPPING.md` §12. */
+    /** Typed view of [label] with the pie-specific members; see the `ktjs-type-mapping` skill §12. */
     @JsName("label")
     var typedLabel: PieLabelOption?
 
@@ -117,7 +117,7 @@ external interface PieSeriesOption :
     /**
      * Typed view of [SeriesOption.data] with the item type of a pie series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<PieDataItem?>?
@@ -162,7 +162,7 @@ external interface FunnelSeriesOption :
     /**
      * Typed view of [SeriesOption.data] with the item type of a funnel series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<FunnelDataItem?>?
@@ -237,7 +237,7 @@ external interface GaugeSeriesOption : SeriesOption, ComponentOnCalendarOptionMi
     /**
      * Typed view of [SeriesOption.data] with the item type of a gauge series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<GaugeDataItem?>?
@@ -494,7 +494,7 @@ external interface RadarSeriesOption : SeriesOption, SymbolOptionMixin, SeriesOn
     /**
      * Typed view of [SeriesOption.data] with the item type of a radar series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<RadarSeriesDataItem?>?
@@ -561,7 +561,7 @@ external interface MapSeriesOption :
     /**
      * Typed view of [SeriesOption.data] with the item type of a map series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<MapDataItem?>?
@@ -611,7 +611,7 @@ external interface ThemeRiverSeriesOption : SeriesOption, SeriesOnSingleOptionMi
     /**
      * Typed view of [SeriesOption.data] with the item type of a theme river series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<ThemeRiverDataItem?>?
@@ -694,7 +694,7 @@ external interface PictorialBarSeriesOption :
     /**
      * Typed view of [SeriesOption.data] with the item type of a pictorial bar series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<PictorialBarDataItem?>?

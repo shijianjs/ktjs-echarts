@@ -4,6 +4,9 @@
 [kotlin-wrappers](https://github.com/JetBrains/kotlin-wrappers) 官方的封装手法，以及在没有生成器 / seskar
 插件时如何写出等价效果。新增或修改 wrapper 声明前先读一遍。
 
+文中的类名（`ZRColor`、`SeriesOption`、`EChartsOption` …）取自 ktjs-echarts，只是示例；换到 iconify /
+vaadin / docusaurus 等项目时替换成本项目对应的类型名和包名，规则本身不变。
+
 核心原则：**上游 `.d.ts` 里写了类型，Kotlin 侧就必须是被编译器检查的类型。** `dynamic` 只用于「上游
 自己也只写了裸 `Function` / `any` 且实现无法推断」的情况；`JsAny` 只用于「上游写 `any` / `unknown` /
 `object` / manifest 缺类型」的成员。退化到 `dynamic` 或 `JsAny` 是最后手段，不是省事手段。
@@ -355,6 +358,8 @@ external interface LineSeriesOption : SeriesOption {
   `ZRColor | "gradient" | "source" | "target"`，而基接口 `LineStyleOption.color` 是窄的 `ZRColor`：
   建一个不透明联合（`SankeyEdgeColor` + 每支一个同名工厂），再在子接口里加 `@JsName("color") var typedColor`。
   判断标准是「子接口要表达的类型和基接口不同、又改不了基接口」，收窄加宽都一样。
+- 问题的边界：`@JsName` 同名字段解决的是「一个 `var` 字段被收窄」；「一个字段接受多种类型」属于第 3 节的
+  联合类型，两者常常一起用（`typedPayload: NumberOrCallback`）。
 
 
 ### `data?: unknown` 被各子类型收窄

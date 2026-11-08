@@ -28,8 +28,8 @@ npc:
         和 pin 的 tag 可能差几个文件，以磁盘实际内容为准。
 
         ## 项目约定
-        动手前读 AGENTS.md 和 TYPE-MAPPING.md：模块结构、上游 API 建模约定、类型映射、
-        测试覆盖要求都在里面。常用命令：`./gradlew compileKotlinJs`、
+        动手前读 AGENTS.md 和类型映射技能（.agents/skills/ktjs-type-mapping/）：模块结构、
+        上游 API 建模约定、类型映射、测试覆盖要求都在里面。常用命令：`./gradlew compileKotlinJs`、
         `./gradlew :ktjs-echarts:jsBrowserTest`、`./gradlew build`（含 Detekt）。
         不手工改 package.json 的 echarts 版本（Dependabot 管），不改 gradle wrapper。
 

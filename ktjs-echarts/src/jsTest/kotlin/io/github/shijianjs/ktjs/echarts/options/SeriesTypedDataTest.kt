@@ -24,7 +24,7 @@ import io.github.shijianjs.ktjs.zrender.ZRColor
  * Upstream narrows `data` in every concrete series, which Kotlin cannot do on an overridden `var`.
  * The wrapper therefore keeps a read-only generic view on [SeriesOption] and gives every series its
  * own `typedData` property, mapped to the same JavaScript property by `@JsName` (see
- * `TYPE-MAPPING.md` §12). These tests pin both halves of that contract.
+ * `ktjs-type-mapping` skill §12). These tests pin both halves of that contract.
  */
 class SeriesTypedDataTest {
     @Test

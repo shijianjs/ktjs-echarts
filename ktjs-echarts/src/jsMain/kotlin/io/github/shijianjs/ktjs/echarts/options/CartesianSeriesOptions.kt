@@ -259,7 +259,7 @@ external interface LineSeriesOption :
     /**
      * Typed view of [SeriesOption.data] with the item type of a line series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<LineDataItem?>?
@@ -333,7 +333,7 @@ external interface BarSeriesOption : SeriesOption, SeriesOnCartesianOptionMixin,
     /**
      * Typed view of [SeriesOption.data] with the item type of a bar series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<BarDataItem?>?
@@ -373,7 +373,7 @@ external interface ScatterSeriesOption :
     /**
      * Typed view of [SeriesOption.data] with the item type of a scatter series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<ScatterDataItem?>?
@@ -425,7 +425,7 @@ external interface EffectScatterSeriesOption :
     /**
      * Typed view of [SeriesOption.data] with the item type of an effect scatter series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<EffectScatterDataItem?>?
@@ -502,7 +502,7 @@ external interface CandlestickSeriesOption : SeriesOption, SeriesOnCartesianOpti
     /**
      * Typed view of [SeriesOption.data] with the item type of a candlestick series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<CandlestickDataItem?>?
@@ -531,7 +531,7 @@ external interface BoxplotSeriesOption : SeriesOption, SeriesOnCartesianOptionMi
     /**
      * Typed view of [SeriesOption.data] with the item type of a boxplot series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<BoxplotDataItem?>?
@@ -572,7 +572,7 @@ external interface HeatmapSeriesOption :
     /**
      * Typed view of [SeriesOption.data] with the item type of a heatmap series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<HeatmapDataItem?>?
@@ -613,7 +613,7 @@ external interface LinesSeriesOption :
     /**
      * Typed view of [SeriesOption.data] with the item type of a lines series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<LinesDataItemOption?>?
@@ -690,7 +690,7 @@ external interface ParallelSeriesOption : SeriesOption, ComponentOnCalendarOptio
     /**
      * Typed view of [SeriesOption.data] with the item type of a parallel series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<ParallelSeriesDataItem?>?

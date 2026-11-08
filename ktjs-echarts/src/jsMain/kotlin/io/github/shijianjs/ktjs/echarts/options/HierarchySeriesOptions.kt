@@ -130,7 +130,7 @@ external interface TreeSeriesOption :
     /**
      * Typed view of [SeriesOption.data] with the item type of a tree series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<TreeSeriesNodeItemOption?>?
@@ -364,7 +364,7 @@ external interface TreemapSeriesOption :
     /**
      * Typed view of [SeriesOption.data] with the item type of a treemap series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<TreemapSeriesNodeItemOption?>?
@@ -544,7 +544,7 @@ external interface SunburstSeriesOption : SeriesOption, ComponentOnCalendarOptio
     /**
      * Typed view of [SeriesOption.data] with the item type of a sunburst series.
      *
-     * Both properties read and write the same JavaScript property; see `TYPE-MAPPING.md` §12.
+     * Both properties read and write the same JavaScript property; see the `ktjs-type-mapping` skill §12.
      */
     @JsName("data")
     var typedData: Array<SunburstSeriesNodeItemOption?>?

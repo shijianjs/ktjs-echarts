@@ -16,7 +16,7 @@ import io.github.shijianjs.ktjs.zrender.ZRColor
  * read back through [SeriesOption.data]. When the upstream item narrows `value` to a type that is
  * wider than [OptionDataItemObject.value] (a row of values, or a value that may itself be an
  * array), the item exposes it as `typedValue`, mapped to the same JavaScript property by `@JsName`;
- * see `TYPE-MAPPING.md` §12.
+ * see the `ktjs-type-mapping` skill §12.
  */
 
 /**

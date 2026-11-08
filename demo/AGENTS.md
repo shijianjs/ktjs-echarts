@@ -653,7 +653,7 @@ candlestick 家族的两张长表在 `examples/candlestick/CandlestickLongTailSu
   `MatrixAndGraphicOptionTest.graphSeriesCanUseTheMatrixAsABox` 覆盖这一写法。
 - `SankeyEdgeStyleOption.color`：上游是 `ZRColor | "gradient" | "source" | "target"`，`LineStyleOption`
   的 `color` 是窄的 `ZRColor`，Kotlin 不能加宽继承来的 `var`，所以边线样式新增 `SankeyEdgeColor` 联合与
-  同名字段 `typedColor`（`TYPE-MAPPING.md` §12 的写法）。
+  同名字段 `typedColor`（`ktjs-type-mapping` 技能 §12 的写法）。
 - `ZRColor`：补「按 data item 参数取色」的回调工厂（`itemStyle.color = (params) => ...`），以及此前漏掉的
   `ZRColor(PatternObject)` 重载 —— 没有它，图片 pattern 不是合法颜色，富文本标签挂不上图标。
 - `GraphicElement.keyframeAnimation`：上游 `ElementOption.keyframeAnimation` 与自定义系列的

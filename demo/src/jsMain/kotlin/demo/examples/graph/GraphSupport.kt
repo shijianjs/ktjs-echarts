@@ -1,9 +1,9 @@
 package demo.examples.graph
 
-import echarts.options.GraphDataItem
-import echarts.options.GraphEdgeItemOption
-import echarts.options.GraphNodeItemOption
-import echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.GraphDataItem
+import io.github.shijianjs.ktjs.echarts.options.GraphEdgeItemOption
+import io.github.shijianjs.ktjs.echarts.options.GraphNodeItemOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
 import js.objects.unsafeJso
 
 /** One node with an explicit position. */

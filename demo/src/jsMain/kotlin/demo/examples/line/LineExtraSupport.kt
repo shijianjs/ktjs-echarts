@@ -1,11 +1,11 @@
 package demo.examples.line
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import kotlin.js.JsAny
-import zrender.ZRColor
-import zrender.gradientColorStop
-import zrender.linearGradient
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.gradientColorStop
+import io.github.shijianjs.ktjs.zrender.linearGradient
 import js.objects.unsafeJso
 import demo.examples.custom.coord
 import demo.examples.dataset.filteredSince1950

@@ -2,9 +2,9 @@ package demo.examples.gl
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.*
-import echartsgl.BooleanOrAuto
-import echartsgl.options.*
+import io.github.shijianjs.ktjs.echarts.options.*
+import io.github.shijianjs.ktjs.echarts.gl.BooleanOrAuto
+import io.github.shijianjs.ktjs.echarts.gl.options.*
 import js.objects.unsafeJso
 import kotlin.math.PI
 import kotlin.math.cos

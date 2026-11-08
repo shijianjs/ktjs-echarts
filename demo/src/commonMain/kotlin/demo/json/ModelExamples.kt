@@ -1,6 +1,6 @@
 package demo.json
 
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 

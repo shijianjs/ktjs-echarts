@@ -3,7 +3,7 @@ package demo.json.examples.doc
 import demo.json.JsonCategory
 import demo.json.JsonExample
 import demo.json.points
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.examples.shared.hiddenTextAxes
 import demo.json.*
 

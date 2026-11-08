@@ -2,16 +2,16 @@ package demo.examples.line
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.ItemStyleOption
-import echarts.options.LineStyleOption
-import echarts.options.SeriesOption
-import echarts.options.SymbolShape
-import echarts.options.SymbolSize
-import echarts.options.lineSeries
-import echarts.options.numbers
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.SymbolShape
+import io.github.shijianjs.ktjs.echarts.options.SymbolSize
+import io.github.shijianjs.ktjs.echarts.options.lineSeries
+import io.github.shijianjs.ktjs.echarts.options.numbers
 import js.objects.unsafeJso
-import zrender.ZRLineTypes
+import io.github.shijianjs.ktjs.zrender.ZRLineTypes
 import demo.examples.Category
 
 private val lineStyleCategory = Category(Groups.LINE, "examples/line/LineStyle.kt")
@@ -26,12 +26,12 @@ val lineStyleEntry: CatalogEntry =
                         lineSeries {
                             symbol = SymbolShape("triangle")
                             symbolSize = SymbolSize(20.0)
-                            lineStyle = unsafeJso<LineStyleOption> { color = zrender.ZRColor("#5470C6"); width = 4.0; type = ZRLineTypes.dashed }
+                            lineStyle = unsafeJso<LineStyleOption> { color = io.github.shijianjs.ktjs.zrender.ZRColor("#5470C6"); width = 4.0; type = ZRLineTypes.dashed }
                             itemStyle =
                                 unsafeJso<ItemStyleOption> {
                                     borderWidth = 3.0
-                                    borderColor = zrender.ZRColor("#EE6666")
-                                    color = zrender.ZRColor("yellow")
+                                    borderColor = io.github.shijianjs.ktjs.zrender.ZRColor("#EE6666")
+                                    color = io.github.shijianjs.ktjs.zrender.ZRColor("yellow")
                                 }
                             typedData = numbers(120.0, 200.0, 150.0, 80.0, 70.0, 110.0, 130.0)
                         },

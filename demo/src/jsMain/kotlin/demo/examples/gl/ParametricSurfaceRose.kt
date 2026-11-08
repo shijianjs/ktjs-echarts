@@ -2,12 +2,12 @@ package demo.examples.gl
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.*
-import echartsgl.BooleanOrAuto
-import echartsgl.GlColor
-import echartsgl.options.*
+import io.github.shijianjs.ktjs.echarts.options.*
+import io.github.shijianjs.ktjs.echarts.gl.BooleanOrAuto
+import io.github.shijianjs.ktjs.echarts.gl.GlColor
+import io.github.shijianjs.ktjs.echarts.gl.options.*
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.shared.toolbox
 import demo.examples.sunburst.radius

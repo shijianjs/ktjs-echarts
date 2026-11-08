@@ -1,57 +1,57 @@
 package demo.examples.calendar
 
-import echarts.ECharts
-import echarts.Orients
-import echarts.VisualMapTypes
-import echarts.options.CalendarDayLabelOption
-import echarts.options.CalendarMonthLabelOption
-import echarts.options.CalendarOption
-import echarts.options.CalendarRange
-import echarts.options.CalendarYearLabelOption
-import echarts.options.CallbackDataParams
-import echarts.options.DataZoomValue
-import echarts.options.DoubleOrDoubleArray
-import echarts.options.EChartsOption
-import echarts.options.EffectScatterDataItem
-import echarts.options.EffectScatterSeriesOption
-import echarts.options.GraphDataItem
-import echarts.options.HeatmapDataItem
-import echarts.options.HeatmapSeriesOption
-import echarts.options.ItemStyleOption
-import echarts.options.LabelFormatter
-import echarts.options.LabelOption
-import echarts.options.LabelPosition
-import echarts.options.OptionDataValue
-import echarts.options.PieSeriesOption
-import echarts.options.RippleEffectOption
-import echarts.options.ScatterDataItem
-import echarts.options.ScatterSeriesOption
-import echarts.options.SeriesOption
-import echarts.options.SplitLineOption
-import echarts.options.SplitLineStyleOption
-import echarts.options.StringOrDouble
-import echarts.options.StringOrDoubleOrArray
-import echarts.options.StringOrStringArray
-import echarts.options.SymbolSize
-import echarts.options.TooltipContent
-import echarts.options.TooltipFormatter
-import echarts.options.TooltipOption
-import echarts.options.VisualMapOption
-import echarts.options.VisualOptionUnit
-import echarts.options.ZRColorOrArray
-import echarts.options.dataItems
-import echarts.options.effectScatterSeries
-import echarts.options.heatmapSeries
-import echarts.options.one
-import echarts.options.pieSeries
-import echarts.options.scatterSeries
+import io.github.shijianjs.ktjs.echarts.ECharts
+import io.github.shijianjs.ktjs.echarts.Orients
+import io.github.shijianjs.ktjs.echarts.VisualMapTypes
+import io.github.shijianjs.ktjs.echarts.options.CalendarDayLabelOption
+import io.github.shijianjs.ktjs.echarts.options.CalendarMonthLabelOption
+import io.github.shijianjs.ktjs.echarts.options.CalendarOption
+import io.github.shijianjs.ktjs.echarts.options.CalendarRange
+import io.github.shijianjs.ktjs.echarts.options.CalendarYearLabelOption
+import io.github.shijianjs.ktjs.echarts.options.CallbackDataParams
+import io.github.shijianjs.ktjs.echarts.options.DataZoomValue
+import io.github.shijianjs.ktjs.echarts.options.DoubleOrDoubleArray
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.EffectScatterDataItem
+import io.github.shijianjs.ktjs.echarts.options.EffectScatterSeriesOption
+import io.github.shijianjs.ktjs.echarts.options.GraphDataItem
+import io.github.shijianjs.ktjs.echarts.options.HeatmapDataItem
+import io.github.shijianjs.ktjs.echarts.options.HeatmapSeriesOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.LabelFormatter
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LabelPosition
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.PieSeriesOption
+import io.github.shijianjs.ktjs.echarts.options.RippleEffectOption
+import io.github.shijianjs.ktjs.echarts.options.ScatterDataItem
+import io.github.shijianjs.ktjs.echarts.options.ScatterSeriesOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.SplitLineOption
+import io.github.shijianjs.ktjs.echarts.options.SplitLineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.StringOrDoubleOrArray
+import io.github.shijianjs.ktjs.echarts.options.StringOrStringArray
+import io.github.shijianjs.ktjs.echarts.options.SymbolSize
+import io.github.shijianjs.ktjs.echarts.options.TooltipContent
+import io.github.shijianjs.ktjs.echarts.options.TooltipFormatter
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.VisualMapOption
+import io.github.shijianjs.ktjs.echarts.options.VisualOptionUnit
+import io.github.shijianjs.ktjs.echarts.options.ZRColorOrArray
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.effectScatterSeries
+import io.github.shijianjs.ktjs.echarts.options.heatmapSeries
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.pieSeries
+import io.github.shijianjs.ktjs.echarts.options.scatterSeries
 import js.objects.unsafeJso
 import kotlin.js.Date
 import kotlin.js.JsAny
 import kotlin.js.js
-import zrender.ZRColor
-import zrender.ZRFontWeight
-import zrender.ZRLineType
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRFontWeight
+import io.github.shijianjs.ktjs.zrender.ZRLineType
 import demo.examples.chord.column
 import demo.examples.funnel.labels
 import demo.examples.gauge.center
@@ -209,11 +209,11 @@ internal fun calendarTopSteps(days: List<Pair<String, Double>>, calendarIndex: D
     }
 
 /** The chain that links the `[date, value]` points of `calendar-graph` / `calendar-charts`. */
-internal fun calendarGraphLinks(count: Int): Array<echarts.options.GraphEdgeItemOption> =
+internal fun calendarGraphLinks(count: Int): Array<io.github.shijianjs.ktjs.echarts.options.GraphEdgeItemOption> =
     Array(count - 1) { index ->
         unsafeJso {
-            source = echarts.options.StringOrDouble(index.toDouble())
-            target = echarts.options.StringOrDouble((index + 1).toDouble())
+            source = io.github.shijianjs.ktjs.echarts.options.StringOrDouble(index.toDouble())
+            target = io.github.shijianjs.ktjs.echarts.options.StringOrDouble((index + 1).toDouble())
         }
     }
 
@@ -264,7 +264,7 @@ internal fun lunarOption(table: Array<Array<String?>>): EChartsOption {
                     min = 0.0
                     max = 300.0
                     calculable = true
-                    seriesIndex = echarts.options.IndexOrIndexArray(2.0)
+                    seriesIndex = io.github.shijianjs.ktjs.echarts.options.IndexOrIndexArray(2.0)
                     orient = Orients.horizontal
                     left = StringOrDouble("center")
                     bottom = StringOrDouble(20.0)

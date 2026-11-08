@@ -2,13 +2,13 @@ package demo.examples.chord
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.LabelOption
-import echarts.options.LineStyleOption
-import echarts.options.SeriesOption
-import echarts.options.chordSeries
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.chordSeries
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 
 private val chordSimpleCategory = Category(Groups.CHORD, "examples/chord/ChordSimple.kt")

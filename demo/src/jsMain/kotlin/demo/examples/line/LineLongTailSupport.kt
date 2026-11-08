@@ -1,7 +1,7 @@
 package demo.examples.line
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.Date
 import kotlin.js.JsAny
@@ -14,13 +14,13 @@ import kotlin.math.round
 import kotlin.math.sin
 import kotlin.math.sqrt
 import web.cssom.FontWeight
-import zrender.ZRColor
-import zrender.ZRFontWeight
-import zrender.ZRShapeProps
-import zrender.ZRStyleProps
-import zrender.TextOverflows
-import zrender.gradientColorStop
-import zrender.linearGradient
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRFontWeight
+import io.github.shijianjs.ktjs.zrender.ZRShapeProps
+import io.github.shijianjs.ktjs.zrender.ZRStyleProps
+import io.github.shijianjs.ktjs.zrender.TextOverflows
+import io.github.shijianjs.ktjs.zrender.gradientColorStop
+import io.github.shijianjs.ktjs.zrender.linearGradient
 import demo.examples.funnel.labels
 import demo.examples.gauge.center
 import demo.examples.matrix.branch

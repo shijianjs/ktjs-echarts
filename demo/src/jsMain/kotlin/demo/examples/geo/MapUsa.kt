@@ -3,8 +3,8 @@ package demo.examples.geo
 import demo.CatalogEntry
 import demo.Groups
 import demo.ui.loadJson
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import demo.examples.Category

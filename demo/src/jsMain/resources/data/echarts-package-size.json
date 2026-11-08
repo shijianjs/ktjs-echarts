@@ -2542,27 +2542,27 @@
       "value": 257880
     },
     {
-      "name": "echarts.all.ts",
+      "name": "io.github.shijianjs.ktjs.echarts.all.ts",
       "size": 7676,
       "value": 7676
     },
     {
-      "name": "echarts.blank.ts",
+      "name": "io.github.shijianjs.ktjs.echarts.blank.ts",
       "size": 818,
       "value": 818
     },
     {
-      "name": "echarts.common.ts",
+      "name": "io.github.shijianjs.ktjs.echarts.common.ts",
       "size": 2624,
       "value": 2624
     },
     {
-      "name": "echarts.simple.ts",
+      "name": "io.github.shijianjs.ktjs.echarts.simple.ts",
       "size": 1481,
       "value": 1481
     },
     {
-      "name": "echarts.ts",
+      "name": "io.github.shijianjs.ktjs.echarts.ts",
       "size": 1727,
       "value": 1727
     },
@@ -3861,7 +3861,7 @@
           "value": 42681
         },
         {
-          "name": "zrender.ts",
+          "name": "io.github.shijianjs.ktjs.zrender.ts",
           "size": 13102,
           "value": 13102
         }

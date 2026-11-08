@@ -2,11 +2,11 @@ package demo.examples.gl
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.*
-import echartsgl.options.*
+import io.github.shijianjs.ktjs.echarts.options.*
+import io.github.shijianjs.ktjs.echarts.gl.options.*
 import js.objects.unsafeJso
 import kotlin.math.sin
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 
 private val simpleSurfaceCategory = Category(Groups.GL, "examples/gl/SimpleSurface.kt")

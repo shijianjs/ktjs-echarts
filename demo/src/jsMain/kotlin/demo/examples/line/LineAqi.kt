@@ -3,11 +3,11 @@ package demo.examples.line
 import demo.CatalogEntry
 import demo.Groups
 import demo.ui.loadJson
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import js.objects.unsafeJso
 import demo.examples.Category
 import demo.examples.shared.toolbox

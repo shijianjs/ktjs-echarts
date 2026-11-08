@@ -2,10 +2,10 @@ package demo.examples.bar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.SeriesOption
-import echarts.options.barSeries
-import echarts.options.numbers
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.barSeries
+import io.github.shijianjs.ktjs.echarts.options.numbers
 import js.objects.unsafeJso
 import kotlin.js.js
 import demo.examples.Category

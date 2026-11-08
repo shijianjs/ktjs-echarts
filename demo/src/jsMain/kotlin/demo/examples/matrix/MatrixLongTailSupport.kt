@@ -1,17 +1,17 @@
 package demo.examples.matrix
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.Record
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import kotlin.math.round
 import web.cssom.TextAlign
 import web.cssom.VerticalAlign
-import zrender.ZRColor
-import zrender.ZRFontWeights
-import zrender.ZRShapeProps
-import zrender.ZRStyleProps
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRFontWeights
+import io.github.shijianjs.ktjs.zrender.ZRShapeProps
+import io.github.shijianjs.ktjs.zrender.ZRStyleProps
 import demo.examples.chord.column
 import demo.examples.doc.decal
 import demo.examples.funnel.labels

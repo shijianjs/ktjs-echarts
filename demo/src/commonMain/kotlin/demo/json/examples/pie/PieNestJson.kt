@@ -3,7 +3,7 @@ package demo.json.examples.pie
 import demo.json.JsonCategory
 import demo.json.JsonExample
 import demo.json.namedValues
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.*
 
 private val pieNestJsonCategory = JsonCategory("json/examples/pie/PieNestJson.kt")
@@ -31,7 +31,7 @@ val pieNestJsonExample: JsonExample =
             series {
                 pie {
                     name = "Access From"
-                    selectedMode = io.github.shijianjs.kmpechartsjson.BooleanOrString.of("single")
+                    selectedMode = io.github.shijianjs.ktjs.echarts.json.BooleanOrString.of("single")
                     radius = NumberOrStringOrNumbers.of(num(0), str("30%"))
                     data =
                         namedValues(

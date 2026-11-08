@@ -2,14 +2,14 @@ package demo.examples.radar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.LegendOption
-import echarts.options.RadarOption
-import echarts.options.SeriesOption
-import echarts.options.TitleOption
-import echarts.options.dataItems
-import echarts.options.one
-import echarts.options.radarSeries
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.LegendOption
+import io.github.shijianjs.ktjs.echarts.options.RadarOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.TitleOption
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.radarSeries
 import js.objects.unsafeJso
 import kotlin.js.js
 import demo.examples.Category

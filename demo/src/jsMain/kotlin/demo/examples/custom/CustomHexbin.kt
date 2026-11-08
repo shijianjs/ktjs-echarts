@@ -3,8 +3,8 @@ package demo.examples.custom
 import demo.CatalogEntry
 import demo.Groups
 import demo.ui.loadJson
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.Promise
@@ -14,9 +14,9 @@ import kotlin.math.cos
 import kotlin.math.ln
 import kotlin.math.sin
 import kotlin.math.sqrt
-import zrender.ZRColor
-import zrender.ZRShapeProps
-import zrender.ZRStyleProps
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRShapeProps
+import io.github.shijianjs.ktjs.zrender.ZRStyleProps
 import demo.examples.Category
 import demo.examples.gauge.center
 import demo.examples.matrix.dimension

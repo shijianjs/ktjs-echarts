@@ -2,7 +2,7 @@ package demo.json.examples.pictorialbar
 
 import demo.json.JsonCategory
 import demo.json.JsonExample
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.examples.shared.BODY_A
 import demo.json.examples.shared.BODY_B
 import demo.json.examples.shared.BODY_MAX

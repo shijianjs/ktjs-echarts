@@ -2,8 +2,8 @@ package demo.examples.bar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.EChartsEvents
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.EChartsEvents
+import io.github.shijianjs.ktjs.echarts.options.one
 import demo.examples.Category
 
 private val barMultiDrilldownCategory = Category(Groups.BAR, "examples/bar/BarMultiDrilldown.kt")

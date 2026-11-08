@@ -2,11 +2,11 @@ package demo.examples.line
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.AreaStyleOption
-import echarts.options.EChartsOption
-import echarts.options.SeriesOption
-import echarts.options.lineSeries
-import echarts.options.numbers
+import io.github.shijianjs.ktjs.echarts.options.AreaStyleOption
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.lineSeries
+import io.github.shijianjs.ktjs.echarts.options.numbers
 import js.objects.unsafeJso
 import demo.examples.Category
 

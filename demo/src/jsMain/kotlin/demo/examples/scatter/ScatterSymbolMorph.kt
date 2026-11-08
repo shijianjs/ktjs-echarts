@@ -2,8 +2,8 @@ package demo.examples.scatter
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import demo.examples.Category
 import demo.examples.shared.every
 

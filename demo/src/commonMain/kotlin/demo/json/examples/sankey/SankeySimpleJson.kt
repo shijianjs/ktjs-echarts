@@ -3,7 +3,7 @@ package demo.json.examples.sankey
 import demo.json.JsonCategory
 import demo.json.JsonExample
 import demo.json.linkItem
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.examples.shared.SIMPLE_NODESSankey
 import demo.json.examples.shared.sankeyNode
 import demo.json.*

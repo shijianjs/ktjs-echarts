@@ -1,8 +1,8 @@
 package demo.examples.gl
 
-import echarts.AxisTypes
-import echarts.options.*
-import echartsgl.options.*
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.options.*
+import io.github.shijianjs.ktjs.echarts.gl.options.*
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast

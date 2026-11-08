@@ -1,14 +1,14 @@
 package demo.examples.bar
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.Record
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
 import kotlin.math.round
-import zrender.ZRColor
-import zrender.ZRStyleProps
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRStyleProps
 import demo.examples.chord.column
 import demo.examples.matrix.dimension
 import demo.examples.shared.axisLabel

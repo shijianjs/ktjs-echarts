@@ -2,11 +2,11 @@ package demo.examples.bar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
-import zrender.gradientColorStop
-import zrender.linearGradient
+import io.github.shijianjs.ktjs.zrender.gradientColorStop
+import io.github.shijianjs.ktjs.zrender.linearGradient
 import demo.examples.Category
 import demo.examples.shared.axisLabel
 

@@ -1,8 +1,8 @@
 package demo.json
 
-import io.github.shijianjs.kmpechartsjson.EChartsOption
-import io.github.shijianjs.kmpechartsjson.echartsOption
-import io.github.shijianjs.kmpechartsjson.toJsonString
+import io.github.shijianjs.ktjs.echarts.json.EChartsOption
+import io.github.shijianjs.ktjs.echarts.json.echartsOption
+import io.github.shijianjs.ktjs.echarts.json.toJsonString
 import demo.json.examples.bar.barJsonExamples
 import demo.json.examples.calendar.calendarJsonExamples
 import demo.json.examples.candlestick.candlestickJsonExamples

@@ -2,13 +2,13 @@ package demo.examples.line
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.GridOption
-import echarts.options.LegendOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.TitleOption
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.GridOption
+import io.github.shijianjs.ktjs.echarts.options.LegendOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.TitleOption
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import demo.examples.Category
 import demo.examples.shared.legendNames

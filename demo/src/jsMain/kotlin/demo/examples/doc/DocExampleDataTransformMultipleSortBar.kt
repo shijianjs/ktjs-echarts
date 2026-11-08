@@ -1,14 +1,14 @@
 package demo.examples.doc
 
 import demo.CatalogEntry
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import demo.Groups
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import web.cssom.TextAlign
 import web.cssom.VerticalAlign
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.chord.column
 import demo.examples.dataset.transform

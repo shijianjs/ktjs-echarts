@@ -2,11 +2,11 @@ package demo.examples.matrix
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.LabelOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.heatmapSeries
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.heatmapSeries
 import js.objects.unsafeJso
 import demo.examples.Category
 

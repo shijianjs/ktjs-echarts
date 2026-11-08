@@ -18,8 +18,8 @@ import demo.ui.interactiveChart
 import demo.ui.officialExampleUrl
 import demo.ui.page
 import demo.ui.pageSection
-import echarts.EChartsInstance
-import echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.EChartsInstance
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
 import web.html.HtmlTagName
 
 /**

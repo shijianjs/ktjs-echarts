@@ -3,9 +3,9 @@ package demo.examples.scatter
 import demo.CatalogEntry
 import demo.Groups
 import demo.ui.loadJson
-import echarts.ECharts
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.ECharts
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import demo.examples.Category

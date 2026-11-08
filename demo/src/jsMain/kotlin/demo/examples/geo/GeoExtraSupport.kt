@@ -1,9 +1,9 @@
 package demo.examples.geo
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.matrix.names
 import demo.examples.scatter.point
 

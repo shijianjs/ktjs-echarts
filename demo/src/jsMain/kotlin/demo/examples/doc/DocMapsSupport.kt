@@ -1,7 +1,7 @@
 package demo.examples.doc
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
@@ -329,7 +329,7 @@ internal fun visualPiece(
         if (color != null) this.color = StringOrStringArray(color)
     }
 
-/** The region names upstream reads from `usaJson.features` with `echarts.util.map`. */
+/** The region names upstream reads from `usaJson.features` with `io.github.shijianjs.ktjs.echarts.util.map`. */
 internal fun usaRegionNames(usa: JsAny): Array<String> =
     usa.unsafeCast<UsaGeoJson>().features.map { it.properties.name }.toTypedArray()
 

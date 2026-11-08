@@ -3,7 +3,7 @@ package demo.json.examples.pie
 import demo.json.JsonCategory
 import demo.json.JsonExample
 import demo.json.namedValues
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.*
 
 private val pieCustomJsonCategory = JsonCategory("json/examples/pie/PieCustomJson.kt")
@@ -37,7 +37,7 @@ val pieCustomJsonExample: JsonExample =
                             "Direct" to 335,
                             "Search Engine" to 400,
                         )
-                    roseType = io.github.shijianjs.kmpechartsjson.BooleanOrString.of("radius")
+                    roseType = io.github.shijianjs.ktjs.echarts.json.BooleanOrString.of("radius")
                     label { color = "rgba(255, 255, 255, 0.3)".asColor() }
                     labelLine {
                         lineStyle { color = "rgba(255, 255, 255, 0.3)".asColor() }

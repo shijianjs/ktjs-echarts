@@ -2,12 +2,12 @@ package demo.examples.graph
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.GraphLayouts
-import echarts.options.DoubleOrDoubleArray
-import echarts.options.EChartsOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.graphSeries
+import io.github.shijianjs.ktjs.echarts.GraphLayouts
+import io.github.shijianjs.ktjs.echarts.options.DoubleOrDoubleArray
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.graphSeries
 import js.objects.unsafeJso
 import demo.examples.Category
 

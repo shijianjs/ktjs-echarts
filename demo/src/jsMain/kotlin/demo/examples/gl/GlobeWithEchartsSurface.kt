@@ -3,8 +3,8 @@ package demo.examples.gl
 import demo.CatalogEntry
 import demo.Groups
 import demo.ui.loadJson
-import echarts.ECharts
-import echartsgl.options.*
+import io.github.shijianjs.ktjs.echarts.ECharts
+import io.github.shijianjs.ktjs.echarts.gl.options.*
 import kotlin.js.JsAny
 import demo.examples.Category
 

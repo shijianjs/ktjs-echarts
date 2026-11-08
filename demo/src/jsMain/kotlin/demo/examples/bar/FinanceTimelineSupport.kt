@@ -1,7 +1,7 @@
 package demo.examples.bar
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.Record
 import js.objects.unsafeJso
 import kotlin.js.JsAny

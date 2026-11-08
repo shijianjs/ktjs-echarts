@@ -2,19 +2,19 @@ package demo.examples.tree
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.EmphasisFocuses
-import echarts.TooltipTriggerOns
-import echarts.TooltipTriggers
-import echarts.TreeOrients
-import echarts.options.EChartsOption
-import echarts.options.LabelOption
-import echarts.options.LabelPosition
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.SymbolSize
-import echarts.options.TooltipOption
-import echarts.options.one
-import echarts.options.treeSeries
+import io.github.shijianjs.ktjs.echarts.EmphasisFocuses
+import io.github.shijianjs.ktjs.echarts.TooltipTriggerOns
+import io.github.shijianjs.ktjs.echarts.TooltipTriggers
+import io.github.shijianjs.ktjs.echarts.TreeOrients
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LabelPosition
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.SymbolSize
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.treeSeries
 import js.objects.unsafeJso
 import web.cssom.TextAlign
 import web.cssom.VerticalAlign
@@ -56,8 +56,8 @@ val treeOrientRightLeftEntry: CatalogEntry =
                                 }
                             emphasis = unsafeJso { focus = EmphasisFocuses.descendant }
                             expandAndCollapse = true
-                            animationDuration = echarts.options.AnimationDuration(550.0)
-                            animationDurationUpdate = echarts.options.AnimationDuration(750.0)
+                            animationDuration = io.github.shijianjs.ktjs.echarts.options.AnimationDuration(550.0)
+                            animationDurationUpdate = io.github.shijianjs.ktjs.echarts.options.AnimationDuration(750.0)
                         },
                     )
             }

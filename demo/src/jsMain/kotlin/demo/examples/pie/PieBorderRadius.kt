@@ -2,16 +2,16 @@ package demo.examples.pie
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.ItemStyleOption
-import echarts.options.LabelLineOption
-import echarts.options.LabelOption
-import echarts.options.LabelPosition
-import echarts.options.SeriesOption
-import echarts.options.StringOrDoubleOrArray
-import echarts.options.pieSeries
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.LabelLineOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LabelPosition
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDoubleOrArray
+import io.github.shijianjs.ktjs.echarts.options.pieSeries
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.gauge.center
 import demo.examples.sunburst.radius

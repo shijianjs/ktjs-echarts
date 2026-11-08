@@ -2,20 +2,20 @@ package demo.examples.funnel
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.EmphasisOption
-import echarts.options.ItemStyleOption
-import echarts.options.LabelLineOption
-import echarts.options.LabelOption
-import echarts.options.LabelPosition
-import echarts.options.LegendOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.TitleOption
-import echarts.options.funnelSeries
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.EmphasisOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.LabelLineOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LabelPosition
+import io.github.shijianjs.ktjs.echarts.options.LegendOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.TitleOption
+import io.github.shijianjs.ktjs.echarts.options.funnelSeries
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.shared.legendNames
 import demo.examples.shared.toolbox
@@ -35,7 +35,7 @@ val funnelCustomizeEntry: CatalogEntry =
                             name = "Expected"
                             left = StringOrDouble("10%")
                             width = StringOrDouble("80%")
-                            label = unsafeJso<LabelOption> { formatter = echarts.options.LabelFormatter("{b}Expected") }
+                            label = unsafeJso<LabelOption> { formatter = io.github.shijianjs.ktjs.echarts.options.LabelFormatter("{b}Expected") }
                             labelLine = unsafeJso<LabelLineOption> { show = false }
                             itemStyle = unsafeJso<ItemStyleOption> { opacity = 0.7 }
                             emphasis =
@@ -43,7 +43,7 @@ val funnelCustomizeEntry: CatalogEntry =
                                     label =
                                         unsafeJso<LabelOption> {
                                             position = LabelPosition("inside")
-                                            formatter = echarts.options.LabelFormatter("{b}Expected: {c}%")
+                                            formatter = io.github.shijianjs.ktjs.echarts.options.LabelFormatter("{b}Expected: {c}%")
                                         }
                                 }
                             typedData = stages(60.0, 40.0, 20.0, 80.0, 100.0)
@@ -56,7 +56,7 @@ val funnelCustomizeEntry: CatalogEntry =
                             label =
                                 unsafeJso<LabelOption> {
                                     position = LabelPosition("inside")
-                                    formatter = echarts.options.LabelFormatter("{c}%")
+                                    formatter = io.github.shijianjs.ktjs.echarts.options.LabelFormatter("{c}%")
                                     color = "#fff"
                                 }
                             itemStyle =
@@ -70,7 +70,7 @@ val funnelCustomizeEntry: CatalogEntry =
                                     label =
                                         unsafeJso<LabelOption> {
                                             position = LabelPosition("inside")
-                                            formatter = echarts.options.LabelFormatter("{b}Actual: {c}%")
+                                            formatter = io.github.shijianjs.ktjs.echarts.options.LabelFormatter("{b}Actual: {c}%")
                                         }
                                 }
                             z = 100.0

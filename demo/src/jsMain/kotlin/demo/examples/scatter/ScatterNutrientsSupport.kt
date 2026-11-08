@@ -1,15 +1,15 @@
 package demo.examples.scatter
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.js
 import kotlin.js.unsafeCast
 import kotlin.math.round
-import zrender.RectLike
-import zrender.ZRColor
-import zrender.ZRLineTypes
+import io.github.shijianjs.ktjs.zrender.RectLike
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRLineTypes
 import demo.examples.chord.column
 import demo.examples.matrix.cell
 import demo.examples.matrix.dimension

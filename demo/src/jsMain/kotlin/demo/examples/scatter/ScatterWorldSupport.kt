@@ -1,10 +1,10 @@
 package demo.examples.scatter
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.gauge.center
 import demo.examples.gl.WorldCountry
 import demo.examples.gl.worldPopulationCountries

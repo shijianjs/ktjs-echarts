@@ -2,15 +2,15 @@ package demo.examples.matrix
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.DoubleOrDoubleArray
-import echarts.options.EChartsOption
-import echarts.options.ItemStyleOption
-import echarts.options.LabelOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.StringOrStringArray
-import echarts.options.VisualOptionUnit
-import echarts.options.scatterSeries
+import io.github.shijianjs.ktjs.echarts.options.DoubleOrDoubleArray
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.StringOrStringArray
+import io.github.shijianjs.ktjs.echarts.options.VisualOptionUnit
+import io.github.shijianjs.ktjs.echarts.options.scatterSeries
 import js.objects.unsafeJso
 import demo.examples.Category
 

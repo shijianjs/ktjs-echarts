@@ -2,9 +2,9 @@ package demo.examples.dataset
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.SeriesOption
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import demo.examples.Category

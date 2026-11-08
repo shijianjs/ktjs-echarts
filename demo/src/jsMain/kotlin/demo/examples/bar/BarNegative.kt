@@ -2,19 +2,19 @@ package demo.examples.bar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.AxisTypes
-import echarts.options.BooleanOrString
-import echarts.options.EChartsOption
-import echarts.options.LabelOption
-import echarts.options.LabelPosition
-import echarts.options.LegendOption
-import echarts.options.SeriesOption
-import echarts.options.XAxisOption
-import echarts.options.YAxisOption
-import echarts.options.barSeries
-import echarts.options.numbers
-import echarts.options.one
-import echarts.options.strings
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.options.BooleanOrString
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LabelPosition
+import io.github.shijianjs.ktjs.echarts.options.LegendOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.XAxisOption
+import io.github.shijianjs.ktjs.echarts.options.YAxisOption
+import io.github.shijianjs.ktjs.echarts.options.barSeries
+import io.github.shijianjs.ktjs.echarts.options.numbers
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.strings
 import js.objects.unsafeJso
 import kotlin.js.js
 import demo.examples.Category
@@ -32,7 +32,7 @@ val barNegativeEntry: CatalogEntry =
                     one(
                         unsafeJso<YAxisOption> {
                             type = AxisTypes.category
-                            axisTick = unsafeJso { show = echarts.options.BooleanOrString(false) }
+                            axisTick = unsafeJso { show = io.github.shijianjs.ktjs.echarts.options.BooleanOrString(false) }
                             data = strings(*week)
                         },
                     )

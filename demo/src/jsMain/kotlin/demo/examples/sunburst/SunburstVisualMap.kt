@@ -2,15 +2,15 @@ package demo.examples.sunburst
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.VisualMapTypes
-import echarts.options.EChartsOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.StringOrStringArray
-import echarts.options.VisualMapOption
-import echarts.options.VisualOptionUnit
-import echarts.options.one
-import echarts.options.sunburstSeries
+import io.github.shijianjs.ktjs.echarts.VisualMapTypes
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.StringOrStringArray
+import io.github.shijianjs.ktjs.echarts.options.VisualMapOption
+import io.github.shijianjs.ktjs.echarts.options.VisualOptionUnit
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.sunburstSeries
 import js.objects.unsafeJso
 import kotlin.js.js
 import demo.examples.Category

@@ -2,18 +2,18 @@ package demo.examples.tree
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.EmphasisFocuses
-import echarts.TooltipTriggerOns
-import echarts.TooltipTriggers
-import echarts.TreeLayouts
-import echarts.options.EChartsOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.SymbolShape
-import echarts.options.SymbolSize
-import echarts.options.TooltipOption
-import echarts.options.one
-import echarts.options.treeSeries
+import io.github.shijianjs.ktjs.echarts.EmphasisFocuses
+import io.github.shijianjs.ktjs.echarts.TooltipTriggerOns
+import io.github.shijianjs.ktjs.echarts.TooltipTriggers
+import io.github.shijianjs.ktjs.echarts.TreeLayouts
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.SymbolShape
+import io.github.shijianjs.ktjs.echarts.options.SymbolSize
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.treeSeries
 import js.objects.unsafeJso
 import demo.examples.Category
 
@@ -39,7 +39,7 @@ val treeRadialEntry: CatalogEntry =
                             symbol = SymbolShape("emptyCircle")
                             symbolSize = SymbolSize(7.0)
                             initialTreeDepth = 3.0
-                            animationDurationUpdate = echarts.options.AnimationDuration(750.0)
+                            animationDurationUpdate = io.github.shijianjs.ktjs.echarts.options.AnimationDuration(750.0)
                             emphasis = unsafeJso { focus = EmphasisFocuses.descendant }
                         },
                     )

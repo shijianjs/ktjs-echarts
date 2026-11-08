@@ -2,7 +2,7 @@ package demo.examples.gl
 
 import demo.CatalogEntry
 import demo.Groups
-import echartsgl.options.*
+import io.github.shijianjs.ktjs.echarts.gl.options.*
 import kotlin.js.JsAny
 import demo.examples.Category
 

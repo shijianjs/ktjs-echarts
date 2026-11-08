@@ -2,16 +2,16 @@ package demo.examples.calendar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.Orients
-import echarts.options.EChartsOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.TooltipFormatter
-import echarts.options.TooltipFormatterCallback
-import echarts.options.TooltipOption
-import echarts.options.TooltipPosition
-import echarts.options.VisualMapOption
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.Orients
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.TooltipFormatter
+import io.github.shijianjs.ktjs.echarts.options.TooltipFormatterCallback
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.TooltipPosition
+import io.github.shijianjs.ktjs.echarts.options.VisualMapOption
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.js

@@ -1,9 +1,9 @@
 package demo.examples.tree
 
-import echarts.options.LabelOption
-import echarts.options.LabelPosition
-import echarts.options.TreeSeriesLeavesOption
-import echarts.options.TreeSeriesNodeItemOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LabelPosition
+import io.github.shijianjs.ktjs.echarts.options.TreeSeriesLeavesOption
+import io.github.shijianjs.ktjs.echarts.options.TreeSeriesNodeItemOption
 import js.objects.unsafeJso
 import web.cssom.TextAlign
 import web.cssom.VerticalAlign

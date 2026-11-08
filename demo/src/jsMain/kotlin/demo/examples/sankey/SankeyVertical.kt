@@ -2,18 +2,18 @@ package demo.examples.sankey
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.Orients
-import echarts.options.EChartsOption
-import echarts.EmphasisFocuses
-import echarts.options.EmphasisOption
-import echarts.options.LabelOption
-import echarts.options.LabelPosition
-import echarts.options.LineStyleOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.sankeySeries
+import io.github.shijianjs.ktjs.echarts.Orients
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.EmphasisFocuses
+import io.github.shijianjs.ktjs.echarts.options.EmphasisOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LabelPosition
+import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.sankeySeries
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 
 private val sankeyVerticalCategory = Category(Groups.SANKEY, "examples/sankey/SankeyVertical.kt")
@@ -29,7 +29,7 @@ val sankeyVerticalEntry: CatalogEntry =
                             bottom = StringOrDouble("10%")
                             orient = Orients.vertical
                             label = unsafeJso<LabelOption> { position = LabelPosition("top") }
-                            lineStyle = unsafeJso<LineStyleOption> { color = zrender.ZRColor("source"); curveness = 0.5 }
+                            lineStyle = unsafeJso<LineStyleOption> { color = io.github.shijianjs.ktjs.zrender.ZRColor("source"); curveness = 0.5 }
                             emphasis = unsafeJso<EmphasisOption> { focus = EmphasisFocuses.adjacency }
                             typedData =
                                 arrayOf(

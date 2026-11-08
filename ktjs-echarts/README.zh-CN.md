@@ -22,14 +22,14 @@ dependencies {
 完整包自带所有图表和组件，不需要注册安装器：
 
 ```kotlin
-import echarts.AxisTypes
-import echarts.ECharts
-import echarts.options.EChartsOption
-import echarts.options.XAxisOption
-import echarts.options.YAxisOption
-import echarts.options.lineSeries
-import echarts.options.numbers
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.ECharts
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.XAxisOption
+import io.github.shijianjs.ktjs.echarts.options.YAxisOption
+import io.github.shijianjs.ktjs.echarts.options.lineSeries
+import io.github.shijianjs.ktjs.echarts.options.numbers
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import web.dom.document
 import web.html.HtmlTagName
@@ -71,11 +71,11 @@ val title = unsafeJso<TitleOption> {
 
 带取值范围的字段用类型而不是裸字符串：`AxisTypes.category`、`SeriesTypes.line`、
 `TooltipTriggers.axis`、`LegendTypes.scroll`、`AxisPointerTypes.cross`、`ImageTypes.png`、
-`AnimationEasings.cubicOut`、`zrender.RendererTypes.svg` 都是各自 sealed 接口的常量，拼错会在编译期
+`AnimationEasings.cubicOut`、`io.github.shijianjs.ktjs.zrender.RendererTypes.svg` 都是各自 sealed 接口的常量，拼错会在编译期
 报错，而不是被 ECharts 静默忽略。CSS 语义的字段直接用 kotlin-wrappers 的类型（`web.cssom.FontStyle`、
 `FontWeight`、`TextAlign`、`VerticalAlign`）以及 canvas 的线端 / 拐角类型。
 
-`echarts.options` 中的辅助函数：
+`io.github.shijianjs.ktjs.echarts.options` 中的辅助函数：
 
 - `one(value)` 把单个组件包成数组。既接受单个组件又接受列表的字段统一声明为数组，保留传入多个
   组件的可能。
@@ -96,8 +96,8 @@ val title = unsafeJso<TitleOption> {
 事件名是 `EChartsEvents` 中的常量，回调参数有对应类型：
 
 ```kotlin
-import echarts.EChartsEvents
-import echarts.ECElementEvent
+import io.github.shijianjs.ktjs.echarts.EChartsEvents
+import io.github.shijianjs.ktjs.echarts.ECElementEvent
 
 chart.on(EChartsEvents.Click) { event: ECElementEvent ->
     println("${event.seriesName}: ${event.name} = ${event.value}")
@@ -113,13 +113,13 @@ chart.on(EChartsEvents.Click) { event: ECElementEvent ->
 `EChartsCore` 初始化：
 
 ```kotlin
-import echarts.EChartsCharts
-import echarts.EChartsComponents
-import echarts.EChartsCore
-import echarts.EChartsRenderers
-import echarts.EChartsInitOpts
+import io.github.shijianjs.ktjs.echarts.EChartsCharts
+import io.github.shijianjs.ktjs.echarts.EChartsComponents
+import io.github.shijianjs.ktjs.echarts.EChartsCore
+import io.github.shijianjs.ktjs.echarts.EChartsRenderers
+import io.github.shijianjs.ktjs.echarts.EChartsInitOpts
 import js.objects.unsafeJso
-import zrender.RendererTypes
+import io.github.shijianjs.ktjs.zrender.RendererTypes
 
 EChartsCore.use(
     arrayOf(
@@ -160,7 +160,7 @@ val chart = EChartsCore.init(
 `extendChartView` 与上游一致：
 
 ```kotlin
-import echarts.extendSeriesModel
+import io.github.shijianjs.ktjs.echarts.extendSeriesModel
 
 val seriesModel = extendSeriesModel(js("({ type: 'mySeries' })"))
 ECharts.use(seriesModel)

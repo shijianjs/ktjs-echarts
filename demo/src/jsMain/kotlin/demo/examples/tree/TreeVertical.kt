@@ -2,18 +2,18 @@ package demo.examples.tree
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.TooltipTriggerOns
-import echarts.TooltipTriggers
-import echarts.TreeOrients
-import echarts.options.EChartsOption
-import echarts.options.LabelOption
-import echarts.options.LabelPosition
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.SymbolShape
-import echarts.options.TooltipOption
-import echarts.options.one
-import echarts.options.treeSeries
+import io.github.shijianjs.ktjs.echarts.TooltipTriggerOns
+import io.github.shijianjs.ktjs.echarts.TooltipTriggers
+import io.github.shijianjs.ktjs.echarts.TreeOrients
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LabelPosition
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.SymbolShape
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.treeSeries
 import js.objects.unsafeJso
 import web.cssom.TextAlign
 import web.cssom.VerticalAlign
@@ -60,7 +60,7 @@ val treeVerticalEntry: CatalogEntry =
                                             align = TextAlign.left
                                         }
                                 }
-                            animationDurationUpdate = echarts.options.AnimationDuration(750.0)
+                            animationDurationUpdate = io.github.shijianjs.ktjs.echarts.options.AnimationDuration(750.0)
                         },
                     )
             }

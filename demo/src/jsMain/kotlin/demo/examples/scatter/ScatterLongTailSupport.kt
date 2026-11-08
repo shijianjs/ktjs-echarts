@@ -1,11 +1,11 @@
 package demo.examples.scatter
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import web.cssom.TextAlign
-import zrender.ZRColor
-import zrender.ZRLineTypes
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRLineTypes
 import demo.examples.chord.column
 import demo.examples.custom.coord
 import demo.examples.funnel.labels

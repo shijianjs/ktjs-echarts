@@ -1,8 +1,8 @@
 package demo.ui
 
 import demo.Theme
-import echarts.ECharts
-import echarts.EChartsInstance
+import io.github.shijianjs.ktjs.echarts.ECharts
+import io.github.shijianjs.ktjs.echarts.EChartsInstance
 import web.html.HTMLElement
 import web.html.HtmlTagName
 
@@ -106,7 +106,7 @@ class ChartHolder(
  * The option is built lazily, on mount, so data generation happens once per visit and the page can
  * be rebuilt (language or theme switch) without paying for it at build time.
  */
-fun chart(option: () -> echarts.options.EChartsOption, height: String? = null): ChartHolder =
+fun chart(option: () -> io.github.shijianjs.ktjs.echarts.options.EChartsOption, height: String? = null): ChartHolder =
     ChartHolder(height) { chart, _ -> chart.setOption(option()) }
 
 /** Creates a chart holder for an example that drives the chart directly (animation, timeline, ...). */

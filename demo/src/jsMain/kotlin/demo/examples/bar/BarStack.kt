@@ -2,24 +2,24 @@ package demo.examples.bar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.AxisTypes
-import echarts.options.EChartsOption
-import echarts.options.LegendOption
-import echarts.options.LineStyleOption
-import echarts.options.MarkLine2DDataItemDimOption
-import echarts.options.MarkLineDataItem
-import echarts.options.MarkLineOption
-import echarts.MarkerStatisticTypes
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.XAxisOption
-import echarts.options.barSeries
-import echarts.options.numbers
-import echarts.options.one
-import echarts.options.strings
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.LegendOption
+import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.MarkLine2DDataItemDimOption
+import io.github.shijianjs.ktjs.echarts.options.MarkLineDataItem
+import io.github.shijianjs.ktjs.echarts.options.MarkLineOption
+import io.github.shijianjs.ktjs.echarts.MarkerStatisticTypes
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.XAxisOption
+import io.github.shijianjs.ktjs.echarts.options.barSeries
+import io.github.shijianjs.ktjs.echarts.options.numbers
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.strings
 import js.objects.unsafeJso
 import kotlin.js.js
-import zrender.ZRLineTypes
+import io.github.shijianjs.ktjs.zrender.ZRLineTypes
 import demo.examples.Category
 
 private val barStackCategory = Category(Groups.BAR, "examples/bar/BarStack.kt")

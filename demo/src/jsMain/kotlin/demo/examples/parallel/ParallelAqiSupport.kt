@@ -1,9 +1,9 @@
 package demo.examples.parallel
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.custom.dim
 import demo.examples.matrix.dimension
 import demo.examples.shared.axisLabel

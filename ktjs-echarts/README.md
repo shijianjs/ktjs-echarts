@@ -23,14 +23,14 @@ dependencies {
 The full bundle registers every chart and component, so it needs no installers:
 
 ```kotlin
-import echarts.AxisTypes
-import echarts.ECharts
-import echarts.options.EChartsOption
-import echarts.options.XAxisOption
-import echarts.options.YAxisOption
-import echarts.options.lineSeries
-import echarts.options.numbers
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.ECharts
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.XAxisOption
+import io.github.shijianjs.ktjs.echarts.options.YAxisOption
+import io.github.shijianjs.ktjs.echarts.options.lineSeries
+import io.github.shijianjs.ktjs.echarts.options.numbers
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import web.dom.document
 import web.html.HtmlTagName
@@ -73,12 +73,12 @@ val title = unsafeJso<TitleOption> {
 
 Named values are typed instead of being plain strings: `AxisTypes.category`, `SeriesTypes.line`,
 `TooltipTriggers.axis`, `LegendTypes.scroll`, `AxisPointerTypes.cross`, `ImageTypes.png`,
-`AnimationEasings.cubicOut` and `zrender.RendererTypes.svg` are constants of their own sealed
+`AnimationEasings.cubicOut` and `io.github.shijianjs.ktjs.zrender.RendererTypes.svg` are constants of their own sealed
 interfaces, so a typo is a compile error rather than a silently ignored option. Fields that take a
 CSS value use the kotlin-wrappers types (`web.cssom.FontStyle`, `FontWeight`, `TextAlign`,
 `VerticalAlign`) and the canvas line cap / join types.
 
-Helpers in `echarts.options`:
+Helpers in `io.github.shijianjs.ktjs.echarts.options`:
 
 - `one(value)` wraps a single component in an array. Fields that accept both one component and a
   list are typed as arrays so that multiple components stay possible.
@@ -101,8 +101,8 @@ Helpers in `echarts.options`:
 Event names are constants in `EChartsEvents`; handlers receive typed payloads:
 
 ```kotlin
-import echarts.EChartsEvents
-import echarts.ECElementEvent
+import io.github.shijianjs.ktjs.echarts.EChartsEvents
+import io.github.shijianjs.ktjs.echarts.ECElementEvent
 
 chart.on(EChartsEvents.Click) { event: ECElementEvent ->
     println("${event.seriesName}: ${event.name} = ${event.value}")
@@ -118,13 +118,13 @@ Dedicated helpers exist for the events whose payload differs from the mouse even
 and features the page uses, then initialize through `EChartsCore`:
 
 ```kotlin
-import echarts.EChartsCharts
-import echarts.EChartsComponents
-import echarts.EChartsCore
-import echarts.EChartsRenderers
-import echarts.EChartsInitOpts
+import io.github.shijianjs.ktjs.echarts.EChartsCharts
+import io.github.shijianjs.ktjs.echarts.EChartsComponents
+import io.github.shijianjs.ktjs.echarts.EChartsCore
+import io.github.shijianjs.ktjs.echarts.EChartsRenderers
+import io.github.shijianjs.ktjs.echarts.EChartsInitOpts
 import js.objects.unsafeJso
-import zrender.RendererTypes
+import io.github.shijianjs.ktjs.zrender.RendererTypes
 
 EChartsCore.use(
     arrayOf(
@@ -166,7 +166,7 @@ The classes that custom series, components and views extend are available from `
 `extendComponentView`, `extendSeriesModel` and `extendChartView` mirror the upstream functions:
 
 ```kotlin
-import echarts.extendSeriesModel
+import io.github.shijianjs.ktjs.echarts.extendSeriesModel
 
 val seriesModel = extendSeriesModel(js("({ type: 'mySeries' })"))
 ECharts.use(seriesModel)

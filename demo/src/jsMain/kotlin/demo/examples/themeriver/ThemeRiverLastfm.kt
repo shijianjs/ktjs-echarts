@@ -2,13 +2,13 @@ package demo.examples.themeriver
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.AxisMinMax
-import echarts.options.EChartsOption
-import echarts.options.LabelOption
-import echarts.options.SeriesOption
-import echarts.options.SingleAxisOption
-import echarts.options.one
-import echarts.options.themeRiverSeries
+import io.github.shijianjs.ktjs.echarts.options.AxisMinMax
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.SingleAxisOption
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.themeRiverSeries
 import js.objects.unsafeJso
 import demo.examples.Category
 

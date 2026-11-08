@@ -1,7 +1,7 @@
 package demo.examples.shared
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import kotlin.js.Date
 import kotlin.js.JsAny
 import kotlin.math.round

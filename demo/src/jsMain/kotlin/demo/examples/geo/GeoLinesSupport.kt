@@ -1,12 +1,12 @@
 package demo.examples.geo
 
 import demo.ui.loadJson
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.Promise
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.custom.coord
 import demo.examples.gauge.center
 import demo.examples.lines.coordinate

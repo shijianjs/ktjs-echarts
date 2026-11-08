@@ -2,18 +2,18 @@ package demo.examples.sunburst
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.ItemStyleOption
-import echarts.options.LabelFormatter
-import echarts.options.LabelFormatterCallback
-import echarts.options.LabelRotates
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.SunburstSeriesLevelOption
-import echarts.options.sunburstSeries
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.LabelFormatter
+import io.github.shijianjs.ktjs.echarts.options.LabelFormatterCallback
+import io.github.shijianjs.ktjs.echarts.options.LabelRotates
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.SunburstSeriesLevelOption
+import io.github.shijianjs.ktjs.echarts.options.sunburstSeries
 import js.objects.unsafeJso
 import kotlin.js.js
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.matrix.names
 

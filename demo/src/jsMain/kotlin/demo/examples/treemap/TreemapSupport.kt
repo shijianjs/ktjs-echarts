@@ -1,8 +1,8 @@
 package demo.examples.treemap
 
-import echarts.options.OptionDataValue
-import echarts.options.OptionId
-import echarts.options.TreemapSeriesNodeItemOption
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.OptionId
+import io.github.shijianjs.ktjs.echarts.options.TreemapSeriesNodeItemOption
 import js.objects.unsafeJso
 
 /** A node of a treemap, with optional children. */

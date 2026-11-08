@@ -24,17 +24,17 @@ Register the installers on the core `ECharts` object before the first `init`, th
 option and a `bar3D` series:
 
 ```kotlin
-import echarts.AxisTypes
-import echarts.ECharts
-import echarts.options.OptionDataValue
-import echarts.options.one
-import echartsgl.Bar3DChart
-import echartsgl.Grid3DComponent
-import echartsgl.options.Axis3DOption
-import echartsgl.options.Bar3DDataItem
-import echartsgl.options.EChartsGlOption
-import echartsgl.options.Grid3DOption
-import echartsgl.options.bar3DSeries
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.ECharts
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.gl.Bar3DChart
+import io.github.shijianjs.ktjs.echarts.gl.Grid3DComponent
+import io.github.shijianjs.ktjs.echarts.gl.options.Axis3DOption
+import io.github.shijianjs.ktjs.echarts.gl.options.Bar3DDataItem
+import io.github.shijianjs.ktjs.echarts.gl.options.EChartsGlOption
+import io.github.shijianjs.ktjs.echarts.gl.options.Grid3DOption
+import io.github.shijianjs.ktjs.echarts.gl.options.bar3DSeries
 import js.objects.unsafeJso
 import web.dom.document
 import web.html.HtmlTagName
@@ -112,7 +112,7 @@ the page loads those libraries itself; `echarts-gl` only renders into their canv
 ## Options
 
 `EChartsGlOption` extends the core `EChartsOption` with `grid3D`, `xAxis3D`, `yAxis3D` and
-`zAxis3D`. The GL specific option types live in `echartsgl.options`:
+`zAxis3D`. The GL specific option types live in `io.github.shijianjs.ktjs.echarts.gl.options`:
 
 - `Grid3DOption` — layout (`left` / `top` / `width` / `height`), `boxWidth` / `boxHeight` /
   `boxDepth`, `environment`, and the nested `viewControl`, `light`, `postEffect` and

@@ -2,16 +2,16 @@ package demo.examples.dataset
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.AxisTypes
-import echarts.options.AxisInterval
-import echarts.options.AxisLabelOption
-import echarts.options.DimensionDefinitionLoose
-import echarts.options.EChartsOption
-import echarts.options.SeriesOption
-import echarts.options.XAxisOption
-import echarts.options.YAxisOption
-import echarts.options.barSeries
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.options.AxisInterval
+import io.github.shijianjs.ktjs.echarts.options.AxisLabelOption
+import io.github.shijianjs.ktjs.echarts.options.DimensionDefinitionLoose
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.XAxisOption
+import io.github.shijianjs.ktjs.echarts.options.YAxisOption
+import io.github.shijianjs.ktjs.echarts.options.barSeries
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import demo.examples.Category

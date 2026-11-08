@@ -3,8 +3,8 @@ package demo.examples.bar
 import demo.CatalogEntry
 import demo.Groups
 import demo.ui.loadJson
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import kotlin.js.unsafeCast
 import demo.examples.Category
 import demo.examples.doc.ObamaBudgetJson

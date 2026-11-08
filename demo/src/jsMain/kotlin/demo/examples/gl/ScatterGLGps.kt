@@ -2,7 +2,7 @@ package demo.examples.gl
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.one
 import demo.examples.Category
 import demo.examples.scatter.point
 

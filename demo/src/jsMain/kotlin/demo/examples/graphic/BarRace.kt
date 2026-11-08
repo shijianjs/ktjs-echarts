@@ -2,8 +2,8 @@ package demo.examples.graphic
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.js
@@ -40,7 +40,7 @@ val barRaceEntry: CatalogEntry =
                             series =
                                 arrayOf<SeriesOption>(
                                     barSeries {
-                                        type = echarts.SeriesTypes.bar
+                                        type = io.github.shijianjs.ktjs.echarts.SeriesTypes.bar
                                         typedData = numbers(*values)
                                     },
                                 )

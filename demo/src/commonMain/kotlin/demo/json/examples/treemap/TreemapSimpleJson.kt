@@ -4,7 +4,7 @@ import demo.json.JsonCategory
 import demo.json.JsonExample
 import demo.json.nodeItem
 import demo.json.nodes
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.*
 
 private val treemapSimpleJsonCategory = JsonCategory("json/examples/treemap/TreemapSimpleJson.kt")

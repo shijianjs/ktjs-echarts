@@ -1,9 +1,9 @@
 package demo.examples.matrix
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.chord.column
 import demo.examples.custom.coord
 import demo.examples.custom.dim

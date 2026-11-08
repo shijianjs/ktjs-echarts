@@ -1,6 +1,6 @@
 package demo.json.examples.shared
 
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.examples.dataset.row
 
 /** One named radar row: `{ name, value: [...] }`. */

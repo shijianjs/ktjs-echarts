@@ -1,13 +1,13 @@
 package demo.examples.shared
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import js.objects.Record
 import kotlin.js.JsAny
 import kotlin.js.js
 import kotlin.js.unsafeCast
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.candlestick.candle
 import demo.examples.chord.column
 import demo.examples.funnel.labels

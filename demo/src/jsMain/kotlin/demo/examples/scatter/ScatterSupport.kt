@@ -1,23 +1,23 @@
 package demo.examples.scatter
 
-import echarts.options.CallbackDataParams
-import echarts.options.DoubleOrDoubleArray
-import echarts.EmphasisFocuses
-import echarts.options.EmphasisOption
-import echarts.options.ItemStyleOption
-import echarts.options.OptionDataItem
-import echarts.options.ScatterDataItem
-import echarts.options.SeriesOption
-import echarts.options.SymbolSize
-import echarts.options.dataItems
-import echarts.options.one
-import echarts.options.points
-import echarts.options.scatterSeries
+import io.github.shijianjs.ktjs.echarts.options.CallbackDataParams
+import io.github.shijianjs.ktjs.echarts.options.DoubleOrDoubleArray
+import io.github.shijianjs.ktjs.echarts.EmphasisFocuses
+import io.github.shijianjs.ktjs.echarts.options.EmphasisOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.OptionDataItem
+import io.github.shijianjs.ktjs.echarts.options.ScatterDataItem
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.SymbolSize
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.points
+import io.github.shijianjs.ktjs.echarts.options.scatterSeries
 import js.objects.unsafeJso
 import kotlin.js.js
-import zrender.ZRColor
-import zrender.gradientColorStop
-import zrender.radialGradient
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.gradientColorStop
+import io.github.shijianjs.ktjs.zrender.radialGradient
 import demo.examples.custom.punchCardValues
 import demo.examples.heatmap.punchCard
 import demo.examples.lines.coordinate
@@ -122,10 +122,10 @@ internal fun bubbleSeries(name: String, table: List<DoubleArray>, inner: String,
                         show = true
                         // The original reads the country name out of the data row.
                         formatter =
-                            echarts.options.LabelFormatter(
-                                js("(params) => params.data[3]") as echarts.options.LabelFormatterCallback,
+                            io.github.shijianjs.ktjs.echarts.options.LabelFormatter(
+                                js("(params) => params.data[3]") as io.github.shijianjs.ktjs.echarts.options.LabelFormatterCallback,
                             )
-                        position = echarts.options.LabelPosition("top")
+                        position = io.github.shijianjs.ktjs.echarts.options.LabelPosition("top")
                     }
             }
         itemStyle =

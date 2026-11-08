@@ -2,7 +2,7 @@ package demo.examples.gauge
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.js
 import kotlin.math.round

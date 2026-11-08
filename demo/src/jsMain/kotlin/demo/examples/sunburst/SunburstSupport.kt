@@ -1,11 +1,11 @@
 package demo.examples.sunburst
 
-import echarts.EmphasisFocuses
-import echarts.options.EmphasisOption
-import echarts.options.LabelRotates
-import echarts.options.StringOrDouble
-import echarts.options.StringOrDoubleOrArray
-import echarts.options.SunburstLabelOption
+import io.github.shijianjs.ktjs.echarts.EmphasisFocuses
+import io.github.shijianjs.ktjs.echarts.options.EmphasisOption
+import io.github.shijianjs.ktjs.echarts.options.LabelRotates
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.StringOrDoubleOrArray
+import io.github.shijianjs.ktjs.echarts.options.SunburstLabelOption
 import js.objects.unsafeJso
 import kotlin.js.js
 import demo.examples.funnel.labels

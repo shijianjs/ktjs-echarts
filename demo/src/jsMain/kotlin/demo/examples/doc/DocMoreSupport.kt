@@ -1,17 +1,17 @@
 package demo.examples.doc
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import kotlin.math.round
 import web.cssom.TextAlign
 import web.cssom.VerticalAlign
-import zrender.ElementTextConfig
-import zrender.PatternObject
-import zrender.ZRColor
-import zrender.ZRShapeProps
-import zrender.ZRStyleProps
+import io.github.shijianjs.ktjs.zrender.ElementTextConfig
+import io.github.shijianjs.ktjs.zrender.PatternObject
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRShapeProps
+import io.github.shijianjs.ktjs.zrender.ZRStyleProps
 import demo.examples.gauge.center
 import demo.examples.shared.doubleRow
 import demo.examples.shared.fixed

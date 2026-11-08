@@ -2,19 +2,19 @@ package demo.examples.matrix
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.DatasetOption
-import echarts.options.OptionDataValue
-import echarts.options.datasetArrayRows
-import echarts.options.EChartsOption
-import echarts.options.ItemStyleOption
-import echarts.options.LabelOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.DatasetOption
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.datasetArrayRows
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
-import zrender.ZRFontWeights
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRFontWeights
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.shared.row
 

@@ -3,7 +3,7 @@ package demo.json.examples.pie
 import demo.json.JsonCategory
 import demo.json.JsonExample
 import demo.json.namedValue
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.*
 
 private val pieLegendJsonCategory = JsonCategory("json/examples/pie/PieLegendJson.kt")

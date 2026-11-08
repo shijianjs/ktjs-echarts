@@ -1,13 +1,13 @@
 package demo.examples.geo
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.round
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.gauge.center
 import demo.examples.gl.square
@@ -121,8 +121,8 @@ internal fun sicilyOption(): EChartsOption =
                 unsafeJso<TooltipOption> {
                     formatter =
                         TooltipFormatter { params ->
-                            val name = params.unsafeCast<echarts.options.CallbackDataParams>().name
-                            echarts.options.TooltipContent(
+                            val name = params.unsafeCast<io.github.shijianjs.ktjs.echarts.options.CallbackDataParams>().name
+                            io.github.shijianjs.ktjs.echarts.options.TooltipContent(
                                 listOf(name + ":")
                                     .plus(List(3) { "xxxxxxxxxxxxxxxx" })
                                     .joinToString("<br>"),
@@ -170,19 +170,19 @@ internal fun sicilyOption(): EChartsOption =
         xAxis =
             one(
                 unsafeJso {
-                    axisLine = unsafeJso<echarts.options.AxisLineOption> { show = BooleanOrString(false) }
-                    splitLine = unsafeJso<echarts.options.SplitLineOption> { show = false }
-                    axisLabel = unsafeJso<echarts.options.AxisLabelOption> { show = false }
-                    axisTick = unsafeJso<echarts.options.AxisTickOption> { show = BooleanOrString(false) }
+                    axisLine = unsafeJso<io.github.shijianjs.ktjs.echarts.options.AxisLineOption> { show = BooleanOrString(false) }
+                    splitLine = unsafeJso<io.github.shijianjs.ktjs.echarts.options.SplitLineOption> { show = false }
+                    axisLabel = unsafeJso<io.github.shijianjs.ktjs.echarts.options.AxisLabelOption> { show = false }
+                    axisTick = unsafeJso<io.github.shijianjs.ktjs.echarts.options.AxisTickOption> { show = BooleanOrString(false) }
                 },
             )
         yAxis =
             one(
                 unsafeJso {
-                    axisLine = unsafeJso<echarts.options.AxisLineOption> { show = BooleanOrString(false) }
-                    splitLine = unsafeJso<echarts.options.SplitLineOption> { show = false }
-                    axisLabel = unsafeJso<echarts.options.AxisLabelOption> { show = false }
-                    axisTick = unsafeJso<echarts.options.AxisTickOption> { show = BooleanOrString(false) }
+                    axisLine = unsafeJso<io.github.shijianjs.ktjs.echarts.options.AxisLineOption> { show = BooleanOrString(false) }
+                    splitLine = unsafeJso<io.github.shijianjs.ktjs.echarts.options.SplitLineOption> { show = false }
+                    axisLabel = unsafeJso<io.github.shijianjs.ktjs.echarts.options.AxisLabelOption> { show = false }
+                    axisTick = unsafeJso<io.github.shijianjs.ktjs.echarts.options.AxisTickOption> { show = BooleanOrString(false) }
                 },
             )
         series =
@@ -196,16 +196,16 @@ internal fun sicilyOption(): EChartsOption =
                             show = true
                             borderColor = "#999"
                             borderWidth = 1.0
-                            borderRadius = echarts.options.DoubleOrDoubleArray(2.0)
+                            borderRadius = io.github.shijianjs.ktjs.echarts.options.DoubleOrDoubleArray(2.0)
                             backgroundColor = ZRColor("#fff")
-                            padding = echarts.options.DoubleOrDoubleArray(arrayOf(3.0, 5.0))
+                            padding = io.github.shijianjs.ktjs.echarts.options.DoubleOrDoubleArray(arrayOf(3.0, 5.0))
                             fontSize = StringOrDouble(18.0)
                             opacity = 1.0
                             color = "#333"
                         }
                     encode =
-                        unsafeJso<echarts.options.OptionEncode> {
-                            label = echarts.options.OptionEncodeValue(echarts.options.DimensionLoose(2.0))
+                        unsafeJso<io.github.shijianjs.ktjs.echarts.options.OptionEncode> {
+                            label = io.github.shijianjs.ktjs.echarts.options.OptionEncodeValue(io.github.shijianjs.ktjs.echarts.options.DimensionLoose(2.0))
                         }
                     select =
                         unsafeJso<SelectOption> {
@@ -435,8 +435,8 @@ internal fun morphMapOption(sorted: Array<Pair<String, Double>>): EChartsOption 
                     id = "population"
                     roam = BooleanOrString(true)
                     map = "USA"
-                    animationDurationUpdate = echarts.options.AnimationDuration(1000.0)
-                    universalTransition = echarts.options.BooleanOrUniversalTransitionOption(true)
+                    animationDurationUpdate = io.github.shijianjs.ktjs.echarts.options.AnimationDuration(1000.0)
+                    universalTransition = io.github.shijianjs.ktjs.echarts.options.BooleanOrUniversalTransitionOption(true)
                     typedData = dataItems(*sorted.map { mapData(it.first, it.second) }.toTypedArray())
                 },
             )
@@ -445,22 +445,22 @@ internal fun morphMapOption(sorted: Array<Pair<String, Double>>): EChartsOption 
 /** The bar half of `map-bar-morph`. */
 internal fun morphBarOption(sorted: Array<Pair<String, Double>>): EChartsOption =
     unsafeJso {
-        xAxis = one(unsafeJso { type = echarts.AxisTypes.value })
+        xAxis = one(unsafeJso { type = io.github.shijianjs.ktjs.echarts.AxisTypes.value })
         yAxis =
             one(
                 unsafeJso {
-                    type = echarts.AxisTypes.category
-                    axisLabel = unsafeJso<echarts.options.AxisLabelOption> { rotate = 30.0 }
+                    type = io.github.shijianjs.ktjs.echarts.AxisTypes.category
+                    axisLabel = unsafeJso<io.github.shijianjs.ktjs.echarts.options.AxisLabelOption> { rotate = 30.0 }
                     data = Array<OptionDataItem?>(sorted.size) { OptionDataItem(OptionDataValue(sorted[it].first)) }
                 },
             )
-        animationDurationUpdate = echarts.options.AnimationDuration(1000.0)
+        animationDurationUpdate = io.github.shijianjs.ktjs.echarts.options.AnimationDuration(1000.0)
         series =
             one(
-                echarts.options.barSeries {
+                io.github.shijianjs.ktjs.echarts.options.barSeries {
                     id = "population"
-                    universalTransition = echarts.options.BooleanOrUniversalTransitionOption(true)
-                    typedData = dataItems(*sorted.map { echarts.options.BarDataItem(OptionDataValue(it.second)) }.toTypedArray())
+                    universalTransition = io.github.shijianjs.ktjs.echarts.options.BooleanOrUniversalTransitionOption(true)
+                    typedData = dataItems(*sorted.map { io.github.shijianjs.ktjs.echarts.options.BarDataItem(OptionDataValue(it.second)) }.toTypedArray())
                 },
             )
     }

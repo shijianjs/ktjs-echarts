@@ -1,68 +1,68 @@
 package demo.examples.custom
 
-import echarts.AxisNameLocations
-import echarts.AxisTypes
-import echarts.CustomSeriesRenderItemAPI
-import echarts.ECharts
-import echarts.Orients
-import echarts.TooltipTriggers
-import echarts.VisualMapTypes
-import echarts.options.AreaStyleOption
-import echarts.options.AxisLabelOption
-import echarts.options.AxisLineOption
-import echarts.options.AxisMinMax
-import echarts.options.BooleanOrDouble
-import echarts.options.BooleanOrString
-import echarts.options.CallbackDataParams
-import echarts.options.CoordinateSystemDataCoord
-import echarts.options.CustomGroupOption
-import echarts.options.CustomImageOption
-import echarts.options.CustomPathOption
-import echarts.options.CustomRootElementOption
-import echarts.options.CustomSeriesFontOption
-import echarts.options.CustomTextOption
-import echarts.options.DataZoomOption
-import echarts.options.DimensionLoose
-import echarts.options.EChartsOption
-import echarts.options.EmphasisOption
-import echarts.options.GridOption
-import echarts.options.IndexOrIndexArray
-import echarts.options.ItemStyleOption
-import echarts.options.LineDataItem
-import echarts.options.OptionDataItem
-import echarts.options.OptionDataValue
-import echarts.options.OptionEncode
-import echarts.options.OptionEncodeValue
-import echarts.options.SeriesOption
-import echarts.options.SplitLineOption
-import echarts.options.StringOrDouble
-import echarts.options.StringOrStringArray
-import echarts.options.SymbolShape
-import echarts.options.SymbolSize
-import echarts.options.TitleOption
-import echarts.options.TooltipFormatter
-import echarts.options.TooltipOption
-import echarts.options.TooltipContent
-import echarts.options.VisualMapOption
-import echarts.options.VisualPiece
-import echarts.options.XAxisOption
-import echarts.options.YAxisOption
-import echarts.options.customSeries
-import echarts.options.lineSeries
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.AxisNameLocations
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.CustomSeriesRenderItemAPI
+import io.github.shijianjs.ktjs.echarts.ECharts
+import io.github.shijianjs.ktjs.echarts.Orients
+import io.github.shijianjs.ktjs.echarts.TooltipTriggers
+import io.github.shijianjs.ktjs.echarts.VisualMapTypes
+import io.github.shijianjs.ktjs.echarts.options.AreaStyleOption
+import io.github.shijianjs.ktjs.echarts.options.AxisLabelOption
+import io.github.shijianjs.ktjs.echarts.options.AxisLineOption
+import io.github.shijianjs.ktjs.echarts.options.AxisMinMax
+import io.github.shijianjs.ktjs.echarts.options.BooleanOrDouble
+import io.github.shijianjs.ktjs.echarts.options.BooleanOrString
+import io.github.shijianjs.ktjs.echarts.options.CallbackDataParams
+import io.github.shijianjs.ktjs.echarts.options.CoordinateSystemDataCoord
+import io.github.shijianjs.ktjs.echarts.options.CustomGroupOption
+import io.github.shijianjs.ktjs.echarts.options.CustomImageOption
+import io.github.shijianjs.ktjs.echarts.options.CustomPathOption
+import io.github.shijianjs.ktjs.echarts.options.CustomRootElementOption
+import io.github.shijianjs.ktjs.echarts.options.CustomSeriesFontOption
+import io.github.shijianjs.ktjs.echarts.options.CustomTextOption
+import io.github.shijianjs.ktjs.echarts.options.DataZoomOption
+import io.github.shijianjs.ktjs.echarts.options.DimensionLoose
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.EmphasisOption
+import io.github.shijianjs.ktjs.echarts.options.GridOption
+import io.github.shijianjs.ktjs.echarts.options.IndexOrIndexArray
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.LineDataItem
+import io.github.shijianjs.ktjs.echarts.options.OptionDataItem
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.OptionEncode
+import io.github.shijianjs.ktjs.echarts.options.OptionEncodeValue
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.SplitLineOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.StringOrStringArray
+import io.github.shijianjs.ktjs.echarts.options.SymbolShape
+import io.github.shijianjs.ktjs.echarts.options.SymbolSize
+import io.github.shijianjs.ktjs.echarts.options.TitleOption
+import io.github.shijianjs.ktjs.echarts.options.TooltipFormatter
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.TooltipContent
+import io.github.shijianjs.ktjs.echarts.options.VisualMapOption
+import io.github.shijianjs.ktjs.echarts.options.VisualPiece
+import io.github.shijianjs.ktjs.echarts.options.XAxisOption
+import io.github.shijianjs.ktjs.echarts.options.YAxisOption
+import io.github.shijianjs.ktjs.echarts.options.customSeries
+import io.github.shijianjs.ktjs.echarts.options.lineSeries
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import kotlin.js.Date
 import kotlin.js.unsafeCast
 import kotlin.math.PI
 import web.cssom.TextAlign
 import web.cssom.VerticalAlign
-import zrender.StringOrImageLike
-import zrender.ZRColor
-import zrender.ZRLineTypes
-import zrender.ZRShapeProps
-import zrender.ZRStyleProps
-import zrender.gradientColorStop
-import zrender.linearGradient
+import io.github.shijianjs.ktjs.zrender.StringOrImageLike
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRLineTypes
+import io.github.shijianjs.ktjs.zrender.ZRShapeProps
+import io.github.shijianjs.ktjs.zrender.ZRStyleProps
+import io.github.shijianjs.ktjs.zrender.gradientColorStop
+import io.github.shijianjs.ktjs.zrender.linearGradient
 import demo.examples.chord.column
 import demo.examples.gauge.center
 import demo.examples.gl.square
@@ -387,12 +387,12 @@ internal fun windBarbOption(
         dataZoom =
             arrayOf(
                 unsafeJso<DataZoomOption> {
-                    type = echarts.DataZoomTypes.inside
+                    type = io.github.shijianjs.ktjs.echarts.DataZoomTypes.inside
                     xAxisIndex = IndexOrIndexArray(0.0)
                     minSpan = 5.0
                 },
                 unsafeJso<DataZoomOption> {
-                    type = echarts.DataZoomTypes.slider
+                    type = io.github.shijianjs.ktjs.echarts.DataZoomTypes.slider
                     xAxisIndex = IndexOrIndexArray(0.0)
                     minSpan = 5.0
                     bottom = StringOrDouble(50.0)

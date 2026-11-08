@@ -1,6 +1,6 @@
 package demo.examples.scatter
 
-import echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
 import demo.examples.shared.row
 
 /** The 31 rows of `dataBJ` (Beijing). */

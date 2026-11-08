@@ -1,16 +1,16 @@
 package demo.examples.gauge
 
-import echarts.options.GaugeDataItem
-import echarts.options.GaugeDataItemOption
-import echarts.options.GaugeDetailOption
-import echarts.options.GaugeTitleOption
-import echarts.options.LabelFormatterCallback
-import echarts.options.OptionDataValue
-import echarts.options.OptionId
-import echarts.options.StringOrDouble
-import echarts.options.TooltipFormatter
-import echarts.options.TooltipOption
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.GaugeDataItem
+import io.github.shijianjs.ktjs.echarts.options.GaugeDataItemOption
+import io.github.shijianjs.ktjs.echarts.options.GaugeDetailOption
+import io.github.shijianjs.ktjs.echarts.options.GaugeTitleOption
+import io.github.shijianjs.ktjs.echarts.options.LabelFormatterCallback
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.OptionId
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.TooltipFormatter
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import kotlin.js.js
 

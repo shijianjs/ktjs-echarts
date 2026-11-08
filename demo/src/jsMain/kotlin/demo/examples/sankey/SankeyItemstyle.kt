@@ -2,20 +2,20 @@ package demo.examples.sankey
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.ItemStyleOption
-import echarts.options.LabelOption
-import echarts.options.OptionId
-import echarts.options.SankeyEdgeColor
-import echarts.options.SankeyEdgeStyleOption
-import echarts.options.SankeyNodeItemOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.TitleOption
-import echarts.options.one
-import echarts.options.sankeySeries
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.OptionId
+import io.github.shijianjs.ktjs.echarts.options.SankeyEdgeColor
+import io.github.shijianjs.ktjs.echarts.options.SankeyEdgeStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SankeyNodeItemOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.TitleOption
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.sankeySeries
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.gauge.center
 

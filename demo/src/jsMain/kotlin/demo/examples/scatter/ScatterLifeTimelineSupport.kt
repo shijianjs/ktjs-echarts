@@ -1,13 +1,13 @@
 package demo.examples.scatter
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
 import kotlin.math.sqrt
 import web.cssom.FontWeight
-import zrender.ZRFontWeight
+import io.github.shijianjs.ktjs.zrender.ZRFontWeight
 import demo.examples.gauge.center
 import demo.examples.gl.square
 import demo.examples.matrix.dimension

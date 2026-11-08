@@ -2,19 +2,19 @@ package demo.examples.chord
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.EmphasisFocuses
-import echarts.options.ItemStyleOption
-import echarts.options.LabelOption
-import echarts.options.LabelPosition
-import echarts.options.LineStyleOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.StringOrDoubleOrArray
-import echarts.options.chordSeries
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.EmphasisFocuses
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LabelPosition
+import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.StringOrDoubleOrArray
+import io.github.shijianjs.ktjs.echarts.options.chordSeries
 import js.objects.unsafeJso
-import zrender.ZRColor
-import zrender.ZRFontWeights
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRFontWeights
 import demo.examples.Category
 import demo.examples.gauge.center
 import demo.examples.sunburst.radius
@@ -41,7 +41,7 @@ val chordStyleEntry: CatalogEntry =
                                     borderColor = ZRColor("#fff")
                                 }
                             lineStyle = unsafeJso<LineStyleOption> { opacity = 0.3; color = ZRColor("gradient") }
-                            emphasis = unsafeJso<echarts.options.EmphasisOption> { focus = EmphasisFocuses.self }
+                            emphasis = unsafeJso<io.github.shijianjs.ktjs.echarts.options.EmphasisOption> { focus = EmphasisFocuses.self }
                             label =
                                 unsafeJso<LabelOption> {
                                     show = true

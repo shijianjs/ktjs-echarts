@@ -2,8 +2,8 @@ package demo.examples.matrix
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import demo.examples.Category
 
 private val matrixPeriodicTableCategory = Category(Groups.MATRIX, "examples/matrix/MatrixPeriodicTable.kt")

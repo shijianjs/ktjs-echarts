@@ -2,10 +2,10 @@ package demo.examples.calendar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.SeriesOption
-import echarts.options.VisualMapOption
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.VisualMapOption
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.js

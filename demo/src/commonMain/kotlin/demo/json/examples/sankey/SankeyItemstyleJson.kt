@@ -2,7 +2,7 @@ package demo.json.examples.sankey
 
 import demo.json.JsonCategory
 import demo.json.JsonExample
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.examples.shared.ITEM_STYLE_LINKS
 import demo.json.examples.shared.ITEM_STYLE_NODES
 import demo.json.examples.shared.coloredNode

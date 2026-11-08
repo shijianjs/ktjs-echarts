@@ -2,7 +2,7 @@ package demo.json.examples.sunburst
 
 import demo.json.nodeItem
 import demo.json.nodes
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive

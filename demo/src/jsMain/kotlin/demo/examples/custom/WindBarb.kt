@@ -3,7 +3,7 @@ package demo.examples.custom
 import demo.CatalogEntry
 import demo.Groups
 import demo.ui.loadJson
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.one
 import kotlin.js.unsafeCast
 import demo.examples.Category
 

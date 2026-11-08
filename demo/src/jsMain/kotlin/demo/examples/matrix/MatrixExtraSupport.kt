@@ -1,12 +1,12 @@
 package demo.examples.matrix
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.math.PI
 import kotlin.math.cos
-import zrender.ZRColor
-import zrender.ZRFontWeight
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRFontWeight
 import demo.examples.calendar.cellSize
 import demo.examples.chord.column
 import demo.examples.custom.coord

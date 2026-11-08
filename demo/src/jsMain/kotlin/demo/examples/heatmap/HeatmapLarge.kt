@@ -2,10 +2,10 @@ package demo.examples.heatmap
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.TooltipOption
-import echarts.options.VisualMapOption
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.VisualMapOption
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import demo.examples.Category
 

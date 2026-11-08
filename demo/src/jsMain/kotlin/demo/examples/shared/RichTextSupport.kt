@@ -1,15 +1,15 @@
 package demo.examples.shared
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.Record
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import web.cssom.TextAlign
-import zrender.ZRColor
-import zrender.ImageLike
-import zrender.ImagePatternObject
-import zrender.PatternObject
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ImageLike
+import io.github.shijianjs.ktjs.zrender.ImagePatternObject
+import io.github.shijianjs.ktjs.zrender.PatternObject
 import demo.examples.gauge.center
 import demo.examples.gl.square
 import demo.examples.matrix.cell

@@ -2,10 +2,10 @@ package demo.examples.bar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
-import zrender.ZRFontWeights
+import io.github.shijianjs.ktjs.zrender.ZRFontWeights
 import demo.examples.Category
 import demo.examples.gauge.center
 

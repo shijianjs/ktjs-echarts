@@ -2,9 +2,9 @@ package demo.examples.treemap
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.SeriesOption
-import echarts.options.treemapSeries
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.treemapSeries
 import js.objects.unsafeJso
 import demo.examples.Category
 

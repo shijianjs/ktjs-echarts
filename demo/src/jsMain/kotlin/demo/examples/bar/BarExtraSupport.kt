@@ -1,14 +1,14 @@
 package demo.examples.bar
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.Record
 import js.objects.unsafeJso
 import kotlin.js.Date
 import kotlin.js.unsafeCast
 import web.cssom.TextAlign
 import web.cssom.VerticalAlign
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.doc.ObamaBudgetJson
 import demo.examples.doc.budgetAxisLabel
 import demo.examples.funnel.labels

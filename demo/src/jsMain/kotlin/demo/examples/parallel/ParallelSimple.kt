@@ -2,15 +2,15 @@ package demo.examples.parallel
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.AxisTypes
-import echarts.options.EChartsOption
-import echarts.options.LineStyleOption
-import echarts.options.ParallelAxisOption
-import echarts.options.ParallelSeriesDataItem
-import echarts.options.dataItems
-import echarts.options.one
-import echarts.options.parallelSeries
-import echarts.options.strings
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.ParallelAxisOption
+import io.github.shijianjs.ktjs.echarts.options.ParallelSeriesDataItem
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.parallelSeries
+import io.github.shijianjs.ktjs.echarts.options.strings
 import js.objects.unsafeJso
 import demo.examples.Category
 import demo.examples.custom.dim
@@ -23,11 +23,11 @@ val parallelSimpleEntry: CatalogEntry =
             unsafeJso<EChartsOption> {
                 parallelAxis =
                     arrayOf(
-                        unsafeJso<ParallelAxisOption> { dim = echarts.options.IndexOrIndexArray(0.0); name = "Price" },
-                        unsafeJso<ParallelAxisOption> { dim = echarts.options.IndexOrIndexArray(1.0); name = "Net Weight" },
-                        unsafeJso<ParallelAxisOption> { dim = echarts.options.IndexOrIndexArray(2.0); name = "Amount" },
+                        unsafeJso<ParallelAxisOption> { dim = io.github.shijianjs.ktjs.echarts.options.IndexOrIndexArray(0.0); name = "Price" },
+                        unsafeJso<ParallelAxisOption> { dim = io.github.shijianjs.ktjs.echarts.options.IndexOrIndexArray(1.0); name = "Net Weight" },
+                        unsafeJso<ParallelAxisOption> { dim = io.github.shijianjs.ktjs.echarts.options.IndexOrIndexArray(2.0); name = "Amount" },
                         unsafeJso<ParallelAxisOption> {
-                            dim = echarts.options.IndexOrIndexArray(3.0)
+                            dim = io.github.shijianjs.ktjs.echarts.options.IndexOrIndexArray(3.0)
                             name = "Score"
                             type = AxisTypes.category
                             data = strings("Excellent", "Good", "OK", "Bad")

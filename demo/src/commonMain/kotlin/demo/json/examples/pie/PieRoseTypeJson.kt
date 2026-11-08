@@ -2,7 +2,7 @@ package demo.json.examples.pie
 
 import demo.json.JsonCategory
 import demo.json.JsonExample
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.*
 
 private val pieRoseTypeJsonCategory = JsonCategory("json/examples/pie/PieRoseTypeJson.kt")
@@ -26,7 +26,7 @@ val pieRoseTypeJsonExample: JsonExample =
                     name = "Radius Mode"
                     radius = NumberOrStringOrNumbers.of(num(20), num(140))
                     center = listOf(str("25%"), str("50%"))
-                    roseType = io.github.shijianjs.kmpechartsjson.BooleanOrString.of("radius")
+                    roseType = io.github.shijianjs.ktjs.echarts.json.BooleanOrString.of("radius")
                     itemStyle { borderRadius = NumberOrStringOrNumbers.of(5) }
                     label { show = false }
                     emphasis { label { show = true } }
@@ -36,7 +36,7 @@ val pieRoseTypeJsonExample: JsonExample =
                     name = "Area Mode"
                     radius = NumberOrStringOrNumbers.of(num(20), num(140))
                     center = listOf(str("75%"), str("50%"))
-                    roseType = io.github.shijianjs.kmpechartsjson.BooleanOrString.of("area")
+                    roseType = io.github.shijianjs.ktjs.echarts.json.BooleanOrString.of("area")
                     itemStyle { borderRadius = NumberOrStringOrNumbers.of(5) }
                     data = roseData(30, 28, 26, 24, 22, 20, 18, 16)
                 }

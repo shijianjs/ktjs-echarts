@@ -2,7 +2,7 @@ package demo.json.examples.themeriver
 
 import demo.json.JsonCategory
 import demo.json.JsonExample
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.examples.shared.lastfmBand
 import demo.json.*
 

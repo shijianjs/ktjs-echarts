@@ -1,7 +1,7 @@
 package demo.json.examples.heatmap
 
 import demo.json.*
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.JsonCategory
 import demo.json.JsonExample
 import demo.json.examples.shared.FIELD_COLUMNS

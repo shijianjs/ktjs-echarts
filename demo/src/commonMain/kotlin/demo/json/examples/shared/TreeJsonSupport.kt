@@ -1,7 +1,7 @@
 package demo.json.examples.shared
 
 import demo.json.nodeItem
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.examples.sunburst.level
 
 /** One leaf of the flare hierarchy. */

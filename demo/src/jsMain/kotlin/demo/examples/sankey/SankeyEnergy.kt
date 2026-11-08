@@ -2,13 +2,13 @@ package demo.examples.sankey
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.EmphasisFocuses
-import echarts.options.EmphasisOption
-import echarts.options.SankeyEdgeColor
-import echarts.options.SankeyEdgeStyleOption
-import echarts.options.SeriesOption
-import echarts.options.sankeySeries
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.EmphasisFocuses
+import io.github.shijianjs.ktjs.echarts.options.EmphasisOption
+import io.github.shijianjs.ktjs.echarts.options.SankeyEdgeColor
+import io.github.shijianjs.ktjs.echarts.options.SankeyEdgeStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.sankeySeries
 import js.objects.unsafeJso
 import demo.examples.Category
 

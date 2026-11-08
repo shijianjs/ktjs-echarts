@@ -1,10 +1,10 @@
 package demo.examples.scatter
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.matrix.dimension
 import demo.examples.matrix.names
 import demo.examples.shared.every

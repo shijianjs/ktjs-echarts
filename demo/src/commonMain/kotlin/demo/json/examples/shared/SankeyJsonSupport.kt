@@ -2,7 +2,7 @@ package demo.json.examples.shared
 
 import demo.json.linkItem
 import demo.json.timedValue
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.examples.dataset.row
 import demo.json.nodes
 

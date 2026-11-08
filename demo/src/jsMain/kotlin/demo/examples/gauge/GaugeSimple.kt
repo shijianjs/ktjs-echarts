@@ -2,12 +2,12 @@ package demo.examples.gauge
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.GaugeDetailOption
-import echarts.options.GaugeProgressOption
-import echarts.options.LabelFormatter
-import echarts.options.SeriesOption
-import echarts.options.gaugeSeries
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.GaugeDetailOption
+import io.github.shijianjs.ktjs.echarts.options.GaugeProgressOption
+import io.github.shijianjs.ktjs.echarts.options.LabelFormatter
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.gaugeSeries
 import js.objects.unsafeJso
 import kotlin.js.js
 import demo.examples.Category

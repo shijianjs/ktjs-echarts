@@ -3,7 +3,7 @@ package demo.json.examples.shared
 import demo.json.namedValues
 import demo.json.points
 import demo.json.triples
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive

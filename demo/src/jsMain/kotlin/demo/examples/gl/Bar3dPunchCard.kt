@@ -2,13 +2,13 @@ package demo.examples.gl
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.AxisTypes
-import echarts.options.*
-import echartsgl.GlColor
-import echartsgl.ShadingTypes
-import echartsgl.options.*
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.options.*
+import io.github.shijianjs.ktjs.echarts.gl.GlColor
+import io.github.shijianjs.ktjs.echarts.gl.ShadingTypes
+import io.github.shijianjs.ktjs.echarts.gl.options.*
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.custom.punchCardDays
 import demo.examples.custom.punchCardHours

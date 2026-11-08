@@ -1,22 +1,22 @@
 package demo.examples.radar
 
-import echarts.options.AreaStyleOption
-import echarts.options.ItemStyleOption
-import echarts.options.LabelFormatterCallback
-import echarts.options.LineStyleOption
-import echarts.options.OptionDataValue
-import echarts.options.OptionId
-import echarts.options.RadarIndicator
-import echarts.options.RadarSeriesDataItem
-import echarts.options.RadarSeriesDataItemOption
-import echarts.options.SeriesOption
-import echarts.options.SymbolShape
-import echarts.options.dataItems
-import echarts.options.one
-import echarts.options.radarSeries
+import io.github.shijianjs.ktjs.echarts.options.AreaStyleOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.LabelFormatterCallback
+import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.OptionId
+import io.github.shijianjs.ktjs.echarts.options.RadarIndicator
+import io.github.shijianjs.ktjs.echarts.options.RadarSeriesDataItem
+import io.github.shijianjs.ktjs.echarts.options.RadarSeriesDataItemOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.SymbolShape
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.radarSeries
 import js.objects.unsafeJso
 import kotlin.js.js
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.lines.coordinate
 import demo.examples.shared.row
 

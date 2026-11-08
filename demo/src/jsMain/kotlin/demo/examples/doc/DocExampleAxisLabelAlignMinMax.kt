@@ -1,8 +1,8 @@
 package demo.examples.doc
 
 import demo.CatalogEntry
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import demo.Groups
 import js.objects.unsafeJso
 import web.cssom.TextAlign

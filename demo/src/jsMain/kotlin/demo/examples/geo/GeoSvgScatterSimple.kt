@@ -3,11 +3,11 @@ package demo.examples.geo
 import demo.CatalogEntry
 import demo.Groups
 import demo.ui.loadText
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.matrix.dimension
 import demo.examples.shared.numberAt

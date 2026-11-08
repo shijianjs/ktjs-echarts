@@ -1,7 +1,7 @@
 package demo.json.examples.radar
 
 import demo.json.*
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import kotlinx.serialization.json.*
 import demo.json.JsonCategory
 import demo.json.JsonExample

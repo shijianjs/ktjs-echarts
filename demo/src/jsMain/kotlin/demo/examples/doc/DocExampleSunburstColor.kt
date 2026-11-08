@@ -1,11 +1,11 @@
 package demo.examples.doc
 
 import demo.CatalogEntry
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import demo.Groups
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 
 private val docExampleSunburstColorCategory = Category(Groups.DOC, "examples/doc/DocExampleSunburstColor.kt")

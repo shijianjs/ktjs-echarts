@@ -2,33 +2,33 @@ package demo.examples.radar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.RadarShapes
-import echarts.options.AreaStyleOption
-import echarts.options.AxisLineOption
-import echarts.options.DoubleOrDoubleArray
-import echarts.options.EChartsOption
-import echarts.options.EmphasisOption
-import echarts.options.LabelFormatter
-import echarts.options.LabelOption
-import echarts.options.LegendOption
-import echarts.options.LineStyleOption
-import echarts.options.RadarOption
-import echarts.options.SeriesOption
-import echarts.options.SplitAreaOption
-import echarts.options.SplitAreaStyleOption
-import echarts.options.SplitLineOption
-import echarts.options.SplitLineStyleOption
-import echarts.options.StringOrDouble
-import echarts.options.SymbolShape
-import echarts.options.SymbolSize
-import echarts.options.TitleOption
-import echarts.options.dataItems
-import echarts.options.one
-import echarts.options.radarSeries
+import io.github.shijianjs.ktjs.echarts.RadarShapes
+import io.github.shijianjs.ktjs.echarts.options.AreaStyleOption
+import io.github.shijianjs.ktjs.echarts.options.AxisLineOption
+import io.github.shijianjs.ktjs.echarts.options.DoubleOrDoubleArray
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.EmphasisOption
+import io.github.shijianjs.ktjs.echarts.options.LabelFormatter
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LegendOption
+import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.RadarOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.SplitAreaOption
+import io.github.shijianjs.ktjs.echarts.options.SplitAreaStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SplitLineOption
+import io.github.shijianjs.ktjs.echarts.options.SplitLineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.SymbolShape
+import io.github.shijianjs.ktjs.echarts.options.SymbolSize
+import io.github.shijianjs.ktjs.echarts.options.TitleOption
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.radarSeries
 import js.objects.unsafeJso
 import kotlin.js.js
-import zrender.ZRColor
-import zrender.ZRLineTypes
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRLineTypes
 import demo.examples.Category
 import demo.examples.gauge.center
 import demo.examples.shared.row
@@ -138,13 +138,13 @@ val radarCustomEntry: CatalogEntry =
                                         areaStyle =
                                             unsafeJso<AreaStyleOption> {
                                                 color =
-                                                    zrender.radialGradient(
+                                                    io.github.shijianjs.ktjs.zrender.radialGradient(
                                                         0.1,
                                                         0.6,
                                                         1.0,
                                                         arrayOf(
-                                                            zrender.gradientColorStop(0.0, "rgba(255, 145, 124, 0.1)"),
-                                                            zrender.gradientColorStop(1.0, "rgba(255, 145, 124, 0.9)"),
+                                                            io.github.shijianjs.ktjs.zrender.gradientColorStop(0.0, "rgba(255, 145, 124, 0.1)"),
+                                                            io.github.shijianjs.ktjs.zrender.gradientColorStop(1.0, "rgba(255, 145, 124, 0.9)"),
                                                         ),
                                                     )
                                             }

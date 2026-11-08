@@ -1,8 +1,8 @@
 package demo.examples.tree
 
-import echarts.options.OptionDataValue
-import echarts.options.OptionId
-import echarts.options.TreeSeriesNodeItemOption
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.OptionId
+import io.github.shijianjs.ktjs.echarts.options.TreeSeriesNodeItemOption
 import js.objects.unsafeJso
 import demo.examples.line.Easing
 

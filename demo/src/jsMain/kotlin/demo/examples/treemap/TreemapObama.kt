@@ -5,8 +5,8 @@ import demo.Groups
 import demo.ui.loadJson
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import demo.examples.Category

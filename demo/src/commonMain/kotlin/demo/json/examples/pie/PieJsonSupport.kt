@@ -1,7 +1,7 @@
 package demo.json.examples.pie
 
 import demo.json.namedValues
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 
 /** The `{ name, value }` set shared by the doughnut family. */
 internal val ACCESS_FROM =
@@ -17,11 +17,11 @@ internal val ACCESS_FROM =
 internal fun legendOf(vararg names: String): List<String> = names.toList()
 
 /** Eight rose values, labelled `rose 1` .. `rose 8`. */
-internal fun roseData(vararg values: Number): List<io.github.shijianjs.kmpechartsjson.DataValue> =
+internal fun roseData(vararg values: Number): List<io.github.shijianjs.ktjs.echarts.json.DataValue> =
     namedValues(*Array(values.size) { index -> "rose ${index + 1}" to values[index] })
 
 /** Label of the doughnut family: the hovered percentage in the middle of the ring. */
-internal fun centerEmphasis(): io.github.shijianjs.kmpechartsjson.EmphasisOption.() -> Unit = {
+internal fun centerEmphasis(): io.github.shijianjs.ktjs.echarts.json.EmphasisOption.() -> Unit = {
     label {
         show = true
         fontSize = 40.0

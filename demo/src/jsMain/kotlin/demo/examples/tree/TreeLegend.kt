@@ -2,21 +2,21 @@ package demo.examples.tree
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.EmphasisFocuses
-import echarts.Orients
-import echarts.TooltipTriggerOns
-import echarts.TooltipTriggers
-import echarts.options.EChartsOption
-import echarts.options.LegendDataItemOption
-import echarts.options.LegendOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.SymbolSize
-import echarts.options.TooltipOption
-import echarts.options.one
-import echarts.options.treeSeries
+import io.github.shijianjs.ktjs.echarts.EmphasisFocuses
+import io.github.shijianjs.ktjs.echarts.Orients
+import io.github.shijianjs.ktjs.echarts.TooltipTriggerOns
+import io.github.shijianjs.ktjs.echarts.TooltipTriggers
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.LegendDataItemOption
+import io.github.shijianjs.ktjs.echarts.options.LegendOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.SymbolSize
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.treeSeries
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 
 private val treeLegendCategory = Category(Groups.TREE, "examples/tree/TreeLegend.kt")
@@ -59,8 +59,8 @@ val treeLegendEntry: CatalogEntry =
                             leaves = leaves()
                             emphasis = unsafeJso { focus = EmphasisFocuses.descendant }
                             expandAndCollapse = true
-                            animationDuration = echarts.options.AnimationDuration(550.0)
-                            animationDurationUpdate = echarts.options.AnimationDuration(750.0)
+                            animationDuration = io.github.shijianjs.ktjs.echarts.options.AnimationDuration(550.0)
+                            animationDurationUpdate = io.github.shijianjs.ktjs.echarts.options.AnimationDuration(750.0)
                         },
                         treeSeries {
                             name = "tree2"
@@ -74,8 +74,8 @@ val treeLegendEntry: CatalogEntry =
                             leaves = leaves()
                             emphasis = unsafeJso { focus = EmphasisFocuses.descendant }
                             expandAndCollapse = true
-                            animationDuration = echarts.options.AnimationDuration(550.0)
-                            animationDurationUpdate = echarts.options.AnimationDuration(750.0)
+                            animationDuration = io.github.shijianjs.ktjs.echarts.options.AnimationDuration(550.0)
+                            animationDurationUpdate = io.github.shijianjs.ktjs.echarts.options.AnimationDuration(750.0)
                         },
                     )
             }

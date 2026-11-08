@@ -2,10 +2,10 @@ package demo.examples.dataset
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.MediaQueryOption
-import echarts.options.MediaUnit
-import echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.MediaQueryOption
+import io.github.shijianjs.ktjs.echarts.options.MediaUnit
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import demo.examples.Category

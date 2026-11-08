@@ -2,26 +2,26 @@ package demo.examples.calendar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.Orients
-import echarts.options.CalendarYearLabelOption
-import echarts.options.DoubleOrDoubleArray
-import echarts.options.EChartsOption
-import echarts.options.EffectScatterDataItem
-import echarts.options.ScatterDataItem
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.StringOrDoubleOrArray
-import echarts.options.StringOrStringArray
-import echarts.options.SymbolSize
-import echarts.options.TooltipOption
-import echarts.options.TooltipPosition
-import echarts.options.VisualMapOption
-import echarts.options.VisualOptionUnit
-import echarts.options.dataItems
-import echarts.options.effectScatterSeries
-import echarts.options.graphSeries
-import echarts.options.one
-import echarts.options.scatterSeries
+import io.github.shijianjs.ktjs.echarts.Orients
+import io.github.shijianjs.ktjs.echarts.options.CalendarYearLabelOption
+import io.github.shijianjs.ktjs.echarts.options.DoubleOrDoubleArray
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.EffectScatterDataItem
+import io.github.shijianjs.ktjs.echarts.options.ScatterDataItem
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.StringOrDoubleOrArray
+import io.github.shijianjs.ktjs.echarts.options.StringOrStringArray
+import io.github.shijianjs.ktjs.echarts.options.SymbolSize
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.TooltipPosition
+import io.github.shijianjs.ktjs.echarts.options.VisualMapOption
+import io.github.shijianjs.ktjs.echarts.options.VisualOptionUnit
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.effectScatterSeries
+import io.github.shijianjs.ktjs.echarts.options.graphSeries
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.scatterSeries
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.js
@@ -51,7 +51,7 @@ val calendarChartsEntry: CatalogEntry =
                             min = 0.0
                             max = 1000.0
                             calculable = true
-                            seriesIndex = echarts.options.IndexOrIndexArray(arrayOf(2.0, 3.0, 4.0))
+                            seriesIndex = io.github.shijianjs.ktjs.echarts.options.IndexOrIndexArray(arrayOf(2.0, 3.0, 4.0))
                             orient = Orients.horizontal
                             left = StringOrDouble("55%")
                             bottom = StringOrDouble(20.0)
@@ -72,7 +72,7 @@ val calendarChartsEntry: CatalogEntry =
                                         }
                                     outOfRange = unsafeJso<VisualOptionUnit> { color = StringOrStringArray("#ccc") }
                                 }
-                            seriesIndex = echarts.options.IndexOrIndexArray(1.0)
+                            seriesIndex = io.github.shijianjs.ktjs.echarts.options.IndexOrIndexArray(1.0)
                             orient = Orients.horizontal
                             left = StringOrDouble("10%")
                             bottom = StringOrDouble(20.0)

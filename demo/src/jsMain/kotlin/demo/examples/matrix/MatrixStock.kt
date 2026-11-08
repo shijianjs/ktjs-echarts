@@ -2,8 +2,8 @@ package demo.examples.matrix
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import kotlin.js.js
 import demo.examples.Category
 import demo.examples.shared.Lcg

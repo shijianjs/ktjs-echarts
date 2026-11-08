@@ -3,7 +3,7 @@ package demo.json.examples.tree
 import demo.json.JsonCategory
 import demo.json.JsonExample
 import demo.json.nodes
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.examples.shared.flareTree
 import demo.json.*
 

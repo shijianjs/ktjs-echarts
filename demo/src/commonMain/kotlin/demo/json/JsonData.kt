@@ -1,11 +1,11 @@
 package demo.json
 
-import io.github.shijianjs.kmpechartsjson.DataItem
-import io.github.shijianjs.kmpechartsjson.DataValue
-import io.github.shijianjs.kmpechartsjson.asDataValue
-import io.github.shijianjs.kmpechartsjson.dataItem
-import io.github.shijianjs.kmpechartsjson.point
-import io.github.shijianjs.kmpechartsjson.valueOf
+import io.github.shijianjs.ktjs.echarts.json.DataItem
+import io.github.shijianjs.ktjs.echarts.json.DataValue
+import io.github.shijianjs.ktjs.echarts.json.asDataValue
+import io.github.shijianjs.ktjs.echarts.json.dataItem
+import io.github.shijianjs.ktjs.echarts.json.point
+import io.github.shijianjs.ktjs.echarts.json.valueOf
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive

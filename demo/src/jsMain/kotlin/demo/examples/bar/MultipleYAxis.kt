@@ -2,28 +2,28 @@ package demo.examples.bar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.AxisPointerTypes
-import echarts.AxisTypes
-import echarts.TooltipTriggers
-import echarts.options.AxisPointerOption
-import echarts.options.BooleanOrString
-import echarts.options.EChartsOption
-import echarts.options.GridOption
-import echarts.options.LegendOption
-import echarts.options.LineStyleOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.TooltipOption
-import echarts.options.XAxisOption
-import echarts.options.YAxisOption
-import echarts.options.barSeries
-import echarts.options.lineSeries
-import echarts.options.numbers
-import echarts.options.one
-import echarts.options.strings
+import io.github.shijianjs.ktjs.echarts.AxisPointerTypes
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.TooltipTriggers
+import io.github.shijianjs.ktjs.echarts.options.AxisPointerOption
+import io.github.shijianjs.ktjs.echarts.options.BooleanOrString
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.GridOption
+import io.github.shijianjs.ktjs.echarts.options.LegendOption
+import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.XAxisOption
+import io.github.shijianjs.ktjs.echarts.options.YAxisOption
+import io.github.shijianjs.ktjs.echarts.options.barSeries
+import io.github.shijianjs.ktjs.echarts.options.lineSeries
+import io.github.shijianjs.ktjs.echarts.options.numbers
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.strings
 import js.objects.unsafeJso
 import kotlin.js.js
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.shared.axisLabel
 import demo.examples.shared.legendNames
@@ -62,27 +62,27 @@ val multipleYAxisEntry: CatalogEntry =
                         unsafeJso<YAxisOption> {
                             type = AxisTypes.value
                             name = "Evaporation"
-                            position = echarts.AxisPositions.right
+                            position = io.github.shijianjs.ktjs.echarts.AxisPositions.right
                             alignTicks = true
-                            axisLine = unsafeJso { show = echarts.options.BooleanOrString(true); lineStyle = unsafeJso<LineStyleOption> { color = ZRColor(colours[0]) } }
-                            axisLabel = unsafeJso { formatter = echarts.options.LabelFormatter("{value} ml") }
+                            axisLine = unsafeJso { show = io.github.shijianjs.ktjs.echarts.options.BooleanOrString(true); lineStyle = unsafeJso<LineStyleOption> { color = ZRColor(colours[0]) } }
+                            axisLabel = unsafeJso { formatter = io.github.shijianjs.ktjs.echarts.options.LabelFormatter("{value} ml") }
                         },
                         unsafeJso<YAxisOption> {
                             type = AxisTypes.value
                             name = "Precipitation"
-                            position = echarts.AxisPositions.right
+                            position = io.github.shijianjs.ktjs.echarts.AxisPositions.right
                             alignTicks = true
                             offset = 80.0
-                            axisLine = unsafeJso { show = echarts.options.BooleanOrString(true); lineStyle = unsafeJso<LineStyleOption> { color = ZRColor(colours[1]) } }
-                            axisLabel = unsafeJso { formatter = echarts.options.LabelFormatter("{value} ml") }
+                            axisLine = unsafeJso { show = io.github.shijianjs.ktjs.echarts.options.BooleanOrString(true); lineStyle = unsafeJso<LineStyleOption> { color = ZRColor(colours[1]) } }
+                            axisLabel = unsafeJso { formatter = io.github.shijianjs.ktjs.echarts.options.LabelFormatter("{value} ml") }
                         },
                         unsafeJso<YAxisOption> {
                             type = AxisTypes.value
                             name = "温度"
-                            position = echarts.AxisPositions.left
+                            position = io.github.shijianjs.ktjs.echarts.AxisPositions.left
                             alignTicks = true
-                            axisLine = unsafeJso { show = echarts.options.BooleanOrString(true); lineStyle = unsafeJso<LineStyleOption> { color = ZRColor(colours[2]) } }
-                            axisLabel = unsafeJso { formatter = echarts.options.LabelFormatter("{value} °C") }
+                            axisLine = unsafeJso { show = io.github.shijianjs.ktjs.echarts.options.BooleanOrString(true); lineStyle = unsafeJso<LineStyleOption> { color = ZRColor(colours[2]) } }
+                            axisLabel = unsafeJso { formatter = io.github.shijianjs.ktjs.echarts.options.LabelFormatter("{value} °C") }
                         },
                     )
                 series =

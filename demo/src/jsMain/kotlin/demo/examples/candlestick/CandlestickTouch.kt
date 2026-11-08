@@ -2,8 +2,8 @@ package demo.examples.candlestick
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import kotlin.js.JsAny
 import demo.examples.Category
 

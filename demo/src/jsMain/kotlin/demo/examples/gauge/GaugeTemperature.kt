@@ -2,11 +2,11 @@ package demo.examples.gauge
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
-import zrender.ZRColor
-import zrender.ZRFontWeights
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRFontWeights
 import demo.examples.Category
 import demo.examples.shared.axisLabel
 

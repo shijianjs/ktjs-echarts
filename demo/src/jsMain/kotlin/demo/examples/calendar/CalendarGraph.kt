@@ -2,26 +2,26 @@ package demo.examples.calendar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.Orients
-import echarts.options.CalendarRange
-import echarts.options.CalendarYearLabelOption
-import echarts.options.DataZoomValue
-import echarts.options.EChartsOption
-import echarts.options.ItemStyleOption
-import echarts.options.LineStyleOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.StringOrDoubleOrArray
-import echarts.options.StringOrStringArray
-import echarts.options.SymbolSize
-import echarts.options.TooltipOption
-import echarts.options.VisualOptionUnit
-import echarts.options.graphSeries
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.Orients
+import io.github.shijianjs.ktjs.echarts.options.CalendarRange
+import io.github.shijianjs.ktjs.echarts.options.CalendarYearLabelOption
+import io.github.shijianjs.ktjs.echarts.options.DataZoomValue
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.StringOrDoubleOrArray
+import io.github.shijianjs.ktjs.echarts.options.StringOrStringArray
+import io.github.shijianjs.ktjs.echarts.options.SymbolSize
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.VisualOptionUnit
+import io.github.shijianjs.ktjs.echarts.options.graphSeries
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.js
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.gauge.center
 import demo.examples.themeriver.days
@@ -68,7 +68,7 @@ val calendarGraphEntry: CatalogEntry =
                         max = 1000.0
                         left = StringOrDouble("center")
                         bottom = StringOrDouble(20.0)
-                        seriesIndex = echarts.options.IndexOrIndexArray(1.0)
+                        seriesIndex = io.github.shijianjs.ktjs.echarts.options.IndexOrIndexArray(1.0)
                         inRange =
                             unsafeJso<VisualOptionUnit> {
                                 color = StringOrStringArray(arrayOf("#5291FF", "#C7DBFF"))

@@ -1,21 +1,21 @@
 package demo.examples.line
 
-import echarts.AxisTypes
-import echarts.TooltipTriggers
-import echarts.options.AreaStyleOption
-import echarts.options.BooleanOrStringArray
-import echarts.EmphasisFocuses
-import echarts.options.EmphasisOption
-import echarts.options.LabelOption
-import echarts.options.LabelPosition
-import echarts.options.SeriesOption
-import echarts.options.TooltipOption
-import echarts.options.XAxisOption
-import echarts.options.YAxisOption
-import echarts.options.lineSeries
-import echarts.options.numbers
-import echarts.options.one
-import echarts.options.strings
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.TooltipTriggers
+import io.github.shijianjs.ktjs.echarts.options.AreaStyleOption
+import io.github.shijianjs.ktjs.echarts.options.BooleanOrStringArray
+import io.github.shijianjs.ktjs.echarts.EmphasisFocuses
+import io.github.shijianjs.ktjs.echarts.options.EmphasisOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LabelPosition
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.XAxisOption
+import io.github.shijianjs.ktjs.echarts.options.YAxisOption
+import io.github.shijianjs.ktjs.echarts.options.lineSeries
+import io.github.shijianjs.ktjs.echarts.options.numbers
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.strings
 import js.objects.unsafeJso
 import demo.examples.matrix.names
 

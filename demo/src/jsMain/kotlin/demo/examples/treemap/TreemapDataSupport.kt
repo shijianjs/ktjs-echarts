@@ -1,12 +1,12 @@
 package demo.examples.treemap
 
-import echarts.ColorMappingBy
-import echarts.ECharts
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.ColorMappingBy
+import io.github.shijianjs.ktjs.echarts.ECharts
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.matrix.dimension
 import demo.examples.matrix.linearMap
 import demo.examples.shared.every

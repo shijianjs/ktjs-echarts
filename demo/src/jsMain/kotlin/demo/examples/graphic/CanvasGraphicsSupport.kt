@@ -1,7 +1,7 @@
 package demo.examples.graphic
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.js
@@ -10,11 +10,11 @@ import web.dom.document
 import web.canvas.CanvasRenderingContext2D
 import web.canvas.ID
 import web.html.HtmlTagName
-import zrender.ImageLike
-import zrender.ImagePatternObject
-import zrender.PatternObject
-import zrender.ZRColor
-import zrender.ZRStyleProps
+import io.github.shijianjs.ktjs.zrender.ImageLike
+import io.github.shijianjs.ktjs.zrender.ImagePatternObject
+import io.github.shijianjs.ktjs.zrender.PatternObject
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRStyleProps
 import demo.examples.funnel.labels
 import demo.examples.gauge.center
 import demo.examples.gl.square

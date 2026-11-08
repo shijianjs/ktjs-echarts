@@ -2,31 +2,31 @@ package demo.examples.pictorialbar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.TooltipTriggers
-import echarts.AxisPointerTypes
-import echarts.options.AxisPointerOption
-import echarts.options.BooleanOrDoubleOrString
-import echarts.options.BooleanOrDouble
-import echarts.options.EChartsOption
-import echarts.options.ItemStyleOption
-import echarts.options.LegendOption
-import echarts.options.SeriesOption
-import echarts.options.SplitLineOption
-import echarts.options.StringOrDouble
-import echarts.options.StringOrDoubleOrArray
-import echarts.options.SymbolSize
-import echarts.options.TooltipOption
-import echarts.options.XAxisOption
-import echarts.options.YAxisOption
-import echarts.options.barSeries
-import echarts.options.lineSeries
-import echarts.options.numbers
-import echarts.options.one
-import echarts.options.pictorialBarSeries
+import io.github.shijianjs.ktjs.echarts.TooltipTriggers
+import io.github.shijianjs.ktjs.echarts.AxisPointerTypes
+import io.github.shijianjs.ktjs.echarts.options.AxisPointerOption
+import io.github.shijianjs.ktjs.echarts.options.BooleanOrDoubleOrString
+import io.github.shijianjs.ktjs.echarts.options.BooleanOrDouble
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.LegendOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.SplitLineOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.StringOrDoubleOrArray
+import io.github.shijianjs.ktjs.echarts.options.SymbolSize
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.XAxisOption
+import io.github.shijianjs.ktjs.echarts.options.YAxisOption
+import io.github.shijianjs.ktjs.echarts.options.barSeries
+import io.github.shijianjs.ktjs.echarts.options.lineSeries
+import io.github.shijianjs.ktjs.echarts.options.numbers
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.pictorialBarSeries
 import js.objects.unsafeJso
-import zrender.ZRColor
-import zrender.gradientColorStop
-import zrender.linearGradient
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.gradientColorStop
+import io.github.shijianjs.ktjs.zrender.linearGradient
 import demo.examples.Category
 import demo.examples.shared.legendNames
 
@@ -47,7 +47,7 @@ val pictorialBarDottedEntry: CatalogEntry =
                     one(
                         unsafeJso<LegendOption> {
                             data = legendNames("line", "bar")
-                            textStyle = unsafeJso<echarts.options.LabelOption> { color = "#ccc" }
+                            textStyle = unsafeJso<io.github.shijianjs.ktjs.echarts.options.LabelOption> { color = "#ccc" }
                         },
                     )
                 xAxis =
@@ -69,8 +69,8 @@ val pictorialBarDottedEntry: CatalogEntry =
                         lineSeries {
                             name = "line"
                             smooth = BooleanOrDouble(true)
-                            showAllSymbol = echarts.options.BooleanOrString("auto")
-                            symbol = echarts.options.SymbolShape("emptyCircle")
+                            showAllSymbol = io.github.shijianjs.ktjs.echarts.options.BooleanOrString("auto")
+                            symbol = io.github.shijianjs.ktjs.echarts.options.SymbolShape("emptyCircle")
                             symbolSize = SymbolSize(15.0)
                             typedData = numbers(*dottedLineValues)
                         },

@@ -75,7 +75,7 @@ scripts/
   英文标题抄 `title`；这样侧边栏与官方站点一致，也便于脚本核对。
 - **数值数据原样搬运**：官方示例里的数组、表格直接写进 Kotlin；`Math.random()` 一律换成固定序列
   （见各文件的 KDoc），保证页面可复现、端到端断言稳定。
-- **通配导入**：`examples/` 下的文件统一用 `import echarts.options.*` / `import echarts.*`。一个示例
+- **通配导入**：`examples/` 下的文件统一用 `import io.github.shijianjs.ktjs.echarts.options.*` / `import io.github.shijianjs.ktjs.echarts.*`。一个示例
   通常触及大半个选项包，逐个列举反而更容易漏；`detekt` 的规则集（只有 `ForbiddenImport`）不禁止它。
 - **数据项名称与取值走联合工厂**：`name` 是 `string | number`、`value` 是 `string | number | Date`，
   所以写 `OptionId("x")`、`OptionDataValue(1.0)`；`examples/shared/Items.kt` 收了这批常用构造器
@@ -702,7 +702,7 @@ candlestick 家族的两张长表在 `examples/candlestick/CandlestickLongTailSu
   Mapbox GL / maptalks。
 - **option 类型用 `EChartsGlOption`**：它继承 `EChartsOption`，`tooltip` / `visualMap` / `dataset` 这些
   2D 组件照常写，`grid3D` / `xAxis3D` / `yAxis3D` / `zAxis3D` 与 `bar3DSeries { }` / `line3DSeries { }` /
-  `scatter3DSeries { }` / `surfaceSeries { }` / `lines3DSeries { }` 来自 `echartsgl.options`。这些工厂都只设
+  `scatter3DSeries { }` / `surfaceSeries { }` / `lines3DSeries { }` 来自 `io.github.shijianjs.ktjs.echarts.gl.options`。这些工厂都只设
   `type`，其余字段一律走 `typed*` 视图（`typedData` / `typedLabel` / `typedItemStyle` / `typedEmphasis` /
   `typedCoordinateSystem` / `typedLineStyle`）。
 - **标签照 2D 的扁平写法**：echarts-gl 2.1.0 用 ECharts 6 的 `createTextStyle` 排版，读的是

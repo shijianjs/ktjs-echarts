@@ -3,7 +3,7 @@ package demo.json.examples.doc
 import demo.json.JsonCategory
 import demo.json.JsonExample
 import demo.json.namedValue
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import kotlinx.serialization.json.JsonPrimitive
 import demo.json.examples.shared.DECAL_COLOR
 import demo.json.examples.shared.DECAL_COUNT

@@ -1,14 +1,14 @@
 package demo.examples.gauge
 
-import echarts.AnimationEasings
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.AnimationEasings
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.Record
 import js.objects.unsafeJso
 import kotlin.js.js
 import web.cssom.TextAlign
-import zrender.ZRColor
-import zrender.ZRFontWeight
-import zrender.ZRFontWeights
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRFontWeight
+import io.github.shijianjs.ktjs.zrender.ZRFontWeights
 import demo.examples.funnel.labels
 import demo.examples.line.bounceOut
 import demo.examples.shared.axisLabel

@@ -2,14 +2,14 @@ package demo.examples.scatter
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.SeriesOption
-import echarts.options.SymbolSize
-import echarts.options.XAxisOption
-import echarts.options.YAxisOption
-import echarts.options.dataItems
-import echarts.options.one
-import echarts.options.scatterSeries
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.SymbolSize
+import io.github.shijianjs.ktjs.echarts.options.XAxisOption
+import io.github.shijianjs.ktjs.echarts.options.YAxisOption
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.scatterSeries
 import js.objects.unsafeJso
 import kotlin.js.js
 import demo.examples.Category

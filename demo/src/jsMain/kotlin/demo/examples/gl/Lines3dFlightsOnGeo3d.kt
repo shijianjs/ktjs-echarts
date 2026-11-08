@@ -4,8 +4,8 @@ import demo.CatalogEntry
 import demo.Groups
 import demo.ui.listen
 import demo.ui.loadJson
-import echarts.Payload
-import echartsgl.EChartsGlActions
+import io.github.shijianjs.ktjs.echarts.Payload
+import io.github.shijianjs.ktjs.echarts.gl.EChartsGlActions
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import web.events.Event

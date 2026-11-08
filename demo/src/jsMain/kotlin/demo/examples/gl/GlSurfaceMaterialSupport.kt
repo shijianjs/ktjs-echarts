@@ -1,15 +1,15 @@
 package demo.examples.gl
 
-import echarts.AxisTypes
-import echarts.options.*
-import echartsgl.BooleanOrAuto
-import echartsgl.GlColor
-import echartsgl.GlEnvironment
-import echartsgl.NumberOrTexture
-import echartsgl.QualityTypes
-import echartsgl.ShadingTypes
-import echartsgl.TextureSource
-import echartsgl.options.*
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.options.*
+import io.github.shijianjs.ktjs.echarts.gl.BooleanOrAuto
+import io.github.shijianjs.ktjs.echarts.gl.GlColor
+import io.github.shijianjs.ktjs.echarts.gl.GlEnvironment
+import io.github.shijianjs.ktjs.echarts.gl.NumberOrTexture
+import io.github.shijianjs.ktjs.echarts.gl.QualityTypes
+import io.github.shijianjs.ktjs.echarts.gl.ShadingTypes
+import io.github.shijianjs.ktjs.echarts.gl.TextureSource
+import io.github.shijianjs.ktjs.echarts.gl.options.*
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import kotlin.math.PI
@@ -27,7 +27,7 @@ import web.events.Event
 import web.events.EventType
 import web.html.HTMLImageElement
 import web.html.HtmlTagName
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.chord.column
 import demo.examples.lines.coordinate
 import demo.examples.matrix.dimension

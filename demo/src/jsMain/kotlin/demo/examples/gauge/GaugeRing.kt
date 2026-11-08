@@ -2,25 +2,25 @@ package demo.examples.gauge
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.GaugeAxisLabelOption
-import echarts.options.GaugeAxisLineOption
-import echarts.options.GaugeAxisLineStyleOption
-import echarts.options.GaugeAxisTickOption
-import echarts.options.GaugeDataItem
-import echarts.options.GaugeDetailOption
-import echarts.options.GaugePointerOption
-import echarts.options.GaugeProgressOption
-import echarts.options.GaugeSplitLineOption
-import echarts.options.GaugeTitleOption
-import echarts.options.ItemStyleOption
-import echarts.options.LabelFormatter
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.gaugeSeries
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.GaugeAxisLabelOption
+import io.github.shijianjs.ktjs.echarts.options.GaugeAxisLineOption
+import io.github.shijianjs.ktjs.echarts.options.GaugeAxisLineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.GaugeAxisTickOption
+import io.github.shijianjs.ktjs.echarts.options.GaugeDataItem
+import io.github.shijianjs.ktjs.echarts.options.GaugeDetailOption
+import io.github.shijianjs.ktjs.echarts.options.GaugePointerOption
+import io.github.shijianjs.ktjs.echarts.options.GaugeProgressOption
+import io.github.shijianjs.ktjs.echarts.options.GaugeSplitLineOption
+import io.github.shijianjs.ktjs.echarts.options.GaugeTitleOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.LabelFormatter
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.gaugeSeries
 import js.objects.unsafeJso
 import kotlin.js.js
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.shared.axisLabel
 import demo.examples.shared.every
@@ -70,7 +70,7 @@ val gaugeRingEntry: CatalogEntry =
                                         fontSize = StringOrDouble(14.0)
                                         color = "inherit"
                                         borderColor = "inherit"
-                                        borderRadius = echarts.options.DoubleOrDoubleArray(20.0)
+                                        borderRadius = io.github.shijianjs.ktjs.echarts.options.DoubleOrDoubleArray(20.0)
                                         borderWidth = 1.0
                                         formatter = LabelFormatter("{value}%")
                                     }

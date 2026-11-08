@@ -1,7 +1,7 @@
 package demo.json.examples.shared
 
 import demo.json.*
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import demo.json.linkItem

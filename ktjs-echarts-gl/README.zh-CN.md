@@ -23,17 +23,17 @@ dependencies {
 在第一次 `init` 之前把安装器注册到核心 `ECharts` 对象上，然后设置 `grid3D` 和 `bar3D`：
 
 ```kotlin
-import echarts.AxisTypes
-import echarts.ECharts
-import echarts.options.OptionDataValue
-import echarts.options.one
-import echartsgl.Bar3DChart
-import echartsgl.Grid3DComponent
-import echartsgl.options.Axis3DOption
-import echartsgl.options.Bar3DDataItem
-import echartsgl.options.EChartsGlOption
-import echartsgl.options.Grid3DOption
-import echartsgl.options.bar3DSeries
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.ECharts
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.gl.Bar3DChart
+import io.github.shijianjs.ktjs.echarts.gl.Grid3DComponent
+import io.github.shijianjs.ktjs.echarts.gl.options.Axis3DOption
+import io.github.shijianjs.ktjs.echarts.gl.options.Bar3DDataItem
+import io.github.shijianjs.ktjs.echarts.gl.options.EChartsGlOption
+import io.github.shijianjs.ktjs.echarts.gl.options.Grid3DOption
+import io.github.shijianjs.ktjs.echarts.gl.options.bar3DSeries
 import js.objects.unsafeJso
 import web.dom.document
 import web.html.HtmlTagName
@@ -110,7 +110,7 @@ chart.setOption(
 ## Option
 
 `EChartsGlOption` 在核心 `EChartsOption` 之上增加了 `grid3D`、`xAxis3D`、`yAxis3D` 与 `zAxis3D`。
-GL 专属的 option 类型都在 `echartsgl.options` 里：
+GL 专属的 option 类型都在 `io.github.shijianjs.ktjs.echarts.gl.options` 里：
 
 - `Grid3DOption` — 布局（`left` / `top` / `width` / `height`）、`boxWidth` / `boxHeight` /
   `boxDepth`、`environment`，以及嵌套的 `viewControl`、`light`、`postEffect` 与

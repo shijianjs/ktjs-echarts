@@ -1,7 +1,7 @@
 package demo.examples.custom
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import kotlin.js.JsAny
 import kotlin.js.unsafeCast
 import kotlin.math.PI

@@ -1,16 +1,16 @@
 package demo.examples.sankey
 
 import demo.ui.loadJson
-import echarts.TooltipTriggers
-import echarts.TooltipTriggerOns
-import echarts.options.OptionDataValue
-import echarts.options.OptionId
-import echarts.options.SankeyEdgeItemOption
-import echarts.options.SankeyNodeItemOption
-import echarts.options.StringOrDouble
-import echarts.options.TitleOption
-import echarts.options.TooltipOption
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.TooltipTriggers
+import io.github.shijianjs.ktjs.echarts.TooltipTriggerOns
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.OptionId
+import io.github.shijianjs.ktjs.echarts.options.SankeyEdgeItemOption
+import io.github.shijianjs.ktjs.echarts.options.SankeyNodeItemOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.TitleOption
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import demo.examples.matrix.names

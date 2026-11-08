@@ -2,7 +2,7 @@ package demo.examples.custom
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.one
 import demo.examples.Category
 
 private val cyclePlotCategory = Category(Groups.CUSTOM, "examples/custom/CyclePlot.kt")

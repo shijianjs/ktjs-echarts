@@ -1,22 +1,22 @@
 package demo.examples.lines
 
 import demo.ui.loadFloat32
-import echarts.AppendDataParams
-import echarts.EChartsInstance
-import echarts.options.BooleanOrString
-import echarts.options.DimensionDefinitionLoose
-import echarts.options.EChartsOption
-import echarts.options.GeoOption
-import echarts.options.ItemStyleOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.linesSeries
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.AppendDataParams
+import io.github.shijianjs.ktjs.echarts.EChartsInstance
+import io.github.shijianjs.ktjs.echarts.options.BooleanOrString
+import io.github.shijianjs.ktjs.echarts.options.DimensionDefinitionLoose
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.GeoOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.linesSeries
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.buffer.ArrayBuffer
 import js.objects.unsafeJso
 import js.typedarrays.Float32Array
 import js.typedarrays.Float64Array
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.gauge.center
 
 /**

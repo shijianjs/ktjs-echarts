@@ -1,26 +1,26 @@
 package demo.examples.pie
 
-import echarts.Payload
-import echarts.TooltipTriggers
-import echarts.options.EmphasisOption
-import echarts.options.LabelOption
-import echarts.options.LabelPosition
-import echarts.options.LegendOption
-import echarts.options.PieDataItem
-import echarts.options.PieLabelOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.StringOrDoubleOrArray
-import echarts.options.TooltipFormatter
-import echarts.options.TooltipOption
-import echarts.options.dataItems
-import echarts.options.one
-import echarts.options.pieSeries
+import io.github.shijianjs.ktjs.echarts.Payload
+import io.github.shijianjs.ktjs.echarts.TooltipTriggers
+import io.github.shijianjs.ktjs.echarts.options.EmphasisOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LabelPosition
+import io.github.shijianjs.ktjs.echarts.options.LegendOption
+import io.github.shijianjs.ktjs.echarts.options.PieDataItem
+import io.github.shijianjs.ktjs.echarts.options.PieLabelOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.StringOrDoubleOrArray
+import io.github.shijianjs.ktjs.echarts.options.TooltipFormatter
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.pieSeries
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import kotlin.math.ceil
 import kotlin.math.round
-import zrender.ZRFontWeights
+import io.github.shijianjs.ktjs.zrender.ZRFontWeights
 import demo.examples.gauge.center
 import demo.examples.matrix.names
 import demo.examples.shared.Lcg
@@ -185,7 +185,7 @@ internal fun tooltipWithPercent(): TooltipOption =
 /** One of the three widths of `pie-alignTo`. */
 internal fun pieAlignToSeries(
     data: Array<PieDataItem?>,
-    alignTo: echarts.options.PieLabelAlignTo,
+    alignTo: io.github.shijianjs.ktjs.echarts.options.PieLabelAlignTo,
     left: StringOrDouble,
     right: StringOrDouble,
     bleedMargin: Double? = null,

@@ -3,7 +3,7 @@ package demo.json.examples.shared
 import demo.json.namedValue
 import demo.json.objectValue
 import demo.json.timedValue
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put

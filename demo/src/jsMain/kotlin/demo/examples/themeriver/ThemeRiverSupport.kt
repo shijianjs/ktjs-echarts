@@ -1,13 +1,13 @@
 package demo.examples.themeriver
 
-import echarts.options.EmphasisOption
-import echarts.options.ItemStyleOption
-import echarts.options.OptionDataValue
-import echarts.options.ThemeRiverDataItem
-import echarts.options.dataItems
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.EmphasisOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.ThemeRiverDataItem
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.funnel.labels
 import demo.examples.matrix.names
 

@@ -2,14 +2,14 @@ package demo.examples.custom
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
-import zrender.ZRColor
-import zrender.ZRLineTypes
-import zrender.ZRShapeProps
-import zrender.ZRStyleProps
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRLineTypes
+import io.github.shijianjs.ktjs.zrender.ZRShapeProps
+import io.github.shijianjs.ktjs.zrender.ZRStyleProps
 import demo.examples.Category
 import demo.examples.matrix.dimension
 import demo.examples.shared.legendNames

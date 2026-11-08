@@ -2,14 +2,14 @@ package demo.examples.bar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.ItemStyleOption
-import echarts.options.SeriesOption
-import echarts.options.barSeries
-import echarts.options.numbers
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.barSeries
+import io.github.shijianjs.ktjs.echarts.options.numbers
 import js.objects.unsafeJso
 import kotlin.js.js
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 
 private val barBackgroundCategory = Category(Groups.BAR, "examples/bar/BarBackground.kt")

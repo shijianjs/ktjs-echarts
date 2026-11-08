@@ -23,21 +23,21 @@ dependencies {
 ## 快速开始
 
 ```kotlin
-import io.github.shijianjs.kmpechartsjson.BooleanOrNumber
-import io.github.shijianjs.kmpechartsjson.EChartsColor
-import io.github.shijianjs.kmpechartsjson.GradientColorStop
-import io.github.shijianjs.kmpechartsjson.areaStyle
-import io.github.shijianjs.kmpechartsjson.categories
-import io.github.shijianjs.kmpechartsjson.echartsOption
-import io.github.shijianjs.kmpechartsjson.entries
-import io.github.shijianjs.kmpechartsjson.legend
-import io.github.shijianjs.kmpechartsjson.line
-import io.github.shijianjs.kmpechartsjson.series
-import io.github.shijianjs.kmpechartsjson.toJsonString
-import io.github.shijianjs.kmpechartsjson.tooltip
-import io.github.shijianjs.kmpechartsjson.values
-import io.github.shijianjs.kmpechartsjson.xAxis
-import io.github.shijianjs.kmpechartsjson.yAxis
+import io.github.shijianjs.ktjs.echarts.json.BooleanOrNumber
+import io.github.shijianjs.ktjs.echarts.json.EChartsColor
+import io.github.shijianjs.ktjs.echarts.json.GradientColorStop
+import io.github.shijianjs.ktjs.echarts.json.areaStyle
+import io.github.shijianjs.ktjs.echarts.json.categories
+import io.github.shijianjs.ktjs.echarts.json.echartsOption
+import io.github.shijianjs.ktjs.echarts.json.entries
+import io.github.shijianjs.ktjs.echarts.json.legend
+import io.github.shijianjs.ktjs.echarts.json.line
+import io.github.shijianjs.ktjs.echarts.json.series
+import io.github.shijianjs.ktjs.echarts.json.toJsonString
+import io.github.shijianjs.ktjs.echarts.json.tooltip
+import io.github.shijianjs.ktjs.echarts.json.values
+import io.github.shijianjs.ktjs.echarts.json.xAxis
+import io.github.shijianjs.ktjs.echarts.json.yAxis
 
 val option = echartsOption {
     tooltip { trigger = TooltipTrigger.Axis }

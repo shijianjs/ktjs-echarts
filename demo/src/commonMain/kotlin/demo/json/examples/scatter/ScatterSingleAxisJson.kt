@@ -2,7 +2,7 @@ package demo.json.examples.scatter
 
 import demo.json.JsonCategory
 import demo.json.JsonExample
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import kotlinx.serialization.json.JsonPrimitive
 import demo.json.examples.shared.SINGLE_AXIS_DAYS
 import demo.json.examples.shared.SINGLE_AXIS_HOURS

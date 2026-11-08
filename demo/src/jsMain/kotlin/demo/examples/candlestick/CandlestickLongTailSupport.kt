@@ -1,11 +1,11 @@
 package demo.examples.candlestick
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import kotlin.math.round
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.custom.coord
 import demo.examples.funnel.labels
 import demo.examples.lines.coordinate

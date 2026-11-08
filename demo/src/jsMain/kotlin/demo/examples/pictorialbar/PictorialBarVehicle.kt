@@ -2,8 +2,8 @@ package demo.examples.pictorialbar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import demo.examples.Category
 
 private val pictorialBarVehicleCategory = Category(Groups.PICTORIAL_BAR, "examples/pictorialbar/PictorialBarVehicle.kt")

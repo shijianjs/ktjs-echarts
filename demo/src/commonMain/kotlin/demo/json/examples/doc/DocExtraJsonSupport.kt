@@ -1,6 +1,6 @@
 package demo.json.examples.doc
 
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 
 /** The star of `pictorialBar-symbolBoundingDataArray`. */
 internal const val STAR_SYMBOL =

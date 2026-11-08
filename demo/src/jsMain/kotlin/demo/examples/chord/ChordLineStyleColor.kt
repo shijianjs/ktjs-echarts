@@ -2,10 +2,10 @@ package demo.examples.chord
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.TitleOption
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.TitleOption
 import js.objects.unsafeJso
 import demo.examples.Category
 
@@ -20,7 +20,7 @@ val chordLineStyleColorEntry: CatalogEntry =
                     arrayOf(
                         unsafeJso<TitleOption> {
                             text = "lineStyle.color"
-                            textStyle = unsafeJso<echarts.options.TextStyleOption> { fontSize = StringOrDouble(24.0) }
+                            textStyle = unsafeJso<io.github.shijianjs.ktjs.echarts.options.TextStyleOption> { fontSize = StringOrDouble(24.0) }
                         },
                         columnTitle(0, "source"),
                         columnTitle(1, "target"),

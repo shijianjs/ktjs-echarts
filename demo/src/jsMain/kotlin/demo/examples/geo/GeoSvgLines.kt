@@ -3,11 +3,11 @@ package demo.examples.geo
 import demo.CatalogEntry
 import demo.Groups
 import demo.ui.loadText
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
-import zrender.ZRColor
-import zrender.ZRLineTypes
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRLineTypes
 import demo.examples.Category
 import demo.examples.gauge.center
 

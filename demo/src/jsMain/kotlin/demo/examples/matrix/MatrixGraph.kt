@@ -2,24 +2,24 @@ package demo.examples.matrix
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.GraphDataItem
-import echarts.options.GraphEdgeItemOption
-import echarts.options.GraphicComponentLooseOption
-import echarts.options.GraphicComponentOption
-import echarts.options.LabelFormatter
-import echarts.options.LabelOption
-import echarts.options.LineStyleOption
-import echarts.options.SymbolSize
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.StringOrStringArray
-import echarts.options.dataItems
-import echarts.options.graphSeries
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.GraphDataItem
+import io.github.shijianjs.ktjs.echarts.options.GraphEdgeItemOption
+import io.github.shijianjs.ktjs.echarts.options.GraphicComponentLooseOption
+import io.github.shijianjs.ktjs.echarts.options.GraphicComponentOption
+import io.github.shijianjs.ktjs.echarts.options.LabelFormatter
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SymbolSize
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.StringOrStringArray
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.graphSeries
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
-import zrender.ZRFontWeights
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRFontWeights
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.shared.row
 import demo.examples.shared.textAt
@@ -48,7 +48,7 @@ val matrixGraphEntry: CatalogEntry =
                     listOf("Programming", "3rd Year", "Software Development"),
                 )
             unsafeJso<EChartsOption> {
-                title = one(unsafeJso<echarts.options.TitleOption> { text = "Course Prerequisites" })
+                title = one(unsafeJso<io.github.shijianjs.ktjs.echarts.options.TitleOption> { text = "Course Prerequisites" })
                 this.matrix =
                     matrixOption {
                         x = dimension { data = names("Data Analysis", "Programming", "Algorithms") }
@@ -63,7 +63,7 @@ val matrixGraphEntry: CatalogEntry =
                         graphSeries {
                             coordinateSystem = "matrix"
                             edgeSymbol = StringOrStringArray(arrayOf("none", "arrow"))
-                            symbolSize = echarts.options.SymbolSize(15.0)
+                            symbolSize = io.github.shijianjs.ktjs.echarts.options.SymbolSize(15.0)
                             this.links = links
                             typedData =
                                 dataItems(

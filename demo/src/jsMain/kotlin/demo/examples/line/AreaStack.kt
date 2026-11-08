@@ -2,16 +2,16 @@ package demo.examples.line
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.AxisPointerTypes
-import echarts.TooltipTriggers
-import echarts.options.AxisPointerOption
-import echarts.options.AxisPointerLabelOption
-import echarts.options.EChartsOption
-import echarts.options.LegendOption
-import echarts.options.SeriesOption
-import echarts.options.TitleOption
-import echarts.options.TooltipOption
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.AxisPointerTypes
+import io.github.shijianjs.ktjs.echarts.TooltipTriggers
+import io.github.shijianjs.ktjs.echarts.options.AxisPointerOption
+import io.github.shijianjs.ktjs.echarts.options.AxisPointerLabelOption
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.LegendOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.TitleOption
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import demo.examples.Category
 import demo.examples.shared.legendNames
@@ -30,7 +30,7 @@ val areaStackEntry: CatalogEntry =
                             axisPointer =
                                 unsafeJso<AxisPointerOption> {
                                     type = AxisPointerTypes.cross
-                                    label = unsafeJso<AxisPointerLabelOption> { backgroundColor = zrender.ZRColor("#6a7985") }
+                                    label = unsafeJso<AxisPointerLabelOption> { backgroundColor = io.github.shijianjs.ktjs.zrender.ZRColor("#6a7985") }
                                 }
                         },
                     )

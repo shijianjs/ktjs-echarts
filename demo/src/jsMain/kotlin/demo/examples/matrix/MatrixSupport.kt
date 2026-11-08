@@ -1,35 +1,35 @@
 package demo.examples.matrix
 
-import echarts.CustomSeriesRenderItem
-import echarts.Orients
-import echarts.VisualMapTypes
-import echarts.options.CoordinateSystemDataCoord
-import echarts.options.CustomGroupOption
-import echarts.options.CustomTextOption
-import echarts.options.OptionEncode
-import echarts.options.OptionEncodeValue
-import echarts.options.customSeries
-import echarts.options.CustomPathOption
-import echarts.options.CustomSeriesOption
-import echarts.options.DimensionLoose
-import echarts.options.GraphicElement
-import echarts.options.HeatmapDataItem
-import echarts.options.LabelFormatter
-import echarts.options.MatrixDimensionCellLooseOption
-import echarts.options.MatrixDimensionCellOption
-import echarts.options.MatrixDimensionOption
-import echarts.options.MatrixOption
-import echarts.options.ScatterDataItem
-import echarts.options.StringOrDouble
-import echarts.options.VisualMapOption
-import echarts.options.dataItems
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.CustomSeriesRenderItem
+import io.github.shijianjs.ktjs.echarts.Orients
+import io.github.shijianjs.ktjs.echarts.VisualMapTypes
+import io.github.shijianjs.ktjs.echarts.options.CoordinateSystemDataCoord
+import io.github.shijianjs.ktjs.echarts.options.CustomGroupOption
+import io.github.shijianjs.ktjs.echarts.options.CustomTextOption
+import io.github.shijianjs.ktjs.echarts.options.OptionEncode
+import io.github.shijianjs.ktjs.echarts.options.OptionEncodeValue
+import io.github.shijianjs.ktjs.echarts.options.customSeries
+import io.github.shijianjs.ktjs.echarts.options.CustomPathOption
+import io.github.shijianjs.ktjs.echarts.options.CustomSeriesOption
+import io.github.shijianjs.ktjs.echarts.options.DimensionLoose
+import io.github.shijianjs.ktjs.echarts.options.GraphicElement
+import io.github.shijianjs.ktjs.echarts.options.HeatmapDataItem
+import io.github.shijianjs.ktjs.echarts.options.LabelFormatter
+import io.github.shijianjs.ktjs.echarts.options.MatrixDimensionCellLooseOption
+import io.github.shijianjs.ktjs.echarts.options.MatrixDimensionCellOption
+import io.github.shijianjs.ktjs.echarts.options.MatrixDimensionOption
+import io.github.shijianjs.ktjs.echarts.options.MatrixOption
+import io.github.shijianjs.ktjs.echarts.options.ScatterDataItem
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.VisualMapOption
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import web.cssom.TextAlign
-import zrender.ZRColor
-import zrender.ZRShapeProps
-import zrender.ZRStyleProps
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRShapeProps
+import io.github.shijianjs.ktjs.zrender.ZRStyleProps
 import demo.examples.chord.column
 import demo.examples.custom.extent
 import demo.examples.gauge.center
@@ -186,7 +186,7 @@ internal fun textElement(
     left: StringOrDouble,
     top: StringOrDouble,
     rotation: Double,
-): echarts.options.GraphicElement =
+): io.github.shijianjs.ktjs.echarts.options.GraphicElement =
     unsafeJso {
         type = "text"
         this.left = left

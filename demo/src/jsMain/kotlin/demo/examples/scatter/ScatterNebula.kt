@@ -3,7 +3,7 @@ package demo.examples.scatter
 import demo.CatalogEntry
 import demo.Groups
 import demo.ui.loadFloat32
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.one
 import demo.examples.Category
 
 private val scatterNebulaCategory = Category(Groups.SCATTER, "examples/scatter/ScatterNebula.kt")

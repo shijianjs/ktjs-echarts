@@ -2,7 +2,7 @@ package demo.json.examples.radar
 
 import demo.json.JsonCategory
 import demo.json.JsonExample
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.examples.shared.indicator
 import demo.json.examples.shared.indicators
 import demo.json.examples.shared.radarItemRadarScatterExtra

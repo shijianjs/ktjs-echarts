@@ -2,11 +2,11 @@ package demo.examples.gl
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.*
-import echartsgl.ProjectionTypes
-import echartsgl.options.*
+import io.github.shijianjs.ktjs.echarts.options.*
+import io.github.shijianjs.ktjs.echarts.gl.ProjectionTypes
+import io.github.shijianjs.ktjs.echarts.gl.options.*
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 
 private val line3dOrthographicCategory = Category(Groups.GL, "examples/gl/Line3dOrthographic.kt")

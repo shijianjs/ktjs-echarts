@@ -2,25 +2,25 @@ package demo.examples.themeriver
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.AxisPointerTypes
-import echarts.AxisTypes
-import echarts.TooltipTriggers
-import echarts.options.AxisPointerLabelOption
-import echarts.options.AxisPointerOption
-import echarts.options.EChartsOption
-import echarts.options.LegendOption
-import echarts.options.LineStyleOption
-import echarts.options.SeriesOption
-import echarts.options.SingleAxisOption
-import echarts.options.SplitLineOption
-import echarts.options.SplitLineStyleOption
-import echarts.options.StringOrDouble
-import echarts.options.TooltipOption
-import echarts.options.one
-import echarts.options.themeRiverSeries
+import io.github.shijianjs.ktjs.echarts.AxisPointerTypes
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.TooltipTriggers
+import io.github.shijianjs.ktjs.echarts.options.AxisPointerLabelOption
+import io.github.shijianjs.ktjs.echarts.options.AxisPointerOption
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.LegendOption
+import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.SingleAxisOption
+import io.github.shijianjs.ktjs.echarts.options.SplitLineOption
+import io.github.shijianjs.ktjs.echarts.options.SplitLineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.themeRiverSeries
 import js.objects.unsafeJso
-import zrender.ZRColor
-import zrender.ZRLineTypes
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRLineTypes
 import demo.examples.Category
 import demo.examples.shared.legendNames
 
@@ -54,7 +54,7 @@ val themeRiverBasicEntry: CatalogEntry =
                             type = AxisTypes.`time`
                             axisPointer =
                                 unsafeJso<AxisPointerOption> {
-                                    animation = echarts.options.BooleanOrString(true)
+                                    animation = io.github.shijianjs.ktjs.echarts.options.BooleanOrString(true)
                                     label = unsafeJso<AxisPointerLabelOption> { show = true }
                                 }
                             splitLine =

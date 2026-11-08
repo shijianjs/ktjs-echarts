@@ -2,7 +2,7 @@ package demo.json.examples.bar
 
 import demo.json.JsonCategory
 import demo.json.JsonExample
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.examples.shared.weatherAxisLabel
 import demo.json.examples.shared.weatherMarkPoint
 import demo.json.*

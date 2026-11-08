@@ -2,29 +2,29 @@ package demo.examples.bar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.AxisTypes
-import echarts.options.AxisLabelOption
-import echarts.options.BarDataItem
-import echarts.options.BarDataItemOption
-import echarts.options.BooleanOrString
-import echarts.options.EChartsOption
-import echarts.options.GridOption
-import echarts.options.LabelOption
-import echarts.options.OptionDataValue
-import echarts.options.SeriesOption
-import echarts.options.SplitLineOption
-import echarts.options.SplitLineStyleOption
-import echarts.options.StringOrDouble
-import echarts.options.TitleOption
-import echarts.options.XAxisOption
-import echarts.options.YAxisOption
-import echarts.options.barSeries
-import echarts.options.dataItems
-import echarts.options.one
-import echarts.options.strings
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.options.AxisLabelOption
+import io.github.shijianjs.ktjs.echarts.options.BarDataItem
+import io.github.shijianjs.ktjs.echarts.options.BarDataItemOption
+import io.github.shijianjs.ktjs.echarts.options.BooleanOrString
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.GridOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.SplitLineOption
+import io.github.shijianjs.ktjs.echarts.options.SplitLineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.TitleOption
+import io.github.shijianjs.ktjs.echarts.options.XAxisOption
+import io.github.shijianjs.ktjs.echarts.options.YAxisOption
+import io.github.shijianjs.ktjs.echarts.options.barSeries
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.strings
 import js.objects.unsafeJso
 import kotlin.js.js
-import zrender.ZRLineTypes
+import io.github.shijianjs.ktjs.zrender.ZRLineTypes
 import demo.examples.Category
 import demo.examples.shared.axisLabel
 
@@ -40,7 +40,7 @@ val barNegative2Entry: CatalogEntry =
                     one(
                         unsafeJso<XAxisOption> {
                             type = AxisTypes.value
-                            position = echarts.AxisPositions.top
+                            position = io.github.shijianjs.ktjs.echarts.AxisPositions.top
                             splitLine = unsafeJso<SplitLineOption> { lineStyle = unsafeJso<SplitLineStyleOption> { type = ZRLineTypes.dashed } }
                         },
                     )
@@ -48,9 +48,9 @@ val barNegative2Entry: CatalogEntry =
                     one(
                         unsafeJso<YAxisOption> {
                             type = AxisTypes.category
-                            axisLine = unsafeJso { show = echarts.options.BooleanOrString(false) }
+                            axisLine = unsafeJso { show = io.github.shijianjs.ktjs.echarts.options.BooleanOrString(false) }
                             axisLabel = unsafeJso<AxisLabelOption> { show = false }
-                            axisTick = unsafeJso { show = echarts.options.BooleanOrString(false) }
+                            axisTick = unsafeJso { show = io.github.shijianjs.ktjs.echarts.options.BooleanOrString(false) }
                             splitLine = unsafeJso<SplitLineOption> { show = false }
                             data = strings("ten", "nine", "eight", "seven", "six", "five", "four", "three", "two", "one")
                         },
@@ -60,7 +60,7 @@ val barNegative2Entry: CatalogEntry =
                         barSeries {
                             name = "Cost"
                             stack = "Total"
-                            label = unsafeJso<LabelOption> { show = true; formatter = echarts.options.LabelFormatter("{b}") }
+                            label = unsafeJso<LabelOption> { show = true; formatter = io.github.shijianjs.ktjs.echarts.options.LabelFormatter("{b}") }
                             typedData =
                                 dataItems(
                                     BarDataItem(unsafeJso<BarDataItemOption> { value = OptionDataValue(-0.07); label = rightLabel() }),

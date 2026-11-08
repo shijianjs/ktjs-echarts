@@ -1,17 +1,17 @@
 package demo.examples.funnel
 
-import echarts.FunnelSorts
-import echarts.TooltipTriggers
-import echarts.options.FunnelDataItem
-import echarts.options.LabelOption
-import echarts.options.LabelPosition
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.TooltipFormatter
-import echarts.options.TooltipOption
-import echarts.options.dataItems
-import echarts.options.funnelSeries
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.FunnelSorts
+import io.github.shijianjs.ktjs.echarts.TooltipTriggers
+import io.github.shijianjs.ktjs.echarts.options.FunnelDataItem
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LabelPosition
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.TooltipFormatter
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.funnelSeries
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import demo.examples.shared.funnelItem
 import demo.examples.shared.toolbox
@@ -37,7 +37,7 @@ internal fun compareFunnel(
     name: String,
     left: String,
     top: String,
-    align: echarts.FunnelAlign,
+    align: io.github.shijianjs.ktjs.echarts.FunnelAlign,
     ascending: Boolean,
 ): SeriesOption =
     funnelSeries {

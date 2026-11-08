@@ -1,13 +1,13 @@
 package demo.examples.doc
 
 import demo.CatalogEntry
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import demo.Groups
 import js.objects.Record
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 import demo.examples.shared.recordOf
 

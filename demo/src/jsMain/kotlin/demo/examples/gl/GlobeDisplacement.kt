@@ -2,13 +2,13 @@ package demo.examples.gl
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.one
-import echartsgl.BooleanOrAuto
-import echartsgl.NumberOrTexture
-import echartsgl.QualityTypes
-import echartsgl.ShadingTypes
-import echartsgl.TextureSource
-import echartsgl.options.*
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.gl.BooleanOrAuto
+import io.github.shijianjs.ktjs.echarts.gl.NumberOrTexture
+import io.github.shijianjs.ktjs.echarts.gl.QualityTypes
+import io.github.shijianjs.ktjs.echarts.gl.ShadingTypes
+import io.github.shijianjs.ktjs.echarts.gl.TextureSource
+import io.github.shijianjs.ktjs.echarts.gl.options.*
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import demo.examples.Category

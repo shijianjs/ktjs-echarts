@@ -2,10 +2,10 @@ package demo.examples.chord
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.LabelOption
-import echarts.options.SeriesOption
-import echarts.options.chordSeries
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.chordSeries
 import js.objects.unsafeJso
 import demo.examples.Category
 

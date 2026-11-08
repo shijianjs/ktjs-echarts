@@ -1,6 +1,6 @@
 package demo.json.examples.dataset
 
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import kotlinx.serialization.json.*
 
 /** One dataset row; numbers and names keep their JSON type. */

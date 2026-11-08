@@ -1,13 +1,13 @@
 package demo.examples.pictorialbar
 
-import echarts.options.AxisLineOption
-import echarts.options.LineStyleOption
-import echarts.options.OptionDataItem
-import echarts.options.strings
-import echarts.options.one
-import echarts.options.strings
+import io.github.shijianjs.ktjs.echarts.options.AxisLineOption
+import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.OptionDataItem
+import io.github.shijianjs.ktjs.echarts.options.strings
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.strings
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.shared.fixed
 
 /** The 20 dates of `pictorialBar-dotted`, starting from a fixed day. */

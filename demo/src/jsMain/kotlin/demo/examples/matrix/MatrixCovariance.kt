@@ -2,16 +2,16 @@ package demo.examples.matrix
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.EChartsOption
-import echarts.options.MatrixDimensionCellLooseOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.StringOrStringArray
-import echarts.options.TooltipOption
-import echarts.options.TooltipValueFormatter
-import echarts.options.VisualOptionUnit
-import echarts.options.heatmapSeries
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.MatrixDimensionCellLooseOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.StringOrStringArray
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.TooltipValueFormatter
+import io.github.shijianjs.ktjs.echarts.options.VisualOptionUnit
+import io.github.shijianjs.ktjs.echarts.options.heatmapSeries
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import demo.examples.Category
 import demo.examples.gauge.center

@@ -1,7 +1,7 @@
 package demo.examples.gauge
 
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import js.objects.unsafeJso
 import demo.examples.shared.every
 

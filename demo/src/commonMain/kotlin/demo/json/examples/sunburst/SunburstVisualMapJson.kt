@@ -2,7 +2,7 @@ package demo.json.examples.sunburst
 
 import demo.json.JsonCategory
 import demo.json.JsonExample
-import io.github.shijianjs.kmpechartsjson.*
+import io.github.shijianjs.ktjs.echarts.json.*
 import demo.json.*
 
 private val sunburstVisualMapJsonCategory = JsonCategory("json/examples/sunburst/SunburstVisualMapJson.kt")

@@ -2,14 +2,14 @@ package demo.examples.calendar
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.CalendarYearLabelOption
-import echarts.options.EChartsOption
-import echarts.options.ItemStyleOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
-import echarts.options.TitleOption
-import echarts.options.TooltipOption
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.CalendarYearLabelOption
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.ItemStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.TitleOption
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.js
@@ -23,7 +23,7 @@ val calendarHeatmapEntry: CatalogEntry =
             unsafeJso<EChartsOption> {
                 title =
                     one(
-                        unsafeJso<echarts.options.TitleOption> {
+                        unsafeJso<io.github.shijianjs.ktjs.echarts.options.TitleOption> {
                             top = StringOrDouble(30.0)
                             left = StringOrDouble("center")
                             text = "Daily Step Count"

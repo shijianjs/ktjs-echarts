@@ -1,19 +1,19 @@
 package demo.examples.chord
 
-import echarts.options.ChordSeriesOption
-import echarts.options.LabelOption
-import echarts.options.LineStyleOption
-import echarts.options.StringOrDouble
-import echarts.options.StringOrDoubleOrArray
-import echarts.options.TitleOption
-import echarts.options.TooltipOption
-import echarts.options.ChordDataItem
-import echarts.options.ChordNodeItemOption
-import echarts.options.chordSeries
-import echarts.options.dataItems
-import echarts.options.one
+import io.github.shijianjs.ktjs.echarts.options.ChordSeriesOption
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.StringOrDoubleOrArray
+import io.github.shijianjs.ktjs.echarts.options.TitleOption
+import io.github.shijianjs.ktjs.echarts.options.TooltipOption
+import io.github.shijianjs.ktjs.echarts.options.ChordDataItem
+import io.github.shijianjs.ktjs.echarts.options.ChordNodeItemOption
+import io.github.shijianjs.ktjs.echarts.options.chordSeries
+import io.github.shijianjs.ktjs.echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.one
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.gauge.center
 import demo.examples.matrix.names
 import demo.examples.sunburst.radius
@@ -25,16 +25,16 @@ internal fun chordNodes(vararg names: String): Array<ChordDataItem?> =
     dataItems(*Array(names.size) { index -> ChordDataItem(unsafeJso<ChordNodeItemOption> { name = names[index] }) })
 
 /** One edge of a chord series. */
-internal fun link(source: String, target: String, value: Double): echarts.options.ChordEdgeItemOption =
+internal fun link(source: String, target: String, value: Double): io.github.shijianjs.ktjs.echarts.options.ChordEdgeItemOption =
     unsafeJso {
         this.source = StringOrDouble(source)
         this.target = StringOrDouble(target)
-        this.value = echarts.options.OptionDataValue(value)
+        this.value = io.github.shijianjs.ktjs.echarts.options.OptionDataValue(value)
     }
 
 internal val chordTooltip = one(unsafeJso<TooltipOption> {})
 
-internal val chordLegend = one(unsafeJso<echarts.options.LegendOption> {})
+internal val chordLegend = one(unsafeJso<io.github.shijianjs.ktjs.echarts.options.LegendOption> {})
 
 /** One of the three columns of `chord-lineStyle-color`. */
 internal fun column(index: Int, color: String, nodes: Array<String>): ChordSeriesOption =
@@ -61,5 +61,5 @@ internal fun columnTitle(index: Int, text: String): TitleOption =
         left = StringOrDouble("${(index * 2 + 1) / 6.0 * 100}%")
         top = StringOrDouble("25%")
         textAlign = "center"
-        padding = echarts.options.DoubleOrDoubleArray(0.0)
+        padding = io.github.shijianjs.ktjs.echarts.options.DoubleOrDoubleArray(0.0)
     }

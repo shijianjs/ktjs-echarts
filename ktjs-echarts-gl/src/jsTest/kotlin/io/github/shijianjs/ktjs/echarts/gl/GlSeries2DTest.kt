@@ -1,0 +1,488 @@
+package io.github.shijianjs.ktjs.echarts.gl
+
+import io.github.shijianjs.ktjs.echarts.AxisTypes
+import io.github.shijianjs.ktjs.echarts.ECharts
+import io.github.shijianjs.ktjs.echarts.options.DimensionDefinitionLoose
+import io.github.shijianjs.ktjs.echarts.options.DoubleOrDoubleArray
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValueOrArray
+import io.github.shijianjs.ktjs.echarts.options.OptionId
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.SymbolShape
+import io.github.shijianjs.ktjs.echarts.options.SymbolSize
+import io.github.shijianjs.ktjs.echarts.options.XAxisOption
+import io.github.shijianjs.ktjs.echarts.options.YAxisOption
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.gl.options.EChartsGlOption
+import io.github.shijianjs.ktjs.echarts.gl.options.FlowGLDataItem
+import io.github.shijianjs.ktjs.echarts.gl.options.GraphGLCategoryOption
+import io.github.shijianjs.ktjs.echarts.gl.options.GraphGLForceAtlas2Option
+import io.github.shijianjs.ktjs.echarts.gl.options.GraphGLLinkOption
+import io.github.shijianjs.ktjs.echarts.gl.options.GraphGLNodeOption
+import io.github.shijianjs.ktjs.echarts.gl.options.LinesGLDataItem
+import io.github.shijianjs.ktjs.echarts.gl.options.LinesGLDataItemOption
+import io.github.shijianjs.ktjs.echarts.gl.options.ScatterGLDataItem
+import io.github.shijianjs.ktjs.echarts.gl.options.ScatterGLDataItemOption
+import io.github.shijianjs.ktjs.echarts.gl.options.flowGLSeries
+import io.github.shijianjs.ktjs.echarts.gl.options.graphGLSeries
+import io.github.shijianjs.ktjs.echarts.gl.options.linesGLSeries
+import io.github.shijianjs.ktjs.echarts.gl.options.scatterGLSeries
+import js.buffer.ArrayBuffer
+import js.objects.unsafeJso
+import js.typedarrays.Float32Array
+import js.typedarrays.Float64Array
+import kotlin.js.JsAny
+import kotlin.js.Promise
+import kotlin.js.js
+import kotlin.js.unsafeCast
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertSame
+import kotlin.test.assertTrue
+import web.dom.document
+import web.gl.ID
+import web.gl.WebGLRenderingContext
+import web.html.HTMLCanvasElement
+import web.html.HTMLElement
+import web.html.HtmlTagName
+import io.github.shijianjs.ktjs.zrender.ZRColor
+
+/**
+ * Tests the 2D series that `echarts-gl` draws with WebGL: `scatterGL`, `linesGL`, `flowGL` and
+ * `graphGL`.
+ *
+ * `echarts-gl` has no upstream unit suite for these types, so the cases cover the wrapper-specific
+ * contract: the option is accepted, the fields survive the `getOption` round trip, and the WebGL
+ * layer is created and painted.
+ */
+class GlSeries2DTest {
+    @Test
+    fun scatterGLSeriesRendersAGlLayer(): Promise<Unit> {
+        ECharts.use(arrayOf(ScatterGLChart))
+        val (chart, container) = createChart()
+        chart.setOption(
+            unsafeJso<EChartsGlOption> {
+                axes()
+                series =
+                    one(
+                        scatterGLSeries {
+                            typedCoordinateSystem = CoordinateSystems2D.cartesian2d
+                            symbol = SymbolShape("circle")
+                            symbolSize = SymbolSize(12.0)
+                            zoomScale = 0.5
+                            typedBlendMode = GlBlendModes.lighter
+                            typedItemStyle = unsafeJso { opacity = 0.7 }
+                            typedLabel = unsafeJso { show = true; fontSize = StringOrDouble(12.0) }
+                            typedEmphasis = unsafeJso { itemStyle = unsafeJso { opacity = 1.0 } }
+                            postEffect = unsafeJso { enable = true }
+                            typedData =
+                                arrayOf<ScatterGLDataItem?>(
+                                    ScatterGLDataItem(row(1.0, 2.0)),
+                                    ScatterGLDataItem(row(3.0, 4.0)),
+                                    ScatterGLDataItem(
+                                        unsafeJso<ScatterGLDataItemOption> {
+                                            name = OptionId("single")
+                                            typedValue = OptionDataValueOrArray(5.0)
+                                            itemStyle = unsafeJso { opacity = 0.5 }
+                                        },
+                                    ),
+                                )
+                        },
+                    )
+            },
+        )
+        return nextFrames(2).then {
+            try {
+                val series = chart.getOption()
+                    .unsafeCast<EChartsGlOption>()
+                    .series!![0]
+                    .unsafeCast<io.github.shijianjs.ktjs.echarts.gl.options.ScatterGLSeriesOption>()
+                assertEquals(EChartsGlSeriesTypes.scatterGL, series.type)
+                assertEquals(CoordinateSystems2D.cartesian2d, series.typedCoordinateSystem)
+                assertEquals(SymbolShape("circle"), series.symbol)
+                assertEquals(SymbolSize(12.0), series.symbolSize)
+                assertEquals(0.5, series.zoomScale)
+                assertEquals(GlBlendModes.lighter, series.typedBlendMode)
+                assertEquals(0.7, series.typedItemStyle!!.opacity)
+                assertEquals(true, series.typedLabel!!.show)
+                assertEquals(1.0, series.typedEmphasis!!.itemStyle!!.opacity)
+                assertEquals(true, series.postEffect!!.enable)
+                assertEquals(3, series.typedData!!.size)
+                val item = series.typedData!![2]!!.unsafeCast<ScatterGLDataItemOption>()
+                assertEquals(OptionId("single"), item.name)
+                assertEquals(0.5, item.itemStyle!!.opacity)
+                assertWebGlCanvas(container)
+            } finally {
+                destroyChart(chart, container)
+            }
+        }
+    }
+
+    @Test
+    fun linesGLSeriesRendersAGlLayer(): Promise<Unit> {
+        ECharts.use(arrayOf(LinesGLChart))
+        val (chart, container) = createChart()
+        chart.setOption(
+            unsafeJso<EChartsGlOption> {
+                axes()
+                series =
+                    one(
+                        linesGLSeries {
+                            typedCoordinateSystem = CoordinateSystems2D.cartesian2d
+                            polyline = true
+                            typedBlendMode = GlBlendModes.lighter
+                            typedLineStyle =
+                                unsafeJso {
+                                    color = GlColor(ZRColor("#fff"))
+                                    width = 2.0
+                                    opacity = 0.5
+                                    curveness = 0.2
+                                }
+                            typedData =
+                                arrayOf<LinesGLDataItem?>(
+                                    LinesGLDataItem(
+                                        arrayOf(arrayOf(0.0, 0.0), arrayOf(1.0, 1.0), arrayOf(2.0, 0.5)),
+                                    ),
+                                    LinesGLDataItem(
+                                        unsafeJso<LinesGLDataItemOption> {
+                                            name = OptionId("route")
+                                            coords = arrayOf(arrayOf(-1.0, 0.5), arrayOf(1.5, -0.5))
+                                            lineStyle = unsafeJso { width = 1.0 }
+                                        },
+                                    ),
+                                )
+                        },
+                    )
+            },
+        )
+        return nextFrames(2).then {
+            try {
+                val series = chart.getOption()
+                    .unsafeCast<EChartsGlOption>()
+                    .series!![0]
+                    .unsafeCast<io.github.shijianjs.ktjs.echarts.gl.options.LinesGLSeriesOption>()
+                assertEquals(EChartsGlSeriesTypes.linesGL, series.type)
+                assertEquals(CoordinateSystems2D.cartesian2d, series.typedCoordinateSystem)
+                assertEquals(true, series.polyline)
+                assertEquals(GlBlendModes.lighter, series.typedBlendMode)
+                assertEquals(2.0, series.typedLineStyle!!.width)
+                assertEquals(0.2, series.typedLineStyle!!.curveness)
+                assertEquals(2, series.typedData!!.size)
+                val item = series.typedData!![1]!!.unsafeCast<LinesGLDataItemOption>()
+                assertEquals(2, item.coords!!.size)
+                assertEquals(1.0, item.lineStyle!!.width)
+                assertWebGlCanvas(container)
+            } finally {
+                destroyChart(chart, container)
+            }
+        }
+    }
+
+    /**
+     * The multi-million-point pages hand the data to a `scatterGL` series as a typed array, not as
+     * one object per point; `dimensions` says how the flat rows are read.
+     */
+    @Test
+    fun scatterGLDataCanBeAFlatTypedArray(): Promise<Unit> {
+        ECharts.use(arrayOf(ScatterGLChart))
+        val (chart, container) = createChart()
+        val flat = js("new Float32Array([1, 2, 3, 4, 5, 6])").unsafeCast<Float32Array<ArrayBuffer>>()
+        val series = scatterGLSeries {
+            typedCoordinateSystem = CoordinateSystems2D.cartesian2d
+            dimensions =
+                arrayOf(DimensionDefinitionLoose("lng"), DimensionDefinitionLoose("lat"))
+            typedFlatData = flat
+            zoomScale = 0.002
+            large = true
+        }
+        assertSame(flat.unsafeCast<JsAny>(), series.typedFlatData!!.unsafeCast<JsAny>())
+
+        chart.setOption(
+            unsafeJso<EChartsGlOption> {
+                axes()
+                this.series = one<SeriesOption>(series)
+            },
+        )
+        return nextFrames(2).then {
+            try {
+                val stored = chart.getOption()
+                    .unsafeCast<EChartsGlOption>()
+                    .series!![0]
+                    .unsafeCast<io.github.shijianjs.ktjs.echarts.gl.options.ScatterGLSeriesOption>()
+                assertSame(flat.unsafeCast<JsAny>(), stored.typedFlatData!!.unsafeCast<JsAny>())
+                assertWebGlCanvas(container)
+            } finally {
+                destroyChart(chart, container)
+            }
+        }
+    }
+
+    /**
+     * Same branch for `linesGL`: a polyline row is `[count, x0, y0, x1, y1, ...]`.
+     */
+    @Test
+    fun linesGLDataCanBeAFlatTypedArray(): Promise<Unit> {
+        ECharts.use(arrayOf(LinesGLChart))
+        val (chart, container) = createChart()
+        val flat = js("new Float64Array([3, 0, 0, 1, 2, 2, 0])").unsafeCast<Float64Array<ArrayBuffer>>()
+        val series = linesGLSeries {
+            typedCoordinateSystem = CoordinateSystems2D.cartesian2d
+            polyline = true
+            dimensions = arrayOf(DimensionDefinitionLoose("value"))
+            typedFlatData = flat
+        }
+        assertSame(flat.unsafeCast<JsAny>(), series.typedFlatData!!.unsafeCast<JsAny>())
+
+        chart.setOption(
+            unsafeJso<EChartsGlOption> {
+                axes()
+                this.series = one<SeriesOption>(series)
+            },
+        )
+        return nextFrames(2).then {
+            try {
+                val stored = chart.getOption()
+                    .unsafeCast<EChartsGlOption>()
+                    .series!![0]
+                    .unsafeCast<io.github.shijianjs.ktjs.echarts.gl.options.LinesGLSeriesOption>()
+                // The stored option holds the parsed polylines, not the flat array that was set.
+                assertNotNull(stored.typedFlatData)
+                assertWebGlCanvas(container)
+            } finally {
+                destroyChart(chart, container)
+            }
+        }
+    }
+
+    /**
+     * A `flowGL` series draws the traces of particles through a vector field; the field data is
+     * `[x, y, vx, vy]` rows in a cartesian coordinate system.
+     */
+    @Test
+    fun flowGLSeriesRendersAGlLayer(): Promise<Unit> {
+        ECharts.use(arrayOf(FlowGLChart))
+        val (chart, container) = createChart()
+        val colorTexture = TextureSource(document.createElement(HtmlTagName.canvas))
+        chart.setOption(
+            unsafeJso<EChartsGlOption> {
+                axes()
+                series =
+                    one(
+                        flowGLSeries {
+                            typedCoordinateSystem = CoordinateSystems2D.cartesian2d
+                            particleType = FlowGLParticleTypes.line
+                            particleDensity = 64.0
+                            particleSize = 2.0
+                            particleSpeed = 1.5
+                            particleTrail = 3.0
+                            supersampling = 2.0
+                            gridWidth = StringOrDouble(4.0)
+                            gridHeight = StringOrDouble(4.0)
+                            this.colorTexture = colorTexture
+                            typedItemStyle = unsafeJso { color = GlColor(ZRColor("#0ff")); opacity = 0.6 }
+                            typedData =
+                                arrayOf<FlowGLDataItem?>(
+                                    FlowGLDataItem(arrayOf(0.0, 0.0, 1.0, 1.0)),
+                                    FlowGLDataItem(arrayOf(1.0, 0.0, 1.0, 1.0)),
+                                    FlowGLDataItem(arrayOf(0.0, 1.0, 1.0, 1.0)),
+                                    FlowGLDataItem(arrayOf(1.0, 1.0, 1.0, 1.0)),
+                                )
+                        },
+                    )
+            },
+        )
+        return nextFrames(2).then {
+            try {
+                val series = chart.getOption()
+                    .unsafeCast<EChartsGlOption>()
+                    .series!![0]
+                    .unsafeCast<io.github.shijianjs.ktjs.echarts.gl.options.FlowGLSeriesOption>()
+                assertEquals(EChartsGlSeriesTypes.flowGL, series.type)
+                assertEquals(CoordinateSystems2D.cartesian2d, series.typedCoordinateSystem)
+                assertEquals(FlowGLParticleTypes.line, series.particleType)
+                assertEquals(64.0, series.particleDensity)
+                assertEquals(2.0, series.particleSize)
+                assertEquals(1.5, series.particleSpeed)
+                assertEquals(3.0, series.particleTrail)
+                assertEquals(2.0, series.supersampling)
+                assertEquals(StringOrDouble(4.0), series.gridWidth)
+                assertEquals(StringOrDouble(4.0), series.gridHeight)
+                assertEquals(0.6, series.typedItemStyle!!.opacity)
+                assertEquals(4, series.typedData!!.size)
+                assertWebGlCanvas(container)
+            } finally {
+                destroyChart(chart, container)
+            }
+        }
+    }
+
+    /**
+     * The nodes of a `graphGL` series come from `data` (the alias `nodes` is covered by the field
+     * type) and the layout runs on the CPU, so the test does not depend on float-texture support.
+     */
+    @Test
+    fun graphGLSeriesRendersAGlLayer(): Promise<Unit> {
+        ECharts.use(arrayOf(GraphGLChart))
+        val (chart, container) = createChart()
+        chart.setOption(
+            unsafeJso<EChartsGlOption> {
+                series =
+                    one(
+                        graphGLSeries {
+                            layout = "forceAtlas2"
+                            forceAtlas2 =
+                                unsafeJso<GraphGLForceAtlas2Option> {
+                                    GPU = false
+                                    steps = 2.0
+                                    maxSteps = 4.0
+                                    gravity = 0.5
+                                    barnesHutOptimize = false
+                                    repulsionByDegree = true
+                                    linLogMode = true
+                                    strongGravityMode = true
+                                    gravityCenter = arrayOf(10.0, 20.0)
+                                    scaling = 50.0
+                                    edgeWeightInfluence = 2.0
+                                    edgeWeight = DoubleOrDoubleArray(arrayOf(1.0, 4.0))
+                                    nodeWeight = DoubleOrDoubleArray(2.0)
+                                    preventOverlap = true
+                                    barnesHutTheta = 1.2
+                                    jitterTolerence = 0.1
+                                    dissuadeHubs = true
+                                }
+                            focusNodeAdjacency = false
+                            zoom = 1.5
+                            offset = arrayOf(10.0, 20.0)
+                            symbolSize = SymbolSize(8.0)
+                            typedItemStyle = unsafeJso { opacity = 1.0 }
+                            typedLineStyle =
+                                unsafeJso {
+                                    color = GlColor(ZRColor("#aaa"))
+                                    width = 2.0
+                                    opacity = 0.4
+                                }
+                            typedLabel = unsafeJso { show = true }
+                            categories =
+                                arrayOf(
+                                    unsafeJso<GraphGLCategoryOption> {
+                                        name = "group"
+                                        itemStyle = unsafeJso { opacity = 0.9 }
+                                    },
+                                )
+                            typedData =
+                                arrayOf<GraphGLNodeOption?>(
+                                    unsafeJso {
+                                        name = OptionId("a")
+                                        typedValue = OptionDataValueOrArray(1.0)
+                                        category = StringOrDouble(0.0)
+                                    },
+                                    unsafeJso {
+                                        name = OptionId("b")
+                                        typedValue = OptionDataValueOrArray(2.0)
+                                        x = 1.0
+                                        y = 1.0
+                                    },
+                                )
+                            links =
+                                arrayOf<GraphGLLinkOption?>(
+                                    unsafeJso {
+                                        source = StringOrDouble(0.0)
+                                        target = StringOrDouble(1.0)
+                                        typedValue = OptionDataValueOrArray(2.0)
+                                    },
+                                )
+                            // `edges` is the alias upstream prefers (`option.edges || option.links`).
+                            edges =
+                                arrayOf<GraphGLLinkOption?>(
+                                    unsafeJso {
+                                        source = StringOrDouble(0.0)
+                                        target = StringOrDouble(1.0)
+                                    },
+                                )
+                        },
+                    )
+            },
+        )
+        return nextFrames(2).then {
+            try {
+                val series = chart.getOption()
+                    .unsafeCast<EChartsGlOption>()
+                    .series!![0]
+                    .unsafeCast<io.github.shijianjs.ktjs.echarts.gl.options.GraphGLSeriesOption>()
+                assertEquals(EChartsGlSeriesTypes.graphGL, series.type)
+                assertEquals("forceAtlas2", series.layout)
+                assertEquals(false, series.forceAtlas2!!.GPU)
+                assertEquals(2.0, series.forceAtlas2!!.steps)
+                assertEquals(4.0, series.forceAtlas2!!.maxSteps)
+                assertEquals(0.5, series.forceAtlas2!!.gravity)
+                assertEquals(false, series.forceAtlas2!!.barnesHutOptimize)
+                assertEquals(true, series.forceAtlas2!!.repulsionByDegree)
+                assertEquals(true, series.forceAtlas2!!.linLogMode)
+                assertEquals(true, series.forceAtlas2!!.strongGravityMode)
+                assertEquals(2, series.forceAtlas2!!.gravityCenter!!.size)
+                assertEquals(20.0, series.forceAtlas2!!.gravityCenter!![1])
+                assertEquals(50.0, series.forceAtlas2!!.scaling)
+                assertEquals(2.0, series.forceAtlas2!!.edgeWeightInfluence)
+                val edgeWeight = series.forceAtlas2!!.edgeWeight!!.unsafeCast<Array<Double>>()
+                assertEquals(2, edgeWeight.size)
+                assertEquals(4.0, edgeWeight[1])
+                assertEquals(2.0, series.forceAtlas2!!.nodeWeight!!.unsafeCast<Double>())
+                assertEquals(true, series.forceAtlas2!!.preventOverlap)
+                assertEquals(1.2, series.forceAtlas2!!.barnesHutTheta)
+                assertEquals(0.1, series.forceAtlas2!!.jitterTolerence)
+                assertEquals(true, series.forceAtlas2!!.dissuadeHubs)
+                assertEquals(false, series.focusNodeAdjacency)
+                assertEquals(GraphGLFocusNodeAdjacencyOns.mouseover, series.focusNodeAdjacencyOn)
+                assertEquals(1.5, series.zoom)
+                assertEquals(2, series.offset!!.size)
+                assertEquals(20.0, series.offset!![1])
+                assertEquals(SymbolSize(8.0), series.symbolSize)
+                assertEquals(0.4, series.typedLineStyle!!.opacity)
+                assertEquals(true, series.typedLabel!!.show)
+                assertEquals("group", series.categories!![0]!!.name)
+                assertEquals(2, series.typedData!!.size)
+                assertEquals(OptionId("a"), series.typedData!![0]!!.name)
+                assertEquals(StringOrDouble(0.0), series.typedData!![0]!!.category)
+                assertEquals(1, series.links!!.size)
+                assertEquals(StringOrDouble(1.0), series.links!![0]!!.target)
+                assertEquals(1, series.edges!!.size)
+                assertEquals(StringOrDouble(1.0), series.edges!![0]!!.target)
+                assertWebGlCanvas(container)
+            } finally {
+                destroyChart(chart, container)
+            }
+        }
+    }
+
+    /**
+     * Asserts that the WebGL layer was created and painted into its own canvas.
+     *
+     * A chart with axes also has the 2D canvas of zrender, so the GL canvas is the one that has a
+     * WebGL context.
+     */
+    private fun assertWebGlCanvas(container: HTMLElement) {
+        assertNull(container.querySelector(".ecgl-nowebgl"), "WebGL is not available")
+        val canvases = container.querySelectorAll("canvas")
+        var glCanvases = 0
+        for (index in 0 until canvases.length) {
+            val canvas = canvases.item(index).unsafeCast<HTMLCanvasElement>()
+            assertTrue(canvas.width > 0 && canvas.height > 0, "${canvas.width}x${canvas.height}")
+            if (canvas.getContext(WebGLRenderingContext.ID) != null) {
+                glCanvases++
+            }
+        }
+        assertEquals(1, glCanvases)
+    }
+}
+
+/**
+ * Adds the two value axes a 2D GL series needs.
+ */
+private fun EChartsGlOption.axes() {
+    xAxis = one(unsafeJso<XAxisOption> { type = AxisTypes.value })
+    yAxis = one(unsafeJso<YAxisOption> { type = AxisTypes.value })
+}
+

@@ -1,7 +1,7 @@
 package demo.examples.heatmap
 
-import echarts.options.HeatmapDataItem
-import echarts.options.dataItems
+import io.github.shijianjs.ktjs.echarts.options.HeatmapDataItem
+import io.github.shijianjs.ktjs.echarts.options.dataItems
 import demo.examples.custom.punchCardValues
 import demo.examples.shared.every
 import demo.examples.shared.row

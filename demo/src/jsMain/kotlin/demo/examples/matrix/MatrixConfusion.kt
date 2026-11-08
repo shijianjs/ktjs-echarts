@@ -2,27 +2,27 @@ package demo.examples.matrix
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.CoordinateSystemDataCoord
-import echarts.options.CustomPathOption
-import echarts.options.CustomSeriesOption
-import echarts.options.DimensionLoose
-import echarts.options.DoubleOrDoubleArray
-import echarts.options.EChartsOption
-import echarts.options.GraphicComponentLooseOption
-import echarts.options.GraphicComponentOption
-import echarts.options.LabelFormatter
-import echarts.options.LabelOption
-import echarts.options.OptionDataItem
-import echarts.options.TextStyleOption
-import echarts.options.SeriesOption
-import echarts.options.StringOrDouble
+import io.github.shijianjs.ktjs.echarts.options.CoordinateSystemDataCoord
+import io.github.shijianjs.ktjs.echarts.options.CustomPathOption
+import io.github.shijianjs.ktjs.echarts.options.CustomSeriesOption
+import io.github.shijianjs.ktjs.echarts.options.DimensionLoose
+import io.github.shijianjs.ktjs.echarts.options.DoubleOrDoubleArray
+import io.github.shijianjs.ktjs.echarts.options.EChartsOption
+import io.github.shijianjs.ktjs.echarts.options.GraphicComponentLooseOption
+import io.github.shijianjs.ktjs.echarts.options.GraphicComponentOption
+import io.github.shijianjs.ktjs.echarts.options.LabelFormatter
+import io.github.shijianjs.ktjs.echarts.options.LabelOption
+import io.github.shijianjs.ktjs.echarts.options.OptionDataItem
+import io.github.shijianjs.ktjs.echarts.options.TextStyleOption
+import io.github.shijianjs.ktjs.echarts.options.SeriesOption
+import io.github.shijianjs.ktjs.echarts.options.StringOrDouble
 import js.objects.Record
 import js.objects.unsafeJso
 import kotlin.js.unsafeCast
 import web.cssom.TextAlign
-import zrender.ZRColor
-import zrender.ZRShapeProps
-import zrender.ZRStyleProps
+import io.github.shijianjs.ktjs.zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRShapeProps
+import io.github.shijianjs.ktjs.zrender.ZRStyleProps
 import demo.examples.Category
 import demo.examples.gauge.center
 import demo.examples.shared.numberAt
@@ -45,7 +45,7 @@ val matrixConfusionEntry: CatalogEntry =
             val custom =
                 unsafeJso<CustomSeriesOption> {
                     // Without the type ECharts drops the series and the cells stay empty.
-                    type = echarts.SeriesTypes.custom
+                    type = io.github.shijianjs.ktjs.echarts.SeriesTypes.custom
                     coordinateSystem = "matrix"
                     clip = false
                     typedData =

@@ -3,8 +3,8 @@ package demo.examples.gl
 import demo.CatalogEntry
 import demo.Groups
 import demo.ui.listen
-import echarts.options.*
-import echartsgl.options.*
+import io.github.shijianjs.ktjs.echarts.options.*
+import io.github.shijianjs.ktjs.echarts.gl.options.*
 import web.dom.document
 import web.html.HtmlTagName
 import demo.examples.Category

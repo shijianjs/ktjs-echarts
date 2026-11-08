@@ -1,11 +1,11 @@
 package demo.examples.sunburst
 
-import echarts.options.SunburstLabelOption
-import echarts.options.OptionDataValue
-import echarts.options.OptionId
-import echarts.options.SunburstSeriesNodeItemOption
+import io.github.shijianjs.ktjs.echarts.options.SunburstLabelOption
+import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
+import io.github.shijianjs.ktjs.echarts.options.OptionId
+import io.github.shijianjs.ktjs.echarts.options.SunburstSeriesNodeItemOption
 import js.objects.unsafeJso
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.matrix.names
 
 /** One sunburst node: name, value, an explicit colour and an optional label colour. */

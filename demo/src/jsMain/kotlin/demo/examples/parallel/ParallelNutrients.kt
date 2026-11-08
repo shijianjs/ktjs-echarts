@@ -3,8 +3,8 @@ package demo.examples.parallel
 import demo.CatalogEntry
 import demo.Groups
 import demo.ui.loadJson
-import echarts.*
-import echarts.options.*
+import io.github.shijianjs.ktjs.echarts.*
+import io.github.shijianjs.ktjs.echarts.options.*
 import kotlin.js.JsAny
 import demo.examples.Category
 import demo.examples.scatter.normalizeNutrients

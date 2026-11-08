@@ -154,7 +154,7 @@ Gradle 9 / JDK 25。升级时注意 2.0 的插件 ID 是 `dev.detekt`，规则�
   post-update 钩子，但它列出的 glob 只覆盖 `lib/chart`、`lib/component` 下一层文件，所以 webpack
   会把这条 import 丢掉、3D 图表静默不渲染。wrapper 因此自己 `@JsModule` 引入
   `echarts-gl/lib/echarts-gl.js`，并在公开的安装器 getter 里读取它（见
-  `ktjs-echarts-gl/src/jsMain/kotlin/echartsgl/EChartsGlCore.kt`）。新增这类「副作用决定功能是否
+  `ktjs-echarts-gl/src/jsMain/kotlin/io/github/shijianjs/ktjs/echarts/gl/EChartsGlCore.kt`）。新增这类「副作用决定功能是否
   可用」的上游包时先按同样方式验证：构建出的 bundle 里搜上游核心模块的特征字符串，而不是只看
   `use()` 有没有报错。
 - 浏览器测试使用新版测试 DSL：`@OptIn(ExperimentalJsTestDsl::class) browser { test { chromium() } }`，

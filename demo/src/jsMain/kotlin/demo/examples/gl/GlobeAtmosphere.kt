@@ -2,14 +2,14 @@ package demo.examples.gl
 
 import demo.CatalogEntry
 import demo.Groups
-import echarts.options.one
-import echartsgl.GlEnvironment
-import echartsgl.ShadingTypes
-import echartsgl.TextureSource
-import echartsgl.options.*
+import io.github.shijianjs.ktjs.echarts.options.one
+import io.github.shijianjs.ktjs.echarts.gl.GlEnvironment
+import io.github.shijianjs.ktjs.echarts.gl.ShadingTypes
+import io.github.shijianjs.ktjs.echarts.gl.TextureSource
+import io.github.shijianjs.ktjs.echarts.gl.options.*
 import js.objects.unsafeJso
 import kotlin.js.JsAny
-import zrender.ZRColor
+import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 
 private val globeAtmosphereCategory = Category(Groups.GL, "examples/gl/GlobeAtmosphere.kt")

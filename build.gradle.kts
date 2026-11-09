@@ -92,6 +92,19 @@ subprojects {
                 // Bundling still shakes the unused parts. See AGENTS.md.
                 freeCompilerArgs.add("-Xir-dce=false")
             }
+
+            // ES2015 is the first target whose output can express a real class; below it Kotlin
+            // emits `function X() { HTMLElement.call(this) }`, which a DOM constructor rejects with
+            // "Please use the 'new' operator". Kotlin/JS accepts es5/es2015 only (es2020 fails), and
+            // the value has to be set here, on the js target — `-target` through freeCompilerArgs
+            // does nothing.
+            targets
+                .withType(org.jetbrains.kotlin.gradle.targets.js.dsl.KotlinJsTargetDsl::class.java)
+                .configureEach {
+                    compilerOptions {
+                        target = "es2015"
+                    }
+                }
         }
     }
 

@@ -11,7 +11,7 @@ plugins {
     kotlin("plugin.serialization") version "2.4.21" apply false
     id("com.vanniktech.maven.publish") version "0.37.0" apply false
     id("dev.detekt") version "2.0.0-alpha.6" apply false
-    id("org.jetbrains.dokka") version "2.2.0"
+    id("org.jetbrains.dokka") version "2.3.0"
 }
 
 // Modules published to Maven Central are also the ones Dokka documents and the release report

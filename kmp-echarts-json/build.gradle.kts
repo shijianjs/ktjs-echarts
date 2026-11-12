@@ -9,7 +9,10 @@ plugins {
 val npmVersions = rootProject.extra["npmVersions"] as Map<String, String>
 @Suppress("UNCHECKED_CAST")
 val wrapperRevisions = rootProject.extra["wrapperRevisions"] as Map<String, Int>
-version = "${npmVersions.getValue("echarts")}-kt.${wrapperRevisions.getValue(project.name)}"
+// Empty in a release build, `-SNAPSHOT` in a working tree: see the note in the root build script.
+@Suppress("UNCHECKED_CAST")
+val versionSuffix = rootProject.extra["versionSuffix"] as String
+version = "${npmVersions.getValue("echarts")}-kt.${wrapperRevisions.getValue(project.name)}$versionSuffix"
 description = "Kotlin Multiplatform model for building type-safe ECharts option JSON."
 
 kotlin {

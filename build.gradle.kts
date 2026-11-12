@@ -14,6 +14,15 @@ plugins {
     id("org.jetbrains.dokka") version "2.3.0"
 }
 
+// A working tree is never a release. Every module derives the version of its *next* release, which
+// Maven Central does not have, so the suffix marks it as unreleased: consumers can tell an artifact
+// built here from one that was published, and a local publish can never shadow a real version.
+// The release workflow passes `-Pktjs.release=true`, which drops the suffix for both the build and
+// `printPublishedVersions`. Nothing else reads the flag.
+val versionSuffix =
+    if (providers.gradleProperty("ktjs.release").map(String::toBoolean).getOrElse(false)) "" else "-SNAPSHOT"
+extra["versionSuffix"] = versionSuffix
+
 // Modules published to Maven Central are also the ones Dokka documents and the release report
 // lists. Keep this set in sync with the module directories and settings.gradle.kts; every entry
 // must also exist in wrapper-revisions.properties. `demo` is the Pages site and is not published.

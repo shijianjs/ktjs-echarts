@@ -1,0 +1,56 @@
+---
+title: ktjs-echarts
+description: echarts 生态的 Kotlin/JS 封装
+hide_table_of_contents: true
+---
+
+import logo from '@site/static/img/ktjs-echarts-logo.png';
+
+{/* `<ktjs-…>` 这一段来自 ktjs-docusaurus kit：Gradle 插件把它的 bundle 发布到 `static/ktjs-client/`，
+    `ClientModule.kt` 在页面 hydrate 之后加载它。`href` 一律相对，这样两种 locale 前缀下都能用；
+    `logo` 通过 import 拿 URL，部署在哪个 `baseUrl` 下都正确。 */}
+
+<ktjs-hero logo-src={logo} title="ktjs-echarts" tagline="Apache ECharts 的 Kotlin/JS 封装，类型来自上游声明">
+
+<ktjs-action kind="primary" href="guide/getting-started">开始使用</ktjs-action>
+
+<ktjs-action kind="secondary" href="https://github.com/shijianjs/ktjs-echarts" icon="simple-icons:github">GitHub</ktjs-action>
+
+<ktjs-action kind="secondary" href="https://shijianjs.github.io/ktjs-echarts/demo/" icon="lucide:play">演示</ktjs-action>
+
+<ktjs-badge href="https://github.com/shijianjs/ktjs-echarts/blob/master/LICENSE" src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></ktjs-badge>
+
+<ktjs-badge href="https://github.com/shijianjs/ktjs-echarts" src="https://img.shields.io/badge/Kotlin%2FJS-2.4.21-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin/JS"></ktjs-badge>
+</ktjs-hero>
+
+<ktjs-features section-title="这套封装给你什么" tinted>
+
+<ktjs-feature icon="lucide:bar-chart-3" title="完整公开面">`init`、`use`、`registerTheme` / `registerMap` / `registerLocale`，`format` / `time` / `graphic` 命名空间，以及每个图表、组件、渲染器的 installer。</ktjs-feature>
+
+<ktjs-feature icon="lucide:shield-check" title="选项不是 dynamic">系列与组件选项是由上游声明生成的 `external interface`，拼错字段就是编译错误。</ktjs-feature>
+
+<ktjs-feature icon="lucide:type" title="具名取值是类型">`AxisTypes.category`、`SeriesTypes.line`、`TooltipTriggers.axis` —— 每个都是自己密封接口里的常量，而不是裸字符串。</ktjs-feature>
+
+<ktjs-feature icon="lucide:package" title="模块化仍然模块化">`EChartsCore` 加你引用的 installer；只有某处写了 `ECharts`，完整包才会进来。</ktjs-feature>
+
+<ktjs-feature icon="lucide:box" title="含 3D 与 WebGL">`ktjs-echarts-gl` 封装 `echarts-gl` 2.1：`bar3D`、`scatterGL`、`globe`、后处理选项与 GL installer。</ktjs-feature>
+
+<ktjs-feature icon="lucide:server" title="选项可以从任何地方来">`kmp-echarts-json` 把同一套选项 schema 建模成 `@Serializable` 类，JVM 或 native 后端可以先拼好 JSON 再交给图表。</ktjs-feature>
+
+</ktjs-features>
+
+<ktjs-next-steps section-title="接下来看哪里">
+
+<ktjs-step href="intro" title="简介">这个仓库封装了什么、版本怎么定、站点怎么拼。</ktjs-step>
+
+<ktjs-step href="guide/getting-started" title="快速开始">安装模块、画出第一张折线图、转发尺寸变化、跑演示。</ktjs-step>
+
+<ktjs-step href="guide/options" title="选项">选项对象、类型化取值辅助，以及取代上游字符串的那些常量。</ktjs-step>
+
+<ktjs-step href="guide/modular" title="模块化构建">只注册页面真正画的东西，并选渲染器。</ktjs-step>
+
+<ktjs-step href="https://shijianjs.github.io/ktjs-echarts/demo/" title="在线演示">从上游移植到 Kotlin 的示例，中英可切换。</ktjs-step>
+
+<ktjs-step href="https://shijianjs.github.io/ktjs-echarts/api/" title="API 参考">已发布模块的 Dokka 输出。</ktjs-step>
+
+</ktjs-next-steps>

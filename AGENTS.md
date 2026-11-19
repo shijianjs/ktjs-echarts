@@ -565,8 +565,24 @@ klibs.io 从 Maven Central 与 GitHub 自动抓取，无需提交元数据文件
   Chromium 复用第一个 wrapper 模块的 `kotlinInstallPlaywrightBrowsers`，因此
   `com.microsoft.playwright:playwright` 的版本必须与 KGP 安装的 npm `playwright` 一致（当前都是
   1.61.0），升级 KGP 后若浏览器版本不匹配，重新跑安装任务。
-- `./gradlew pagesSite` 把 demo 与 `build/dokka/html` 组装到 `build/pages`：演示页在根目录，API 文档在
-  `api/`。演示页内部链接使用相对路径。
+- `./gradlew pagesSite` 把三份产物组装到 `build/pages`：文档站（`:docs:docusaurusBuild` 的
+  `build/js/docusaurus/docs/build`）在根目录，演示页在 `demo/`，API 文档在 `api/`。演示页内部链接使用相对
+  路径，所以搬到 `/demo/` 之后不用改页面。导航栏里的 Demo / API 是完整 URL 而不是路径——它们不是 Docusaurus
+  的路由，写绝对路径会被 `onBrokenLinks` 判成坏链。
+- **文档站**：`:docs` 是 Docusaurus 工程，配置在 Kotlin（`Config.kt`），页面是中英各一份（英文源在
+  `docs/src/jsMain/resources/docs/`，中文镜像在 `i18n/zh-Hans/`）。首页一律用 `ktjs-docusaurus-kit` 的
+  `<ktjs-hero>` / `<ktjs-features>` / `<ktjs-next-steps>`，右侧目录折叠由 `ClientModule.kt` 里的 `TocToggle`
+  接线（`Config.kt` 的 `clientModules` 与 `ClientModule.onRouteDidUpdate` 两处都要在，缺一处就不显示）。
+  默认启动是中文：`docs/build.gradle.kts` 的 `startArguments = listOf("--locale", "zh-Hans")`。
+  能画的结构一律用 ` ```mermaid ` 围栏块，不要贴图。
+- **根 `package.json` 必须有 `browserslist`**：它会被从生成站点目录往上找到。缺了它 Babel 没有目标，
+  会把 async/await 降级成 regenerator 状态机，`@docusaurus/theme-mermaid` 的
+  `if (__DOCUSAURUS_MERMAID_LAYOUT_ELK_ENABLED__)` 守卫就不再是死代码，`docusaurusBuild` 卡在
+  `Can't resolve '@mermaid-js/layout-elk'`（那个可选 peer 是故意不装的）。派生项目第一次加 mermaid 主题时
+  都踩这个坑。
+- **`settings.gradle.kts` 的 `mavenLocal()` 必须配 `exclusiveContent` 把 Kotlin 坐标钉到 Central**：本地仓库里
+  POM-only 的 stdlib 没有 JS variant，Gradle 找到元数据就不再回退，`:docs:compileKotlinJs` 会在每个文件上报
+  `Missing stdlib class`。
 - Dokka 2.2.0 同时应用到根项目和所有 wrapper 子模块；聚合入口是根项目的 `dependencies { dokka(...) }`，
   任务为 `dokkaGeneratePublicationHtml`（2.x 已移除旧的 `dokkaHtmlMultiModule`）。
 - `.github/workflows/pages.yml` 只有 `workflow_dispatch`：站点更新在内容值得上线后手动执行

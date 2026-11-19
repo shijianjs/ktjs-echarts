@@ -1,0 +1,57 @@
+---
+title: ktjs-echarts
+description: Kotlin/JS wrappers for the echarts ecosystem
+hide_table_of_contents: true
+---
+
+import logo from '@site/static/img/ktjs-echarts-logo.png';
+
+{/* The `<ktjs-…>` sections come from the ktjs-docusaurus kit: the Gradle plugin publishes its bundle
+    under `static/ktjs-client/`, and `ClientModule.kt` loads it once the page is hydrated. `href`s stay
+    relative so the same page works under both locale prefixes; `logo` is imported so the URL carries
+    whatever `baseUrl` this site is deployed under. */}
+
+<ktjs-hero logo-src={logo} title="ktjs-echarts" tagline="Apache ECharts in Kotlin/JS, typed from the upstream declarations">
+
+<ktjs-action kind="primary" href="guide/getting-started">Get started</ktjs-action>
+
+<ktjs-action kind="secondary" href="https://github.com/shijianjs/ktjs-echarts" icon="simple-icons:github">GitHub</ktjs-action>
+
+<ktjs-action kind="secondary" href="https://shijianjs.github.io/ktjs-echarts/demo/" icon="lucide:play">Demo</ktjs-action>
+
+<ktjs-badge href="https://github.com/shijianjs/ktjs-echarts/blob/master/LICENSE" src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT"></ktjs-badge>
+
+<ktjs-badge href="https://github.com/shijianjs/ktjs-echarts" src="https://img.shields.io/badge/Kotlin%2FJS-2.4.21-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin/JS"></ktjs-badge>
+</ktjs-hero>
+
+<ktjs-features section-title="What the wrapper gives you" tinted>
+
+<ktjs-feature icon="lucide:bar-chart-3" title="The whole public surface">`init`, `use`, `registerTheme` / `registerMap` / `registerLocale`, the `format` / `time` / `graphic` namespaces and every chart, component and renderer installer.</ktjs-feature>
+
+<ktjs-feature icon="lucide:shield-check" title="Options, not `dynamic`">Series and component options are `external interface` types built from the upstream declarations, so a misspelt field is a compile error.</ktjs-feature>
+
+<ktjs-feature icon="lucide:type" title="Named values are typed">`AxisTypes.category`, `SeriesTypes.line`, `TooltipTriggers.axis` — each is a constant of its own sealed interface instead of a bare string.</ktjs-feature>
+
+<ktjs-feature icon="lucide:package" title="Modular builds stay modular">`EChartsCore` plus the installers you reference; the full bundle is only pulled in when something names `ECharts`.</ktjs-feature>
+
+<ktjs-feature icon="lucide:box" title="3D and WebGL included">`ktjs-echarts-gl` wraps `echarts-gl` 2.1: `bar3D`, `scatterGL`, `globe`, the post-effect options and the GL installers.</ktjs-feature>
+
+<ktjs-feature icon="lucide:server" title="Options from anywhere">`kmp-echarts-json` models the same option schema as `@Serializable` classes, so a JVM or native backend can hand a JSON payload to the chart.</ktjs-feature>
+
+</ktjs-features>
+
+<ktjs-next-steps section-title="Where to go next">
+
+<ktjs-step href="intro" title="Introduction">What this repository wraps, how the modules are versioned and how the site is laid out.</ktjs-step>
+
+<ktjs-step href="guide/getting-started" title="Getting started">Install the module, draw a first line chart, forward resize events and run the demo.</ktjs-step>
+
+<ktjs-step href="guide/options" title="Options">Option objects, the typed value helpers and the constants that replace upstream's strings.</ktjs-step>
+
+<ktjs-step href="guide/modular" title="Modular builds">Register only what the page draws, and pick the renderer.</ktjs-step>
+
+<ktjs-step href="https://shijianjs.github.io/ktjs-echarts/demo/" title="Live demo">The upstream examples, ported to Kotlin and switchable between English and Chinese.</ktjs-step>
+
+<ktjs-step href="https://shijianjs.github.io/ktjs-echarts/api/" title="API reference">Dokka output for the published modules.</ktjs-step>
+
+</ktjs-next-steps>

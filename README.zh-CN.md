@@ -4,7 +4,8 @@
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-**[在线演示](https://shijianjs.github.io/ktjs-echarts/)** ·
+**[文档](https://shijianjs.github.io/ktjs-echarts/)** ·
+**[在线演示](https://shijianjs.github.io/ktjs-echarts/demo/)** ·
 **[API 文档](https://shijianjs.github.io/ktjs-echarts/api/)**
 
 仓库按 npm 包（或一组共享上游版本与发版节奏的包）划分 Gradle 模块。项目同名的包使用
@@ -52,7 +53,7 @@ Kotlin Multiplatform 选项模型。终端应用打包时本来就会摇树，�
 # demo 打包页面的端到端检查（Playwright，需要 PATH 上有 node）
 ./gradlew :demo:e2eTest
 
-# GitHub Pages 站点（根目录是 demo，API 文档在 /api/）
+# GitHub Pages 站点（根目录是文档，demo 在 /demo/，API 文档在 /api/）
 ./gradlew pagesSite
 ```
 

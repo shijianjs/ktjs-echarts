@@ -4,7 +4,8 @@ Kotlin/JS wrappers for the [`echarts`](https://www.npmjs.com/package/echarts) ec
 
 [English](README.md) | [简体中文](README.zh-CN.md)
 
-**[Live demo](https://shijianjs.github.io/ktjs-echarts/)** ·
+**[Documentation](https://shijianjs.github.io/ktjs-echarts/)** ·
+**[Live demo](https://shijianjs.github.io/ktjs-echarts/demo/)** ·
 **[API reference](https://shijianjs.github.io/ktjs-echarts/api/)**
 
 The repository keeps one Gradle module per npm package, or per group of packages that share an
@@ -56,7 +57,7 @@ the `npm(...)` dependency from these two files:
 # End-to-end checks for the bundled demo page (Playwright, needs node on PATH)
 ./gradlew :demo:e2eTest
 
-# GitHub Pages site (demo at the root, Dokka output under /api/)
+# GitHub Pages site (docs at the root, the demo under /demo/, Dokka output under /api/)
 ./gradlew pagesSite
 ```
 

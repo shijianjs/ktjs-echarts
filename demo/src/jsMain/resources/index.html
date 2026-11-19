@@ -1,39 +1,22 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="ktjs-echarts example gallery: the official ECharts examples ported to Kotlin/JS. ECharts 官方示例的 Kotlin/JS 移植。">
     <title>ktjs-echarts · Example gallery</title>
-    <link rel="icon" href="img/ktjs-wrapper-template-logo.png">
-    <link rel="stylesheet" href="demo.css">
+    <link rel="icon" href="img/ktjs-echarts-logo.png">
+    <!-- Lumo's design tokens and the utility classes the shell uses; copied from the npm workspace. -->
+    <link rel="stylesheet" href="lumo.css">
+    <link rel="stylesheet" href="utility.css">
     <script src="demo.js" defer></script>
-    <script>
-        // The gallery follows the browser language until the user picks one; mirror that on <html> as
-        // early as possible so assistive technology sees the right language before the bundle runs.
-        (() => {
-            try {
-                const stored = localStorage.getItem('ktjs-echarts-language');
-                const preferred = (navigator.languages && navigator.languages[0]) || navigator.language || '';
-                const code = stored || (preferred.toLowerCase().startsWith('zh') ? 'zh' : 'en');
-                document.documentElement.lang = code === 'zh' ? 'zh-CN' : 'en';
-            } catch (ignored) {
-                // Private mode with storage disabled: LanguageState detects the browser language.
-            }
-        })();
-        // Applied before first paint so a stored dark preference does not flash the light theme.
-        (() => {
-            try {
-                if (localStorage.getItem('ktjs-echarts-theme') === 'dark') {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                }
-            } catch (ignored) {
-                // Private mode with storage disabled: stay with the light default.
-            }
-        })();
-    </script>
 </head>
 <body>
+<!--
+  The shell is named here, not created by the script: `main` defines the tags and mounts the menu into
+  the element the browser built, so there is exactly one `<ktjs-demo-layout>` on the page.
+-->
+<ktjs-demo-layout id="demo"></ktjs-demo-layout>
 <noscript>This gallery is built with Kotlin/JS and needs JavaScript. 这个示例站由 Kotlin/JS 构建，需要启用 JavaScript。</noscript>
 </body>
 </html>

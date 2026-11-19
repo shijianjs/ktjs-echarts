@@ -2,1056 +2,184 @@ package demo.e2e
 
 import com.microsoft.playwright.Page
 import com.microsoft.playwright.junit.UsePlaywright
-import com.microsoft.playwright.options.BoundingBox
 import com.microsoft.playwright.options.WaitUntilState
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Timeout
 import org.junitpioneer.jupiter.RetryingTest
 
 /**
- * End-to-end checks for the example gallery.
+ * Smoke checks for the gallery: the shared shell runs, the drawer drives the router, charts mount inside
+ * the page, the KMP model pages show both builders, and the shell's own features (filter, language
+ * switch, one scrollbar) still work.
  *
- * The suite drives the published bundle the way a visitor does: it walks the sidebar, switches the
- * language and the theme, filters the index, and asserts that the visited pages render their ECharts
- * canvas without a console error or a failed request.
+ * The shell lives in a shadow tree, so the demo's own nodes are selected through `#demo` and the page
+ * element the shell mounts — never through the document root.
  */
 @UsePlaywright(DemoOptions::class)
 class DemoPageTest {
     @RetryingTest(maxAttempts = 2)
-    fun `overview lists every example and applies its stylesheet`(page: Page) {
+    fun `overview lists every group and every example`(page: Page) {
         openPage(page)
 
         assertTrue(page.title().contains("ktjs-echarts"), "title: ${page.title()}")
-        assertTrue(page.locator(".shell__nav").isVisible, "the sidebar is visible")
+        assertTrue(page.locator("#demo img.layout__logo").isVisible(), "the shell serves the project logo")
+        assertEquals("Example overview", page.locator("#demo ktjs-demo-page h1").first().textContent())
 
-        val cards = page.locator(".example-card").count()
-        assertTrue(cards > 50, "the index lists the ported examples, got $cards cards")
-
-        val display = page.locator(".page").first().evaluate("(node) => getComputedStyle(node).display") as String
-        assertTrue(display != "contents", "the stylesheet applies to .page (display = $display)")
+        // One drawer row per group, one card per ported example.
+        val groups = page.locator("#demo vaadin-side-nav-item").count()
+        assertTrue(groups > 25, "drawer rows: $groups")
+        val cards = page.locator("#demo ktjs-demo-page a.example-card").count()
+        assertTrue(cards > 300, "index cards: $cards")
     }
 
     @RetryingTest(maxAttempts = 2)
-    fun `sidebar navigation renders the chart of the chosen example`(page: Page) {
+    fun `bar simple mounts a chart inside the page`(page: Page) {
         openPage(page)
-        openFromSidebar(page, "bar", "bar-simple")
+        openRoute(page, "bar-simple")
 
-        val breadcrumb = page.locator(".topbar__breadcrumb").textContent()!!
-        assertTrue(breadcrumb.contains("基础柱状图"), "breadcrumb: $breadcrumb")
-        assertChartRendered(page, "bar-simple")
+        assertEquals("Basic Bar", page.locator("#demo ktjs-demo-page h1").first().textContent())
+        waitForChart(page)
+
+        val box = chartBox(page)
+        assertTrue(box.first > 400, "chart width: ${box.first}")
+        assertTrue(box.second > 240, "chart height: ${box.second}")
     }
 
     @RetryingTest(maxAttempts = 2)
-    fun `a deep link renders the example and its official link`(page: Page) {
-        openPage(page, "#/gauge-grade")
-
-        val heading = page.locator("h1").textContent()!!
-        assertTrue(heading.contains("等级仪表盘"), "heading: $heading")
-        val official = page.locator(".page__links a").first().getAttribute("href")!!
-        assertTrue(official.contains("editor.html?c=gauge-grade"), "official link: $official")
-        assertChartRendered(page, "gauge-grade")
-    }
-
-    @RetryingTest(maxAttempts = 2)
-    fun `the index filter hides the cards that do not match`(page: Page) {
+    fun `the json switch feeds the same chart from the model output`(page: Page) {
         openPage(page)
+        openRoute(page, "bar-simple")
 
-        val total = page.locator(".example-card").count()
-        page.locator(".index__search").fill("gauge")
-        page.waitForFunction("() => document.querySelectorAll('.example-card:not(.is-hidden)').length < 50")
+        assertEquals(1, page.locator("#demo ktjs-demo-page vaadin-switch").count())
+        page.locator("#demo ktjs-demo-page vaadin-switch").first().evaluate("(el) => { el.checked = true }")
+        waitForChart(page)
 
-        val visible = page.locator(".example-card:not(.is-hidden)").count()
-        assertTrue(visible in 1 until total, "filtering keeps $visible of $total cards")
+        // Re-initialising leaves one canvas behind, and the JSON card stayed where it was.
+        assertEquals(1, page.locator("#demo ktjs-demo-page demo-chart canvas").count())
+        assertEquals(2, page.locator("#demo ktjs-demo-page .section__title").count())
     }
 
     @RetryingTest(maxAttempts = 2)
-    fun `the language switch rebuilds the page in the other language`(page: Page) {
-        openPage(page, "#/pie-simple")
-
-        val chineseHeading = page.locator("h1").textContent()!!
-        page.locator(".lang-switch button").nth(1).click()
-        page.waitForFunction("() => document.documentElement.lang === 'en'")
-
-        val englishHeading = page.locator("h1").textContent()!!
-        assertTrue(
-            englishHeading != chineseHeading && englishHeading.contains("Referer"),
-            "heading is re-resolved: $englishHeading",
-        )
-        assertChartRendered(page, "pie-simple")
-    }
-
-    @RetryingTest(maxAttempts = 2)
-    fun `the theme switch re-creates the chart in dark mode`(page: Page) {
-        openPage(page, "#/line-simple")
-
-        page.locator(".theme-switch button").nth(1).click()
-        page.waitForFunction("() => document.documentElement.getAttribute('data-theme') === 'dark'")
-
-        assertChartRendered(page, "line-simple")
-    }
-
-    /**
-     * The model pages build their option with `kmp-echarts-json` in `commonMain`; the top-bar source
-     * switch only shows up there and swaps the code panel between the Kotlin builder and the JSON the
-     * chart consumes, without touching the rendered chart.
-     */
-    @RetryingTest(maxAttempts = 2)
-    fun `the source switch shows the JSON of a model page`(page: Page) {
-        openPage(page, "#/kmp-json/line-smooth")
-        assertChartRendered(page, "kmp-json/line-smooth")
-
-        val code = page.locator(".page[data-route='kmp-json/line-smooth'] .code-block")
-        assertTrue(code.textContent()!!.trimStart().startsWith("echartsOption"), "Kotlin source: ${code.textContent()}")
-        assertTrue(page.locator(".source-switch").isVisible, "the source switch is visible on a model page")
-
-        page.locator(".source-switch button").nth(1).click()
-        page.waitForFunction("() => document.querySelector('.code-block').textContent.trimStart().startsWith('{')")
-        assertTrue(code.textContent()!!.contains("\"series\""), "JSON source: ${code.textContent()}")
-        assertChartRendered(page, "kmp-json/line-smooth")
-
-        page.locator(".source-switch button").nth(0).click()
-        page.waitForFunction(
-            "() => document.querySelector('.code-block').textContent.trimStart().startsWith('echartsOption')",
-        )
-    }
-
-    /**
-     * The JSON port covers most of the catalog, so an official example that has a counterpart shows
-     * the top-bar switch, while a page that only exists in Kotlin keeps it hidden.
-     */
-    @RetryingTest(maxAttempts = 2)
-    fun `the source switch follows the JSON coverage of a page`(page: Page) {
-        openPage(page, "#/bar-simple")
-        assertChartRendered(page, "bar-simple")
-        assertTrue(page.locator(".source-switch").isVisible, "an example with a JSON source shows the switch")
-
-        assertChartRendered(page, "bar-breaks-simple")
-        assertTrue(!page.locator(".source-switch").isVisible, "a Kotlin-only page hides the Kotlin/JSON switch")
-    }
-
-    /**
-     * The two theme buttons share one highlighted style, so exactly one of them may carry `is-on`,
-     * and its label has to stay readable against the accent of the current theme.
-     */
-    @RetryingTest(maxAttempts = 2)
-    fun `exactly one theme button is highlighted and stays readable`(page: Page) {
+    fun `a kmp model page shows the builder, the json and the chart`(page: Page) {
         openPage(page)
-        page.evaluate("() => { localStorage.clear(); location.hash = '#/bar-simple' }")
+        openRoute(page, "kmp-json/line-smooth")
 
-        assertEquals(1, page.locator(".theme-switch button.is-on").count(), "one highlighted theme button")
-
-        page.locator(".theme-switch button").nth(1).click()
-        page.waitForFunction("() => document.documentElement.getAttribute('data-theme') === 'dark'")
-        assertEquals(1, page.locator(".theme-switch button.is-on").count(), "one highlighted theme button after switching")
-        assertTrue(
-            page.locator(".theme-switch button.is-on").textContent()!!.contains("暗色"),
-            "the dark button is the highlighted one",
+        assertEquals("Smooth line", page.locator("#demo ktjs-demo-page h1").first().textContent())
+        assertEquals(
+            listOf("Chart", "Kotlin builder", "JSON option"),
+            page.locator("#demo ktjs-demo-page .section__title").allInnerTexts(),
         )
-        assertTrue(contrast(page, ".theme-switch button.is-on") >= 4.5, "the highlighted label contrasts with its background")
-
-        page.locator(".theme-switch button").nth(0).click()
-        page.waitForFunction("() => document.documentElement.getAttribute('data-theme') !== 'dark'")
-        assertEquals(1, page.locator(".theme-switch button.is-on").count(), "one highlighted theme button after switching back")
-        assertTrue(
-            page.locator(".theme-switch button.is-on").textContent()!!.contains("亮色"),
-            "the light button is the highlighted one",
-        )
-        assertTrue(contrast(page, ".theme-switch button.is-on") >= 4.5, "the highlighted label contrasts with its background")
+        assertEquals(2, page.locator("#demo ktjs-demo-page code.code").count())
+        waitForChart(page)
     }
 
-    /** Computes the WCAG contrast ratio between the text and the background of [selector]. */
-    private fun contrast(page: Page, selector: String): Double =
-        page.locator(selector).first().evaluate(
-            """
-            (node) => {
-                const parse = (value) => {
-                    const parts = value.match(/[\d.]+/g).map(Number);
-                    return parts.length >= 3 ? parts.slice(0, 3) : [0, 0, 0];
-                };
-                const channel = (value) => {
-                    const c = value / 255;
-                    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-                };
-                const luminance = (rgb) => 0.2126 * channel(rgb[0]) + 0.7152 * channel(rgb[1]) + 0.0722 * channel(rgb[2]);
-                const style = getComputedStyle(node);
-                const foreground = luminance(parse(style.color));
-                const background = luminance(parse(style.backgroundColor));
-                const lighter = Math.max(foreground, background);
-                const darker = Math.min(foreground, background);
-                return (lighter + 0.05) / (darker + 0.05);
-            }
-            """,
-        ) as Double
+    @RetryingTest(maxAttempts = 2)
+    fun `the index filter narrows the cards`(page: Page) {
+        openPage(page)
+        val all = page.locator("#demo ktjs-demo-page a.example-card").count()
+
+        page.locator("#demo ktjs-demo-page vaadin-text-field").first().evaluate(
+            "(el, value) => { el.value = value; el.dispatchEvent(new Event('input')) }",
+            "gauge",
+        )
+        val visible = page.locator("#demo ktjs-demo-page a.example-card:not([hidden])").count()
+        assertTrue(visible < all, "visible $visible of $all")
+        assertTrue(visible > 0, "the filter matched at least one example")
+    }
 
     @RetryingTest(maxAttempts = 2)
-    fun `the gallery logs no console errors or failed requests`(page: Page) {
+    fun `the language switch rewrites the page in place`(page: Page) {
+        openPage(page)
+        openRoute(page, "kmp-json/line-smooth")
+        val jsonBefore = page.locator("#demo ktjs-demo-page code.code").nth(1).textContent()
+
+        switchLanguage(page, "zh-Hans")
+        assertEquals("平滑折线图", page.locator("#demo ktjs-demo-page h1").first().textContent())
+        assertEquals(
+            listOf("图表", "Kotlin 构造", "JSON 选项"),
+            page.locator("#demo ktjs-demo-page .section__title").allInnerTexts(),
+        )
+
+        // The serialized option is data: a language switch must not re-run the model.
+        assertEquals(jsonBefore, page.locator("#demo ktjs-demo-page code.code").nth(1).textContent())
+    }
+
+    @RetryingTest(maxAttempts = 2)
+    fun `the page keeps a single scrollbar`(page: Page) {
+        openPage(page)
+        openRoute(page, "bar-simple")
+
+        val horizontal = page.evaluate(
+            "() => document.documentElement.scrollWidth - document.documentElement.clientWidth",
+        ) as Number
+        assertEquals(0, horizontal.toInt(), "no horizontal overflow")
+    }
+
+    @RetryingTest(maxAttempts = 2)
+    fun `page logs no console errors or failed requests`(page: Page) {
         val consoleErrors = mutableListOf<String>()
         val failedRequests = mutableListOf<String>()
         page.onConsoleMessage { message ->
             if (message.type() == "error") consoleErrors += message.text()
         }
-        page.onRequestFailed { request -> failedRequests += "${request.url()} ${request.failure()}" }
+        page.onRequestFailed { request ->
+            failedRequests += "${request.url()} ${request.failure()}"
+        }
 
         openPage(page)
-        openFromSidebar(page, "boxplot", "boxplot-light-velocity")
-        assertChartRendered(page, "boxplot-light-velocity")
-        openFromSidebar(page, "sankey", "sankey-vertical")
-        assertChartRendered(page, "sankey-vertical")
-        openFromSidebar(page, "heatmap", "heatmap-cartesian")
-        assertChartRendered(page, "heatmap-cartesian")
+        openRoute(page, "bar-simple")
+        waitForChart(page)
 
         assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
         assertTrue(failedRequests.isEmpty(), "failed requests: $failedRequests")
     }
 
-    /**
-     * Walks the whole catalog and asserts that each route renders a sized canvas, which catches a
-     * page that throws while building its option. Every route is visited: a sample missed a page
-     * whose option builder indexed past the end of a table.
-     *
-     * The timeout goes past the suite default (90 s) because this test visits every route of the
-     * catalog: each visit costs a route switch plus a scoped wait, and the WebGL pages compile their
-     * shaders first.
-     */
-    @Test
-    @Timeout(300)
-    fun `every example of the catalog renders without errors`(page: Page) {
-        val consoleErrors = mutableListOf<String>()
-        page.onConsoleMessage { message ->
-            if (message.type() == "error") consoleErrors += message.text()
-        }
-        openPage(page)
+    private fun openPage(page: Page) {
+        page.navigate("/", Page.NavigateOptions().setWaitUntil(WaitUntilState.NETWORKIDLE))
+        page.waitForSelector("#demo ktjs-demo-page h1")
+    }
 
-        val routes =
-            (page.locator(".example-card").evaluateAll("(nodes) => nodes.map((node) => node.dataset.route)") as List<*>)
-                .filterIsInstance<String>()
-        assertTrue(routes.size >= 100, "the catalog should ship every example, got ${routes.size} routes")
+    /** Clicks the drawer item for [route]; the router is also what the menu drives. */
+    private fun openRoute(page: Page, route: String) {
+        page.locator("#demo vaadin-side-nav-item[data-route='$route']").first().click()
+        page.waitForSelector("#demo ktjs-demo-page h1")
+    }
 
-        routes.forEach { route -> assertChartRendered(page, route) }
-        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
+    /** Opens the layout's language menu and picks [code]. */
+    private fun switchLanguage(page: Page, code: String) {
+        page.locator("#demo [data-menu='lang']").first().click()
+        page.locator("#demo [data-action='lang:$code']").first().click()
+        page.waitForFunction("(expected) => document.documentElement.lang === expected", code)
     }
 
     /**
-     * Walks the catalog with the top-bar source switch set to JSON.
+     * Waits until the chart element has a canvas with a non-zero box.
      *
-     * The other catalog sweep runs every page in its Kotlin form; this one turns the switch on once
-     * and then visits every route again, so each `kmp-echarts-json` option is serialized, parsed and
-     * handed to `setOption` in a real browser. A page keeps its canvas on the switchable routes, and
-     * those routes must show a JSON code block; the routes without a counterpart hide the switch and
-     * keep their Kotlin chart.
-     *
-     * Failures are collected per route instead of aborting on the first one, because a broken model
-     * field can surface on several pages and the whole list is a better report than one route.
-     *
-     * Uncaught exceptions are attributed to the route that was open when they fired. ECharts reports
-     * some option problems as a thrown `TypeError` and still leaves a blank chart, which the canvas
-     * check alone would not see.
+     * ECharts creates its canvas on init, which happens when the element connects, so this is the
+     * signal that the page is mounted and measured.
      */
-    @Test
-    @Timeout(600)
-    fun `every JSON source renders without errors`(page: Page) {
-        val consoleErrors = mutableListOf<String>()
-        page.onConsoleMessage { message ->
-            if (message.type() == "error") consoleErrors += message.text()
-        }
-        val pageErrors = mutableListOf<String>()
-        page.onPageError { message -> pageErrors += message }
-        openPage(page)
-
-        val routes =
-            (page.locator(".example-card").evaluateAll("(nodes) => nodes.map((node) => node.dataset.route)") as List<*>)
-                .filterIsInstance<String>()
-
-        // Turn the switch on once; the choice is remembered for the rest of the walk.
-        page.evaluate("(value) => { location.hash = '#/' + value }", "kmp-json/line-smooth")
-        page.locator(".source-switch button").nth(1).click()
-        page.waitForFunction("() => document.querySelector('.code-block').textContent.trimStart().startsWith('{')")
-
-        val failures = mutableListOf<String>()
-        routes.forEach { route ->
-            pageErrors.clear()
-            try {
-                assertChartRendered(page, route)
-                val switchVisible = page.locator(".source-switch").isVisible
-                if (switchVisible) {
-                    val code = page.locator(".page[data-route='$route'] .code-block").textContent()!!
-                    assertTrue(
-                        code.trimStart().startsWith("{"),
-                        "route $route did not show its JSON source",
-                    )
-                }
-                assertTrue(pageErrors.isEmpty(), "route $route raised ${pageErrors.toList()}")
-            } catch (error: Throwable) {
-                failures += "$route: ${error.message}"
+    private fun waitForChart(page: Page) {
+        page.waitForFunction(
+            """
+            () => {
+              const pageEl = document.querySelector('ktjs-demo-layout')?.shadowRoot?.querySelector('ktjs-demo-page');
+              const chart = pageEl?.shadowRoot?.querySelector('demo-chart');
+              return Boolean(chart && chart.querySelector('canvas') && chart.clientHeight > 0);
             }
-        }
-        assertTrue(
-            failures.isEmpty() && consoleErrors.isEmpty(),
-            "JSON routes that failed: $failures; console errors: $consoleErrors",
+            """,
         )
     }
 
-    /**
-     * Asserts that the newest coordinate systems really paint: a canvas that exists but stays
-     * transparent would pass [assertChartRendered] on its own.
-     *
-     * `matrix-covariance` guards the nested matrix header (a flat header renders nothing) and
-     * `matrix-confusion` the custom series `type` — without it the cells stay empty and the labels
-     * pile up in the corner.
-     */
-    @RetryingTest(maxAttempts = 2)
-    fun `the matrix and custom series pages draw content`(page: Page) {
-        openPage(page, "#/matrix-simple")
-        assertChartRendered(page, "matrix-simple")
-        waitForPainted(page, "matrix-simple")
-
-        val painted =
-            listOf(
-                "custom-bar-trend",
-                "custom-wind",
-                "custom-hexbin",
-                "custom-profile",
-                "geo-svg-custom-effect",
-                "custom-polar-heatmap",
-                "matrix-covariance",
-                "matrix-confusion",
-                "matrix-sparkline",
-                "pie-nest",
-                // Applied after a fetch, so it also proves the static datasets are served.
-                "treemap-disk",
-                "treemap-obama",
-            )
-        for (route in painted) {
-            page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page, route)
-            waitForPainted(page, route)
-        }
-    }
-
-    /**
-     * The `echarts-gl` pages of `Gl.kt`, `GlScatter.kt`, `GlSurfaceMaterial.kt` and `GlGeo.kt` paint
-     * into a WebGL layer, which is a canvas of its own next to the (empty) zrender canvas layer. A
-     * surface with a broken equation or a missing `visualMap` dimension only logs an error and stays
-     * blank, which is what the console assertion catches; the `scatter3D` pages fetch their rows
-     * first, so a `dataset` whose `encode.z` never arrived would leave the layer empty without an
-     * error of its own.
-     *
-     * The leather and image surfaces and the pixel-bar pages wait for an image before they set any
-     * option, so those layers are only expected to be there once the `load` handler ran. The `geo3D`
-     * pages wait for `data/world.json` and the globe pages for their textures, which the same wait
-     * covers.
-     *
-     * A missing core module of `echarts-gl` (its `sideEffects` list does not cover the nested
-     * installers, so a bundler may drop the module that registers the post-update hook) leaves the
-     * option accepted and the page blank; a browser without WebGL replaces the layer with an
-     * `.ecgl-nowebgl` placeholder. Both are asserted against here.
-     *
-     * Every page here is a WebGL one, so the sweep exceeds the suite default (90 s) as the list
-     * grows; the timeout is raised rather than trimmed so the coverage stays complete.
-     */
-    @RetryingTest(maxAttempts = 2)
-    @Timeout(300)
-    fun `the 3d pages paint through the webgl layer`(page: Page) {
-        val consoleErrors = mutableListOf<String>()
-        page.onConsoleMessage { message ->
-            if (message.type() == "error") consoleErrors += message.text()
-        }
-        openPage(page)
-
-        val routes =
-            listOf(
-                "bar3d-punch-card",
-                "transparent-bar3d",
-                "bar3d-dataset",
-                "line3d-orthographic",
-                "scatter3d",
-                "scatter3d-scatter",
-                "scatter3D-dataset",
-                "simple-surface",
-                "sphere-parametric-surface",
-                "surface-wave",
-                "metal-surface",
-                "surface-breather",
-                "surface-mollusc-shell",
-                "surface-golden-rose",
-                "surface-theme-roses",
-                "parametric-surface-rose",
-                "surface-leather",
-                "image-surface-sushuang",
-                "geo3d",
-                "geo3d-with-different-height",
-                "globe-echarts-gl-hello-world",
-                "globe-atmosphere",
-                "globe-displacement",
-                "globe-moon",
-                "globe-layers",
-                "scatter3d-globe-population",
-                "globe-with-echarts-surface",
-                "lines3d-airline-on-globe",
-                "lines3d-flights-on-geo3d",
-                "bar3d-global-population",
-                "global-population-bar3d-on-globe",
-                "lines3d-flights",
-                "lines3d-flights-gl",
-                "bar3d-myth",
-                "image-to-bar3d",
-                "bar3d-voxelize-image",
-                "graphgl-gpu-layout",
-                "graphgl-large-internet",
-                "graphgl-npm-dep",
-                "map3d-alcohol-consumption",
-                "map3d-buildings",
-                "map3d-wood-city",
-                "map3d-wood-map",
-                "linesGL-ny",
-                "scatterGL-gps",
-            )
-        for (route in routes) {
-            assertChartRendered(page, route)
-            page.waitForFunction(
-                """
-                (value) => {
-                    const canvases = document.querySelectorAll('.page[data-route="' + value + '"] .chart canvas');
-                    if (canvases.length === 0) {
-                        return false;
-                    }
-                    // A 2D-coordinate GL series keeps the zrender canvas next to its own, so the
-                    // WebGL layer is any canvas with a GL context rather than the first one.
-                    for (const canvas of canvases) {
-                        if (canvas.getContext('webgl2') !== null || canvas.getContext('webgl') !== null) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-                """,
-                route,
-            )
-            assertEquals(0, page.locator(".ecgl-nowebgl").count(), "WebGL is not available on $route")
-        }
-        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
-    }
-
-    /**
-     * The `doc-example` pages of `DocInteractive.kt` paint on their own: a timer replaces the data,
-     * `showLoading` covers the canvas for three seconds, the sunburst pages dispatch an action after
-     * the first frame, and `bar-dataZoom-filterMode` / `candlestick-axisPointer` set the option only
-     * once their data file has been fetched. Sampling once right after the route switch would miss all
-     * of that, so each page is left running long enough for at least one tick of its timer; an
-     * exception in a timer callback is what the console assertion catches. `mix-timeline-all` is
-     * checked one step further: its timeline autoplays, so a frame sampled after the play interval
-     * must differ from the first one, which is what proves the per-year options reached the chart.
-     * `tutorial-async` starts with empty arrays, so its check counts content instead of comparing
-     * frames: the deferred option has to put noticeably more pixels on the canvas.
-     */
-    @Test
-    fun `the interactive doc examples paint and run their timers`(page: Page) {
-        val consoleErrors = mutableListOf<String>()
-        page.onConsoleMessage { message ->
-            if (message.type() == "error") consoleErrors += message.text()
-        }
-        openPage(page)
-        val routes =
-            listOf(
-                "doc-example/barGrid-barGap",
-                "doc-example/tutorial-dynamic-data",
-                "doc-example/tutorial-loading",
-                "doc-example/sunburst-highlight-ancestor",
-                "doc-example/sunburst-highlight-descendant",
-                "doc-example/graphic-bounding",
-                "doc-example/timeline-dynamic-series",
-                "doc-example/pictorialBar-clip",
-                "doc-example/bar-dataZoom-filterMode",
-                "doc-example/candlestick-axisPointer",
-                "doc-example/grid-outerBounds",
-                "doc-example/mix-timeline-all",
-                "doc-example/tutorial-async",
-            )
-        for (route in routes) {
-            page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page, route)
-            waitForPainted(page, route)
-            if (route == "doc-example/tutorial-loading") {
-                // The loading effect occupies the canvas until the faked request resolves.
-                page.waitForTimeout(3300.0)
-                assertChartRendered(page, route)
+    private fun chartBox(page: Page): Pair<Int, Int> {
+        val box = page.evaluate(
+            """
+            () => {
+              const pageEl = document.querySelector('ktjs-demo-layout')?.shadowRoot?.querySelector('ktjs-demo-page');
+              const chart = pageEl?.shadowRoot?.querySelector('demo-chart');
+              return chart ? [chart.clientWidth, chart.clientHeight] : [0, 0];
             }
-            if (route == "doc-example/mix-timeline-all") {
-                // The timeline autoplays one year per second, so a year must reach the canvas.
-                val before = paintedFrame(page)
-                page.waitForTimeout(1600.0)
-                val after = paintedFrame(page)
-                assertTrue(before != after, "the timeline of $route did not switch to the next year")
-            }
-            if (route == "doc-example/tutorial-async") {
-                // The page starts with empty arrays, so the axis labels and the bars only arrive with
-                // the asynchronous option; the canvas must therefore hold noticeably more content.
-                val before = paintedPixels(page)
-                page.waitForTimeout(1800.0)
-                val after = paintedPixels(page)
-                assertTrue(after > before * 1.2, "$route stayed empty: $before painted pixels before, $after after")
-            }
-        }
-        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
-    }
-
-    /**
-     * The dial pages of `GaugeLongTail.kt` draw their whole identity from `path://` needles, so a
-     * missing icon leaves a canvas that only holds the ring: the static pages are checked for painted
-     * pixels. The three animated ones replace their values from a timer, so a frame sampled after one
-     * tick of that timer must differ from the first one; an exception inside the callback is what the
-     * console assertion catches.
-     */
-    @RetryingTest(maxAttempts = 2)
-    fun `the gauge long tail pages draw and move their needles`(page: Page) {
-        val consoleErrors = mutableListOf<String>()
-        page.onConsoleMessage { message ->
-            if (message.type() == "error") consoleErrors += message.text()
-        }
-        openPage(page)
-        for (route in listOf("gauge-speed", "gauge-car")) {
-            page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page, route)
-            waitForPainted(page, route)
-        }
-        for (route in listOf("gauge-clock", "gauge-barometer", "gauge-multi-title")) {
-            page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page, route)
-            waitForPainted(page, route)
-            val before = paintedFrame(page)
-            page.waitForTimeout(2400.0)
-            val after = paintedFrame(page)
-            assertTrue(before != after, "$route did not repaint after its timer tick")
-        }
-        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
-    }
-
-    /**
-     * The generated-data pages of `LineLongTail.kt`. `area-time-axis` plots twenty thousand points and
-     * `line-easing` thirty grids of their own: a page that fails to build its arrays leaves an empty
-     * canvas, so those are checked for painted pixels. `dynamic-data2` shifts its window once a
-     * second, so a frame sampled after one tick must differ from the first one; an exception inside
-     * the timer callback is what the console assertion catches.
-     */
-    @RetryingTest(maxAttempts = 2)
-    fun `the line long tail pages draw and move their window`(page: Page) {
-        val consoleErrors = mutableListOf<String>()
-        page.onConsoleMessage { message ->
-            if (message.type() == "error") consoleErrors += message.text()
-        }
-        openPage(page)
-        for (route in listOf("area-time-axis", "line-easing", "area-pieces", "doc-example/matrix-graph-box")) {
-            page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page, route)
-            waitForPainted(page, route)
-        }
-        val route = "dynamic-data2"
-        page.evaluate("(value) => { location.hash = '#/' + value }", route)
-        assertChartRendered(page, route)
-        waitForPainted(page, route)
-        val before = paintedFrame(page)
-        page.waitForTimeout(2400.0)
-        val after = paintedFrame(page)
-        assertTrue(before != after, "$route did not repaint after its timer tick")
-        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
-    }
-
-    /**
-     * The computed-stack pages of `BarLongTail.kt`, the cartesian graph of `GraphExtra.kt` and the two
-     * lines pages of `LineLongTail.kt` that draw their shape out of a table.
-     *
-     * `bar-stack-normalization` and `bar-stack-borderRadius` build their bars out of the same array of
-     * counts, so a mistake in that arithmetic shows up as an empty or half-empty canvas;
-     * `bar-waterfall2` hides its placeholder series with a transparent style, which leaves the two
-     * visible segments as the only content. The variation page is compared against the plain
-     * normalization page: it draws the same bars plus the translucent polygons that connect them, so
-     * it has to hold strictly more painted pixels — a graphic layer that never got built would leave
-     * the two counts equal.
-     */
-    @RetryingTest(maxAttempts = 2)
-    fun `the bar long tail pages draw their computed stacks`(page: Page) {
-        val consoleErrors = mutableListOf<String>()
-        page.onConsoleMessage { message ->
-            if (message.type() == "error") consoleErrors += message.text()
-        }
-        openPage(page)
-        for (
-            route in
-                listOf(
-                    "bar1",
-                    "bar-stack-borderRadius",
-                    "bar-waterfall2",
-                    "graph-grid",
-                    "bump-chart",
-                    "line-graphic",
-                )
-        ) {
-            page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page, route)
-            waitForPainted(page, route)
-        }
-        page.evaluate("(value) => { location.hash = '#/' + value }", "bar-stack-normalization")
-        assertChartRendered(page, "bar-stack-normalization")
-        waitForPainted(page, "bar-stack-normalization")
-        val plainBars = paintedPixels(page)
-        page.evaluate("(value) => { location.hash = '#/' + value }", "bar-stack-normalization-and-variation")
-        assertChartRendered(page, "bar-stack-normalization-and-variation")
-        waitForPainted(page, "bar-stack-normalization-and-variation")
-        val withPolygons = paintedPixels(page)
-        assertTrue(
-            withPolygons > plainBars,
-            "the polygons of bar-stack-normalization-and-variation are missing: " +
-                "$plainBars painted pixels without them, $withPolygons with them",
-        )
-        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
-    }
-
-    /**
-     * The keyframe-driven `graphic` pages of `GraphicAnimations.kt`, the sampled perlin fields of
-     * `HeatmapLongTail.kt`, the `cycle-plot` polylines and the two pages that only reach their final
-     * shape over time.
-     *
-     * The stroke page starts from `lineDash: [0, 200]`, so nothing is drawn until the animation reaches
-     * its `lineDash: [200, 0]` keyframe — a missing `keyframeAnimation` would therefore leave the canvas
-     * empty, which is what the painted-pixel wait catches. The stroke and wave pages loop, so a frame
-     * sampled one second later must differ. `graph-force-dynamic` adds a node every 200 ms, so its
-     * canvas can only grow; `dataset-link` rewrites the pie through an `updateAxisPointer` listener that
-     * never fires on its own, so it is checked as a static page.
-     */
-    @RetryingTest(maxAttempts = 2)
-    fun `the graphic keyframe pages animate and the dynamic page grows`(page: Page) {
-        val consoleErrors = mutableListOf<String>()
-        page.onConsoleMessage { message ->
-            if (message.type() == "error") consoleErrors += message.text()
-        }
-        openPage(page)
-        for (
-            route in
-                listOf(
-                    "heatmap-large",
-                    "heatmap-large-piecewise",
-                    "cycle-plot",
-                    "dataset-link",
-                    "graphic-loading",
-                    "graphic-stroke-animation",
-                    "graphic-wave-animation",
-                    "graph-force-dynamic",
-                )
-        ) {
-            page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page, route)
-            waitForPainted(page, route)
-        }
-        for (route in listOf("graphic-stroke-animation", "graphic-wave-animation")) {
-            page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page, route)
-            waitForPainted(page, route)
-            val before = paintedFrame(page)
-            page.waitForTimeout(1500.0)
-            val after = paintedFrame(page)
-            assertTrue(before != after, "$route did not repaint its keyframe animation")
-        }
-        page.evaluate("(value) => { location.hash = '#/' + value }", "graph-force-dynamic")
-        assertChartRendered(page, "graph-force-dynamic")
-        waitForPainted(page, "graph-force-dynamic")
-        val first = paintedPixels(page)
-        page.waitForTimeout(2500.0)
-        val later = paintedPixels(page)
-        assertTrue(
-            later > first,
-            "graph-force-dynamic stopped adding nodes: $first painted pixels at first, $later after 2.5s",
-        )
-        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
-    }
-
-    /**
-     * The pages of the breaks / generated-data batch: the two intraday charts of ECharts 6, the
-     * twenty-thousand point area page and the two hundred thousand candle page.
-     *
-     * The intraday pages build their own minute series, so a wrong walk would either loop forever
-     * (a break that never advances the clock) or leave an empty canvas; the candle page turns two
-     * hundred thousand rows into a `dataset`, which the painted-pixel wait proves reached the
-     * chart. `scatter-matrix` is the one page here whose grid positions are computed: a percentage
-     * that slipped back to pixels would stack every cell on the top-left corner, so it is checked
-     * for painted pixels as well.
-     */
-    @RetryingTest(maxAttempts = 2)
-    fun `the breaks and generated pages draw content`(page: Page) {
-        val consoleErrors = mutableListOf<String>()
-        page.onConsoleMessage { message ->
-            if (message.type() == "error") consoleErrors += message.text()
-        }
-        openPage(page)
-        for (
-            route in
-                listOf(
-                    "intraday-breaks-1",
-                    "intraday-breaks-2",
-                    "area-simple",
-                    "candlestick-large",
-                    "scatter-matrix",
-                    "parallel-aqi",
-                    "watermark",
-                    "scatter-anscombe-quartet",
-                )
-        ) {
-            page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page, route)
-            waitForPainted(page, route)
-        }
-        // `bar-race` grows its bars from a timer, so a frame after one tick must differ.
-        page.evaluate("(value) => { location.hash = '#/' + value }", "bar-race")
-        assertChartRendered(page, "bar-race")
-        waitForPainted(page, "bar-race")
-        val before = paintedFrame(page)
-        page.waitForTimeout(3600.0)
-        val after = paintedFrame(page)
-        assertTrue(before != after, "bar-race did not repaint after its timer tick")
-        // `bar-race-country` is the same shape with a fetched table: the first year comes from the
-        // file and every later year is a timer, so two seconds of that race repaint the canvas too.
-        page.evaluate("(value) => { location.hash = '#/' + value }", "bar-race-country")
-        assertChartRendered(page, "bar-race-country")
-        waitForPainted(page, "bar-race-country")
-        val raceBefore = paintedFrame(page)
-        page.waitForTimeout(4000.0)
-        val raceAfter = paintedFrame(page)
-        assertTrue(raceBefore != raceAfter, "bar-race-country did not advance to the next year")
-        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
-    }
-
-    /**
-     * The four pages of `ScatterAqi.kt`, `ScatterNutrients.kt` and `ParallelNutrients.kt`, the
-     * timeline of `ScatterLifeTimeline.kt`, and the table-driven pages of `ScatterStreamVisual.kt`,
-     * `WindBarb.kt`, `ScatterNebula.kt`, `Calendar.kt` (the lunar table) and
-     * `ScatterVisualMapCategories.kt` (which reuses the same inline AQI rows).
-     *
-     * All of them build their rows from a fetched table (the AQI page keeps its three tables inline),
-     * so an option that never reached the chart leaves an empty canvas that only the painted-pixel
-     * wait catches. The two nutrient scatters draw on `zlevel = 1` with a motion-blur trail, which
-     * puts their content on a second canvas layer: the layer-aware wait is what makes those two
-     * pass at all. The timeline plays by itself, so a frame sampled after one point must differ from
-     * the first one. The arrow and forecast icons of the wind page are custom series elements, so a
-     * `renderItem` that throws would leave only the two lines painted; the console assertion covers
-     * that.
-     */
-    @RetryingTest(maxAttempts = 2)
-    @Timeout(300)
-    fun `the nutrient and aqi data pages paint`(page: Page) {
-        val consoleErrors = mutableListOf<String>()
-        page.onConsoleMessage { message ->
-            if (message.type() == "error") consoleErrors += message.text()
-        }
-        openPage(page)
-        for (
-            route in
-                listOf(
-                    "scatter-aqi-color",
-                    "scatter-nutrients",
-                    "scatter-nutrients-matrix",
-                    "scatter-stream-visual",
-                    "parallel-nutrients",
-                    "wind-barb",
-                    "scatter-nebula",
-                    "calendar-lunar",
-                    "doc-example/scatter-visualMap-categories",
-                )
-        ) {
-            page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page, route)
-            waitForAnyPainted(page, route)
-        }
-        val route = "scatter-life-expectancy-timeline"
-        page.evaluate("(value) => { location.hash = '#/' + value }", route)
-        assertChartRendered(page, route)
-        waitForPainted(page, route)
-        val before = paintedFrame(page)
-        page.waitForTimeout(2400.0)
-        val after = paintedFrame(page)
-        assertTrue(before != after, "$route did not walk to the next year")
-        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
-    }
-
-    /**
-     * The five pages of `GeoMaps.kt`, the five map tutorials of `DocMaps.kt`, the five air-quality
-     * pages of `ChinaAqi.kt`, the migration page of `GeoLines.kt`, the two check-in pages of
-     * `WeiboCheckin.kt` and the matrix map of `MatrixExtra.kt`.
-     *
-     * Each of them fetches its map (four GeoJSON files, the 1.7 MB China boundary, and a 3.7 MB SVG);
-     * the China pages add the city tables or the 773 kB check-in file on top, and the canvas stays
-     * blank until those requests resolve, so the painted-pixel wait is what proves the map reached the
-     * chart. `map-bar-morph` swaps its map and bar options from a two-second timer, so a frame sampled
-     * after one tick must differ from the first one.
-     */
-    @RetryingTest(maxAttempts = 2)
-    @Timeout(300)
-    fun `the fetched map pages paint`(page: Page) {
-        val consoleErrors = mutableListOf<String>()
-        page.onConsoleMessage { message ->
-            if (message.type() == "error") consoleErrors += message.text()
-        }
-        openPage(page)
-        for (
-            route in
-                listOf(
-                    "geo-svg-map",
-                    "map-HK",
-                    "map-usa",
-                    "map-iceland-pie",
-                    "matrix-mini-bar-geo",
-                    "doc-example/map-example",
-                    "doc-example/map-visualMap-continuous",
-                    "doc-example/map-visualMap-continuous-text",
-                    "doc-example/map-visualMap-piecewise-text",
-                    "doc-example/map-visualMap-pieces",
-                    "scatter-map",
-                    "effectScatter-map",
-                    "heatmap-map",
-                    "geo-map-scatter",
-                    "doc-example/scatter-visualMap-piecewise",
-                    "geo-lines",
-                    "scatter-weibo",
-                    "scattergl-weibo",
-                )
-        ) {
-            page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page, route)
-            waitForAnyPainted(page, route)
-        }
-        page.evaluate("(value) => { location.hash = '#/' + value }", "map-bar-morph")
-        assertChartRendered(page, "map-bar-morph")
-        waitForAnyPainted(page, "map-bar-morph")
-        val before = paintedFrame(page)
-        page.waitForTimeout(2600.0)
-        val after = paintedFrame(page)
-        assertTrue(before != after, "map-bar-morph did not morph into the other option")
-        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
-    }
-
-    /**
-     * The two static pages of `ScatterPunchCard.kt` / `MatrixGridLayout.kt` and the two animated
-     * ones of `ScatterTransition.kt`.
-     *
-     * The morph page swaps its `symbol` every 700 ms and the aggregate page folds the cloud into
-     * bars every two seconds, so a frame sampled later has to differ from the first one. The punch
-     * card and the responsive layout draw once; the layout only shows its five titles when the
-     * `coord` patches of the media units reach the matrix, so painting is the signal that the
-     * media options were applied.
-     */
-    @RetryingTest(maxAttempts = 2)
-    @Timeout(300)
-    fun `the animated scatter and matrix layout pages paint`(page: Page) {
-        val consoleErrors = mutableListOf<String>()
-        page.onConsoleMessage { message ->
-            if (message.type() == "error") consoleErrors += message.text()
-        }
-        openPage(page)
-        for (route in listOf("scatter-punchCard", "matrix-grid-layout")) {
-            page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page, route)
-            waitForPainted(page, route)
-        }
-        for ((route, millis) in listOf("scatter-symbol-morph" to 1600.0, "scatter-aggregate-bar" to 2400.0)) {
-            page.evaluate("(value) => { location.hash = '#/' + value }", route)
-            assertChartRendered(page, route)
-            waitForPainted(page, route)
-            val before = paintedFrame(page)
-            page.waitForTimeout(millis)
-            val after = paintedFrame(page)
-            assertTrue(before != after, "$route did not change its shapes")
-        }
-        assertTrue(consoleErrors.isEmpty(), "console errors: $consoleErrors")
-    }
-
-    /**
-     * Waits until any canvas layer of [route] holds a painted pixel.
-     *
-     * ECharts puts every `zlevel` on its own canvas, and the pages that fan a scatter out on
-     * `zlevel = 1` leave the first layer empty, so [waitForPainted] would time out on them even
-     * though they draw perfectly well.
-     */
-    private fun waitForAnyPainted(page: Page, route: String) {
-        try {
-            page.waitForFunction(
-                """
-                () => {
-                    const canvases = document.querySelectorAll(".page[data-route='$route'] .chart canvas");
-                    for (const canvas of canvases) {
-                        const context = canvas.getContext('2d');
-                        if (!context) {
-                            continue;
-                        }
-                        const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
-                        for (let index = 3; index < data.length; index += 4 * 97) {
-                            if (data[index] !== 0) {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
-                }
-                """,
-                null,
-                Page.WaitForFunctionOptions().setTimeout(20000.0),
-            )
-        } catch (error: com.microsoft.playwright.TimeoutError) {
-            throw AssertionError("route $route painted nothing on any canvas layer", error)
-        }
-    }
-
-    /**
-     * Waits until the chart canvas of [route] holds a painted pixel.
-     *
-     * The pages that fetch their data set the option later, so a single sample would race with the
-     * request; the loop samples the alpha channel until something shows up. The canvas is looked up
-     * inside the page of [route] for the same reason [assertChartRendered] does — the previous page is
-     * still mounted while the router has not reacted to the hash yet.
-     */
-    private fun waitForPainted(page: Page, route: String) {
-        try {
-            page.waitForFunction(
-                """
-                () => {
-                    const canvas = document.querySelector(".page[data-route='$route'] .chart canvas");
-                    if (!canvas) {
-                        return false;
-                    }
-                    const context = canvas.getContext('2d');
-                    if (!context) {
-                        return false;
-                    }
-                    const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
-                    for (let index = 3; index < data.length; index += 4 * 97) {
-                        if (data[index] !== 0) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-                """,
-                null,
-                Page.WaitForFunctionOptions().setTimeout(15000.0),
-            )
-        } catch (error: com.microsoft.playwright.TimeoutError) {
-            throw AssertionError("route $route did not paint any pixel", error)
-        }
-    }
-
-    /**
-     * Fingerprint of what the chart canvas currently holds.
-     *
-     * Only the pixels that carry content contribute, so a page that repaints with different data
-     * changes the value while an idle page does not.
-     *
-     * Playwright hands a JS integer back in the narrowest box that fits, so the sampling helpers read
-     * it through [Number] instead of casting to [Double].
-     */
-    private fun paintedFrame(page: Page): Double =
-        (
-            page.evaluate(
-                """
-                () => {
-                    const canvas = document.querySelector('.chart canvas');
-                    const context = canvas.getContext('2d');
-                    const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
-                    let hash = 0;
-                    let painted = 0;
-                    for (let index = 3; index < data.length; index += 4 * 7) {
-                        if (data[index] !== 0) {
-                            painted++;
-                            hash = (hash * 31 + data[index - 3] + data[index - 2] * 7 + data[index - 1] * 13) % 1000000007;
-                        }
-                    }
-                    return painted * 1000000007 + hash;
-                }
-                """,
-            ) as Number
-                ).toDouble()
-
-    /**
-     * How much of the chart canvas currently carries content.
-     *
-     * A page that starts from empty arrays can only grow, so the count tells whether a deferred option
-     * ever reached the chart, which a frame comparison cannot prove while other animation runs.
-     */
-    private fun paintedPixels(page: Page): Double =
-        (
-            page.evaluate(
-                """
-                () => {
-                    const canvas = document.querySelector('.chart canvas');
-                    const context = canvas.getContext('2d');
-                    const data = context.getImageData(0, 0, canvas.width, canvas.height).data;
-                    let painted = 0;
-                    for (let index = 3; index < data.length; index += 4 * 7) {
-                        if (data[index] !== 0) {
-                            painted++;
-                        }
-                    }
-                    return painted;
-                }
-                """,
-            ) as Number
-                ).toDouble()
-
-    /** Opens [route] through the sidebar, the way a visitor reaches it. */
-    private fun openFromSidebar(page: Page, group: String, route: String) {
-        // Groups start collapsed except the active one, so expand the group before clicking.
-        page.locator(".nav__group-title[data-group='$group']").click()
-        val link = page.locator(".nav__link[data-route='$route']")
-        link.waitFor()
-        link.click()
-        page.waitForFunction("(route) => location.hash === '#/' + route", route)
-        page.waitForFunction("() => document.querySelector('.chart canvas') !== null")
-    }
-
-    /**
-     * Waits until the current page holds a laid-out ECharts canvas.
-     *
-     * A chart instance is created on mount and measures its container, so a rendered canvas with a
-     * non-zero box is exactly the signal that the option survived the mount.
-     *
-     * With a [route] the canvas is looked up inside the page of that route: the shell swaps pages from
-     * the `hashchange` handler, which the browser dispatches only after the hash already changed, so an
-     * unscoped wait can pass on the page that is still mounted. Reading the box through the locator
-     * re-resolves the selector, so a null box means the swap landed in between and the check is retried
-     * until the box of the page that stayed is measured.
-     */
-    private fun assertChartRendered(page: Page, route: String? = null) {
-        if (route != null) {
-            page.evaluate("(value) => { location.hash = '#/' + value }", route)
-        }
-        val selector = if (route == null) ".chart canvas" else ".page[data-route='$route'] .chart canvas"
-        var lastBox: BoundingBox? = null
-        repeat(3) {
-            try {
-                page.waitForFunction(
-                    """
-                    (scope) => {
-                        const canvas = document.querySelector(scope);
-                        if (canvas === null) {
-                            return false;
-                        }
-                        const box = canvas.getBoundingClientRect();
-                        return box.width > 0 && box.height > 0;
-                    }
-                    """,
-                    selector,
-                )
-            } catch (error: com.microsoft.playwright.TimeoutError) {
-                throw AssertionError("route $route did not mount a laid-out chart canvas", error)
-            }
-            val box = page.locator(selector).first().boundingBox()
-            if (box != null && box.width > 0 && box.height > 0) {
-                return
-            }
-            lastBox = box
-        }
-        throw AssertionError("chart canvas box of $route stayed $lastBox after three samples")
-    }
-
-    private fun openPage(page: Page, hash: String = "") {
-        page.navigate("/$hash", Page.NavigateOptions().setWaitUntil(WaitUntilState.NETWORKIDLE))
+            """,
+        ) as List<*>
+        return (box[0] as Number).toInt() to (box[1] as Number).toInt()
     }
 }

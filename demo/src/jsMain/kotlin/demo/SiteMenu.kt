@@ -1,5 +1,6 @@
 package demo
 
+import demo.examples.overview.newOverviewPage
 import io.github.shijianjs.ktjs.demo.nav.DemoMenu
 import io.github.shijianjs.ktjs.demo.nav.Entry
 import io.github.shijianjs.ktjs.demo.nav.Group
@@ -35,6 +36,9 @@ private val groups: Map<String, Group> =
 fun siteMenu(): DemoMenu =
     DemoMenu(
         catalog.map { entry ->
-            Entry(entry.id, groups.getValue(entry.group.id)) { pageFor(entry) }
+            Entry(entry.id, groups.getValue(entry.group.id)) {
+                // The overview draws its own index; every other route is the shared example frame.
+                if (entry.body == ExampleBody.Custom) newOverviewPage() else newExamplePage(entry)
+            }
         },
     )

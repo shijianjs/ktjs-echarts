@@ -33,7 +33,6 @@ import demo.examples.treemap.treemapEntries
 import demo.json.JsonExample
 import io.github.shijianjs.ktjs.demo.i18n.Lang
 import io.github.shijianjs.ktjs.demo.i18n.Langs
-import io.github.shijianjs.ktjs.demo.nav.Page
 import demo.ui.ChartHolder
 import io.github.shijianjs.ktjs.echarts.EChartsInstance
 import io.github.shijianjs.ktjs.echarts.options.EChartsOption
@@ -145,8 +144,8 @@ sealed interface ExampleBody {
         val kotlinSource: String,
     ) : ExampleBody
 
-    /** A page that composes its own body (the overview). */
-    class Custom(val create: () -> Page) : ExampleBody
+    /** A page that builds its own body instead of the shared example frame (the overview). */
+    data object Custom : ExampleBody
 
 }
 

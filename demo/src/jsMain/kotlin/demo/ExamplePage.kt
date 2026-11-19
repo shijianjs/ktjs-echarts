@@ -8,34 +8,35 @@ import demo.ui.jsonInput
 import demo.ui.optionInput
 import io.github.shijianjs.ktjs.demo.i18n.Lang
 import io.github.shijianjs.ktjs.demo.i18n.Langs
-import io.github.shijianjs.ktjs.demo.nav.Page
+import io.github.shijianjs.ktjs.demo.page.DemoPage
 import io.github.shijianjs.ktjs.demo.page.SectionBlock
 import io.github.shijianjs.ktjs.demo.page.anchor
 import io.github.shijianjs.ktjs.demo.page.codeText
 import io.github.shijianjs.ktjs.demo.page.exampleBox
-import io.github.shijianjs.ktjs.demo.page.newPage
 import io.github.shijianjs.ktjs.demo.page.sectionBlock
+import io.github.shijianjs.ktjs.dom.element.invoke
+import io.github.shijianjs.ktjs.dom.webcomponent.defineIfMissing
 import io.github.shijianjs.ktjs.vaadin.switch.SwitchElement
 import io.github.shijianjs.ktjs.vaadin.switch.SwitchEvents
 import io.github.shijianjs.ktjs.vaadin.switch.createSwitch
+import web.components.CustomElementReference
+import web.dom.TagName
 import web.events.Event
 import web.events.addEventListener
 import web.html.HTMLAnchorElement
-import web.html.HTMLElement
 
 /**
  * One page of the gallery: the frame every ported example shares.
  *
  * The examples differ in their chart, not in what a page has to say about it — so the frame (chart card,
  * the JSON the KMP model serializes to, the links to the official original and to the sources) is written
- * once here, and a family declaration only supplies an option. This is the kit's [Page] contract; the
- * page element is what the router mounts, and [applyTranslation] is the only place strings change.
+ * once here, and a family declaration only supplies an option.
+ *
+ * The page is a custom element like every other page of the site, and the catalog entry it shows is what
+ * the router hands it: [show] is the element's one property, the same way a component takes its props.
+ * [applyTranslation] is the only place strings change.
  */
-class ExamplePage(private val entry: CatalogEntry) : Page {
-    private val page = newPage()
-
-    override val node: HTMLElement get() = page
-
+internal class ExamplePage : DemoPage() {
     private val chartSection: SectionBlock = sectionBlock()
 
     private var modelSection: SectionBlock? = null
@@ -48,49 +49,55 @@ class ExamplePage(private val entry: CatalogEntry) : Page {
     private var jsonSwitch: SwitchElement? = null
 
     /** Link to the official example; absent for pages the official gallery does not have. */
-    private val officialLink: HTMLAnchorElement? = entry.officialUrl?.let { pageLink(it) }
+    private var officialLink: HTMLAnchorElement? = null
 
-    private val sourceLink: HTMLAnchorElement =
-        pageLink("${entry.sourceRoot}/blob/${entry.sourcePath}")
+    private var sourceLink: HTMLAnchorElement? = null
 
-    /** One link of the page's link row, opened in a new tab. */
-    private fun pageLink(url: String): HTMLAnchorElement =
-        anchor("", url, external = true).also { page.addLink(it) }
+    private var entry: CatalogEntry? = null
 
-    init {
-        when (val body = entry.body) {
+    /** Builds the frame around the entry's chart. Called once, right after the element is created. */
+    fun show(entry: CatalogEntry) {
+        this.entry = entry
+        officialLink = entry.officialUrl?.let { pageLink(it) }
+        sourceLink = pageLink("${entry.sourceRoot}/blob/${entry.sourcePath}")
+
+        when (val example = entry.body) {
             is ExampleBody.Option -> {
-                val node = chart(body.option, body.height)
+                val node = chart(example.option, example.height)
                 chartNode = node
                 chartSection.body.append(exampleBox(null, node))
-                body.json?.let { json -> jsonSection = buildJsonSection(json.json) }
+                example.json?.let { json -> jsonSection = buildJsonSection(json.json) }
             }
 
             is ExampleBody.Interactive -> {
-                val node = interactiveChart(body.height, body.setup)
+                val node = interactiveChart(example.height, example.setup)
                 chartNode = node
                 chartSection.body.append(exampleBox(null, node))
             }
 
             is ExampleBody.Model -> {
-                val node = jsonChart(body.json)
+                val node = jsonChart(example.json)
                 chartNode = node
                 chartSection.body.append(exampleBox(null, node))
                 modelSection = sectionBlock().also {
-                    it.body.append(exampleBox(null, codeText(body.kotlinSource)))
+                    it.body.append(exampleBox(null, codeText(example.kotlinSource)))
                 }
                 jsonSection = sectionBlock().also {
-                    it.body.append(exampleBox(null, codeText(body.json)))
+                    it.body.append(exampleBox(null, codeText(example.json)))
                 }
             }
 
             is ExampleBody.Custom -> Unit
         }
 
-        page.body.append(chartSection.root)
-        modelSection?.let { page.body.append(it.root) }
-        jsonSection?.let { page.body.append(it.root) }
+        body.append(chartSection.root)
+        modelSection?.let { body.append(it.root) }
+        jsonSection?.let { body.append(it.root) }
     }
+
+    /** One link of the page's link row, opened in a new tab. */
+    private fun pageLink(url: String): HTMLAnchorElement =
+        anchor("", url, external = true).also { addLink(it) }
 
     /**
      * The JSON card: the switch that decides what the chart consumes, and the JSON itself.
@@ -103,10 +110,10 @@ class ExamplePage(private val entry: CatalogEntry) : Page {
         val demoSwitch = createSwitch()
         val onToggle: (Event) -> Unit = {
             val node = chartNode
-            val body = entry.body as? ExampleBody.Option
-            val builder = body?.json
-            if (node != null && body != null && builder != null) {
-                node.reload(if (demoSwitch.checked) jsonInput(builder.json) else optionInput(body.option))
+            val example = entry?.body as? ExampleBody.Option
+            val builder = example?.json
+            if (node != null && example != null && builder != null) {
+                node.reload(if (demoSwitch.checked) jsonInput(builder.json) else optionInput(example.option))
             }
         }
         demoSwitch.addEventListener(SwitchEvents.checkedChanged, onToggle)
@@ -116,9 +123,10 @@ class ExamplePage(private val entry: CatalogEntry) : Page {
     }
 
     override fun applyTranslation(lang: Lang) {
+        val current = entry ?: return
         val zh = lang == Langs.ZH_HANS
-        page.setTitle(if (zh) entry.titleZh else entry.titleEn)
-        page.setSummary(if (zh) entry.summaryZh else entry.summaryEn)
+        setTitle(if (zh) current.titleZh else current.titleEn)
+        setSummary(if (zh) current.summaryZh else current.summaryEn)
 
         chartSection.setText(if (zh) "图表" else "Chart")
         modelSection?.setText(if (zh) "Kotlin 构造" else "Kotlin builder")
@@ -135,10 +143,20 @@ class ExamplePage(private val entry: CatalogEntry) : Page {
         jsonSwitch?.label = if (zh) "用这份 JSON 驱动图表" else "Feed the chart with this JSON"
 
         officialLink?.textContent = if (zh) "官方示例" else "Official example"
-        sourceLink.textContent = if (zh) "Kotlin 源码" else "Kotlin source"
+        sourceLink?.textContent = if (zh) "Kotlin 源码" else "Kotlin source"
+    }
+
+    companion object : CustomElementReference<ExamplePage>(ExamplePage::class.js) {
+        val NAME: TagName<ExamplePage> = TagName("echarts-example-page")
+
+        fun define() {
+            defineIfMissing(NAME, this)
+        }
     }
 }
 
-/** Page of an entry: the shared frame, or the body the entry builds itself. */
-internal fun pageFor(entry: CatalogEntry): Page =
-    (entry.body as? ExampleBody.Custom)?.create?.invoke() ?: ExamplePage(entry)
+/** Creates a defined `<echarts-example-page>` showing [entry]. */
+internal fun newExamplePage(entry: CatalogEntry): ExamplePage {
+    ExamplePage.define()
+    return ExamplePage.NAME().also { it.show(entry) }
+}

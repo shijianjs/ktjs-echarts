@@ -13,13 +13,12 @@ import io.github.shijianjs.ktjs.demo.i18n.Lang
 import io.github.shijianjs.ktjs.demo.i18n.Langs
 import io.github.shijianjs.ktjs.demo.i18n.Translations
 import io.github.shijianjs.ktjs.demo.i18n.texts
-import io.github.shijianjs.ktjs.demo.nav.Page
+import io.github.shijianjs.ktjs.demo.page.DemoPage
 import io.github.shijianjs.ktjs.demo.page.Readout
 import io.github.shijianjs.ktjs.demo.page.anchor
 import io.github.shijianjs.ktjs.demo.page.grid
 import io.github.shijianjs.ktjs.demo.page.heading
 import io.github.shijianjs.ktjs.demo.page.icon
-import io.github.shijianjs.ktjs.demo.page.newPage
 import io.github.shijianjs.ktjs.demo.page.paragraph
 import io.github.shijianjs.ktjs.demo.page.row
 import io.github.shijianjs.ktjs.demo.page.sectionBlock
@@ -33,6 +32,7 @@ import io.github.shijianjs.ktjs.dom.css.dsl.pseudo
 import io.github.shijianjs.ktjs.dom.css.dsl.pseudoClass
 import io.github.shijianjs.ktjs.dom.css.dsl.tag
 import io.github.shijianjs.ktjs.dom.element.invoke
+import io.github.shijianjs.ktjs.dom.webcomponent.defineIfMissing
 import io.github.shijianjs.ktjs.vaadin.VaadinTagName
 import io.github.shijianjs.ktjs.vaadin.card.CardElement
 import io.github.shijianjs.ktjs.vaadin.card.CardVariants
@@ -40,6 +40,8 @@ import io.github.shijianjs.ktjs.vaadin.card.createCard
 import io.github.shijianjs.ktjs.vaadin.textfield.TextFieldEvents
 import io.github.shijianjs.ktjs.vaadin.textfield.createTextField
 import io.github.shijianjs.ktjs.vaadin.themablemixin.addTheme
+import web.components.CustomElementReference
+import web.dom.TagName
 import web.cssom.ClassName
 import web.cssom.Color
 import web.cssom.CSSStyleSheet
@@ -144,9 +146,7 @@ private class GroupSection(val title: HTMLElement, val label: HTMLElement, val c
  * The index is filterable so the whole catalog stays reachable without scrolling; filtering only toggles
  * `hidden` on the cards that are already in the DOM, and a language switch only rewrites their copy.
  */
-internal class OverviewPage : Page {
-    private val page = newPage()
-
+internal class OverviewPage : DemoPage() {
     private val binder = Binder(overviewTexts)
 
     private val counter = Readout()
@@ -159,8 +159,6 @@ internal class OverviewPage : Page {
 
     private var currentLang: Lang = Langs.EN
 
-    override val node: HTMLElement get() = page
-
     init {
         val what = sectionBlock()
         binder.bind(what.title) { it.whatHeading }
@@ -171,8 +169,8 @@ internal class OverviewPage : Page {
         binder.bind(index.hint) { it.indexHint }
         index.body.append(row(search, counter.root), *buildIndex().toTypedArray())
 
-        page.addSheet(INDEX_SHEET)
-        page.body.append(what.root, index.root)
+        addSheet(INDEX_SHEET)
+        body.append(what.root, index.root)
 
         val onInput: (Event) -> Unit = { filter() }
         search.addEventListener(TextFieldEvents.input, onInput)
@@ -241,8 +239,8 @@ internal class OverviewPage : Page {
     override fun applyTranslation(lang: Lang) {
         val current = overviewTexts[lang]
         this.currentLang = lang
-        page.setTitle(current.title)
-        page.setSummary(current.summary)
+        setTitle(current.title)
+        setSummary(current.summary)
         binder.apply(lang)
 
         search.label = current.findLabel
@@ -256,6 +254,20 @@ internal class OverviewPage : Page {
         groups.forEach { section -> section.label.textContent = section.cards.first().entry.group.titleFor(currentLang) }
         filter()
     }
+
+    companion object : CustomElementReference<OverviewPage>(OverviewPage::class.js) {
+        val NAME: TagName<OverviewPage> = TagName("echarts-overview-page")
+
+        fun define() {
+            defineIfMissing(NAME, this)
+        }
+    }
+}
+
+/** Creates a defined `<echarts-overview-page>`. */
+internal fun newOverviewPage(): OverviewPage {
+    OverviewPage.define()
+    return OverviewPage.NAME()
 }
 
 /** The catalog's overview entry: this page builds its body itself. */
@@ -269,7 +281,7 @@ val overviewEntries: List<CatalogEntry> =
             summaryZh = "把 ECharts 官方示例逐个移植成 Kotlin/JS：每个图表都由 ktjs-echarts 的类型化 API 构造。",
             summaryEn = "The official ECharts examples ported to Kotlin/JS one by one: every chart is built " +
                 "with the typed ktjs-echarts API.",
-            body = ExampleBody.Custom { OverviewPage() },
+            body = ExampleBody.Custom,
             sourcePath = "examples/overview/OverviewPage.kt",
             officialUrl = null,
         ),

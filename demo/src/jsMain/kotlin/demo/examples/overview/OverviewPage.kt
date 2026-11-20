@@ -14,7 +14,7 @@ import io.github.shijianjs.ktjs.demo.i18n.Langs
 import io.github.shijianjs.ktjs.demo.i18n.Translations
 import io.github.shijianjs.ktjs.demo.i18n.texts
 import io.github.shijianjs.ktjs.demo.page.DemoPage
-import io.github.shijianjs.ktjs.demo.page.Readout
+import io.github.shijianjs.ktjs.demo.page.newReadout
 import io.github.shijianjs.ktjs.demo.page.anchor
 import io.github.shijianjs.ktjs.demo.page.grid
 import io.github.shijianjs.ktjs.demo.page.heading
@@ -149,7 +149,7 @@ private class GroupSection(val title: HTMLElement, val label: HTMLElement, val c
 internal class OverviewPage : DemoPage() {
     private val binder = Binder(overviewTexts)
 
-    private val counter = Readout()
+    private val counter = newReadout()
 
     private val search = createTextField { clearButtonVisible = true }
 

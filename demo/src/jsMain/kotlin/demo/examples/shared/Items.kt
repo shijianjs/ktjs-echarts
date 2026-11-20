@@ -93,6 +93,18 @@ internal class Lcg(seed: Int) {
         state = state * 1664525 + 1013904223
         return (state ushr 1).toDouble() / 2147483648.0
     }
+
+    // This file's helpers, kept with the class that owns them.
+    private companion object {
+        /** A gauge item: `{ name, value }`. */
+        internal fun gaugeItem(name: String, value: Double): GaugeDataItem =
+            GaugeDataItem(
+                unsafeJso<GaugeDataItemOption> {
+                    this.name = OptionId(name)
+                    this.value = OptionDataValue(value)
+                },
+            )
+    }
 }
 
 /** A pie item: `{ name, value }`. */
@@ -108,15 +120,6 @@ internal fun pieItem(name: String, value: Double): PieDataItem =
 internal fun funnelItem(name: String, value: Double): FunnelDataItem =
     FunnelDataItem(
         unsafeJso<FunnelDataItemOption> {
-            this.name = OptionId(name)
-            this.value = OptionDataValue(value)
-        },
-    )
-
-/** A gauge item: `{ name, value }`. */
-internal fun gaugeItem(name: String, value: Double): GaugeDataItem =
-    GaugeDataItem(
-        unsafeJso<GaugeDataItemOption> {
             this.name = OptionId(name)
             this.value = OptionDataValue(value)
         },

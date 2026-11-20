@@ -80,35 +80,11 @@ private val chinese: OverviewTexts = OverviewTexts(
     showing = { visible, total -> "显示 $visible / $total 个示例" },
 )
 
-private val overviewTexts: Translations<OverviewTexts> = texts(
-    Langs.EN to english,
-    Langs.ZH_HANS to chinese,
-)
-
 /** The class the index cards are found by in tests; it carries no style of its own. */
 private val EXAMPLE_CARD: ClassName = ClassName("example-card")
 
 /** The condition the filter toggles, written as a selector instead of as text. */
 private val NOT_HIDDEN = pseudo(pseudoClass("not"), attributeSelector(HtmlAttributes.hidden))
-
-/**
- * What the index needs from the wrapper: an `<a>` around a card must stop painting text the way a link
- * paints it, and must pass the row's height through to the card inside it.
- */
-private val INDEX_SHEET: CSSStyleSheet = cssSheet {
-    compound(className(EXAMPLE_CARD), NOT_HIDDEN).invoke {
-        display = Display.flex
-    }
-
-    className(EXAMPLE_CARD).child(tag(VaadinTagName.card)).invoke {
-        flexGrow = number(1.0)
-    }
-
-    className(EXAMPLE_CARD).invoke {
-        color = Color("inherit")
-        textDecorationLine = None.none
-    }
-}
 
 /**
  * Landing page: what the showcase covers and an index of every ported example.
@@ -225,7 +201,30 @@ internal class OverviewPage : DemoPage() {
         filter()
     }
 
-    companion object : CustomElementReferenceAdapter<OverviewPage>(OverviewPage::class.js, "echarts-overview-page")
+    companion object : CustomElementReferenceAdapter<OverviewPage>(OverviewPage::class.js, "echarts-overview-page") {
+        private val overviewTexts: Translations<OverviewTexts> = texts(
+            Langs.EN to english,
+            Langs.ZH_HANS to chinese,
+        )
+        /**
+         * What the index needs from the wrapper: an `<a>` around a card must stop painting text the way a link
+         * paints it, and must pass the row's height through to the card inside it.
+         */
+        private val INDEX_SHEET: CSSStyleSheet = cssSheet {
+            compound(className(EXAMPLE_CARD), NOT_HIDDEN).invoke {
+                display = Display.flex
+            }
+
+            className(EXAMPLE_CARD).child(tag(VaadinTagName.card)).invoke {
+                flexGrow = number(1.0)
+            }
+
+            className(EXAMPLE_CARD).invoke {
+                color = Color("inherit")
+                textDecorationLine = None.none
+            }
+        }
+    }
 }
 
 /** The catalog's overview entry: this page builds its body itself. */

@@ -17,15 +17,6 @@ import web.mutation.MutationObserver
 import web.mutation.MutationObserverInit
 import web.window.window
 
-/** Dark theme registered by ECharts itself; used when the document runs in dark mode. */
-private const val DARK_THEME = "dark"
-
-/** Height the chart takes when an example does not ask for its own. */
-private const val DEFAULT_HEIGHT = "clamp(360px, 62vh, 680px)"
-
-/** `resize` as a typed event. */
-private val RESIZE: EventType<Event> = EventType("resize")
-
 /**
  * `<demo-chart>`: one ECharts instance, mounted when the element enters the document and disposed when
  * it leaves.
@@ -122,22 +113,28 @@ class ChartElement : CustomElementAdapter() {
         themeObserver = observer
     }
 
-    companion object : CustomElementReferenceAdapter<ChartElement>(ChartElement::class.js, "demo-chart")
-}
-
-/**
- * Chart theme of the moment.
- *
- * `theme="dark"` is explicit dark, `theme="light-dark"` follows the browser, and no attribute means
- * light — the same three states the shell's theme menu writes. `prefers-color-scheme` has no typed
- * counterpart in kotlin-browser, so that single query stays one JavaScript expression.
- */
-private fun prefersDark(): Boolean =
-    when (document.documentElement.getAttribute("theme")) {
-        "dark" -> true
-        "light-dark" -> js("window.matchMedia('(prefers-color-scheme: dark)').matches") as Boolean
-        else -> false
+    companion object : CustomElementReferenceAdapter<ChartElement>(ChartElement::class.js, "demo-chart") {
+        /** Dark theme registered by ECharts itself; used when the document runs in dark mode. */
+        private const val DARK_THEME = "dark"
+        /** Height the chart takes when an example does not ask for its own. */
+        private const val DEFAULT_HEIGHT = "clamp(360px, 62vh, 680px)"
+        /** `resize` as a typed event. */
+        private val RESIZE: EventType<Event> = EventType("resize")
+        /**
+         * Chart theme of the moment.
+         *
+         * `theme="dark"` is explicit dark, `theme="light-dark"` follows the browser, and no attribute means
+         * light — the same three states the shell's theme menu writes. `prefers-color-scheme` has no typed
+         * counterpart in kotlin-browser, so that single query stays one JavaScript expression.
+         */
+        private fun prefersDark(): Boolean =
+            when (document.documentElement.getAttribute("theme")) {
+                "dark" -> true
+                "light-dark" -> js("window.matchMedia('(prefers-color-scheme: dark)').matches") as Boolean
+                else -> false
+            }
     }
+}
 
 /**
  * Handles one example owns while its chart is mounted: timers, resize callbacks and cleanup.

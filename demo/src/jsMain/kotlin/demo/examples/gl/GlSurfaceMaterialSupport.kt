@@ -151,12 +151,6 @@ internal fun cosh(value: Double): Double = (exp(value) + exp(-value)) / 2
 
 internal fun sinh(value: Double): Double = (exp(value) - exp(-value)) / 2
 
-/** `a mod b` with a positive result, the `mod2` helper of the rose equations. */
-internal fun mod2(a: Double, b: Double): Double {
-    val c = a % b
-    return if (c > 0) c else c + b
-}
-
 /**
  * One point of the rose, `[radius, height]` of the spiral parametrised by `x1 ∈ [0, 1]` and
  * `theta ∈ [-20π/9, 15π]`.
@@ -174,6 +168,15 @@ internal class RoseShape(x1: Double, theta: Double) {
 
     /** Height of the point, the z coordinate of the rose. */
     val height = bulk * (x1 * cos(phi) - y1 * sin(phi))
+
+    // This file's helpers, kept with the class that owns them.
+    private companion object {
+        /** `a mod b` with a positive result, the `mod2` helper of the rose equations. */
+        internal fun mod2(a: Double, b: Double): Double {
+            val c = a % b
+            return if (c > 0) c else c + b
+        }
+    }
 }
 
 /**

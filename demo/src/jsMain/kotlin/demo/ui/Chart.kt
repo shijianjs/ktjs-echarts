@@ -120,6 +120,7 @@ class ChartElement : CustomElementAdapter() {
         private const val DEFAULT_HEIGHT = "clamp(360px, 62vh, 680px)"
         /** `resize` as a typed event. */
         private val RESIZE: EventType<Event> = EventType("resize")
+
         /**
          * Chart theme of the moment.
          *

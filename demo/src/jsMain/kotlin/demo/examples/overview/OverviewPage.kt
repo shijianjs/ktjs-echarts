@@ -243,5 +243,3 @@ val overviewEntries: List<CatalogEntry> =
             officialUrl = null,
         ),
     )
-
-/** Entries of one drawer group, in catalog order. */

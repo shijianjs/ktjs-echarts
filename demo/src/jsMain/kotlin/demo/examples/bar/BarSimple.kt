@@ -10,13 +10,17 @@ import js.objects.unsafeJso
 import kotlin.js.js
 import demo.examples.Category
 
-private val barSimpleCategory = Category(Groups.BAR, "examples/bar/BarSimple.kt")
+internal class BarSimple {
+    companion object {
+        private val CATEGORY = Category(Groups.BAR, "examples/bar/BarSimple.kt")
 
-val barSimpleEntry: CatalogEntry =
-    barSimpleCategory.chart("bar-simple", "基础柱状图", "Basic Bar") {
-            unsafeJso<EChartsOption> {
-                xAxis = categoryAxis(*week)
-                yAxis = valueAxis
-                series = arrayOf<SeriesOption>(barSeries { typedData = numbers(120.0, 200.0, 150.0, 80.0, 70.0, 110.0, 130.0) })
-            }
-        }
+        val ENTRY: CatalogEntry =
+            CATEGORY.chart("bar-simple", "基础柱状图", "Basic Bar") {
+                    unsafeJso<EChartsOption> {
+                        xAxis = categoryAxis(*week)
+                        yAxis = valueAxis
+                        series = arrayOf<SeriesOption>(barSeries { typedData = numbers(120.0, 200.0, 150.0, 80.0, 70.0, 110.0, 130.0) })
+                    }
+                }
+    }
+}

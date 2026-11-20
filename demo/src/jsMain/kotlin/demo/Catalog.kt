@@ -1,56 +1,37 @@
 package demo
 
-import demo.examples.bar.barEntries
-import demo.examples.boxplot.boxplotEntries
-import demo.examples.calendar.calendarEntries
-import demo.examples.candlestick.candlestickEntries
-import demo.examples.chord.chordEntries
-import demo.examples.custom.customEntries
-import demo.examples.dataset.datasetEntries
-import demo.examples.doc.docEntries
-import demo.examples.funnel.funnelEntries
-import demo.examples.gauge.gaugeEntries
-import demo.examples.geo.geoEntries
-import demo.examples.gl.glEntries
-import demo.examples.graph.graphEntries
-import demo.examples.graphic.graphicEntries
-import demo.examples.heatmap.heatmapEntries
-import demo.examples.kmpjson.kmpJsonEntries
-import demo.examples.line.lineEntries
-import demo.examples.lines.linesEntries
-import demo.examples.matrix.matrixEntries
-import demo.examples.overview.overviewEntries
-import demo.examples.parallel.parallelEntries
-import demo.examples.pictorialbar.pictorialbarEntries
-import demo.examples.pie.pieEntries
-import demo.examples.radar.radarEntries
-import demo.examples.sankey.sankeyEntries
-import demo.examples.scatter.scatterEntries
-import demo.examples.sunburst.sunburstEntries
-import demo.examples.themeriver.themeriverEntries
-import demo.examples.tree.treeEntries
-import demo.examples.treemap.treemapEntries
 import io.github.shijianjs.ktjs.demo.i18n.Lang
 import io.github.shijianjs.ktjs.demo.i18n.Langs
-
-/** Dokka output assembled by `pagesSite` next to the demo. */
-const val API_ROOT = "api/ktjs-echarts"
-
-/** Menu entry point of the API reference. */
-const val API_DOCS_URL = "$API_ROOT/index.html"
-
-/** Live gallery of the official examples. */
-const val OFFICIAL_INDEX = "https://echarts.apache.org/examples/zh/index.html"
-
-/** GitHub blob base of the Kotlin sources of this showcase. */
-const val REPO_SOURCE_ROOT = "https://github.com/shijianjs/ktjs-echarts/blob/main/demo/src/jsMain/kotlin/demo"
-
-/** GitHub blob base of the platform-independent demo sources. */
-const val REPO_COMMON_SOURCE_ROOT =
-    "https://github.com/shijianjs/ktjs-echarts/blob/main/demo/src/commonMain/kotlin/demo"
-
-/** Live example on the official site, addressed by the id the demo uses as its route. */
-fun officialExampleUrl(id: String): String = "https://echarts.apache.org/examples/zh/editor.html?c=$id"
+import demo.examples.overview.OverviewPage
+import demo.examples.bar.BarEntries
+import demo.examples.pie.PieEntries
+import demo.examples.line.LineEntries
+import demo.examples.lines.LinesEntries
+import demo.examples.candlestick.CandlestickEntries
+import demo.examples.scatter.ScatterEntries
+import demo.examples.boxplot.BoxplotEntries
+import demo.examples.pictorialbar.PictorialbarEntries
+import demo.examples.parallel.ParallelEntries
+import demo.examples.heatmap.HeatmapEntries
+import demo.examples.gauge.GaugeEntries
+import demo.examples.geo.GeoEntries
+import demo.examples.funnel.FunnelEntries
+import demo.examples.radar.RadarEntries
+import demo.examples.tree.TreeEntries
+import demo.examples.treemap.TreemapEntries
+import demo.examples.sunburst.SunburstEntries
+import demo.examples.dataset.DatasetEntries
+import demo.examples.calendar.CalendarEntries
+import demo.examples.matrix.MatrixEntries
+import demo.examples.custom.CustomEntries
+import demo.examples.graphic.GraphicEntries
+import demo.examples.graph.GraphEntries
+import demo.examples.chord.ChordEntries
+import demo.examples.sankey.SankeyEntries
+import demo.examples.themeriver.ThemeriverEntries
+import demo.examples.gl.GlEntries
+import demo.examples.doc.DocEntries
+import demo.examples.kmpjson.KmpJson
 
 /**
  * One drawer group.
@@ -61,73 +42,83 @@ fun officialExampleUrl(id: String): String = "https://echarts.apache.org/example
 class Group(val id: String, val titleZh: String, val titleEn: String, val icon: String? = null)
 
 /**
- * How a page gets its chart.
+ * The showcase's one registry: every ported example, its drawer group, and the route table.
  *
- * The page builder is generic on purpose: every example differs in the option, not in the frame, so
- * the frame lives in [ExamplePage] and a `(id, title, option)` triple is all a family declaration
- * has to write.
- */
-
-/**
- * One page of the gallery.
+ * Each example class carries its own entry (`BarSimple.ENTRY`), because an entry is that example's
+ * metadata — route id, group, bilingual copy, and the option it renders. Per-group objects order
+ * those entries, and this object orders the groups.
  *
- * [id] is the route id *and* the id the official gallery uses, so a ported example is one click away
- * from the live original. Titles and summaries are kept in both languages here and resolved when the
- * page is translated, which is what lets a language switch rewrite strings instead of rebuilding the
- * page.
+ * Every member here is `by lazy`: the catalog is assembled from 384 companions in 30 packages, and
+ * Kotlin/JS initialises file-level properties in an order nobody controls. Reading them on first use
+ * is what makes the collection independent of that order.
  */
+object Catalog {
+    /** Dokka output assembled by `pagesSite` next to the demo. */
+    const val API_ROOT: String = "api/ktjs-echarts"
 
-/**
- * Every ported example, one page each, grouped by the examples' family.
- *
- * Each family directory owns one `<family>Entries` list and every page is its own file there, so a new
- * example only touches the family it belongs to. The order of the list below is the order of the
- * drawer groups; within a group the declaration order of the family's `Entries.kt` is kept.
- */
-val catalog: List<CatalogEntry> =
-    listOf(
-        overviewEntries,
-        barEntries,
-        pieEntries,
-        lineEntries,
-        linesEntries,
-        candlestickEntries,
-        scatterEntries,
-        boxplotEntries,
-        pictorialbarEntries,
-        parallelEntries,
-        heatmapEntries,
-        gaugeEntries,
-        geoEntries,
-        funnelEntries,
-        radarEntries,
-        treeEntries,
-        treemapEntries,
-        sunburstEntries,
-        datasetEntries,
-        calendarEntries,
-        matrixEntries,
-        customEntries,
-        graphicEntries,
-        graphEntries,
-        chordEntries,
-        sankeyEntries,
-        themeriverEntries,
-        glEntries,
-        docEntries,
-        kmpJsonEntries,
-    ).flatten()
+    /** Menu entry point of the API reference. */
+    const val API_DOCS_URL: String = "$API_ROOT/index.html"
 
-private val catalogById: Map<String, CatalogEntry> = catalog.associateBy { it.id }
+    /** Live gallery of the official examples. */
+    const val OFFICIAL_INDEX: String = "https://echarts.apache.org/examples/zh/index.html"
 
-/** Groups that actually have entries, in navigation order. */
-val catalogGroups: List<Group> = catalog.map { it.group }.distinct()
+    /** GitHub blob base of the Kotlin sources of this showcase. */
+    const val REPO_SOURCE_ROOT: String =
+        "https://github.com/shijianjs/ktjs-echarts/blob/main/demo/src/jsMain/kotlin/demo"
 
-/** Looks up an entry by route id. */
-fun catalogEntry(id: String): CatalogEntry? = catalogById[id]
+    /** GitHub blob base of the platform-independent demo sources. */
+    const val REPO_COMMON_SOURCE_ROOT: String =
+        "https://github.com/shijianjs/ktjs-echarts/blob/main/demo/src/commonMain/kotlin/demo"
 
-/** Entries of one drawer group, in catalog order. */
-fun catalogEntriesOf(group: Group): List<CatalogEntry> = catalog.filter { it.group == group }
+    /** Every ported example, in drawer order. */
+    val ENTRIES: List<CatalogEntry> by lazy {
+        listOf(OverviewPage.ENTRY) + listOf(
+            BarEntries.ENTRIES,
+            PieEntries.ENTRIES,
+            LineEntries.ENTRIES,
+            LinesEntries.ENTRIES,
+            CandlestickEntries.ENTRIES,
+            ScatterEntries.ENTRIES,
+            BoxplotEntries.ENTRIES,
+            PictorialbarEntries.ENTRIES,
+            ParallelEntries.ENTRIES,
+            HeatmapEntries.ENTRIES,
+            GaugeEntries.ENTRIES,
+            GeoEntries.ENTRIES,
+            FunnelEntries.ENTRIES,
+            RadarEntries.ENTRIES,
+            TreeEntries.ENTRIES,
+            TreemapEntries.ENTRIES,
+            SunburstEntries.ENTRIES,
+            DatasetEntries.ENTRIES,
+            CalendarEntries.ENTRIES,
+            MatrixEntries.ENTRIES,
+            CustomEntries.ENTRIES,
+            GraphicEntries.ENTRIES,
+            GraphEntries.ENTRIES,
+            ChordEntries.ENTRIES,
+            SankeyEntries.ENTRIES,
+            ThemeriverEntries.ENTRIES,
+            GlEntries.ENTRIES,
+            DocEntries.ENTRIES,
+            KmpJson.ENTRIES,
+        ).flatten()
+    }
+
+    /** Groups that actually have entries, in navigation order. */
+    val GROUPS: List<Group> by lazy { ENTRIES.map { it.group }.distinct() }
+
+    private val BY_ID: Map<String, CatalogEntry> by lazy { ENTRIES.associateBy { it.id } }
+
+    /** Looks up an entry by route id. */
+    fun entry(id: String): CatalogEntry? = BY_ID[id]
+
+    /** Entries of one drawer group, in catalog order. */
+    fun entriesOf(group: Group): List<CatalogEntry> = ENTRIES.filter { it.group == group }
+}
+
+/** Live example on the official site, addressed by the id the demo uses as its route. */
+fun officialExampleUrl(id: String): String = "https://echarts.apache.org/examples/zh/editor.html?c=$id"
 
 /**
  * The title of a group in [lang].

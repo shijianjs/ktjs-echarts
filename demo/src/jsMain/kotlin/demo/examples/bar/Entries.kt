@@ -2,42 +2,26 @@ package demo.examples.bar
 
 import demo.CatalogEntry
 
-val barEntries: List<CatalogEntry> =
-    listOf(
-        barSimpleEntry,
-        barTickAlignEntry,
-        barBackgroundEntry,
-        barDataColorEntry,
-        barYCategoryEntry,
-        barNegativeEntry,
-        barNegative2Entry,
-        barStackEntry,
-        barYCategoryStackEntry,
-        barWaterfallEntry,
-        mixLineBarEntry,
-        multipleYAxisEntry,
-        barAnimationDelayEntry,
-        barLabelRotationEntry,
-        barGradientEntry,
-        barLargeEntry,
-        barBreaksSimpleEntry,
-        barBrushEntry,
-        barPolarLabelRadialEntry,
-        barPolarLabelTangentialEntry,
-        barPolarStackEntry,
-        barPolarStackRadialEntry,
-        barPolarRealEstateEntry,
-        polarRoundCapEntry,
-        polarEndAngleEntry,
-        mixZoomOnValueEntry,
-        bar1Entry,
-        barStackNormalizationEntry,
-        barStackNormalizationAndVariationEntry,
-        barStackBorderRadiusEntry,
-        barWaterfall2Entry,
-        barMultiDrilldownEntry,
-        barRaceCountryEntry,
-        mixTimelineFinanceEntry,
-        barRichTextEntry,
-        dynamicDataEntry,
-    )
+/**
+ * Bar examples, in navigation order.
+ *
+ * The entries are the example classes' own companions; this list only orders them, lazily —
+ * the classes sit in this same package, so nothing here has to be imported or initialised
+ * ahead of anything else.
+ */
+internal object BarEntries {
+    val ENTRIES: List<CatalogEntry> by lazy {
+        listOf(
+            BarSimple.ENTRY, BarTickAlign.ENTRY, BarBackground.ENTRY, BarDataColor.ENTRY,
+            BarYCategory.ENTRY, BarNegative.ENTRY, BarNegative2.ENTRY, BarStack.ENTRY,
+            BarYCategoryStack.ENTRY, BarWaterfall.ENTRY, MixLineBar.ENTRY, MultipleYAxis.ENTRY,
+            BarAnimationDelay.ENTRY, BarLabelRotation.ENTRY, BarGradient.ENTRY, BarLarge.ENTRY,
+            BarBreaksSimple.ENTRY, BarBrush.ENTRY, BarPolarLabelRadial.ENTRY,
+            BarPolarLabelTangential.ENTRY, BarPolarStack.ENTRY, BarPolarStackRadial.ENTRY,
+            BarPolarRealEstate.ENTRY, PolarRoundCap.ENTRY, PolarEndAngle.ENTRY, MixZoomOnValue.ENTRY,
+            Bar1.ENTRY, BarStackNormalization.ENTRY, BarStackNormalizationAndVariation.ENTRY,
+            BarStackBorderRadius.ENTRY, BarWaterfall2.ENTRY, BarMultiDrilldown.ENTRY, BarRaceCountry.ENTRY,
+            MixTimelineFinance.ENTRY, BarRichText.ENTRY, DynamicData.ENTRY,
+        )
+    }
+}

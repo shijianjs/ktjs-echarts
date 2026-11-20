@@ -4,13 +4,17 @@ import demo.CatalogEntry
 import demo.Groups
 import demo.examples.Category
 
-private val graphicLoadingCategory = Category(Groups.GRAPHIC, "examples/graphic/GraphicLoading.kt")
+internal class GraphicLoading {
+    companion object {
+        private val CATEGORY = Category(Groups.GRAPHIC, "examples/graphic/GraphicLoading.kt")
 
-val graphicLoadingEntry: CatalogEntry =
-    graphicLoadingCategory.chart(
-            "graphic-loading",
-            "加载动画",
-            "Customized Loading Animation",
-        ) {
-            graphicOption(loadingAnimationElements())
-        }
+        val ENTRY: CatalogEntry =
+            CATEGORY.chart(
+                    "graphic-loading",
+                    "加载动画",
+                    "Customized Loading Animation",
+                ) {
+                    graphicOption(loadingAnimationElements())
+                }
+    }
+}

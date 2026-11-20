@@ -7,11 +7,15 @@ import kotlin.js.JsAny
 import kotlin.js.js
 import demo.examples.Category
 
-private val calendarLunarCategory = Category(Groups.CALENDAR, "examples/calendar/CalendarLunar.kt")
+internal class CalendarLunar {
+    companion object {
+        private val CATEGORY = Category(Groups.CALENDAR, "examples/calendar/CalendarLunar.kt")
 
-val calendarLunarEntry: CatalogEntry =
-    calendarLunarCategory.interactive("calendar-lunar", "农历日历图", "Calendar Lunar") { chart ->
-            loadJson("data/calendar-lunar.json").then { json ->
-                chart.setOption(lunarOption(json.unsafeCast<Array<Array<String?>>>()))
-            }
-        }
+        val ENTRY: CatalogEntry =
+            CATEGORY.interactive("calendar-lunar", "农历日历图", "Calendar Lunar") { chart ->
+                    loadJson("data/calendar-lunar.json").then { json ->
+                        chart.setOption(lunarOption(json.unsafeCast<Array<Array<String?>>>()))
+                    }
+                }
+    }
+}

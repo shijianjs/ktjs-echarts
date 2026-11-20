@@ -3,9 +3,6 @@ package demo.examples.overview
 import demo.CatalogEntry
 import demo.ExampleBody
 import demo.Groups
-import demo.catalog
-import demo.catalogEntriesOf
-import demo.catalogGroups
 import demo.summaryFor
 import demo.titleFor
 import io.github.shijianjs.ktjs.demo.i18n.Binder
@@ -50,6 +47,7 @@ import web.dom.Node
 import web.events.Event
 import web.events.addEventListener
 import web.html.HtmlTagName
+import demo.Catalog
 
 private val english: OverviewTexts = OverviewTexts(
     title = "Example overview",
@@ -124,13 +122,13 @@ internal class OverviewPage : DemoPage() {
 
     private fun buildIndex(): List<Node> {
         val blocks = mutableListOf<Node>()
-        catalogGroups.filter { group -> group != Groups.OVERVIEW }.forEach { group ->
+        Catalog.GROUPS.filter { group -> group != Groups.OVERVIEW }.forEach { group ->
             // The group's mark, the same the drawer draws: the heading and the drawer row are two
             // views of one section, so they carry one icon.
             val groupLabel = HtmlTagName.span { textContent = group.titleFor(currentLang) }
             val groupTitle = row(icon(group.icon ?: ""), heading(3).apply { append(groupLabel) })
             val list = Grid.NAME { show(240) }
-            val groupCards = catalogEntriesOf(group).map { entry ->
+            val groupCards = Catalog.entriesOf(group).map { entry ->
                 val card = card(entry)
                 list.append(card.link)
                 cards += card
@@ -202,6 +200,27 @@ internal class OverviewPage : DemoPage() {
     }
 
     companion object : CustomElementReferenceAdapter<OverviewPage>(OverviewPage::class.js, "echarts-overview-page") {
+        /**
+         * The catalog's overview entry: this page builds its body itself.
+         *
+         * The entry is the page's own metadata, so it lives on the page's companion rather than in a
+         * file-level declaration that the catalog would have to reach across files for.
+         */
+        val ENTRY: CatalogEntry =
+            CatalogEntry(
+                id = "overview",
+                group = Groups.OVERVIEW,
+                titleZh = "示例总览",
+                titleEn = "Example overview",
+                summaryZh = "把 ECharts 官方示例逐个移植成 Kotlin/JS：每个图表都由 ktjs-echarts 的类型化 API 构造。",
+                summaryEn =
+                    "The official ECharts examples ported to Kotlin/JS one by one: every chart is built " +
+                        "with the typed ktjs-echarts API.",
+                body = ExampleBody.Custom,
+                sourcePath = "examples/overview/OverviewPage.kt",
+                officialUrl = null,
+            )
+
         private val overviewTexts: Translations<OverviewTexts> = texts(
             Langs.EN to english,
             Langs.ZH_HANS to chinese,
@@ -227,19 +246,3 @@ internal class OverviewPage : DemoPage() {
     }
 }
 
-/** The catalog's overview entry: this page builds its body itself. */
-val overviewEntries: List<CatalogEntry> =
-    listOf(
-        CatalogEntry(
-            id = "overview",
-            group = Groups.OVERVIEW,
-            titleZh = "示例总览",
-            titleEn = "Example overview",
-            summaryZh = "把 ECharts 官方示例逐个移植成 Kotlin/JS：每个图表都由 ktjs-echarts 的类型化 API 构造。",
-            summaryEn = "The official ECharts examples ported to Kotlin/JS one by one: every chart is built " +
-                "with the typed ktjs-echarts API.",
-            body = ExampleBody.Custom,
-            sourcePath = "examples/overview/OverviewPage.kt",
-            officialUrl = null,
-        ),
-    )

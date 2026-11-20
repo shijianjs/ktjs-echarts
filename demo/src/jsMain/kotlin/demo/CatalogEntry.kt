@@ -11,5 +11,5 @@ class CatalogEntry(
     val sourcePath: String,
     val officialUrl: String? = officialExampleUrl(id),
     /** GitHub blob base of [sourcePath]; the KMP model lives in the `commonMain` tree. */
-    val sourceRoot: String = REPO_SOURCE_ROOT,
+    val sourceRoot: String = Catalog.REPO_SOURCE_ROOT,
 )

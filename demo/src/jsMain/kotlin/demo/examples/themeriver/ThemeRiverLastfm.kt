@@ -12,18 +12,22 @@ import io.github.shijianjs.ktjs.echarts.options.themeRiverSeries
 import js.objects.unsafeJso
 import demo.examples.Category
 
-private val themeRiverLastfmCategory = Category(Groups.THEME_RIVER, "examples/themeriver/ThemeRiverLastfm.kt")
+internal class ThemeRiverLastfm {
+    companion object {
+        private val CATEGORY = Category(Groups.THEME_RIVER, "examples/themeriver/ThemeRiverLastfm.kt")
 
-val themeRiverLastfmEntry: CatalogEntry =
-    themeRiverLastfmCategory.chart("themeRiver-lastfm", "Lastfm 主题河流图", "ThemeRiver Lastfm") {
-            unsafeJso<EChartsOption> {
-                singleAxis = one(unsafeJso<SingleAxisOption> { max = AxisMinMax("dataMax") })
-                series =
-                    arrayOf<SeriesOption>(
-                        themeRiverSeries {
-                            typedData = lastFmData()
-                            label = unsafeJso<LabelOption> { show = false }
-                        },
-                    )
-            }
-        }
+        val ENTRY: CatalogEntry =
+            CATEGORY.chart("themeRiver-lastfm", "Lastfm 主题河流图", "ThemeRiver Lastfm") {
+                    unsafeJso<EChartsOption> {
+                        singleAxis = one(unsafeJso<SingleAxisOption> { max = AxisMinMax("dataMax") })
+                        series =
+                            arrayOf<SeriesOption>(
+                                themeRiverSeries {
+                                    typedData = lastFmData()
+                                    label = unsafeJso<LabelOption> { show = false }
+                                },
+                            )
+                    }
+                }
+    }
+}

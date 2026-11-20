@@ -27,58 +27,62 @@ import kotlin.js.js
 import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.Category
 
-private val barWaterfallCategory = Category(Groups.BAR, "examples/bar/BarWaterfall.kt")
+internal class BarWaterfall {
+    companion object {
+        private val CATEGORY = Category(Groups.BAR, "examples/bar/BarWaterfall.kt")
 
-val barWaterfallEntry: CatalogEntry =
-    barWaterfallCategory.chart("bar-waterfall", "瀑布图（柱状图模拟）", "Waterfall Chart") {
-            unsafeJso<EChartsOption> {
-                title =
-                    one(
-                        unsafeJso<TitleOption> {
-                            text = "Waterfall Chart"
-                            subtext = "Living Expenses in Shenzhen"
-                        },
-                    )
-                tooltip =
-                    one(
-                        unsafeJso<TooltipOption> {
-                            trigger = TooltipTriggers.axis
-                            axisPointer = shadowPointer
-                            // The original formatter reads the second series of the axis trigger.
-                            formatter =
-                                TooltipFormatter(
-                                    js("(params) => params[1].name + '<br/>' + params[1].seriesName + ' : ' + params[1].value") as TooltipFormatterCallback,
-                                )
-                        },
-                    )
-                grid = one(unsafeJso<GridOption> { left = StringOrDouble("3%"); right = StringOrDouble("4%"); bottom = StringOrDouble("3%"); containLabel = true })
-                xAxis =
-                    one(
-                        unsafeJso<XAxisOption> {
-                            type = AxisTypes.category
-                            splitLine = unsafeJso<SplitLineOption> { show = false }
-                            data = strings("Total", "Rent", "Utilities", "Transportation", "Meals", "Other")
-                        },
-                    )
-                yAxis = valueAxis
-                series =
-                    arrayOf<SeriesOption>(
-                        barSeries {
-                            name = "Placeholder"
-                            stack = "Total"
-                            itemStyle = unsafeJso<ItemStyleOption> { borderColor = ZRColor("transparent"); color = ZRColor("transparent") }
-                            emphasis =
-                                unsafeJso<EmphasisOption> {
+        val ENTRY: CatalogEntry =
+            CATEGORY.chart("bar-waterfall", "瀑布图（柱状图模拟）", "Waterfall Chart") {
+                    unsafeJso<EChartsOption> {
+                        title =
+                            one(
+                                unsafeJso<TitleOption> {
+                                    text = "Waterfall Chart"
+                                    subtext = "Living Expenses in Shenzhen"
+                                },
+                            )
+                        tooltip =
+                            one(
+                                unsafeJso<TooltipOption> {
+                                    trigger = TooltipTriggers.axis
+                                    axisPointer = shadowPointer
+                                    // The original formatter reads the second series of the axis trigger.
+                                    formatter =
+                                        TooltipFormatter(
+                                            js("(params) => params[1].name + '<br/>' + params[1].seriesName + ' : ' + params[1].value") as TooltipFormatterCallback,
+                                        )
+                                },
+                            )
+                        grid = one(unsafeJso<GridOption> { left = StringOrDouble("3%"); right = StringOrDouble("4%"); bottom = StringOrDouble("3%"); containLabel = true })
+                        xAxis =
+                            one(
+                                unsafeJso<XAxisOption> {
+                                    type = AxisTypes.category
+                                    splitLine = unsafeJso<SplitLineOption> { show = false }
+                                    data = strings("Total", "Rent", "Utilities", "Transportation", "Meals", "Other")
+                                },
+                            )
+                        yAxis = valueAxis
+                        series =
+                            arrayOf<SeriesOption>(
+                                barSeries {
+                                    name = "Placeholder"
+                                    stack = "Total"
                                     itemStyle = unsafeJso<ItemStyleOption> { borderColor = ZRColor("transparent"); color = ZRColor("transparent") }
-                                }
-                            typedData = numbers(0.0, 1700.0, 1400.0, 1200.0, 300.0, 0.0)
-                        },
-                        barSeries {
-                            name = "Life Cost"
-                            stack = "Total"
-                            label = unsafeJso<LabelOption> { show = true; position = LabelPosition("inside") }
-                            typedData = numbers(2900.0, 1200.0, 300.0, 200.0, 900.0, 300.0)
-                        },
-                    )
-            }
-        }
+                                    emphasis =
+                                        unsafeJso<EmphasisOption> {
+                                            itemStyle = unsafeJso<ItemStyleOption> { borderColor = ZRColor("transparent"); color = ZRColor("transparent") }
+                                        }
+                                    typedData = numbers(0.0, 1700.0, 1400.0, 1200.0, 300.0, 0.0)
+                                },
+                                barSeries {
+                                    name = "Life Cost"
+                                    stack = "Total"
+                                    label = unsafeJso<LabelOption> { show = true; position = LabelPosition("inside") }
+                                    typedData = numbers(2900.0, 1200.0, 300.0, 200.0, 900.0, 300.0)
+                                },
+                            )
+                    }
+                }
+    }
+}

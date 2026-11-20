@@ -19,7 +19,7 @@ demo/src/jsMain/kotlin/demo/
   SourceMode.kt      顶栏代码源切换（Kotlin / JSON，localStorage 记忆）
   Router.kt          hash 路由
   AppShell.kt        侧边栏目录 + 顶栏 + 内容区；页面缓存、图表随页面挂载/卸载
-  Catalog.kt         Groups、CatalogEntry 与整份目录的汇总
+  Catalog.kt         Groups、CatalogEntry 与整份目录的汇总（只有这一个 object，成员一律 by lazy）
   ui/Dom.kt          类型安全的 DOM 构造与小工具
   ui/Blocks.kt       页面骨架（page / pageSection / example）与 PageMeta / PageView
   ui/Chart.kt        ChartHolder：容器的持有者，负责 ECharts 实例的挂载、卸载与 resize
@@ -46,10 +46,12 @@ scripts/
 移植页与家族子目录一一对应，家族目录名用侧边栏分组的 id（`pictorial-bar` → `pictorialbar`、
 `theme-river` → `themeriver`、`doc-example` → `doc`、`kmp-json` → `kmpjson`）：
 
-- **一页一文件**：每个官方示例单独一个 `.kt`（`examples/bar/BarSimple.kt` 里的
-  `barSimpleEntry`），文件内先用 `Category(Groups.X, "examples/<family>/<File>.kt")` 绑定分组与
-  源码路径，再声明这一个示例。家族目录里的 `Entries.kt` 按声明顺序把这批页面收成 `<family>Entries`，
-  `Catalog.kt` 再按侧边栏顺序把它们拼成整份目录。
+- **一页一文件，目录项在类里**：每个官方示例单独一个 `.kt`（`examples/bar/BarSimple.kt` 里的
+  `internal class BarSimple`），示例自己（分组绑定、源码路径、标题、选项）都写在它的 `companion object`
+  里：`private val CATEGORY = Category(Groups.X, "examples/<family>/<File>.kt")` 与 `val ENTRY`。
+  文件里除 `class BarSimple` 外没有别的顶层声明。家族目录里的 `Entries.kt` 是一个
+  `internal object <Family>Entries`，`val ENTRIES: List<CatalogEntry> by lazy { listOf(BarSimple.ENTRY, …) }`
+  只负责顺序；`Catalog.kt` 再按侧边栏顺序把这些家族列表拼成 `Catalog.ENTRIES`（同样 `by lazy`）。
 - **辅助声明跟着原文件走**：拆分前的 `Bar.kt` 里的辅助函数/常量落在同目录的 `BarSupport.kt`
   （声明提升为 `internal`）。跨家族引用的（`GeoMaps.kt` 的 `registerGeojsonMap` 被 doc 页复用等）
   由 import 显式引入。
@@ -66,9 +68,9 @@ scripts/
 ## 移植约定
 
 - **一页一示例、id 与官方一致**：路由 id 就是官方示例 id，页面上的「官方示例」链接由此拼出。
-- **每个示例一族一文件**：`examples/bar/BarSimple.kt`、`examples/pie/Pie.kt`…；文件里先用
-  `Category(Groups.X, "examples/<family>/<File>.kt")` 绑定分组与源码路径，再声明示例。家族目录
-  内 `<family>Entries.kt` 的声明顺序就是侧边栏顺序。
+- **每个示例一族一文件**：`examples/bar/BarSimple.kt`、`examples/pie/Pie.kt`…；文件里用
+  `Category(Groups.X, "examples/<family>/<File>.kt")` 绑定分组与源码路径，示例声明成该类 companion 的
+  `ENTRY`。家族目录内 `Entries.kt`（`<Family>Entries` 对象）的列表顺序就是侧边栏顺序。
 - **静态示例用 `chart { option }`**：选项在挂载时构造（懒构造，避免建页时白算数据）。
   **需要自己驱动图表的用 `interactive { chart -> }`**：定时动画、`getWidth()` 相关布局、事件等。
 - **中文标题抄官方清单**（`echarts-examples/src/data/chart-list-data.js` 的 `titleCN`），

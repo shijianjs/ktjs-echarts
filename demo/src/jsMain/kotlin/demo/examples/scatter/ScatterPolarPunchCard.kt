@@ -36,62 +36,66 @@ import demo.examples.shared.legendNames
 import demo.examples.shared.numberAt
 import demo.examples.shared.textOf
 
-private val scatterPolarPunchCardCategory = Category(Groups.SCATTER, "examples/scatter/ScatterPolarPunchCard.kt")
+internal class ScatterPolarPunchCard {
+    companion object {
+        private val CATEGORY = Category(Groups.SCATTER, "examples/scatter/ScatterPolarPunchCard.kt")
 
-val scatterPolarPunchCardEntry: CatalogEntry =
-    scatterPolarPunchCardCategory.chart("scatter-polar-punchCard", "GitHub 打卡气泡图（极坐标）", "Punch Card of Github") {
-            unsafeJso<EChartsOption> {
-                title = one(unsafeJso<TitleOption> { text = "Punch Card of Github" })
-                legend =
-                    one(
-                        unsafeJso<LegendOption> {
-                            data = legendNames("Punch Card")
-                            left = StringOrDouble("right")
-                        },
-                    )
-                polar = one(unsafeJso<PolarOption> {})
-                tooltip =
-                    one(
-                        unsafeJso<TooltipOption> {
-                            formatter =
-                                TooltipFormatter { params ->
-                                    val value = params.unsafeCast<CallbackDataParams>().value
-                                    TooltipContent(
-                                        "${textOf(numberAt(value, 2))} commits in " +
-                                            punchCardHours[numberAt(value, 1).toInt()] +
-                                            " of " + punchCardDays[numberAt(value, 0).toInt()],
-                                    )
-                                }
-                        },
-                    )
-                angleAxis =
-                    one(
-                        unsafeJso<AngleAxisOption> {
-                            type = AxisTypes.category
-                            data = strings(*punchCardHours)
-                            boundaryGap = BooleanOrStringArray(false)
-                            splitLine = unsafeJso<SplitLineOption> { show = true }
-                            axisLine = unsafeJso<AxisLineOption> { show = BooleanOrString(false) }
-                        },
-                    )
-                radiusAxis =
-                    one(
-                        unsafeJso<RadiusAxisOption> {
-                            type = AxisTypes.category
-                            data = strings(*punchCardDays)
-                            axisLine = unsafeJso<AxisLineOption> { show = BooleanOrString(false) }
-                            axisLabel = unsafeJso<AxisLabelOption> { rotate = 45.0 }
-                        },
-                    )
-                series =
-                    one(
-                        scatterSeries {
-                            name = "Punch Card"
-                            coordinateSystem = "polar"
-                            symbolSize = SymbolSize { value, _ -> DoubleOrDoubleArray(numberAt(value, 2) * 2.0) }
-                            animationDelay = AnimationDelay { index, _ -> index * 5.0 }
-                            typedData = punchCardPoints()
-                        },
-                    )
-            }
-        }
+        val ENTRY: CatalogEntry =
+            CATEGORY.chart("scatter-polar-punchCard", "GitHub 打卡气泡图（极坐标）", "Punch Card of Github") {
+                    unsafeJso<EChartsOption> {
+                        title = one(unsafeJso<TitleOption> { text = "Punch Card of Github" })
+                        legend =
+                            one(
+                                unsafeJso<LegendOption> {
+                                    data = legendNames("Punch Card")
+                                    left = StringOrDouble("right")
+                                },
+                            )
+                        polar = one(unsafeJso<PolarOption> {})
+                        tooltip =
+                            one(
+                                unsafeJso<TooltipOption> {
+                                    formatter =
+                                        TooltipFormatter { params ->
+                                            val value = params.unsafeCast<CallbackDataParams>().value
+                                            TooltipContent(
+                                                "${textOf(numberAt(value, 2))} commits in " +
+                                                    punchCardHours[numberAt(value, 1).toInt()] +
+                                                    " of " + punchCardDays[numberAt(value, 0).toInt()],
+                                            )
+                                        }
+                                },
+                            )
+                        angleAxis =
+                            one(
+                                unsafeJso<AngleAxisOption> {
+                                    type = AxisTypes.category
+                                    data = strings(*punchCardHours)
+                                    boundaryGap = BooleanOrStringArray(false)
+                                    splitLine = unsafeJso<SplitLineOption> { show = true }
+                                    axisLine = unsafeJso<AxisLineOption> { show = BooleanOrString(false) }
+                                },
+                            )
+                        radiusAxis =
+                            one(
+                                unsafeJso<RadiusAxisOption> {
+                                    type = AxisTypes.category
+                                    data = strings(*punchCardDays)
+                                    axisLine = unsafeJso<AxisLineOption> { show = BooleanOrString(false) }
+                                    axisLabel = unsafeJso<AxisLabelOption> { rotate = 45.0 }
+                                },
+                            )
+                        series =
+                            one(
+                                scatterSeries {
+                                    name = "Punch Card"
+                                    coordinateSystem = "polar"
+                                    symbolSize = SymbolSize { value, _ -> DoubleOrDoubleArray(numberAt(value, 2) * 2.0) }
+                                    animationDelay = AnimationDelay { index, _ -> index * 5.0 }
+                                    typedData = punchCardPoints()
+                                },
+                            )
+                    }
+                }
+    }
+}

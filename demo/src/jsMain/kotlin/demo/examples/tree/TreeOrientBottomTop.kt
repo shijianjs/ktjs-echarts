@@ -20,49 +20,53 @@ import web.cssom.TextAlign
 import web.cssom.VerticalAlign
 import demo.examples.Category
 
-private val treeOrientBottomTopCategory = Category(Groups.TREE, "examples/tree/TreeOrientBottomTop.kt")
+internal class TreeOrientBottomTop {
+    companion object {
+        private val CATEGORY = Category(Groups.TREE, "examples/tree/TreeOrientBottomTop.kt")
 
-val treeOrientBottomTopEntry: CatalogEntry =
-    treeOrientBottomTopCategory.chart("tree-orient-bottom-top", "从下到上树状图", "From Bottom to Top Tree") {
-            unsafeJso<EChartsOption> {
-                tooltip =
-                    one(
-                        unsafeJso<TooltipOption> {
-                            trigger = TooltipTriggers.item
-                            triggerOn = TooltipTriggerOns.mouseMove
-                        },
-                    )
-                series =
-                    arrayOf<SeriesOption>(
-                        treeSeries {
-                            typedData = arrayOf(flareTree())
-                            left = StringOrDouble("2%")
-                            right = StringOrDouble("2%")
-                            top = StringOrDouble("20%")
-                            bottom = StringOrDouble("8%")
-                            symbol = SymbolShape("emptyCircle")
-                            orient = TreeOrients.bottomToTop
-                            expandAndCollapse = true
-                            label =
-                                unsafeJso<LabelOption> {
-                                    position = LabelPosition("bottom")
-                                    rotate = 90.0
-                                    verticalAlign = VerticalAlign.middle
-                                    align = TextAlign.right
-                                }
-                            leaves =
-                                unsafeJso {
+        val ENTRY: CatalogEntry =
+            CATEGORY.chart("tree-orient-bottom-top", "从下到上树状图", "From Bottom to Top Tree") {
+                    unsafeJso<EChartsOption> {
+                        tooltip =
+                            one(
+                                unsafeJso<TooltipOption> {
+                                    trigger = TooltipTriggers.item
+                                    triggerOn = TooltipTriggerOns.mouseMove
+                                },
+                            )
+                        series =
+                            arrayOf<SeriesOption>(
+                                treeSeries {
+                                    typedData = arrayOf(flareTree())
+                                    left = StringOrDouble("2%")
+                                    right = StringOrDouble("2%")
+                                    top = StringOrDouble("20%")
+                                    bottom = StringOrDouble("8%")
+                                    symbol = SymbolShape("emptyCircle")
+                                    orient = TreeOrients.bottomToTop
+                                    expandAndCollapse = true
                                     label =
                                         unsafeJso<LabelOption> {
-                                            position = LabelPosition("top")
+                                            position = LabelPosition("bottom")
                                             rotate = 90.0
                                             verticalAlign = VerticalAlign.middle
-                                            align = TextAlign.left
+                                            align = TextAlign.right
                                         }
-                                }
-                            emphasis = unsafeJso { focus = EmphasisFocuses.descendant }
-                            animationDurationUpdate = io.github.shijianjs.ktjs.echarts.options.AnimationDuration(750.0)
-                        },
-                    )
-            }
-        }
+                                    leaves =
+                                        unsafeJso {
+                                            label =
+                                                unsafeJso<LabelOption> {
+                                                    position = LabelPosition("top")
+                                                    rotate = 90.0
+                                                    verticalAlign = VerticalAlign.middle
+                                                    align = TextAlign.left
+                                                }
+                                        }
+                                    emphasis = unsafeJso { focus = EmphasisFocuses.descendant }
+                                    animationDurationUpdate = io.github.shijianjs.ktjs.echarts.options.AnimationDuration(750.0)
+                                },
+                            )
+                    }
+                }
+    }
+}

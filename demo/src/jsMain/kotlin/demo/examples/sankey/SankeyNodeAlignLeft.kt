@@ -13,30 +13,34 @@ import io.github.shijianjs.ktjs.echarts.options.sankeySeries
 import js.objects.unsafeJso
 import demo.examples.Category
 
-private val sankeyNodeAlignLeftCategory = Category(Groups.SANKEY, "examples/sankey/SankeyNodeAlignLeft.kt")
+internal class SankeyNodeAlignLeft {
+    companion object {
+        private val CATEGORY = Category(Groups.SANKEY, "examples/sankey/SankeyNodeAlignLeft.kt")
 
-val sankeyNodeAlignLeftEntry: CatalogEntry =
-    sankeyNodeAlignLeftCategory.interactive("sankey-nodeAlign-left", "桑基图左对齐布局", "Node Align Left in Sankey") { chart ->
-            loadSankeyTable("data/energy.json") { table ->
-                chart.setOption(
-                    unsafeJso<EChartsOption> {
-                        title = sankeyTitle("Node Align Left")
-                        tooltip = sankeyTooltip
-                        series =
-                            arrayOf<SeriesOption>(
-                                sankeySeries {
-                                    emphasis = unsafeJso<EmphasisOption> { focus = EmphasisFocuses.adjacency }
-                                    nodeAlign = NodeAligns.left
-                                    typedData = table.nodes
-                                    links = table.links
-                                    lineStyle =
-                                        unsafeJso<SankeyEdgeStyleOption> {
-                                            typedColor = SankeyEdgeColor("source")
-                                            curveness = 0.5
-                                        }
-                                },
-                            )
-                    },
-                )
-            }
-        }
+        val ENTRY: CatalogEntry =
+            CATEGORY.interactive("sankey-nodeAlign-left", "桑基图左对齐布局", "Node Align Left in Sankey") { chart ->
+                    loadSankeyTable("data/energy.json") { table ->
+                        chart.setOption(
+                            unsafeJso<EChartsOption> {
+                                title = sankeyTitle("Node Align Left")
+                                tooltip = sankeyTooltip
+                                series =
+                                    arrayOf<SeriesOption>(
+                                        sankeySeries {
+                                            emphasis = unsafeJso<EmphasisOption> { focus = EmphasisFocuses.adjacency }
+                                            nodeAlign = NodeAligns.left
+                                            typedData = table.nodes
+                                            links = table.links
+                                            lineStyle =
+                                                unsafeJso<SankeyEdgeStyleOption> {
+                                                    typedColor = SankeyEdgeColor("source")
+                                                    curveness = 0.5
+                                                }
+                                        },
+                                    )
+                            },
+                        )
+                    }
+                }
+    }
+}

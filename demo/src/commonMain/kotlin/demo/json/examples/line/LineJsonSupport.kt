@@ -232,16 +232,6 @@ internal fun bumpRankings(): Array<DoubleArray> {
     }
 }
 
-/** `centered text that sits above one cell of the `line-easing` mesh. */
-internal class EasingCell(
-    /** Left edge of the cell, in percent. */
-    val leftPercent: Double,
-    /** Top edge of the cell, in percent. */
-    val topPercent: Double,
-    /** Width and height of the cell, in percent. */
-    val sizePercent: Double,
-)
-
 /** Lays the easing panels out in a square mesh, as the original does. */
 internal fun easingCells(count: Int): List<EasingCell> {
     val columns = kotlin.math.ceil(kotlin.math.sqrt(count.toDouble())).toInt()
@@ -259,9 +249,6 @@ internal fun easingCells(count: Int): List<EasingCell> {
 /** Percent text rounded to two decimals, so the option stays readable. */
 internal fun percentText(value: Double): String =
     "${kotlin.math.round(value * 100) / 100.0}%"
-
-/** One easing function of `line-easing`. */
-internal class Easing(val name: String, val at: (Double) -> Double)
 
 /** `2 ^ exponent`, the base of the exponential easings. */
 internal fun twoPow(exponent: Double): Double = kotlin.math.exp(exponent * kotlin.math.ln(2.0))

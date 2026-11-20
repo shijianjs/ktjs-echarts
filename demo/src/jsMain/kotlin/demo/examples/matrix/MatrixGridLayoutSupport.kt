@@ -32,9 +32,6 @@ internal val LAYOUT_SECTIONS =
         LayoutSection("section_footer_1", hasGrid = true),
     )
 
-/** Caption of a section title. */
-internal class SectionTitle(val text: String, val top: Double, val fontSize: Double? = null)
-
 /** The captions of [LAYOUT_SECTIONS]; only the page title keeps the default font size. */
 internal val SECTION_TITLES =
     mapOf(
@@ -44,14 +41,6 @@ internal val SECTION_TITLES =
         "section_main_content_area_1" to SectionTitle("Main Content Area", 15.0, 14.0),
         "section_footer_1" to SectionTitle("Footer Section", 15.0, 14.0),
     )
-
-/** Inset of one section grid inside its matrix cell, in pixels. */
-internal class SectionGrid(
-    val top: Double,
-    val bottom: Double,
-    val left: Double,
-    val right: Double,
-)
 
 /** The grids of the four chart sections, as the upstream page insets them. */
 internal val SECTION_GRIDS =
@@ -68,11 +57,6 @@ internal val SECTION_GRIDS =
  * A coordinate is one dimension of a `coord` option: a single `0`-like value, or a `[min, max]`
  * range of cells.
  */
-internal class LayoutMedia(
-    val maxWidth: Double?,
-    val columns: Double,
-    val coords: Map<String, Array<DoubleArray>>,
-)
 
 /** The narrow arrangement: one column, every section stacked. */
 internal val NARROW_LAYOUT =

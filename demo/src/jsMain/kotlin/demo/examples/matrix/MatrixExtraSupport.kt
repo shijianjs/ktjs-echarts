@@ -61,9 +61,6 @@ internal fun sparklineData(dayCount: Int, xIndex: Int, yIndex: Int): Array<LineD
 /** One row of `matrix-mini-bar-geo`: the region name and its two values. */
 internal data class MiniBarRow(val region: String, val values: DoubleArray)
 
-/** One year of `matrix-mini-bar-geo`; the year is the series name of the mini bars. */
-internal data class MiniBarSource(val year: String, val rows: List<MiniBarRow>)
-
 internal val MINI_BAR_HEADERS = arrayOf("Region and Time", "Data A", "Data B", "Location")
 
 internal const val MINI_BAR_REGION_COL = 0

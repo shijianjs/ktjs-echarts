@@ -10,7 +10,6 @@ import io.github.shijianjs.ktjs.echarts.options.DimensionLoose
 import io.github.shijianjs.ktjs.echarts.options.EChartsOption
 import io.github.shijianjs.ktjs.echarts.options.GraphicComponentLooseOption
 import io.github.shijianjs.ktjs.echarts.options.GraphicElement
-import io.github.shijianjs.ktjs.echarts.options.OptionDataValue
 import io.github.shijianjs.ktjs.echarts.options.OptionEncode
 import io.github.shijianjs.ktjs.echarts.options.OptionEncodeValue
 import io.github.shijianjs.ktjs.echarts.options.SeriesOption
@@ -26,23 +25,9 @@ import io.github.shijianjs.ktjs.zrender.ZRColor
 import io.github.shijianjs.ktjs.zrender.ZRStyleProps
 import demo.examples.matrix.names
 import demo.examples.shared.every
-import demo.examples.shared.row
 
 /** One bar of a level: its name, value and the level its group drills into (`null` at the bottom). */
 internal class DrillRow(val name: String, val value: Double, val child: String?)
-
-/** One level of the drilldown, identified by the `groupId` shared by its rows. */
-internal class DrillLevel(val id: String, val rows: List<DrillRow>) {
-    /** The data row at [index] as `[name, value, groupId, childGroupId?]`. */
-    fun columns(index: Int): Array<OptionDataValue?> {
-        val item = rows[index]
-        return if (item.child == null) {
-            row(item.name, item.value, id)
-        } else {
-            row(item.name, item.value, id, item.child)
-        }
-    }
-}
 
 /** Every level of `bar-multi-drilldown`, in the upstream `allLevelData` order. */
 internal val DRILL_LEVELS =

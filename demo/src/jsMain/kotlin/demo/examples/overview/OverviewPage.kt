@@ -34,7 +34,6 @@ import io.github.shijianjs.ktjs.dom.css.dsl.tag
 import io.github.shijianjs.ktjs.dom.element.invoke
 import io.github.shijianjs.ktjs.dom.webcomponent.CustomElementReferenceAdapter
 import io.github.shijianjs.ktjs.vaadin.VaadinTagName
-import io.github.shijianjs.ktjs.vaadin.card.CardElement
 import io.github.shijianjs.ktjs.vaadin.card.CardVariants
 import io.github.shijianjs.ktjs.vaadin.card.createCard
 import io.github.shijianjs.ktjs.vaadin.textfield.TextFieldEvents
@@ -46,27 +45,11 @@ import web.cssom.CSSStyleSheet
 import web.cssom.Display
 import web.cssom.HtmlAttributes
 import web.cssom.None
-import web.cssom.TextDecorationLine
 import web.cssom.number
 import web.dom.Node
 import web.events.Event
 import web.events.addEventListener
-import web.html.HTMLAnchorElement
-import web.html.HTMLElement
 import web.html.HtmlTagName
-
-/** Every string this page shows, in one language. */
-private class OverviewTexts(
-    val title: String,
-    val summary: String,
-    val whatHeading: String,
-    val whatBody: String,
-    val indexHeading: String,
-    val indexHint: String,
-    val findLabel: String,
-    val findPlaceholder: String,
-    val showing: (Int, Int) -> String,
-)
 
 private val english: OverviewTexts = OverviewTexts(
     title = "Example overview",
@@ -126,17 +109,6 @@ private val INDEX_SHEET: CSSStyleSheet = cssSheet {
         textDecorationLine = None.none
     }
 }
-
-/** The card and the link around it; a language switch rewrites the title and the summary. */
-private class Card(
-    val entry: CatalogEntry,
-    val node: CardElement,
-    val link: HTMLAnchorElement,
-    val summary: HTMLElement,
-)
-
-/** One group of the index: the heading (mark and text are separate nodes) and its cards. */
-private class GroupSection(val title: HTMLElement, val label: HTMLElement, val cards: List<Card>)
 
 /**
  * Landing page: what the showcase covers and an index of every ported example.

@@ -12,7 +12,6 @@ import demo.examples.lines.coordinate
 import demo.examples.matrix.dimension
 import demo.examples.matrix.names
 import demo.examples.scatter.point
-import demo.examples.shared.every
 import demo.examples.shared.row
 
 /** Shape of the shot table: column names plus one row per shot. */
@@ -37,9 +36,6 @@ internal external interface CourtData {
 internal class HexBin(val x: Double, val y: Double) {
     val points = mutableListOf<DoubleArray>()
 }
-
-/** Result of the binning: the largest bin and every bin. */
-internal class HexBinResult(val maxBinLen: Int, val bins: List<HexBin>)
 
 /**
  * Port of the `hexBinStatistics` helper of the example (itself based on d3-hexbin).

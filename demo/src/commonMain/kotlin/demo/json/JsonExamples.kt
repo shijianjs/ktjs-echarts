@@ -1,7 +1,6 @@
 package demo.json
 
 import io.github.shijianjs.ktjs.echarts.json.EChartsOption
-import io.github.shijianjs.ktjs.echarts.json.echartsOption
 import io.github.shijianjs.ktjs.echarts.json.toJsonString
 import demo.json.examples.bar.barJsonExamples
 import demo.json.examples.calendar.calendarJsonExamples
@@ -53,12 +52,6 @@ class JsonExample internal constructor(
  * Mirrors `demo.examples.Category`: the source path is bound once per file, and every example only
  * declares the official id plus the model builder.
  */
-class JsonCategory(private val sourcePath: String) {
-    /** One example of this family. */
-    fun example(id: String, block: EChartsOption.() -> Unit): JsonExample =
-        JsonExample(id, sourcePath) { echartsOption(block) }
-}
-
 
 /** Every JSON example, keyed by the official example id. */
 val jsonExamples: Map<String, JsonExample> =

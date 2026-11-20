@@ -157,9 +157,6 @@ internal val COUNTRY_ROWS_1990: Array<CountryRow> =
         CountryRow(37062.0, 75.4, 252847810.0, "United States", 1990),
     )
 
-/** One day of the AQI table: `[day, AQI, PM2.5, PM10, CO, NO2, SO2]` plus its grade. */
-internal class AqiDay(val values: DoubleArray, val grade: String)
-
 /** Builds one [AqiDay]. */
 internal fun aqiDay(
     dayValue: Double,
@@ -394,9 +391,6 @@ internal val MATRIX_AXES = arrayOf("AQI", "PM 2.5", "PM 10", "CO", "NO₂", "SO�
 /** The grade axis of the parallel block. */
 internal val MATRIX_GRADES = arrayOf("优", "良", "轻度", "中度", "重度", "严重")
 
-/** One row of the matrix: its city, its six numbers and its grade. */
-internal class MatrixRow(val city: String, val values: DoubleArray, val grade: String)
-
 /** Nine sampled rows, three per city, of the AQI table behind `scatter-matrix`. */
 internal val MATRIX_ROWS: Array<MatrixRow> =
     arrayOf(
@@ -486,17 +480,6 @@ internal fun punchCardItems(polar: Boolean): List<DataValue> =
             }
         }
     }
-
-/** Fixed random source of `scatter-large`, standing in for its `Math.random()` calls. */
-internal class ScatterRandom(seed: Int) {
-    private var state = seed
-
-    /** Next value in `0..1`. */
-    fun next(): Double {
-        state = state * 1664525 + 1013904223
-        return (state ushr 1).toDouble() / 2147483648.0
-    }
-}
 
 /** One sine cloud of `scatter-large`, `[x, sin(x) - 0.1 * x * random + offset / 10]`. */
 internal fun largeCloud(random: ScatterRandom, offset: Double): List<DataValue> =
@@ -610,14 +593,6 @@ internal fun parallelItems(): List<DataValue> =
             textValue(row.grade),
         )
     }
-
-/** The generated grids, axes and series of the lower triangle of the matrix. */
-internal class MatrixCells(
-    val grids: List<GridOption>,
-    val xAxes: List<AxisOption>,
-    val yAxes: List<AxisOption>,
-    val series: List<SeriesOption>,
-)
 
 /** Builds the matrix the way the original walks its table: one cell per dimension pair. */
 internal fun matrixCells(): MatrixCells {

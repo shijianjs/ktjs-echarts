@@ -237,9 +237,6 @@ internal val mbtiGroupMembers =
         "SP" to arrayOf("ISFP", "ISTP", "ESFP", "ESTP"),
     )
 
-/** The base, lighter and darker tone of one MBTI group. */
-internal class MbtiShade(val base: String, val lighter: String, val darker: String)
-
 internal val mbtiShades =
     mapOf(
         "NF" to MbtiShade("#2D9A69", "#10CA77", "#0FB369"),

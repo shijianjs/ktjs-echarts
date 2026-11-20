@@ -254,17 +254,6 @@ internal fun areaSimpleValues(): DoubleArray {
     return values
 }
 
-/** One row of the `candlestick-large` dataset. */
-internal class CandleRow(
-    val label: String,
-    val open: Double,
-    val highest: Double,
-    val lowest: Double,
-    val close: Double,
-    val volume: Double,
-    val sign: Double,
-)
-
 /**
  * The OHLC table of `candlestick-large`.
  *

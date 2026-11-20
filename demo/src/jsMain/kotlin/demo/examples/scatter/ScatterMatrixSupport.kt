@@ -181,9 +181,6 @@ internal fun cellData(dimX: Int, dimY: Int): Array<ScatterDataItem?> =
         ScatterDataItem(row(row.grades[dimX], row.grades[dimY], cityOf(row)))
     }
 
-/** The generated grids, axes and series of the upper triangle of the matrix. */
-internal class MatrixCells(val grids: Array<GridOption>, val xAxes: Array<XAxisOption>, val yAxes: Array<YAxisOption>, val series: Array<SeriesOption>)
-
 /** Builds the upper triangle of the matrix the way the original does, skipping the lower half. */
 internal fun matrixCells(): MatrixCells {
     val grids = mutableListOf<GridOption>()

@@ -60,16 +60,6 @@ internal fun round2(value: Double): Double = kotlin.math.round(value * 100.0) / 
 /** Three decimals, the precision of the generated heatmap field. */
 internal fun round3(value: Double): Double = kotlin.math.round(value * 1000.0) / 1000.0
 
-/** One trading day: its date, its four prices and its volume. */
-internal class CandleRow(
-    val date: String,
-    val open: Double,
-    val close: Double,
-    val lowest: Double,
-    val highest: Double,
-    val volume: Double,
-)
-
 /**
  * A [count]-day random walk over the weekdays that follow [startEpoch].
  *
@@ -322,16 +312,6 @@ internal val LARGE_CANDLES: List<CandleRow> by lazy {
 // ---------------------------------------------------------------------------------------------
 // Box plot summaries
 // ---------------------------------------------------------------------------------------------
-
-/** One five-number summary plus the outliers of a measurement group. */
-internal class BoxSummary(
-    val low: Double,
-    val q1: Double,
-    val median: Double,
-    val q3: Double,
-    val high: Double,
-    val outliers: List<Double>,
-)
 
 /** The `quantile` of d3.js, the one ECharts uses in its boxplot transform. */
 internal fun quantile(sorted: DoubleArray, p: Double): Double {

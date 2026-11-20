@@ -168,13 +168,6 @@ internal fun ema(values: List<Pair<Double, Double>>, period: Int): List<Pair<Dou
     return out
 }
 
-/** The three MACD outputs, all on the timestamps where both the DIF and the signal line exist. */
-internal class Macd(
-    val bars: List<Pair<Double, Double>>,
-    val dif: List<Pair<Double, Double>>,
-    val dea: List<Pair<Double, Double>>,
-)
-
 /** MACD (12, 26, 9): DIF from the two EMAs, DEA as the EMA of DIF, histogram as their difference. */
 internal fun macd(walk: StockWalk): Macd {
     val short = ema(walk.prices, SHORT_PERIOD).associate { it.first to it.second }
@@ -198,9 +191,6 @@ internal fun macd(walk: StockWalk): Macd {
     }
     return Macd(bars, difOut, deaOut)
 }
-
-/** One row of the order book: a price, its amount, and whether it is a bid. */
-internal class OrderRow(val price: Double, val amount: Double, val isBid: Boolean)
 
 /**
  * The ten levels around the last price, one cent apart, skipping the price itself.

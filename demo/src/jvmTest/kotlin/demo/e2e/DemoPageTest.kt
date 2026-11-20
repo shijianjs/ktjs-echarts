@@ -23,12 +23,12 @@ class DemoPageTest {
 
         assertTrue(page.title().contains("ktjs-echarts"), "title: ${page.title()}")
         assertTrue(page.locator("#demo img.layout__logo").isVisible(), "the shell serves the project logo")
-        assertEquals("Example overview", page.locator("#demo ktjs-demo-page h1").first().textContent())
+        assertEquals("Example overview", page.locator("#demo :is(echarts-example-page, echarts-overview-page) h1").first().textContent())
 
         // One drawer row per group, one card per ported example.
         val groups = page.locator("#demo vaadin-side-nav-item").count()
         assertTrue(groups > 25, "drawer rows: $groups")
-        val cards = page.locator("#demo ktjs-demo-page a.example-card").count()
+        val cards = page.locator("#demo :is(echarts-example-page, echarts-overview-page) a.example-card").count()
         assertTrue(cards > 300, "index cards: $cards")
     }
 
@@ -37,7 +37,7 @@ class DemoPageTest {
         openPage(page)
         openRoute(page, "bar-simple")
 
-        assertEquals("Basic Bar", page.locator("#demo ktjs-demo-page h1").first().textContent())
+        assertEquals("Basic Bar", page.locator("#demo :is(echarts-example-page, echarts-overview-page) h1").first().textContent())
         waitForChart(page)
 
         val box = chartBox(page)
@@ -50,13 +50,13 @@ class DemoPageTest {
         openPage(page)
         openRoute(page, "bar-simple")
 
-        assertEquals(1, page.locator("#demo ktjs-demo-page vaadin-switch").count())
-        page.locator("#demo ktjs-demo-page vaadin-switch").first().evaluate("(el) => { el.checked = true }")
+        assertEquals(1, page.locator("#demo :is(echarts-example-page, echarts-overview-page) vaadin-switch").count())
+        page.locator("#demo :is(echarts-example-page, echarts-overview-page) vaadin-switch").first().evaluate("(el) => { el.checked = true }")
         waitForChart(page)
 
         // Re-initialising leaves one canvas behind, and the JSON card stayed where it was.
-        assertEquals(1, page.locator("#demo ktjs-demo-page demo-chart canvas").count())
-        assertEquals(2, page.locator("#demo ktjs-demo-page .section__title").count())
+        assertEquals(1, page.locator("#demo :is(echarts-example-page, echarts-overview-page) demo-chart canvas").count())
+        assertEquals(2, page.locator("#demo :is(echarts-example-page, echarts-overview-page) .section__title").count())
     }
 
     @RetryingTest(maxAttempts = 2)
@@ -64,25 +64,25 @@ class DemoPageTest {
         openPage(page)
         openRoute(page, "kmp-json/line-smooth")
 
-        assertEquals("Smooth line", page.locator("#demo ktjs-demo-page h1").first().textContent())
+        assertEquals("Smooth line", page.locator("#demo :is(echarts-example-page, echarts-overview-page) h1").first().textContent())
         assertEquals(
             listOf("Chart", "Kotlin builder", "JSON option"),
-            page.locator("#demo ktjs-demo-page .section__title").allInnerTexts(),
+            page.locator("#demo :is(echarts-example-page, echarts-overview-page) .section__title").allInnerTexts(),
         )
-        assertEquals(2, page.locator("#demo ktjs-demo-page code.code").count())
+        assertEquals(2, page.locator("#demo :is(echarts-example-page, echarts-overview-page) code.code").count())
         waitForChart(page)
     }
 
     @RetryingTest(maxAttempts = 2)
     fun `the index filter narrows the cards`(page: Page) {
         openPage(page)
-        val all = page.locator("#demo ktjs-demo-page a.example-card").count()
+        val all = page.locator("#demo :is(echarts-example-page, echarts-overview-page) a.example-card").count()
 
-        page.locator("#demo ktjs-demo-page vaadin-text-field").first().evaluate(
+        page.locator("#demo :is(echarts-example-page, echarts-overview-page) vaadin-text-field").first().evaluate(
             "(el, value) => { el.value = value; el.dispatchEvent(new Event('input')) }",
             "gauge",
         )
-        val visible = page.locator("#demo ktjs-demo-page a.example-card:not([hidden])").count()
+        val visible = page.locator("#demo :is(echarts-example-page, echarts-overview-page) a.example-card:not([hidden])").count()
         assertTrue(visible < all, "visible $visible of $all")
         assertTrue(visible > 0, "the filter matched at least one example")
     }
@@ -91,17 +91,17 @@ class DemoPageTest {
     fun `the language switch rewrites the page in place`(page: Page) {
         openPage(page)
         openRoute(page, "kmp-json/line-smooth")
-        val jsonBefore = page.locator("#demo ktjs-demo-page code.code").nth(1).textContent()
+        val jsonBefore = page.locator("#demo :is(echarts-example-page, echarts-overview-page) code.code").nth(1).textContent()
 
         switchLanguage(page, "zh-Hans")
-        assertEquals("平滑折线图", page.locator("#demo ktjs-demo-page h1").first().textContent())
+        assertEquals("平滑折线图", page.locator("#demo :is(echarts-example-page, echarts-overview-page) h1").first().textContent())
         assertEquals(
             listOf("图表", "Kotlin 构造", "JSON 选项"),
-            page.locator("#demo ktjs-demo-page .section__title").allInnerTexts(),
+            page.locator("#demo :is(echarts-example-page, echarts-overview-page) .section__title").allInnerTexts(),
         )
 
         // The serialized option is data: a language switch must not re-run the model.
-        assertEquals(jsonBefore, page.locator("#demo ktjs-demo-page code.code").nth(1).textContent())
+        assertEquals(jsonBefore, page.locator("#demo :is(echarts-example-page, echarts-overview-page) code.code").nth(1).textContent())
     }
 
     @RetryingTest(maxAttempts = 2)
@@ -136,13 +136,13 @@ class DemoPageTest {
 
     private fun openPage(page: Page) {
         page.navigate("/", Page.NavigateOptions().setWaitUntil(WaitUntilState.NETWORKIDLE))
-        page.waitForSelector("#demo ktjs-demo-page h1")
+        page.waitForSelector("#demo :is(echarts-example-page, echarts-overview-page) h1")
     }
 
     /** Clicks the drawer item for [route]; the router is also what the menu drives. */
     private fun openRoute(page: Page, route: String) {
         page.locator("#demo vaadin-side-nav-item[data-route='$route']").first().click()
-        page.waitForSelector("#demo ktjs-demo-page h1")
+        page.waitForSelector("#demo :is(echarts-example-page, echarts-overview-page) h1")
     }
 
     /** Opens the layout's language menu and picks [code]. */
@@ -162,7 +162,7 @@ class DemoPageTest {
         page.waitForFunction(
             """
             () => {
-              const pageEl = document.querySelector('ktjs-demo-layout')?.shadowRoot?.querySelector('ktjs-demo-page');
+              const pageEl = document.querySelector('ktjs-demo-layout')?.shadowRoot?.querySelector(':is(echarts-example-page, echarts-overview-page)');
               const chart = pageEl?.shadowRoot?.querySelector('demo-chart');
               return Boolean(chart && chart.querySelector('canvas') && chart.clientHeight > 0);
             }
@@ -174,7 +174,7 @@ class DemoPageTest {
         val box = page.evaluate(
             """
             () => {
-              const pageEl = document.querySelector('ktjs-demo-layout')?.shadowRoot?.querySelector('ktjs-demo-page');
+              const pageEl = document.querySelector('ktjs-demo-layout')?.shadowRoot?.querySelector(':is(echarts-example-page, echarts-overview-page)');
               const chart = pageEl?.shadowRoot?.querySelector('demo-chart');
               return chart ? [chart.clientWidth, chart.clientHeight] : [0, 0];
             }

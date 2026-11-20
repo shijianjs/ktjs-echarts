@@ -1,9 +1,10 @@
 package demo
 
-import demo.examples.overview.newOverviewPage
+import demo.examples.overview.OverviewPage
 import io.github.shijianjs.ktjs.demo.nav.DemoMenu
 import io.github.shijianjs.ktjs.demo.nav.Entry
 import io.github.shijianjs.ktjs.demo.nav.Group
+import io.github.shijianjs.ktjs.dom.element.invoke
 
 /** The Kotlin toolchain this bundle is compiled with; shown next to the title. */
 const val SITE_VERSION: String = "Kotlin/JS 2.4.21"
@@ -38,7 +39,7 @@ fun siteMenu(): DemoMenu =
         catalog.map { entry ->
             Entry(entry.id, groups.getValue(entry.group.id)) {
                 // The overview draws its own index; every other route is the shared example frame.
-                if (entry.body == ExampleBody.Custom) newOverviewPage() else newExamplePage(entry)
+                if (entry.body == ExampleBody.Custom) OverviewPage.NAME() else newExamplePage(entry)
             }
         },
     )

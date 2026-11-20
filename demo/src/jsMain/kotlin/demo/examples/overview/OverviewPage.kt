@@ -14,14 +14,14 @@ import io.github.shijianjs.ktjs.demo.i18n.Langs
 import io.github.shijianjs.ktjs.demo.i18n.Translations
 import io.github.shijianjs.ktjs.demo.i18n.texts
 import io.github.shijianjs.ktjs.demo.page.DemoPage
-import io.github.shijianjs.ktjs.demo.page.newReadout
-import io.github.shijianjs.ktjs.demo.page.anchor
-import io.github.shijianjs.ktjs.demo.page.grid
-import io.github.shijianjs.ktjs.demo.page.heading
-import io.github.shijianjs.ktjs.demo.page.icon
-import io.github.shijianjs.ktjs.demo.page.paragraph
-import io.github.shijianjs.ktjs.demo.page.row
-import io.github.shijianjs.ktjs.demo.page.sectionBlock
+import io.github.shijianjs.ktjs.demo.page.Blocks.anchor
+import io.github.shijianjs.ktjs.demo.page.Blocks.heading
+import io.github.shijianjs.ktjs.demo.page.Blocks.icon
+import io.github.shijianjs.ktjs.demo.page.Blocks.paragraph
+import io.github.shijianjs.ktjs.demo.page.Blocks.row
+import io.github.shijianjs.ktjs.demo.page.Grid
+import io.github.shijianjs.ktjs.demo.page.SectionBlock
+import io.github.shijianjs.ktjs.demo.page.Readout
 import io.github.shijianjs.ktjs.dom.css.cssSheet
 import io.github.shijianjs.ktjs.dom.css.dsl.attributeSelector
 import io.github.shijianjs.ktjs.dom.css.dsl.child
@@ -32,7 +32,7 @@ import io.github.shijianjs.ktjs.dom.css.dsl.pseudo
 import io.github.shijianjs.ktjs.dom.css.dsl.pseudoClass
 import io.github.shijianjs.ktjs.dom.css.dsl.tag
 import io.github.shijianjs.ktjs.dom.element.invoke
-import io.github.shijianjs.ktjs.dom.webcomponent.defineIfMissing
+import io.github.shijianjs.ktjs.dom.webcomponent.CustomElementReferenceAdapter
 import io.github.shijianjs.ktjs.vaadin.VaadinTagName
 import io.github.shijianjs.ktjs.vaadin.card.CardElement
 import io.github.shijianjs.ktjs.vaadin.card.CardVariants
@@ -40,8 +40,6 @@ import io.github.shijianjs.ktjs.vaadin.card.createCard
 import io.github.shijianjs.ktjs.vaadin.textfield.TextFieldEvents
 import io.github.shijianjs.ktjs.vaadin.textfield.createTextField
 import io.github.shijianjs.ktjs.vaadin.themablemixin.addTheme
-import web.components.CustomElementReference
-import web.dom.TagName
 import web.cssom.ClassName
 import web.cssom.Color
 import web.cssom.CSSStyleSheet
@@ -149,7 +147,7 @@ private class GroupSection(val title: HTMLElement, val label: HTMLElement, val c
 internal class OverviewPage : DemoPage() {
     private val binder = Binder(overviewTexts)
 
-    private val counter = newReadout()
+    private val counter = Readout.NAME { show() }
 
     private val search = createTextField { clearButtonVisible = true }
 
@@ -160,11 +158,11 @@ internal class OverviewPage : DemoPage() {
     private var currentLang: Lang = Langs.EN
 
     init {
-        val what = sectionBlock()
+        val what = SectionBlock.NAME { show() }
         binder.bind(what.heading) { it.whatHeading }
         what.body.append(binder.bind(paragraph()) { it.whatBody })
 
-        val index = sectionBlock()
+        val index = SectionBlock.NAME { show() }
         binder.bind(index.heading) { it.indexHeading }
         binder.bind(index.hint) { it.indexHint }
         index.body.append(row(search, counter.root), *buildIndex().toTypedArray())
@@ -183,7 +181,7 @@ internal class OverviewPage : DemoPage() {
             // views of one section, so they carry one icon.
             val groupLabel = HtmlTagName.span { textContent = group.titleFor(currentLang) }
             val groupTitle = row(icon(group.icon ?: ""), heading(3).apply { append(groupLabel) })
-            val list = grid(240)
+            val list = Grid.NAME { show(240) }
             val groupCards = catalogEntriesOf(group).map { entry ->
                 val card = card(entry)
                 list.append(card.link)
@@ -255,19 +253,7 @@ internal class OverviewPage : DemoPage() {
         filter()
     }
 
-    companion object : CustomElementReference<OverviewPage>(OverviewPage::class.js) {
-        val NAME: TagName<OverviewPage> = TagName("echarts-overview-page")
-
-        fun define() {
-            defineIfMissing(NAME, this)
-        }
-    }
-}
-
-/** Creates a defined `<echarts-overview-page>`. */
-internal fun newOverviewPage(): OverviewPage {
-    OverviewPage.define()
-    return OverviewPage.NAME()
+    companion object : CustomElementReferenceAdapter<OverviewPage>(OverviewPage::class.js, "echarts-overview-page")
 }
 
 /** The catalog's overview entry: this page builds its body itself. */

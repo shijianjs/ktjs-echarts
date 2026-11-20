@@ -8,6 +8,7 @@ import io.github.shijianjs.ktjs.demo.layout.LayoutConfig
 import io.github.shijianjs.ktjs.demo.style.Theme
 import web.dom.ElementId
 import web.dom.document
+import io.github.shijianjs.ktjs.dom.element.invoke
 
 /**
  * Entry point of the example gallery.
@@ -29,8 +30,10 @@ fun main() {
     // for every chart instance, so it has to run before the first page mounts.
     useEChartsGl()
 
-    ChartElement.define()
-    DemoLayout.define()
+    // The companion registers the tag in its `init`; reading `NAME` upgrades the element the page already spells.
+    ChartElement.NAME
+    // The companion registers the tag in its `init`; reading `NAME` upgrades the element the page already spells.
+    DemoLayout.NAME
 
     val layout = document.getElementById(ElementId("demo")) as? DemoLayout
         ?: error("index.html has no <ktjs-demo-layout id=\"demo\">")

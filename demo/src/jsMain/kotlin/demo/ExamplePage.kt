@@ -10,17 +10,14 @@ import io.github.shijianjs.ktjs.demo.i18n.Lang
 import io.github.shijianjs.ktjs.demo.i18n.Langs
 import io.github.shijianjs.ktjs.demo.page.DemoPage
 import io.github.shijianjs.ktjs.demo.page.SectionBlock
-import io.github.shijianjs.ktjs.demo.page.anchor
-import io.github.shijianjs.ktjs.demo.page.codeText
-import io.github.shijianjs.ktjs.demo.page.exampleBox
-import io.github.shijianjs.ktjs.demo.page.sectionBlock
+import io.github.shijianjs.ktjs.demo.page.Blocks.anchor
+import io.github.shijianjs.ktjs.demo.page.Blocks.codeText
+import io.github.shijianjs.ktjs.demo.page.Blocks.exampleBox
 import io.github.shijianjs.ktjs.dom.element.invoke
-import io.github.shijianjs.ktjs.dom.webcomponent.defineIfMissing
+import io.github.shijianjs.ktjs.dom.webcomponent.CustomElementReferenceAdapter
 import io.github.shijianjs.ktjs.vaadin.switch.SwitchElement
 import io.github.shijianjs.ktjs.vaadin.switch.SwitchEvents
 import io.github.shijianjs.ktjs.vaadin.switch.createSwitch
-import web.components.CustomElementReference
-import web.dom.TagName
 import web.events.Event
 import web.events.addEventListener
 import web.html.HTMLAnchorElement
@@ -37,7 +34,7 @@ import web.html.HTMLAnchorElement
  * [applyTranslation] is the only place strings change.
  */
 internal class ExamplePage : DemoPage() {
-    private val chartSection: SectionBlock = sectionBlock()
+    private val chartSection: SectionBlock = SectionBlock.NAME { show() }
 
     private var modelSection: SectionBlock? = null
 
@@ -79,10 +76,10 @@ internal class ExamplePage : DemoPage() {
                 val node = jsonChart(example.json)
                 chartNode = node
                 chartSection.body.append(exampleBox(null, node))
-                modelSection = sectionBlock().also {
+                modelSection = SectionBlock.NAME { show() }.also {
                     it.body.append(exampleBox(null, codeText(example.kotlinSource)))
                 }
-                jsonSection = sectionBlock().also {
+                jsonSection = SectionBlock.NAME { show() }.also {
                     it.body.append(exampleBox(null, codeText(example.json)))
                 }
             }
@@ -106,7 +103,7 @@ internal class ExamplePage : DemoPage() {
      * is the same code path a first mount takes.
      */
     private fun buildJsonSection(json: String): SectionBlock {
-        val section = sectionBlock()
+        val section = SectionBlock.NAME { show() }
         val demoSwitch = createSwitch()
         val onToggle: (Event) -> Unit = {
             val node = chartNode
@@ -146,17 +143,12 @@ internal class ExamplePage : DemoPage() {
         sourceLink?.textContent = if (zh) "Kotlin 源码" else "Kotlin source"
     }
 
-    companion object : CustomElementReference<ExamplePage>(ExamplePage::class.js) {
-        val NAME: TagName<ExamplePage> = TagName("echarts-example-page")
-
-        fun define() {
-            defineIfMissing(NAME, this)
-        }
-    }
+    companion object : CustomElementReferenceAdapter<ExamplePage>(ExamplePage::class.js, "echarts-example-page")
 }
 
 /** Creates a defined `<echarts-example-page>` showing [entry]. */
 internal fun newExamplePage(entry: CatalogEntry): ExamplePage {
-    ExamplePage.define()
+    // The companion registers the tag in its `init`; reading `NAME` upgrades the element the page already spells.
+    ExamplePage.NAME
     return ExamplePage.NAME().also { it.show(entry) }
 }

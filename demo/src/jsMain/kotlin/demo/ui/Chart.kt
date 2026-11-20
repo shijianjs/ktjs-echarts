@@ -1,15 +1,13 @@
 package demo.ui
 
 import io.github.shijianjs.ktjs.dom.webcomponent.CustomElementAdapter
-import io.github.shijianjs.ktjs.dom.webcomponent.defineIfMissing
+import io.github.shijianjs.ktjs.dom.webcomponent.CustomElementReferenceAdapter
 import io.github.shijianjs.ktjs.echarts.ECharts
 import io.github.shijianjs.ktjs.echarts.EChartsInstance
 import io.github.shijianjs.ktjs.echarts.options.EChartsOption
 import js.objects.unsafeJso
 import kotlin.js.JsAny
 import kotlin.js.js
-import web.components.CustomElementReference
-import web.dom.TagName
 import web.dom.document
 import web.events.Event
 import web.events.EventType
@@ -124,13 +122,7 @@ class ChartElement : CustomElementAdapter() {
         themeObserver = observer
     }
 
-    companion object : CustomElementReference<ChartElement>(ChartElement::class.js) {
-        val NAME: TagName<ChartElement> = TagName("demo-chart")
-
-        fun define() {
-            defineIfMissing(NAME, this)
-        }
-    }
+    companion object : CustomElementReferenceAdapter<ChartElement>(ChartElement::class.js, "demo-chart")
 }
 
 /**

@@ -5,7 +5,6 @@ import io.github.shijianjs.ktjs.echarts.options.LineStyleOption
 import io.github.shijianjs.ktjs.echarts.options.OptionDataItem
 import io.github.shijianjs.ktjs.echarts.options.strings
 import io.github.shijianjs.ktjs.echarts.options.one
-import io.github.shijianjs.ktjs.echarts.options.strings
 import js.objects.unsafeJso
 import io.github.shijianjs.ktjs.zrender.ZRColor
 import demo.examples.shared.fixed

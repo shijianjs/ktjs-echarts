@@ -161,11 +161,11 @@ internal class OverviewPage : DemoPage() {
 
     init {
         val what = sectionBlock()
-        binder.bind(what.title) { it.whatHeading }
+        binder.bind(what.heading) { it.whatHeading }
         what.body.append(binder.bind(paragraph()) { it.whatBody })
 
         val index = sectionBlock()
-        binder.bind(index.title) { it.indexHeading }
+        binder.bind(index.heading) { it.indexHeading }
         binder.bind(index.hint) { it.indexHint }
         index.body.append(row(search, counter.root), *buildIndex().toTypedArray())
 

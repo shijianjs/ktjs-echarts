@@ -39,7 +39,7 @@ fun siteMenu(): DemoMenu =
         catalog.map { entry ->
             Entry(entry.id, groups.getValue(entry.group.id)) {
                 // The overview draws its own index; every other route is the shared example frame.
-                if (entry.body == ExampleBody.Custom) OverviewPage.NAME() else newExamplePage(entry)
+                if (entry.body == ExampleBody.Custom) OverviewPage.NAME() else ExamplePage.NAME { show(entry) }
             }
         },
     )

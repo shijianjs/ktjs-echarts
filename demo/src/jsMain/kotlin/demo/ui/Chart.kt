@@ -147,17 +147,17 @@ private fun prefersDark(): Boolean =
  */
 
 /** Window timers have no typed counterpart in kotlin-browser; each call is one JavaScript expression. */
-private fun startInterval(handler: () -> Unit, delayMillis: Int): Int =
+internal fun startInterval(handler: () -> Unit, delayMillis: Int): Int =
     js("(fn, ms) => window.setInterval(fn, ms)")(handler, delayMillis) as Int
 
-private fun startTimeout(handler: () -> Unit, delayMillis: Int): Int =
+internal fun startTimeout(handler: () -> Unit, delayMillis: Int): Int =
     js("(fn, ms) => window.setTimeout(fn, ms)")(handler, delayMillis) as Int
 
-private fun cancelInterval(handle: Int) {
+internal fun cancelInterval(handle: Int) {
     js("(h) => window.clearInterval(h)")(handle)
 }
 
-private fun cancelTimeout(handle: Int) {
+internal fun cancelTimeout(handle: Int) {
     js("(h) => window.clearTimeout(h)")(handle)
 }
 

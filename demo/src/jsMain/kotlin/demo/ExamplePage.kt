@@ -145,10 +145,3 @@ internal class ExamplePage : DemoPage() {
 
     companion object : CustomElementReferenceAdapter<ExamplePage>(ExamplePage::class.js, "echarts-example-page")
 }
-
-/** Creates a defined `<echarts-example-page>` showing [entry]. */
-internal fun newExamplePage(entry: CatalogEntry): ExamplePage {
-    // The companion registers the tag in its `init`; reading `NAME` upgrades the element the page already spells.
-    ExamplePage.NAME
-    return ExamplePage.NAME().also { it.show(entry) }
-}

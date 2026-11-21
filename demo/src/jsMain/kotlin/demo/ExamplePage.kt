@@ -14,7 +14,6 @@ import io.github.shijianjs.ktjs.demo.page.Blocks.anchor
 import io.github.shijianjs.ktjs.demo.page.Blocks.codeText
 import io.github.shijianjs.ktjs.demo.page.Blocks.exampleBox
 import io.github.shijianjs.ktjs.dom.element.invoke
-import io.github.shijianjs.ktjs.dom.webcomponent.CustomElementReferenceAdapter
 import io.github.shijianjs.ktjs.vaadin.switch.SwitchElement
 import io.github.shijianjs.ktjs.vaadin.switch.SwitchEvents
 import io.github.shijianjs.ktjs.vaadin.switch.createSwitch
@@ -143,5 +142,5 @@ internal class ExamplePage : DemoPage() {
         sourceLink?.textContent = if (zh) "Kotlin 源码" else "Kotlin source"
     }
 
-    companion object : CustomElementReferenceAdapter<ExamplePage>(ExamplePage::class.js, "echarts-example-page")
+    companion object : ExamplePageDefaultReference()
 }

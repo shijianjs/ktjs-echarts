@@ -29,7 +29,6 @@ import io.github.shijianjs.ktjs.dom.css.dsl.pseudo
 import io.github.shijianjs.ktjs.dom.css.dsl.pseudoClass
 import io.github.shijianjs.ktjs.dom.css.dsl.tag
 import io.github.shijianjs.ktjs.dom.element.invoke
-import io.github.shijianjs.ktjs.dom.webcomponent.CustomElementReferenceAdapter
 import io.github.shijianjs.ktjs.vaadin.VaadinTagName
 import io.github.shijianjs.ktjs.vaadin.card.CardVariants
 import io.github.shijianjs.ktjs.vaadin.card.createCard
@@ -199,7 +198,7 @@ internal class OverviewPage : DemoPage() {
         filter()
     }
 
-    companion object : CustomElementReferenceAdapter<OverviewPage>(OverviewPage::class.js, "echarts-overview-page") {
+    companion object : OverviewPageDefaultReference() {
         /**
          * The catalog's overview entry: this page builds its body itself.
          *

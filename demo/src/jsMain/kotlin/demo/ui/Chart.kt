@@ -1,7 +1,6 @@
 package demo.ui
 
 import io.github.shijianjs.ktjs.dom.webcomponent.CustomElementAdapter
-import io.github.shijianjs.ktjs.dom.webcomponent.CustomElementReferenceAdapter
 import io.github.shijianjs.ktjs.echarts.ECharts
 import io.github.shijianjs.ktjs.echarts.EChartsInstance
 import io.github.shijianjs.ktjs.echarts.options.EChartsOption
@@ -113,7 +112,7 @@ class ChartElement : CustomElementAdapter() {
         themeObserver = observer
     }
 
-    companion object : CustomElementReferenceAdapter<ChartElement>(ChartElement::class.js, "demo-chart") {
+    companion object : ChartElementDefaultReference(name = "demo-chart") {
         /** Dark theme registered by ECharts itself; used when the document runs in dark mode. */
         private const val DARK_THEME = "dark"
         /** Height the chart takes when an example does not ask for its own. */

@@ -7,18 +7,6 @@ import io.github.shijianjs.ktjs.demo.nav.Group
 import io.github.shijianjs.ktjs.dom.element.invoke
 import demo.Catalog
 
-/** The Kotlin toolchain this bundle is compiled with; shown next to the title. */
-const val SITE_VERSION: String = "Kotlin/JS 2.4.21"
-
-/** The documentation site. */
-const val DOCS_URL: String = "https://shijianjs.github.io/ktjs-echarts/"
-
-/** Dokka reference assembled by pagesSite next to the demo. */
-const val API_URL: String = "https://shijianjs.github.io/ktjs-echarts/api/"
-
-/** Source repository, linked from the navbar's link menu. */
-const val SOURCE_URL: String = "https://github.com/shijianjs/ktjs-echarts"
-
 /**
  * The site: one entry per page, and one page per ported example.
  *

@@ -62,33 +62,25 @@ kotlin {
         }
 
         jsMain.dependencies {
-            implementation("org.jetbrains.kotlin-wrappers:kotlin-browser:2026.11.2")
+            implementation(libs.kotlin.browser)
             // Wrapper modules used by the demo.
             implementation(project(":ktjs-echarts"))
             implementation(project(":ktjs-echarts-gl"))
             // The shared demo shell: layout, menu, router, i18n, page blocks. Published to
             // `mavenLocal` by a working tree of the `ktjs-dom-kit` repository until the release batch.
-            implementation(
-                "io.github.shijianjs:ktjs-demo-kit-js:${providers.gradleProperty("ktjs-demo-kit.version").get()}",
-            )
+            implementation(libs.ktjs.demo.kit.js)
             // Components the pages compose with, and the icon set the group marks come from.
-            implementation(
-                "io.github.shijianjs:ktjs-vaadin-web-components-js:" +
-                    providers.gradleProperty("ktjs-vaadin-web-components.version").get(),
-            )
-            implementation(
-                "io.github.shijianjs:ktjs-iconify-icon-js:" +
-                    providers.gradleProperty("ktjs-iconify-icon.version").get(),
-            )
+            implementation(libs.ktjs.vaadin.web.components.js)
+            implementation(libs.ktjs.iconify.icon.js)
         }
 
         jvmTest.dependencies {
-            implementation("com.microsoft.playwright:playwright:1.61.0")
-            implementation("cn.hutool:hutool-all:5.8.48")
-            implementation("org.junit.jupiter:junit-jupiter:6.1.3")
-            implementation("org.junit-pioneer:junit-pioneer:2.3.0")
+            implementation(libs.playwright)
+            implementation(libs.hutool.all)
+            implementation(libs.junit.jupiter)
+            implementation(libs.junit.pioneer)
             implementation(kotlin("test-junit5"))
-            runtimeOnly("org.junit.platform:junit-platform-launcher:6.1.3")
+            runtimeOnly(libs.junit.platform.launcher)
         }
     }
 }
@@ -136,7 +128,7 @@ tasks.named<Test>("jvmTest") { enabled = false }
  * listing all of them. The prefix spells the tags this demo already uses: `echarts-`.
  */
 dependencies {
-    add("kspJs", "io.github.shijianjs:ktjs-dom-kit-ksp:${providers.gradleProperty("ktjs-dom-kit.version").get()}")
+    add("kspJs", libs.ktjs.dom.kit.processor)
 }
 
 ksp {

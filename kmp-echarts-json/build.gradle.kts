@@ -31,8 +31,8 @@ kotlin {
         commonMain.dependencies {
             // Both are public API: JsonElement appears in escape hatches, Instant/LocalDateTime in
             // time values.
-            api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.13.0")
-            api("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0")
+            api(libs.serialization.json)
+            api(libs.datetime)
         }
         commonTest.dependencies {
             implementation(kotlin("test"))

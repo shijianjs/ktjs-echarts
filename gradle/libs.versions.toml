@@ -32,7 +32,7 @@ hutool = "5.8.48"
 ktjs-docusaurus = "3.10.2-kt.2-SNAPSHOT"
 ktjs-docusaurus-kit = "0.1.0-SNAPSHOT"
 ktjs-demo-kit = "0.1.0-SNAPSHOT"
-ktjs-vaadin-web-components = "25.3.5-kt.8-SNAPSHOT"
+ktjs-vaadin-web-components = "25.3.6-kt.8-SNAPSHOT"
 ktjs-iconify-icon = "3.0.5-kt.6-SNAPSHOT"
 ktjs-dom-kit = "0.1.0-SNAPSHOT"
 
